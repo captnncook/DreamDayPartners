@@ -1,0 +1,312 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  role       String   // admin | planner | team_member | couple | vendor
+  vendorType String?  // bloemist | dj | catering | fotograaf | etc.
+  avatar     String?
+  isPremium  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  ownedWeddings     Wedding[]           @relation("WeddingOwner")
+  teamMemberships   WeddingTeamMember[]
+  sentMessages      Message[]
+  assignedTasks     Task[]
+  uploadedDocuments Document[]
+  notifications     Notification[]
+
+  @@map("users")
+}
+
+model Wedding {
+  id           String   @id @default(uuid())
+  weddingCode  String   @unique
+  title        String
+  date         DateTime
+  venue        String?
+  status       String   @default("planning")
+  coupleEmail1 String
+  coupleEmail2 String
+  ownerId      String
+  isPremium    Boolean  @default(false)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  owner         User                @relation("WeddingOwner", fields: [ownerId], references: [id])
+  teamMembers   WeddingTeamMember[]
+  vendors       WeddingVendor[]
+  guests        Guest[]
+  budget        Budget?
+  tasks         Task[]
+  draaiboeken   Draaiboek[]
+  threads       MessageThread[]
+  documents     Document[]
+  notifications Notification[]
+  seatTables    SeatingTable[]
+
+  @@map("weddings")
+}
+
+model WeddingTeamMember {
+  id        String   @id @default(uuid())
+  weddingId String
+  userId    String
+  role      String   // planner | team_member | couple | vendor_contact
+  createdAt DateTime @default(now())
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([weddingId, userId])
+  @@map("wedding_team_members")
+}
+
+model Vendor {
+  id            String  @id @default(uuid())
+  name          String
+  category      String
+  contactPerson String?
+  email         String?
+  phone         String?
+  website       String?
+  notes         String?
+  userId        String?
+
+  weddingVendors WeddingVendor[]
+  draaiboekItems DraaiboekItem[]
+  budgetItems    BudgetItem[]
+
+  @@map("vendors")
+}
+
+model WeddingVendor {
+  id           String   @id @default(uuid())
+  weddingId    String
+  vendorId     String
+  status       String   @default("contacted")
+  portalAccess Boolean  @default(false)
+  notes        String?
+  contractUrl  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  vendor  Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([weddingId, vendorId])
+  @@map("wedding_vendors")
+}
+
+model Guest {
+  id         String   @id @default(uuid())
+  weddingId  String
+  name       String
+  email      String?
+  phone      String?
+  side       String   @default("both")
+  rsvpStatus String   @default("invited")
+  dietary    String?
+  plusOne    Boolean  @default(false)
+  tableId    String?
+  rsvpToken  String   @unique @default(uuid())
+  createdAt  DateTime @default(now())
+
+  wedding      Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  seatingTable SeatingTable? @relation(fields: [tableId], references: [id])
+
+  @@map("guests")
+}
+
+model SeatingTable {
+  id        String  @id @default(uuid())
+  weddingId String
+  label     String
+  capacity  Int     @default(8)
+  notes     String?
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  guests  Guest[]
+
+  @@map("seating_tables")
+}
+
+model Budget {
+  id          String @id @default(uuid())
+  weddingId   String @unique
+  totalAmount Float  @default(0)
+  currency    String @default("EUR")
+
+  wedding Wedding      @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  items   BudgetItem[]
+
+  @@map("budgets")
+}
+
+model BudgetItem {
+  id          String  @id @default(uuid())
+  budgetId    String
+  category    String
+  description String
+  estimated   Float   @default(0)
+  actual      Float   @default(0)
+  vendorId    String?
+  payStatus   String  @default("pending")
+  invoiceUrl  String?
+
+  budget Budget  @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  vendor Vendor? @relation(fields: [vendorId], references: [id])
+
+  @@map("budget_items")
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  weddingId   String
+  title       String
+  description String?
+  dueDate     DateTime?
+  category    String    @default("general")
+  assignedTo  String?
+  status      String    @default("open")
+  priority    String    @default("medium")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  wedding      Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  assignedUser User?   @relation(fields: [assignedTo], references: [id])
+
+  @@map("tasks")
+}
+
+model Draaiboek {
+  id        String   @id @default(uuid())
+  weddingId String
+  title     String
+  version   String   @default("1.0")
+  status    String   @default("draft")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wedding Wedding         @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  items   DraaiboekItem[]
+
+  @@map("draaiboeken")
+}
+
+model DraaiboekItem {
+  id             String  @id @default(uuid())
+  draaiboekId    String
+  startTime      String
+  duration       Int     @default(30)
+  title          String
+  description    String?
+  location       String?
+  sortOrder      Int     @default(0)
+  assignedUserId String?
+  vendorId       String?
+  notes          String?
+
+  draaiboek Draaiboek @relation(fields: [draaiboekId], references: [id], onDelete: Cascade)
+  vendor    Vendor?   @relation(fields: [vendorId], references: [id])
+
+  @@map("draaiboek_items")
+}
+
+model MessageThread {
+  id        String   @id @default(uuid())
+  weddingId String
+  type      String   // internal | couple | vendor
+  vendorId  String?
+  subject   String?
+  createdAt DateTime @default(now())
+
+  wedding  Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@map("message_threads")
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  threadId      String
+  senderId      String
+  content       String
+  hasAttachment Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  thread      MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender      User          @relation(fields: [senderId], references: [id])
+  reads       MessageRead[]
+  attachments Attachment[]
+
+  @@map("messages")
+}
+
+model MessageRead {
+  id        String   @id @default(uuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@map("message_reads")
+}
+
+model Attachment {
+  id        String @id @default(uuid())
+  messageId String
+  fileUrl   String
+  fileName  String
+  fileType  String
+  size      Int
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+model Document {
+  id         String   @id @default(uuid())
+  weddingId  String
+  name       String
+  fileUrl    String
+  category   String   @default("other")
+  visibility String   @default("team")
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  wedding  Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  uploader User    @relation(fields: [uploadedBy], references: [id])
+
+  @@map("documents")
+}
+
+model Notification {
+  id          String    @id @default(uuid())
+  userId      String
+  weddingId   String?
+  type        String
+  content     String
+  relatedType String?
+  relatedId   String?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wedding Wedding? @relation(fields: [weddingId], references: [id], onDelete: SetNull)
+
+  @@map("notifications")
+}
