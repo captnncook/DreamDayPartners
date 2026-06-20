@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -282,9 +282,11 @@ model Document {
   id         String   @id @default(uuid())
   weddingId  String
   name       String
-  fileUrl    String
-  category   String   @default("other")
-  visibility String   @default("team")
+  fileKey    String
+  mimeType   String   @default("application/octet-stream")
+  fileSize   Int      @default(0)
+  category   String   @default("overig") // inspiratie | offerte | factuur | contract | overig
+  visibility String   @default("team")   // team | couple | vendor | private
   uploadedBy String
   createdAt  DateTime @default(now())
 
