@@ -2,8 +2,8 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "npx prisma migrate deploy && npm run db:seed && npm start"
+startCommand = "npx prisma migrate deploy && (npm run db:seed || true) && npm start"
 healthcheckPath = "/"
-healthcheckTimeout = 60
+healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
