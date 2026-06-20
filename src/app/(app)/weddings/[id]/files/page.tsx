@@ -122,12 +122,15 @@ export default function FilesPage() {
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
+      {/* Header */}
       <div className="mb-6">
         <Link href={`/weddings/${id}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
           <div>
             <h1 className="text-2xl font-bold">Bestanden</h1>
-            <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>Inspiratie, offertes, facturen en contracten</p>
+            <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
+              Inspiratie, offertes, facturen en contracten
+            </p>
           </div>
           <button onClick={() => setShowUpload(!showUpload)} className="ddp-btn-primary">
             {showUpload ? "Annuleren" : "+ Uploaden"}
@@ -135,16 +138,24 @@ export default function FilesPage() {
         </div>
       </div>
 
+      {/* Upload form */}
       {showUpload && (
         <form onSubmit={handleUpload} className="ddp-card mb-6">
           <h3 className="font-semibold mb-4">Bestand uploaden</h3>
+
+          {/* File drop zone */}
           <div
             className="border-2 border-dashed rounded-xl p-8 text-center mb-4 cursor-pointer transition-colors"
             style={{ borderColor: selectedFile ? "var(--primary)" : "var(--border)", background: selectedFile ? "var(--accent)" : undefined }}
             onClick={() => fileInputRef.current?.click()}
           >
-            <input ref={fileInputRef} type="file" className="hidden"
-              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileSelect} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+              onChange={handleFileSelect}
+            />
             {selectedFile ? (
               <div>
                 <div className="text-3xl mb-2">{fileIcon(selectedFile.type)}</div>
@@ -155,7 +166,9 @@ export default function FilesPage() {
               <div>
                 <div className="text-3xl mb-2">📂</div>
                 <div className="text-sm font-medium">Klik om bestand te kiezen</div>
-                <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>Afbeeldingen, PDF, Word, Excel — max 50 MB</div>
+                <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>
+                  Afbeeldingen, PDF, Word, Excel — max 50 MB
+                </div>
               </div>
             )}
           </div>
@@ -164,14 +177,22 @@ export default function FilesPage() {
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-xs font-medium mb-1">Naam</label>
-                <input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                   placeholder="Naam van het bestand"
-                  className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--border)" }}
+                />
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1">Categorie</label>
-                <select value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--border)" }}
+                >
                   {CATEGORIES.filter((c) => c.value !== "all").map((c) => (
                     <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
                   ))}
@@ -180,36 +201,52 @@ export default function FilesPage() {
             </div>
           )}
 
+          {/* Progress bar */}
           {uploading && (
             <div className="mb-4">
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
-                <div className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress}%`, background: "var(--primary)" }} />
+                <div
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%`, background: "var(--primary)" }}
+                />
               </div>
-              <div className="text-xs mt-1 text-center" style={{ color: "var(--muted)" }}>Uploaden naar Cloudflare R2...</div>
+              <div className="text-xs mt-1 text-center" style={{ color: "var(--muted)" }}>
+                Uploaden naar Cloudflare R2...
+              </div>
             </div>
           )}
 
-          <button type="submit" disabled={!selectedFile || uploading} className="ddp-btn-primary w-full">
+          <button
+            type="submit"
+            disabled={!selectedFile || uploading}
+            className="ddp-btn-primary w-full"
+          >
             {uploading ? "Bezig met uploaden..." : "Bestand uploaden"}
           </button>
         </form>
       )}
 
+      {/* Category filter */}
       <div className="flex gap-2 flex-wrap mb-6">
         {CATEGORIES.map((cat) => (
-          <button key={cat.value} onClick={() => setActiveCategory(cat.value)}
+          <button
+            key={cat.value}
+            onClick={() => setActiveCategory(cat.value)}
             className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
             style={{
               background: activeCategory === cat.value ? "var(--primary)" : "var(--accent)",
               color: activeCategory === cat.value ? "white" : "var(--foreground)",
-            }}>
+            }}
+          >
             {cat.icon && `${cat.icon} `}{cat.label}
-            {cat.value === "all" ? ` (${documents.length})` : ` (${documents.filter((d) => d.category === cat.value).length})`}
+            {cat.value === "all"
+              ? ` (${documents.length})`
+              : ` (${documents.filter((d) => d.category === cat.value).length})`}
           </button>
         ))}
       </div>
 
+      {/* Files grid */}
       {filtered.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
           <div className="text-4xl mb-3">📂</div>
@@ -219,39 +256,62 @@ export default function FilesPage() {
               ? "Upload inspiratie, offertes, facturen of contracten"
               : `Geen ${CATEGORIES.find((c) => c.value === activeCategory)?.label.toLowerCase()} gevonden`}
           </p>
-          <button onClick={() => setShowUpload(true)} className="ddp-btn-primary">Eerste bestand uploaden</button>
+          <button onClick={() => setShowUpload(true)} className="ddp-btn-primary">
+            Eerste bestand uploaden
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {filtered.map((doc) => {
+            const isImage = doc.mimeType.startsWith("image/");
             const catInfo = CATEGORIES.find((c) => c.value === doc.category);
             return (
-              <div key={doc.id} className="ddp-card p-0 overflow-hidden">
-                <div className="h-32 flex items-center justify-center text-5xl cursor-pointer"
+              <div key={doc.id} className="ddp-card p-0 overflow-hidden group">
+                {/* Preview area */}
+                <div
+                  className="h-32 flex items-center justify-center text-5xl cursor-pointer"
                   style={{ background: "var(--accent)" }}
-                  onClick={() => handleDownload(doc)}>
-                  {fileIcon(doc.mimeType)}
+                  onClick={() => handleDownload(doc)}
+                >
+                  {isImage ? "🖼️" : fileIcon(doc.mimeType)}
                 </div>
+
+                {/* Info */}
                 <div className="p-3">
-                  <div className="text-sm font-medium truncate mb-1" title={doc.name}>{doc.name}</div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="ddp-badge badge-neutral" style={{ fontSize: "0.65rem" }}>
-                      {catInfo?.icon} {catInfo?.label ?? doc.category}
-                    </span>
-                    <span className="text-xs" style={{ color: "var(--muted)" }}>{formatSize(doc.fileSize)}</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium truncate" title={doc.name}>{doc.name}</div>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="ddp-badge badge-neutral" style={{ fontSize: "0.65rem" }}>
+                          {catInfo?.icon} {catInfo?.label ?? doc.category}
+                        </span>
+                        <span className="text-xs" style={{ color: "var(--muted)" }}>{formatSize(doc.fileSize)}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: "var(--border)" }}>
+
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t" style={{ borderColor: "var(--border)" }}>
                     <div className="text-xs" style={{ color: "var(--muted)" }}>
                       <div>{doc.uploader.name}</div>
                       <div>{formatDate(doc.createdAt)}</div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleDownload(doc)}
-                        className="text-xs px-2 py-1 rounded-md hover:opacity-80"
-                        style={{ background: "var(--accent)", color: "var(--primary)" }}>↓</button>
-                      <button onClick={() => handleDelete(doc)}
-                        className="text-xs px-2 py-1 rounded-md hover:opacity-80"
-                        style={{ background: "#fde8e8", color: "var(--danger)" }}>✕</button>
+                      <button
+                        onClick={() => handleDownload(doc)}
+                        className="text-xs px-2 py-1 rounded-md transition-colors hover:opacity-80"
+                        style={{ background: "var(--accent)", color: "var(--primary)" }}
+                        title="Downloaden / bekijken"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        onClick={() => handleDelete(doc)}
+                        className="text-xs px-2 py-1 rounded-md transition-colors hover:opacity-80"
+                        style={{ background: "#fde8e8", color: "var(--danger)" }}
+                        title="Verwijderen"
+                      >
+                        ✕
+                      </button>
                     </div>
                   </div>
                 </div>

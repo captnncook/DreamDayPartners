@@ -61,6 +61,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
     { href: `/weddings/${id}/tasks`, label: "Taken" },
     { href: `/weddings/${id}/guests`, label: "Gasten" },
     { href: `/weddings/${id}/budget`, label: "Budget" },
+    { href: `/weddings/${id}/files`, label: "Bestanden" },
     { href: `/weddings/${id}/draaiboek`, label: "Draaiboek" },
     { href: `/weddings/${id}/messages`, label: "Berichten" },
     { href: `/weddings/${id}/vendors`, label: "Leveranciers" },
@@ -68,12 +69,14 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
+      {/* Breadcrumb */}
       <div className="mb-6">
         <Link href="/weddings" className="text-sm hover:underline" style={{ color: "var(--muted)" }}>
           ← Bruiloften
         </Link>
       </div>
 
+      {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -97,6 +100,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
+      {/* Tabs */}
       <div className="flex gap-1 border-b mb-6 overflow-x-auto" style={{ borderColor: "var(--border)" }}>
         {tabs.map((tab) => (
           <Link
@@ -110,8 +114,11 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
         ))}
       </div>
 
+      {/* Overview grid */}
       <div className="grid grid-cols-3 gap-6">
+        {/* Left: stats */}
         <div className="col-span-2 space-y-5">
+          {/* Quick stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="ddp-card text-center">
               <div className="text-2xl font-bold" style={{ color: "var(--primary)" }}>{guestConfirmed}</div>
@@ -127,30 +134,39 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
+          {/* Budget */}
           {wedding.budget && (
             <div className="ddp-card">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm">Budget</h3>
-                <Link href={`/weddings/${id}/budget`} className="text-xs" style={{ color: "var(--primary)" }}>Details →</Link>
+                <Link href={`/weddings/${id}/budget`} className="text-xs" style={{ color: "var(--primary)" }}>
+                  Details →
+                </Link>
               </div>
               <div className="flex justify-between text-sm mb-2">
                 <span>€{spent.toLocaleString("nl-NL")} uitgegeven</span>
                 <span style={{ color: "var(--muted)" }}>van €{totalBudget.toLocaleString("nl-NL")}</span>
               </div>
               <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--accent)" }}>
-                <div className="h-full rounded-full transition-all" style={{
-                  width: `${budgetPct}%`,
-                  background: budgetPct > 90 ? "#e05252" : budgetPct > 70 ? "var(--warning)" : "var(--primary)",
-                }} />
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${budgetPct}%`,
+                    background: budgetPct > 90 ? "#e05252" : budgetPct > 70 ? "var(--warning)" : "var(--primary)",
+                  }}
+                />
               </div>
               <div className="text-xs mt-1 text-right" style={{ color: "var(--muted)" }}>{budgetPct}%</div>
             </div>
           )}
 
+          {/* Recent tasks */}
           <div className="ddp-card">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-sm">Recente taken</h3>
-              <Link href={`/weddings/${id}/tasks`} className="text-xs" style={{ color: "var(--primary)" }}>Alle taken →</Link>
+              <Link href={`/weddings/${id}/tasks`} className="text-xs" style={{ color: "var(--primary)" }}>
+                Alle taken →
+              </Link>
             </div>
             <div className="space-y-2">
               {wedding.tasks.slice(0, 4).map((task) => (
@@ -164,8 +180,11 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                     </span>
                   </div>
                   {task.assignedUser && (
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0"
-                      style={{ background: "var(--primary)" }} title={task.assignedUser.name}>
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs flex-shrink-0"
+                      style={{ background: "var(--primary)" }}
+                      title={task.assignedUser.name}
+                    >
                       {task.assignedUser.name.charAt(0)}
                     </div>
                   )}
@@ -177,10 +196,13 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
+          {/* Vendors */}
           <div className="ddp-card">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-sm">Leveranciers</h3>
-              <Link href={`/weddings/${id}/vendors`} className="text-xs" style={{ color: "var(--primary)" }}>Beheren →</Link>
+              <Link href={`/weddings/${id}/vendors`} className="text-xs" style={{ color: "var(--primary)" }}>
+                Beheren →
+              </Link>
             </div>
             <div className="space-y-2">
               {wedding.vendors.map((wv) => (
@@ -207,14 +229,17 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
 
+        {/* Right: team + notes */}
         <div className="space-y-5">
           <div className="ddp-card">
             <h3 className="font-semibold text-sm mb-3">Team</h3>
             <div className="space-y-3">
               {wedding.teamMembers.map((m) => (
                 <div key={m.id} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                    style={{ background: "var(--primary)" }}>
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                    style={{ background: "var(--primary)" }}
+                  >
                     {m.user.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
@@ -235,17 +260,22 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
 
+          {/* Quick links */}
           <div className="ddp-card">
             <h3 className="font-semibold text-sm mb-3">Snelle toegang</h3>
             <div className="space-y-1">
               {[
                 { href: `/weddings/${id}/draaiboek`, label: "📋 Draaiboek openen", show: true },
                 { href: `/weddings/${id}/guests`, label: "👥 Gastenlijst", show: true },
+                { href: `/weddings/${id}/files`, label: "📂 Bestanden", show: true },
                 { href: `/weddings/${id}/budget`, label: "💶 Budget bekijken", show: user.role !== "couple" },
                 { href: `/weddings/${id}/messages`, label: "💬 Berichten", show: true },
               ].filter((l) => l.show).map((link) => (
-                <Link key={link.href} href={link.href}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                >
                   {link.label}
                 </Link>
               ))}
