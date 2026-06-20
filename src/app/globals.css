@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fdf9f7;
+  --foreground: #1a1a1a;
+  --primary: #c9956a;
+  --primary-dark: #a87850;
+  --accent: #e8d5c4;
+  --surface: #ffffff;
+  --border: #e5ddd8;
+  --muted: #8a7a72;
+  --success: #4caf7d;
+  --warning: #f5a623;
+  --danger: #e05252;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.ddp-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.ddp-btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ddp-btn-primary:hover { background: var(--primary-dark); }
+
+.ddp-btn-secondary {
+  background: white;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.ddp-btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+.ddp-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-success { background: #dcf5e8; color: #1a7a4a; }
+.badge-warning { background: #fef3dc; color: #b37a00; }
+.badge-danger  { background: #fde8e8; color: #c43a3a; }
+.badge-info    { background: #e3eeff; color: #2856c4; }
+.badge-neutral { background: #f0ede9; color: #6b5e56; }
+.badge-premium { background: linear-gradient(135deg, #f5d080, #e8a84a); color: #5a3800; }
