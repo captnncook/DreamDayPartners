@@ -66,16 +66,25 @@ export default async function DashboardPage() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold tracking-tight">{greetings[user.role] ?? "Welkom"}</h1>
-        <p className="text-sm mt-1.5" style={{ color: "var(--muted)" }}>
+    <div className="px-4 py-6 md:p-8 max-w-6xl mx-auto">
+      <div className="mb-6 md:mb-8">
+        <h1
+          style={{
+            fontSize: "clamp(1.5rem, 5vw, 2rem)",
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            color: "var(--foreground)",
+          }}
+        >
+          {greetings[user.role] ?? "Welkom"}
+        </h1>
+        <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
           {new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>
       </div>
 
       {user.role !== "couple" && user.role !== "vendor" && (
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 md:mb-8">
           <StatCard label="Bruiloften" value={weddings.length} icon={Heart} />
           <StatCard label="Open taken" value={myTasks.length} icon={CheckSquare} />
           <StatCard label="Komende 30 dagen" value={weddings.filter((w) => daysUntil(w.date) <= 30 && daysUntil(w.date) > 0).length} icon={Calendar} />
@@ -83,8 +92,8 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+        <div className="md:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-base">
               {user.role === "vendor" ? "Jouw bruiloften" : user.role === "couple" ? "Onze bruiloft" : "Bruiloften"}
@@ -199,13 +208,27 @@ export default async function DashboardPage() {
 
 function StatCard({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
-    <div className="ddp-stat-card">
-      <div className="flex items-center justify-between">
+    <div className="ddp-card" style={{ padding: "1.125rem 1.25rem" }}>
+      <div className="flex items-center justify-between gap-2">
         <div>
-          <div className="text-2xl font-bold tracking-tight mb-0.5" style={{ color: "var(--foreground)" }}>{value}</div>
-          <div className="text-xs font-medium" style={{ color: "var(--muted)" }}>{label}</div>
+          <div
+            style={{
+              fontSize: "2rem",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1,
+              color: "var(--foreground)",
+              marginBottom: "4px",
+            }}
+          >
+            {value}
+          </div>
+          <div style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>{label}</div>
         </div>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: "var(--accent)" }}
+        >
           <Icon className="w-5 h-5" style={{ color: "var(--primary)" }} />
         </div>
       </div>
