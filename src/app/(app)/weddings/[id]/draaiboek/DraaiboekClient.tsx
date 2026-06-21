@@ -135,7 +135,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <Link href={`/weddings/${weddingId}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
@@ -180,7 +180,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
           <div className="space-y-2">
             <div className="text-xs font-semibold mb-3 uppercase tracking-wide" style={{ color: "var(--muted)" }}>Versies</div>
             {draaiboeken.map((d) => (
@@ -202,7 +202,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
             ))}
           </div>
 
-          <div className="col-span-3">
+          <div className="lg:col-span-3">
             {activeDraaiboek && (
               <>
                 {showAddItem && !isReadOnly && (

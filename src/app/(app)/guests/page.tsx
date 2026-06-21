@@ -23,7 +23,7 @@ export default async function AllGuestsPage() {
   const totalConfirmed = weddings.reduce((s, w) => s + w.guests.filter((g) => g.rsvpStatus === "confirmed").length, 0);
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-2">Gasten</h1>
       <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>{totalGuests} gasten totaal · {totalConfirmed} bevestigd</p>
       <div className="space-y-6">
@@ -33,7 +33,7 @@ export default async function AllGuestsPage() {
               <h2 className="font-semibold">{w.title}</h2>
               <Link href={`/weddings/${w.id}/guests`} className="text-sm" style={{ color: "var(--primary)" }}>Beheren →</Link>
             </div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {["confirmed","invited","no_response","declined"].map((status) => {
                 const count = w.guests.filter((g) => g.rsvpStatus === status).length;
                 return (

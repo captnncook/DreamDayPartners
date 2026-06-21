@@ -21,7 +21,7 @@ export default async function AllBudgetPage() {
   });
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Budget overzicht</h1>
       <div className="space-y-4">
         {weddings.map((w) => {

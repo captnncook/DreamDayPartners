@@ -23,7 +23,7 @@ export default async function MyTasksPage() {
   });
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-2">Mijn taken</h1>
       <p className="text-sm mb-8" style={{ color: "var(--muted)" }}>{tasks.length} taken toegewezen aan jou</p>
       {tasks.length === 0 ? (

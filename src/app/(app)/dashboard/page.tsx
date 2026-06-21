@@ -65,16 +65,16 @@ export default async function DashboardPage() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold tracking-tight">{greetings[user.role] ?? "Welkom"}</h1>
+    <div className="px-4 py-5 md:px-6 md:py-7 lg:p-8 max-w-6xl mx-auto">
+      <div className="mb-6 lg:mb-8">
+        <h1 className="font-serif text-2xl lg:text-3xl font-bold tracking-tight">{greetings[user.role] ?? "Welkom"}</h1>
         <p className="text-sm mt-1.5" style={{ color: "var(--muted)" }}>
           {new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>
       </div>
 
       {user.role !== "couple" && user.role !== "vendor" && (
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 lg:mb-8">
           <StatCard label="Bruiloften" value={weddings.length} icon="💍" />
           <StatCard label="Open taken" value={myTasks.length} icon="✅" />
           <StatCard label="Komende 30 dagen" value={weddings.filter((w) => daysUntil(w.date) <= 30 && daysUntil(w.date) > 0).length} icon="📅" />
@@ -82,8 +82,8 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-base">
               {user.role === "vendor" ? "Jouw bruiloften" : user.role === "couple" ? "Onze bruiloft" : "Bruiloften"}

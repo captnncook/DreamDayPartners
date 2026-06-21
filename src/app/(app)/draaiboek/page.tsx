@@ -23,7 +23,7 @@ export default async function AllDraaiboekPage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-2">Draaiboeken</h1>
       <p className="text-sm mb-8" style={{ color: "var(--muted)" }}>{user.role === "vendor" ? "Jouw onderdelen in het draaiboek" : "Overzicht van alle draaiboeken"}</p>
       {weddings.length === 0 ? (

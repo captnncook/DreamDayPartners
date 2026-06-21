@@ -79,7 +79,7 @@ export default function TasksPage() {
   if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-4xl mx-auto">
       <div className="mb-6">
         <Link href={`/weddings/${id}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
@@ -98,7 +98,7 @@ export default function TasksPage() {
           <textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
             placeholder="Omschrijving (optioneel)" rows={2}
             className="w-full border rounded-lg px-3 py-2 text-sm resize-none" style={{ borderColor: "var(--border)" }} />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium mb-1">Deadline</label>
               <input type="date" value={form.dueDate} onChange={(e) => setForm((p) => ({ ...p, dueDate: e.target.value }))}

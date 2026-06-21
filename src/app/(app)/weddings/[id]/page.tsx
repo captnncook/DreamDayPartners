@@ -59,35 +59,35 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-6xl mx-auto">
       {/* Breadcrumb */}
-      <div className="mb-6">
+      <div className="mb-4 lg:mb-6">
         <Link href="/weddings" className="text-sm hover:underline" style={{ color: "var(--muted)" }}>
           ← Bruiloften
         </Link>
       </div>
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl font-bold">{wedding.title}</h1>
+      <div className="flex items-start justify-between mb-5 lg:mb-6 gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <h1 className="text-xl lg:text-2xl font-bold">{wedding.title}</h1>
             <span className={`ddp-badge ${statusColors[wedding.status] ?? "badge-neutral"}`}>
               {statusLabels[wedding.status] ?? wedding.status}
             </span>
             {wedding.isPremium && <span className="ddp-badge badge-premium">Premium</span>}
           </div>
-          <div className="flex items-center gap-4 text-sm" style={{ color: "var(--muted)" }}>
+          <div className="flex flex-wrap items-center gap-2 lg:gap-4 text-sm" style={{ color: "var(--muted)" }}>
             <span>📅 {formatDate(wedding.date)}</span>
             {wedding.venue && <span>📍 {wedding.venue}</span>}
             <span className="font-mono text-xs">{wedding.weddingCode}</span>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold" style={{ color: days < 30 ? "#e05252" : "var(--primary)" }}>
+        <div className="text-right flex-shrink-0">
+          <div className="text-2xl lg:text-3xl font-bold" style={{ color: days < 30 ? "#e05252" : "var(--primary)" }}>
             {days > 0 ? days : 0}
           </div>
-          <div className="text-xs" style={{ color: "var(--muted)" }}>{days > 0 ? "dagen" : "dagen geleden"}</div>
+          <div className="text-xs" style={{ color: "var(--muted)" }}>{days > 0 ? "dagen" : "geleden"}</div>
         </div>
       </div>
 
@@ -95,11 +95,11 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
       <TabNav id={id} />
 
       {/* Overview grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Left: stats */}
-        <div className="col-span-2 space-y-5">
+        <div className="lg:col-span-2 space-y-4 lg:space-y-5">
           {/* Quick stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div className="ddp-card text-center">
               <div className="text-2xl font-bold" style={{ color: "var(--primary)" }}>{guestConfirmed}</div>
               <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>van {wedding._count.guests} gasten bevestigd</div>

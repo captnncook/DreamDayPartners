@@ -164,7 +164,7 @@ export default function VendorDetailPage() {
   const icon = VENDOR_ICONS[wv.vendor.category] ?? "🤝";
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-4xl mx-auto">
       {/* Breadcrumb */}
       <div className="mb-6">
         <Link href={`/weddings/${id}/team`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>

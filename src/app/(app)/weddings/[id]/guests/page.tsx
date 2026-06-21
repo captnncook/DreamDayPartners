@@ -87,7 +87,7 @@ export default function GuestsPage() {
   if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <Link href={`/weddings/${id}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
@@ -98,7 +98,7 @@ export default function GuestsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {Object.entries(stats).map(([key, count]) => (
           <div key={key} className="ddp-card text-center p-3 cursor-pointer"
             onClick={() => setFilterRsvp(filterRsvp === key ? "all" : key)}

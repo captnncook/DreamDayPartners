@@ -38,7 +38,7 @@ export default function NewWeddingPage() {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-2xl mx-auto">
       <div className="mb-8">
         <Link href="/weddings" className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug naar bruiloften</Link>
         <h1 className="text-2xl font-bold mt-4">Nieuwe bruiloft aanmaken</h1>

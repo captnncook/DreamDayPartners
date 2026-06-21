@@ -19,7 +19,7 @@ export default async function AllVendorsPage() {
   });
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="px-4 py-5 md:px-6 lg:p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Leveranciers</h1>
       {weddings.map((w) => (
         <div key={w.id} className="mb-8">
@@ -27,7 +27,7 @@ export default async function AllVendorsPage() {
             <h2 className="font-semibold">{w.title}</h2>
             <Link href={`/weddings/${w.id}/vendors`} className="text-sm" style={{ color: "var(--primary)" }}>Beheren →</Link>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {w.vendors.map((wv) => (
               <div key={wv.id} className="ddp-card p-3">
                 <div className="flex items-center gap-2 mb-2">

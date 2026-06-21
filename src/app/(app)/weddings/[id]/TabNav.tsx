@@ -22,14 +22,17 @@ export default function TabNav({ id }: { id: string }) {
   ];
 
   return (
-    <div className="flex gap-1 border-b mb-6 overflow-x-auto" style={{ borderColor: "var(--border)" }}>
+    <div
+      className="flex gap-0.5 border-b mb-5 overflow-x-auto ddp-tabs-scroll"
+      style={{ borderColor: "var(--border)" }}
+    >
       {tabs.map((tab) => {
         const isActive = pathname === tab.href;
         return (
           <Link
             key={tab.href}
             href={tab.href}
-            className="px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors"
+            className="px-3.5 py-3 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors flex-shrink-0"
             style={{
               borderColor: isActive ? "var(--primary)" : "transparent",
               color: isActive ? "var(--primary)" : "var(--muted)",

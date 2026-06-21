@@ -364,6 +364,34 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MOBILE SIDEBAR
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Sidebar is hidden on mobile by default via -translate-x-full,
+   revealed by adding translate-x-0 class via JS */
+@media (max-width: 1023px) {
+  aside.-translate-x-full {
+    transform: translateX(-100%);
+  }
+  aside.translate-x-0 {
+    transform: translateX(0);
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TABS SCROLL
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.ddp-tabs-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.ddp-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ANIMATIONS
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
