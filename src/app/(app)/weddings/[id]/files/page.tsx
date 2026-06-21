@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { Palette, ClipboardList, Receipt, FileSignature, FolderOpen, Image as ImageIcon, FileText, File, Upload, X, AlertCircle } from "lucide-react";
 
 type Document = {
   id: string;
@@ -17,20 +18,19 @@ type Document = {
 };
 
 const CATEGORIES = [
-  { value: "all", label: "Alles" },
-  { value: "inspiratie", label: "Inspiratie", icon: "🎨" },
-  { value: "offerte", label: "Offertes", icon: "📋" },
-  { value: "factuur", label: "Facturen", icon: "🧾" },
-  { value: "contract", label: "Contracten", icon: "✍️" },
-  { value: "overig", label: "Overig", icon: "📁" },
+  { value: "all", label: "Alles", Icon: FolderOpen },
+  { value: "inspiratie", label: "Inspiratie", Icon: Palette },
+  { value: "offerte", label: "Offertes", Icon: ClipboardList },
+  { value: "factuur", label: "Facturen", Icon: Receipt },
+  { value: "contract", label: "Contracten", Icon: FileSignature },
+  { value: "overig", label: "Overig", Icon: FolderOpen },
 ];
 
-function fileIcon(mimeType: string) {
-  if (mimeType.startsWith("image/")) return "🖼️";
-  if (mimeType === "application/pdf") return "📄";
-  if (mimeType.includes("word") || mimeType.includes("document")) return "📝";
-  if (mimeType.includes("excel") || mimeType.includes("spreadsheet")) return "📊";
-  return "📁";
+function FileIcon({ mimeType, className, style }: { mimeType: string; className?: string; style?: React.CSSProperties }) {
+  if (mimeType.startsWith("image/")) return <ImageIcon className={className} style={style} />;
+  if (mimeType === "application/pdf") return <FileText className={className} style={style} />;
+  if (mimeType.includes("word") || mimeType.includes("document")) return <FileText className={className} style={style} />;
+  return <File className={className} style={style} />;
 }
 
 function formatSize(bytes: number) {
@@ -164,13 +164,13 @@ export default function FilesPage() {
             />
             {selectedFile ? (
               <div>
-                <div className="text-3xl mb-2">{fileIcon(selectedFile.type)}</div>
+                <div className="flex justify-center mb-2"><FileIcon mimeType={selectedFile.type} className="w-10 h-10" style={{ color: "var(--primary)" }} /></div>
                 <div className="font-medium text-sm">{selectedFile.name}</div>
                 <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>{formatSize(selectedFile.size)}</div>
               </div>
             ) : (
               <div>
-                <div className="text-3xl mb-2">📂</div>
+                <div className="flex justify-center mb-2"><Upload className="w-10 h-10" style={{ color: "var(--muted-light)" }} /></div>
                 <div className="text-sm font-medium">Klik om bestand te kiezen</div>
                 <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>
                   Afbeeldingen, PDF, Word, Excel — max 50 MB
@@ -200,7 +200,7 @@ export default function FilesPage() {
                   style={{ borderColor: "var(--border)" }}
                 >
                   {CATEGORIES.filter((c) => c.value !== "all").map((c) => (
-                    <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
+                    <option key={c.value} value={c.value}>{c.label}</option>
                   ))}
                 </select>
               </div>
@@ -223,8 +223,8 @@ export default function FilesPage() {
           )}
 
           {uploadError && (
-            <div className="mb-4 p-3 rounded-lg text-sm" style={{ background: "#fde8e8", color: "var(--danger)" }}>
-              ⚠️ {uploadError}
+            <div className="mb-4 p-3 rounded-lg text-sm flex items-center gap-2" style={{ background: "#fde8e8", color: "var(--danger)" }}>
+              <AlertCircle className="w-4 h-4 flex-shrink-0" /> {uploadError}
             </div>
           )}
 
@@ -250,7 +250,7 @@ export default function FilesPage() {
               color: activeCategory === cat.value ? "white" : "var(--foreground)",
             }}
           >
-            {cat.icon && `${cat.icon} `}{cat.label}
+            {cat.label}
             {cat.value === "all"
               ? ` (${documents.length})`
               : ` (${documents.filter((d) => d.category === cat.value).length})`}
@@ -261,7 +261,7 @@ export default function FilesPage() {
       {/* Files grid */}
       {filtered.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-          <div className="text-4xl mb-3">📂</div>
+          <div className="flex justify-center mb-3"><FolderOpen className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
           <h2 className="font-semibold text-lg mb-2">Nog geen bestanden</h2>
           <p className="text-sm mb-4">
             {activeCategory === "all"
@@ -281,11 +281,11 @@ export default function FilesPage() {
               <div key={doc.id} className="ddp-card p-0 overflow-hidden group">
                 {/* Preview area */}
                 <div
-                  className="h-32 flex items-center justify-center text-5xl cursor-pointer"
+                  className="h-32 flex items-center justify-center cursor-pointer"
                   style={{ background: "var(--accent)" }}
                   onClick={() => handleDownload(doc)}
                 >
-                  {isImage ? "🖼️" : fileIcon(doc.mimeType)}
+                  <FileIcon mimeType={doc.mimeType} className="w-12 h-12" style={{ color: "var(--primary)" }} />
                 </div>
 
                 {/* Info */}
@@ -295,7 +295,7 @@ export default function FilesPage() {
                       <div className="text-sm font-medium truncate" title={doc.name}>{doc.name}</div>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <span className="ddp-badge badge-neutral" style={{ fontSize: "0.65rem" }}>
-                          {catInfo?.icon} {catInfo?.label ?? doc.category}
+                          {catInfo?.label ?? doc.category}
                         </span>
                         <span className="text-xs" style={{ color: "var(--muted)" }}>{formatSize(doc.fileSize)}</span>
                       </div>
@@ -322,7 +322,7 @@ export default function FilesPage() {
                         style={{ background: "#fde8e8", color: "var(--danger)" }}
                         title="Verwijderen"
                       >
-                        ✕
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>

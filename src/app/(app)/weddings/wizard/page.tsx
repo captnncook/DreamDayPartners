@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Heart } from "lucide-react";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -77,7 +78,7 @@ export default function WeddingWizardPage() {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <span className="text-4xl">💍</span>
+          <div className="flex justify-center"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}><Heart className="w-7 h-7 text-white fill-white" /></div></div>
           <h1 className="text-2xl font-bold mt-3" style={{ color: "var(--primary)" }}>Jouw bruiloft aanmaken</h1>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Snel en eenvoudig — je kunt later alles aanpassen</p>
         </div>
@@ -139,8 +140,8 @@ export default function WeddingWizardPage() {
                 </div>
               </div>
               {form.partner1 && form.partner2 && (
-                <div className="p-3 rounded-xl text-center text-sm font-medium" style={{ background: "var(--accent)", color: "var(--primary)" }}>
-                  💍 Bruiloft {form.partner1} & {form.partner2}
+                <div className="p-3 rounded-xl text-center text-sm font-medium flex items-center justify-center gap-2" style={{ background: "var(--accent)", color: "var(--primary)" }}>
+                  <Heart className="w-4 h-4 fill-current" /> Bruiloft {form.partner1} & {form.partner2}
                 </div>
               )}
             </div>
@@ -246,7 +247,7 @@ export default function WeddingWizardPage() {
           {step === 4 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold">Alles klopt? 🎉</h2>
+                <h2 className="text-lg font-semibold">Alles klopt?</h2>
                 <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Controleer de gegevens en maak je bruiloft aan.</p>
               </div>
               <div className="space-y-3 rounded-xl p-4" style={{ background: "var(--accent)" }}>
@@ -313,7 +314,7 @@ export default function WeddingWizardPage() {
                 disabled={saving}
                 className="ddp-btn-primary flex-1 py-3"
               >
-                {saving ? "Aanmaken..." : "💍 Bruiloft aanmaken!"}
+                {saving ? "Aanmaken..." : "Bruiloft aanmaken"}
               </button>
             )}
           </div>

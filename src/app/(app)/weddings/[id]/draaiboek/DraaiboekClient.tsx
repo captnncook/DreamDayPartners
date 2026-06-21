@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ClipboardList, Briefcase, MapPin, MessageSquare, X, Clock } from "lucide-react";
 
 type DraaiboekItem = {
   id: string;
@@ -39,9 +40,6 @@ interface Props {
   isPremium: boolean;
 }
 
-const CATEGORY_ICONS: Record<string, string> = {
-  bloemist: "🌸", dj: "🎵", catering: "🍽️", fotograaf: "📷", default: "🎊",
-};
 
 function addMinutes(time: string, mins: number): string {
   const [h, m] = time.split(":").map(Number);
@@ -172,7 +170,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
 
       {draaiboeken.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-          <div className="text-4xl mb-3">📋</div>
+          <div className="flex justify-center mb-3"><ClipboardList className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
           <h2 className="font-semibold text-lg mb-2">Nog geen draaiboek</h2>
           <p className="text-sm mb-4">Maak een draaiboek aan om de tijdlijn van de trouwdag te plannen</p>
           {!isReadOnly && (
@@ -275,7 +273,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
 
                 {activeDraaiboek.items.length === 0 ? (
                   <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-                    <div className="text-3xl mb-2">⏱️</div>
+                    <div className="flex justify-center mb-2"><Clock className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
                     <p>Nog geen items. Voeg het eerste moment toe.</p>
                   </div>
                 ) : (
@@ -307,21 +305,21 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
                                     {item.startTime} – {endTime}
                                   </span>
                                   {!isReadOnly && (
-                                    <button onClick={() => deleteItem(activeDraaiboekId!, item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
+                                    <button onClick={() => deleteItem(activeDraaiboekId!, item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-3.5 h-3.5" /></button>
                                   )}
                                 </div>
                               </div>
                               <div className="flex items-center gap-3 mt-2 flex-wrap">
                                 {item.location && (
-                                  <span className="text-xs" style={{ color: "var(--muted)" }}>📍 {item.location}</span>
+                                  <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><MapPin className="w-3 h-3" /> {item.location}</span>
                                 )}
                                 {item.vendor && (
-                                  <span className="ddp-badge badge-info text-xs">
-                                    {CATEGORY_ICONS[item.vendor.category] ?? "🤝"} {item.vendor.name}
+                                  <span className="ddp-badge badge-info text-xs flex items-center gap-1">
+                                    <Briefcase className="w-3 h-3" /> {item.vendor.name}
                                   </span>
                                 )}
                                 {item.notes && (
-                                  <span className="text-xs" style={{ color: "var(--muted)" }}>💬 {item.notes}</span>
+                                  <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><MessageSquare className="w-3 h-3" /> {item.notes}</span>
                                 )}
                               </div>
                             </div>

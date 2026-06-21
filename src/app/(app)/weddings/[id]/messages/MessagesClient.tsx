@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { Lock, Heart, Handshake, MessageCircle, Star } from "lucide-react";
 
 type Message = {
   id: string;
@@ -27,7 +28,7 @@ interface Props {
   isPremium: boolean;
 }
 
-const THREAD_ICONS: Record<string, string> = { internal: "🔒", couple: "💍", vendor: "🤝" };
+const THREAD_ICONS: Record<string, React.ElementType> = { internal: Lock, couple: Heart, vendor: Handshake };
 const THREAD_LABELS: Record<string, string> = { internal: "Intern team", couple: "Bruidspaar", vendor: "Leverancier" };
 
 function formatTime(iso: string) {
@@ -121,9 +122,9 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                   className="w-full border rounded-lg px-2 py-1.5 text-xs"
                   style={{ borderColor: "var(--border)" }}
                 >
-                  <option value="internal">🔒 Intern team</option>
-                  <option value="couple">💍 Bruidspaar</option>
-                  {isPremium && <option value="vendor">🤝 Leverancier</option>}
+                  <option value="internal">Intern team</option>
+                  <option value="couple">Bruidspaar</option>
+                  {isPremium && <option value="vendor">Leverancier</option>}
                 </select>
                 <button type="submit" className="w-full text-xs py-1.5 rounded-lg" style={{ background: "var(--accent)", color: "var(--primary)" }}>
                   Aanmaken
@@ -141,7 +142,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                   className="w-full text-left px-3 py-3 rounded-lg transition-colors"
                   style={{ background: active ? "var(--accent)" : "transparent" }}>
                   <div className="flex items-center gap-2 mb-1">
-                    <span>{THREAD_ICONS[thread.type] ?? "💬"}</span>
+                    {(() => { const Icon = THREAD_ICONS[thread.type] ?? MessageCircle; return <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--muted)" }} />; })()}
                     <span className="text-xs font-semibold">{thread.subject ?? THREAD_LABELS[thread.type]}</span>
                   </div>
                   {lastMsg && (
@@ -157,7 +158,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
 
           {!isPremium && currentUser.role === "planner" && (
             <div className="mx-4 mb-4 p-3 rounded-lg" style={{ background: "var(--accent)" }}>
-              <p className="text-xs font-medium mb-1">🌟 Premium</p>
+              <p className="text-xs font-medium mb-1 flex items-center gap-1"><Star className="w-3 h-3" style={{ color: "var(--gold)" }} /> Premium</p>
               <p className="text-xs" style={{ color: "var(--muted)" }}>Upgrade naar Premium voor leverancierscommunicatie.</p>
             </div>
           )}
@@ -167,7 +168,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
           {!activeThread ? (
             <div className="flex-1 flex items-center justify-center" style={{ color: "var(--muted)" }}>
               <div className="text-center">
-                <div className="text-4xl mb-3">💬</div>
+                <div className="flex justify-center mb-3"><MessageCircle className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
                 <p>Selecteer een gesprek</p>
               </div>
             </div>
@@ -175,7 +176,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
             <>
               <div className="px-6 py-4 border-b" style={{ borderColor: "var(--border)", background: "white" }}>
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{THREAD_ICONS[activeThread.type]}</span>
+                  {(() => { const Icon = THREAD_ICONS[activeThread.type] ?? MessageCircle; return <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)" }} />; })()}
                   <div>
                     <div className="font-medium text-sm">{activeThread.subject ?? THREAD_LABELS[activeThread.type]}</div>
                     <div className="text-xs" style={{ color: "var(--muted)" }}>{activeThread.messages.length} berichten</div>

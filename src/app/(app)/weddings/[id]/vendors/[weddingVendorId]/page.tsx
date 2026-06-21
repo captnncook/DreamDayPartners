@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLang } from "@/components/LangProvider";
+import { Briefcase, User, Mail, Phone, Globe, MapPin, MessageSquare, Clock, X, Image as ImageIcon, FileText, File, Upload, AlertCircle, Palette } from "lucide-react";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string; website?: string };
 type WeddingVendor = { id: string; status: string; portalAccess: boolean; notes?: string; vendor: Vendor };
@@ -11,10 +12,6 @@ type Document = { id: string; name: string; fileKey: string; mimeType: string; f
 type ScheduleItem = { id: string; startTime: string; duration: number; title: string; location?: string; notes?: string; draaiboek: { id: string; title: string; version: string } };
 type Draaiboek = { id: string; title: string; version: string };
 
-const VENDOR_ICONS: Record<string, string> = {
-  bloemist: "🌸", dj: "🎵", catering: "🍽️", fotograaf: "📷",
-  locatie: "🏰", muziek: "🎶", video: "🎬", transport: "🚗", haar_make: "💄",
-};
 
 function addMinutes(time: string, mins: number): string {
   const [h, m] = time.split(":").map(Number);
@@ -40,10 +37,10 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function fileIcon(mime: string) {
-  if (mime.startsWith("image/")) return "🖼️";
-  if (mime === "application/pdf") return "📄";
-  return "📁";
+function FileIcon({ mime, className, style }: { mime: string; className?: string; style?: React.CSSProperties }) {
+  if (mime.startsWith("image/")) return <ImageIcon className={className} style={style} />;
+  if (mime === "application/pdf") return <FileText className={className} style={style} />;
+  return <File className={className} style={style} />;
 }
 
 export default function VendorDetailPage() {
@@ -161,8 +158,6 @@ export default function VendorDetailPage() {
   if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>{t.common.loading}</div>;
   if (!wv) return <div className="p-8">Leverancier niet gevonden</div>;
 
-  const icon = VENDOR_ICONS[wv.vendor.category] ?? "🤝";
-
   return (
     <div className="p-8 max-w-4xl mx-auto">
       {/* Breadcrumb */}
@@ -176,19 +171,19 @@ export default function VendorDetailPage() {
       <div className="ddp-card mb-6">
         <div className="flex items-center gap-5">
           <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
+            className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
             style={{ background: "var(--accent)" }}
           >
-            {icon}
+            <Briefcase className="w-7 h-7" style={{ color: "var(--primary)" }} />
           </div>
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold">{wv.vendor.name}</h1>
             <div className="text-sm capitalize mt-0.5" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
-            <div className="flex items-center gap-2 mt-2 flex-wrap text-xs" style={{ color: "var(--muted)" }}>
-              {wv.vendor.contactPerson && <span>👤 {wv.vendor.contactPerson}</span>}
-              {wv.vendor.email && <a href={`mailto:${wv.vendor.email}`} className="hover:underline" style={{ color: "var(--primary)" }}>✉️ {wv.vendor.email}</a>}
-              {wv.vendor.phone && <span>📞 {wv.vendor.phone}</span>}
-              {wv.vendor.website && <a href={wv.vendor.website} target="_blank" rel="noreferrer" className="hover:underline" style={{ color: "var(--primary)" }}>🌐 Website</a>}
+            <div className="flex items-center gap-3 mt-2 flex-wrap text-xs" style={{ color: "var(--muted)" }}>
+              {wv.vendor.contactPerson && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</span>}
+              {wv.vendor.email && <a href={`mailto:${wv.vendor.email}`} className="flex items-center gap-1 hover:underline" style={{ color: "var(--primary)" }}><Mail className="w-3 h-3" /> {wv.vendor.email}</a>}
+              {wv.vendor.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {wv.vendor.phone}</span>}
+              {wv.vendor.website && <a href={wv.vendor.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:underline" style={{ color: "var(--primary)" }}><Globe className="w-3 h-3" /> Website</a>}
             </div>
           </div>
         </div>
@@ -253,13 +248,13 @@ export default function VendorDetailPage() {
                 />
                 {selectedFile ? (
                   <div>
-                    <div className="text-3xl mb-2">{fileIcon(selectedFile.type)}</div>
+                    <div className="flex justify-center mb-2"><FileIcon mime={selectedFile.type} className="w-10 h-10" style={{ color: "var(--primary)" }} /></div>
                     <div className="font-medium text-sm">{selectedFile.name}</div>
                     <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>{formatSize(selectedFile.size)}</div>
                   </div>
                 ) : (
                   <div>
-                    <div className="text-3xl mb-2">🎨</div>
+                    <div className="flex justify-center mb-2"><Upload className="w-10 h-10" style={{ color: "var(--muted-light)" }} /></div>
                     <div className="text-sm font-medium">Klik om bestand te kiezen</div>
                     <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>Afbeeldingen, PDF — max 50 MB</div>
                   </div>
@@ -275,8 +270,8 @@ export default function VendorDetailPage() {
                 />
               )}
               {uploadError && (
-                <div className="p-3 rounded-lg text-sm" style={{ background: "#fde8e8", color: "var(--danger)" }}>
-                  ⚠️ {uploadError}
+                <div className="p-3 rounded-lg text-sm flex items-center gap-2" style={{ background: "#fde8e8", color: "var(--danger)" }}>
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" /> {uploadError}
                 </div>
               )}
               <button type="submit" disabled={!selectedFile || uploading} className="ddp-btn-primary w-full">
@@ -287,7 +282,7 @@ export default function VendorDetailPage() {
 
           {files.length === 0 ? (
             <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-              <div className="text-4xl mb-3">🎨</div>
+              <div className="flex justify-center mb-3"><Palette className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
               <p className="text-sm">{vd.noFiles}</p>
             </div>
           ) : (
@@ -295,11 +290,11 @@ export default function VendorDetailPage() {
               {files.map((doc) => (
                 <div key={doc.id} className="ddp-card p-0 overflow-hidden">
                   <div
-                    className="h-28 flex items-center justify-center text-4xl cursor-pointer hover:opacity-90 transition-opacity"
+                    className="h-28 flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity"
                     style={{ background: "var(--accent)" }}
                     onClick={() => handleDownload(doc.id)}
                   >
-                    {fileIcon(doc.mimeType)}
+                    <FileIcon mime={doc.mimeType} className="w-10 h-10" style={{ color: "var(--primary)" }} />
                   </div>
                   <div className="p-3">
                     <div className="text-sm font-medium truncate" title={doc.name}>{doc.name}</div>
@@ -314,7 +309,7 @@ export default function VendorDetailPage() {
                         onClick={() => handleDeleteFile(doc.id)}
                         className="text-xs px-2 py-1 rounded-md"
                         style={{ background: "#fde8e8", color: "var(--danger)" }}
-                      >✕</button>
+                      ><X className="w-3.5 h-3.5" /></button>
                     </div>
                   </div>
                 </div>
@@ -441,7 +436,7 @@ export default function VendorDetailPage() {
 
           {schedule.length === 0 ? (
             <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-              <div className="text-4xl mb-3">⏱️</div>
+              <div className="flex justify-center mb-3"><Clock className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
               <p className="text-sm">{vd.noSchedule}</p>
             </div>
           ) : (
@@ -457,8 +452,8 @@ export default function VendorDetailPage() {
                       </div>
                       <div>
                         <div className="font-medium text-sm">{item.title}</div>
-                        {item.location && <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>📍 {item.location}</div>}
-                        {item.notes && <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>💬 {item.notes}</div>}
+                        {item.location && <div className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "var(--muted)" }}><MapPin className="w-3 h-3" /> {item.location}</div>}
+                        {item.notes && <div className="text-xs mt-0.5 flex items-center gap-1" style={{ color: "var(--muted)" }}><MessageSquare className="w-3 h-3" /> {item.notes}</div>}
                         <div className="text-xs mt-1" style={{ color: "var(--muted)", opacity: 0.7 }}>
                           {item.draaiboek.title} v{item.draaiboek.version}
                         </div>
@@ -468,7 +463,7 @@ export default function VendorDetailPage() {
                       onClick={() => handleDeleteSchedule(item.id)}
                       className="text-xs hover:opacity-70 flex-shrink-0"
                       style={{ color: "var(--muted)" }}
-                    >✕</button>
+                    ><X className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
               ))}

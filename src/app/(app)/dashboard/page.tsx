@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Heart, CheckSquare, Calendar, Sparkles } from "lucide-react";
 
 function daysUntil(date: Date) {
   const now = new Date();
@@ -48,10 +49,10 @@ export default async function DashboardPage() {
 
   const greetings: Record<string, string> = {
     admin: "Platform overzicht",
-    planner: `Goedemorgen, ${user.name.split(" ")[0]}! 👋`,
-    team_member: `Goedemorgen, ${user.name.split(" ")[0]}! 👋`,
-    couple: `Welkom, ${user.name.split(" ")[0]}! 💍`,
-    vendor: `Welkom, ${user.name.split(" ")[0]}! 🌸`,
+    planner: `Goedemorgen, ${user.name.split(" ")[0]}`,
+    team_member: `Goedemorgen, ${user.name.split(" ")[0]}`,
+    couple: `Welkom, ${user.name.split(" ")[0]}`,
+    vendor: `Welkom, ${user.name.split(" ")[0]}`,
   };
 
   const statusColors: Record<string, string> = {
@@ -75,10 +76,10 @@ export default async function DashboardPage() {
 
       {user.role !== "couple" && user.role !== "vendor" && (
         <div className="grid grid-cols-4 gap-4 mb-8">
-          <StatCard label="Bruiloften" value={weddings.length} icon="💍" />
-          <StatCard label="Open taken" value={myTasks.length} icon="✅" />
-          <StatCard label="Komende 30 dagen" value={weddings.filter((w) => daysUntil(w.date) <= 30 && daysUntil(w.date) > 0).length} icon="📅" />
-          <StatCard label="Dit jaar" value={weddings.filter((w) => new Date(w.date).getFullYear() === new Date().getFullYear()).length} icon="🎊" />
+          <StatCard label="Bruiloften" value={weddings.length} icon={Heart} />
+          <StatCard label="Open taken" value={myTasks.length} icon={CheckSquare} />
+          <StatCard label="Komende 30 dagen" value={weddings.filter((w) => daysUntil(w.date) <= 30 && daysUntil(w.date) > 0).length} icon={Calendar} />
+          <StatCard label="Dit jaar" value={weddings.filter((w) => new Date(w.date).getFullYear() === new Date().getFullYear()).length} icon={Sparkles} />
         </div>
       )}
 
@@ -95,7 +96,9 @@ export default async function DashboardPage() {
 
           {weddings.length === 0 ? (
             <div className="ddp-card text-center py-12" style={{ color: "var(--muted)" }}>
-              <div className="text-4xl mb-3">💍</div>
+              <div className="flex justify-center mb-3">
+                <Heart className="w-10 h-10" style={{ color: "var(--accent-dark)" }} />
+              </div>
               <p className="font-medium">Nog geen bruiloften</p>
               {(user.role === "planner" || user.role === "admin") && (
                 <Link href="/weddings/new" className="ddp-btn-primary inline-block mt-4 text-sm">Eerste bruiloft aanmaken</Link>
@@ -152,7 +155,10 @@ export default async function DashboardPage() {
                       <span className={`ddp-badge ${priorityColors[task.priority]} flex-shrink-0`}>{task.priority}</span>
                     </div>
                     {task.dueDate && (
-                      <div className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>📅 {formatDate(task.dueDate)}</div>
+                      <div className="text-xs mt-1.5 flex items-center gap-1" style={{ color: "var(--muted)" }}>
+                        <Calendar className="w-3 h-3" />
+                        {formatDate(task.dueDate)}
+                      </div>
                     )}
                   </div>
                 ))}
@@ -191,24 +197,16 @@ export default async function DashboardPage() {
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value: number; icon: string }) {
+function StatCard({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
     <div className="ddp-stat-card">
       <div className="flex items-center justify-between">
         <div>
-          <div
-            className="text-2xl font-bold tracking-tight mb-0.5"
-            style={{ color: "var(--foreground)" }}
-          >
-            {value}
-          </div>
+          <div className="text-2xl font-bold tracking-tight mb-0.5" style={{ color: "var(--foreground)" }}>{value}</div>
           <div className="text-xs font-medium" style={{ color: "var(--muted)" }}>{label}</div>
         </div>
-        <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-          style={{ background: "var(--accent)" }}
-        >
-          {icon}
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
+          <Icon className="w-5 h-5" style={{ color: "var(--primary)" }} />
         </div>
       </div>
     </div>

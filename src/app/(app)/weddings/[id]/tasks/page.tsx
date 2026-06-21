@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { CheckCircle2, RefreshCw, Circle, Calendar, User, X, CheckSquare } from "lucide-react";
 
 type Task = {
   id: string;
@@ -15,7 +16,8 @@ type Task = {
   assignedUser?: { id: string; name: string } | null;
 };
 
-const STATUS_ICONS: Record<string, string> = { open: "⭕", in_progress: "🔄", done: "✅" };
+const STATUS_ICON_MAP: Record<string, React.ElementType> = { open: Circle, in_progress: RefreshCw, done: CheckCircle2 };
+const STATUS_ICON_COLOR: Record<string, string> = { open: "var(--muted-light)", in_progress: "var(--warning)", done: "var(--success)" };
 const PRIORITY_COLORS: Record<string, string> = { high: "badge-danger", medium: "badge-warning", low: "badge-neutral" };
 const PRIORITY_LABELS: Record<string, string> = { high: "Hoog", medium: "Middel", low: "Laag" };
 const STATUS_LABELS: Record<string, string> = { open: "Open", in_progress: "Bezig", done: "Klaar" };
@@ -146,8 +148,8 @@ export default function TasksPage() {
       <div className="space-y-2">
         {filtered.map((task) => (
           <div key={task.id} className="ddp-card flex items-start gap-4">
-            <button onClick={() => toggleStatus(task)} className="mt-0.5 text-xl flex-shrink-0" title="Status wijzigen">
-              {STATUS_ICONS[task.status] ?? "⭕"}
+            <button onClick={() => toggleStatus(task)} className="mt-0.5 flex-shrink-0" title="Status wijzigen">
+              {(() => { const Icon = STATUS_ICON_MAP[task.status] ?? Circle; return <Icon className="w-5 h-5" style={{ color: STATUS_ICON_COLOR[task.status] ?? "var(--muted-light)" }} />; })()}
             </button>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -162,17 +164,17 @@ export default function TasksPage() {
                 <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>{task.description}</p>
               )}
               <div className="flex items-center gap-3 mt-1.5">
-                {task.dueDate && <span className="text-xs" style={{ color: "var(--muted)" }}>📅 {formatDate(task.dueDate)}</span>}
-                {task.assignedUser && <span className="text-xs" style={{ color: "var(--muted)" }}>👤 {task.assignedUser.name}</span>}
+                {task.dueDate && <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><Calendar className="w-3 h-3" />{formatDate(task.dueDate)}</span>}
+                {task.assignedUser && <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><User className="w-3 h-3" />{task.assignedUser.name}</span>}
                 <span className="text-xs" style={{ color: "var(--muted)" }}>{STATUS_LABELS[task.status]}</span>
               </div>
             </div>
-            <button onClick={() => deleteTask(task.id)} className="text-xs flex-shrink-0 hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
+            <button onClick={() => deleteTask(task.id)} className="flex-shrink-0 hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-4 h-4" /></button>
           </div>
         ))}
         {filtered.length === 0 && (
           <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-            <div className="text-3xl mb-2">✅</div>
+            <div className="flex justify-center mb-2"><CheckSquare className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
             <p>Geen taken gevonden</p>
           </div>
         )}

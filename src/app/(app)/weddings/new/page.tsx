@@ -63,7 +63,7 @@ export default function NewWeddingPage() {
           </div>
         </div>
         <div className="p-4 rounded-lg" style={{ background: "var(--accent)" }}>
-          <div className="text-sm font-semibold mb-3">💍 Bruidspaar e-mailadressen</div>
+          <div className="text-sm font-semibold mb-3">Bruidspaar e-mailadressen</div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium mb-1">Partner 1 e-mail *</label>

@@ -3,6 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import TabNav from "./TabNav";
+import { Calendar, MapPin, CheckCircle2, RefreshCw, Circle, Briefcase, ClipboardList, Users, FolderOpen, Euro, MessageCircle, Handshake } from "lucide-react";
+
+function vendorCategoryIcon(category: string) {
+  const map: Record<string, string> = {
+    bloemist: "🌸 →", dj: "♪", catering: "⬡", fotograaf: "◎",
+  };
+  return map[category] ?? null;
+}
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
@@ -78,8 +86,8 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             {wedding.isPremium && <span className="ddp-badge badge-premium">Premium</span>}
           </div>
           <div className="flex items-center gap-4 text-sm" style={{ color: "var(--muted)" }}>
-            <span>📅 {formatDate(wedding.date)}</span>
-            {wedding.venue && <span>📍 {wedding.venue}</span>}
+            <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {formatDate(wedding.date)}</span>
+            {wedding.venue && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {wedding.venue}</span>}
             <span className="font-mono text-xs">{wedding.weddingCode}</span>
           </div>
         </div>
@@ -151,8 +159,12 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             <div className="space-y-2">
               {wedding.tasks.slice(0, 4).map((task) => (
                 <div key={task.id} className="flex items-center gap-3 py-1.5">
-                  <span className="text-sm">
-                    {task.status === "done" ? "✅" : task.status === "in_progress" ? "🔄" : "⭕"}
+                  <span className="flex items-center">
+                    {task.status === "done"
+                      ? <CheckCircle2 className="w-4 h-4" style={{ color: "var(--success)" }} />
+                      : task.status === "in_progress"
+                      ? <RefreshCw className="w-4 h-4" style={{ color: "var(--warning)" }} />
+                      : <Circle className="w-4 h-4" style={{ color: "var(--muted-light)" }} />}
                   </span>
                   <div className="flex-1 min-w-0">
                     <span className={`text-sm ${task.status === "done" ? "line-through" : ""}`} style={{ color: task.status === "done" ? "var(--muted)" : undefined }}>
@@ -188,7 +200,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               {wedding.vendors.map((wv) => (
                 <div key={wv.id} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style={{ background: "var(--accent)" }}>
-                    {wv.vendor.category === "bloemist" ? "🌸" : wv.vendor.category === "dj" ? "🎵" : wv.vendor.category === "catering" ? "🍽️" : "🤝"}
+                    <Briefcase className="w-4 h-4" style={{ color: "var(--primary)" }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{wv.vendor.name}</div>
@@ -245,21 +257,25 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             <h3 className="font-semibold text-sm mb-3">Snelle toegang</h3>
             <div className="space-y-1">
               {[
-                { href: `/weddings/${id}/team`, label: "🤝 Dream Day Team", show: true },
-                { href: `/weddings/${id}/draaiboek`, label: "📋 Draaiboek openen", show: true },
-                { href: `/weddings/${id}/guests`, label: "👥 Gastenlijst", show: true },
-                { href: `/weddings/${id}/files`, label: "📂 Bestanden", show: true },
-                { href: `/weddings/${id}/budget`, label: "💶 Budget bekijken", show: user.role !== "couple" },
-                { href: `/weddings/${id}/messages`, label: "💬 Berichten", show: true },
-              ].filter((l) => l.show).map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
+                { href: `/weddings/${id}/team`, label: "Dream Day Team", icon: Handshake, show: true },
+                { href: `/weddings/${id}/draaiboek`, label: "Draaiboek openen", icon: ClipboardList, show: true },
+                { href: `/weddings/${id}/guests`, label: "Gastenlijst", icon: Users, show: true },
+                { href: `/weddings/${id}/files`, label: "Bestanden", icon: FolderOpen, show: true },
+                { href: `/weddings/${id}/budget`, label: "Budget bekijken", icon: Euro, show: user.role !== "couple" },
+                { href: `/weddings/${id}/messages`, label: "Berichten", icon: MessageCircle, show: true },
+              ].filter((l) => l.show).map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors hover:bg-gray-50"
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ClipboardList } from "lucide-react";
 
 export default async function AllDraaiboekPage() {
   const user = await getSession();
@@ -27,7 +28,7 @@ export default async function AllDraaiboekPage() {
       <h1 className="text-2xl font-bold mb-2">Draaiboeken</h1>
       <p className="text-sm mb-8" style={{ color: "var(--muted)" }}>{user.role === "vendor" ? "Jouw onderdelen in het draaiboek" : "Overzicht van alle draaiboeken"}</p>
       {weddings.length === 0 ? (
-        <div className="ddp-card text-center py-12" style={{ color: "var(--muted)" }}><div className="text-4xl mb-3">📋</div><p>Geen draaiboeken gevonden</p></div>
+        <div className="ddp-card text-center py-12" style={{ color: "var(--muted)" }}><div className="flex justify-center mb-3"><ClipboardList className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div><p>Geen draaiboeken gevonden</p></div>
       ) : (
         <div className="space-y-6">
           {weddings.map((w) => (

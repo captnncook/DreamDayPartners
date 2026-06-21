@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { Users, Heart, Handshake } from "lucide-react";
 
 export default async function AdminPage() {
   const user = await getSession();
@@ -23,9 +24,15 @@ export default async function AdminPage() {
     <div className="p-8 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-8">Platform Beheer</h1>
       <div className="grid grid-cols-3 gap-4 mb-8">
-        {[["👥", userCount, "Gebruikers"],["💍", weddingCount, "Bruiloften"],["🤝", vendorCount, "Leveranciers"]].map(([icon, val, label]) => (
-          <div key={String(label)} className="ddp-card flex items-center gap-4">
-            <span className="text-3xl">{icon}</span>
+        {([
+          { Icon: Users, val: userCount, label: "Gebruikers" },
+          { Icon: Heart, val: weddingCount, label: "Bruiloften" },
+          { Icon: Handshake, val: vendorCount, label: "Leveranciers" },
+        ] as const).map(({ Icon, val, label }) => (
+          <div key={label} className="ddp-card flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
+              <Icon className="w-6 h-6" style={{ color: "var(--primary)" }} />
+            </div>
             <div><div className="text-3xl font-bold">{val}</div><div className="text-xs" style={{ color: "var(--muted)" }}>{label}</div></div>
           </div>
         ))}
@@ -60,7 +67,7 @@ export default async function AdminPage() {
                   <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{w.weddingCode} · {w.owner.name}</div>
                 </div>
                 <div className="text-xs text-right" style={{ color: "var(--muted)" }}>
-                  <div>👥 {w._count.guests}</div><div>🤝 {w._count.vendors}</div>
+                  <div>{w._count.guests} gasten</div><div>{w._count.vendors} leveranciers</div>
                 </div>
                 {w.isPremium && <span className="ddp-badge badge-premium">Premium</span>}
               </div>

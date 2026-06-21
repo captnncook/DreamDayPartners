@@ -4,14 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
+import { Heart, Settings, Users, Leaf, Music, Utensils } from "lucide-react";
 
-const ROLE_OPTIONS: { value: DemoRole; label: string; icon: string; description: string }[] = [
-  { value: "admin",     label: "Admin",          icon: "⚙️", description: "Platform beheerder" },
-  { value: "planner",   label: "Weddingplanner", icon: "💍", description: "Sophie van der Berg" },
-  { value: "couple",    label: "Bruidspaar",     icon: "👰", description: "Emma de Vries" },
-  { value: "bloemist",  label: "Bloemist",       icon: "🌸", description: "Roos Janssen" },
-  { value: "dj",        label: "DJ",             icon: "🎵", description: "DJ Marco" },
-  { value: "catering",  label: "Catering",       icon: "🍽️", description: "Tasty Events" },
+const ROLE_OPTIONS: { value: DemoRole; label: string; Icon: React.ElementType; description: string }[] = [
+  { value: "admin",     label: "Admin",          Icon: Settings,  description: "Platform beheerder" },
+  { value: "planner",   label: "Weddingplanner", Icon: Heart,     description: "Sophie van der Berg" },
+  { value: "couple",    label: "Bruidspaar",     Icon: Users,     description: "Emma de Vries" },
+  { value: "bloemist",  label: "Bloemist",       Icon: Leaf,      description: "Roos Janssen" },
+  { value: "dj",        label: "DJ",             Icon: Music,     description: "DJ Marco" },
+  { value: "catering",  label: "Catering",       Icon: Utensils,  description: "Tasty Events" },
 ];
 
 export default function LoginPage() {
@@ -71,10 +72,10 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-3">
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center"
               style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-primary)" }}
             >
-              💍
+              <Heart className="w-6 h-6 text-white fill-white" />
             </div>
             <div className="text-left">
               <div className="font-serif text-xl font-bold" style={{ color: "var(--foreground)" }}>DreamDay</div>
@@ -109,7 +110,7 @@ export default function LoginPage() {
                 >
                   {ROLE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
-                      {opt.icon} {opt.label}
+                      {opt.label}
                     </option>
                   ))}
                 </select>
@@ -125,10 +126,10 @@ export default function LoginPage() {
               style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
             >
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: "var(--accent)" }}
               >
-                {selected.icon}
+                <selected.Icon className="w-5 h-5" style={{ color: "var(--primary)" }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm">{selected.label}</div>
@@ -175,10 +176,10 @@ export default function LoginPage() {
         {/* Register CTA */}
         <div className="ddp-card text-center" style={{ boxShadow: "var(--shadow-md)" }}>
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mx-auto mb-3"
+            className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
             style={{ background: "var(--accent)" }}
           >
-            💍
+            <Heart className="w-5 h-5" style={{ color: "var(--primary)" }} />
           </div>
           <h2 className="font-semibold text-sm mb-1">Jullie bruiloft plannen?</h2>
           <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>

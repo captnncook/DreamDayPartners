@@ -4,10 +4,26 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import { useLang } from "@/components/LangProvider";
+import {
+  Home, Heart, CheckSquare, Users, Euro, ClipboardList,
+  MessageCircle, Briefcase, Settings, Globe, LogOut,
+} from "lucide-react";
 
 interface SidebarProps {
   user: User;
 }
+
+const NAV_ICONS: Record<string, React.ElementType> = {
+  "/dashboard":  Home,
+  "/weddings":   Heart,
+  "/tasks":      CheckSquare,
+  "/guests":     Users,
+  "/budget":     Euro,
+  "/draaiboek":  ClipboardList,
+  "/messages":   MessageCircle,
+  "/vendors":    Briefcase,
+  "/admin":      Settings,
+};
 
 export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
@@ -16,15 +32,15 @@ export default function Sidebar({ user }: SidebarProps) {
   const n = t.nav;
 
   const NAV_ITEMS = [
-    { href: "/dashboard",  label: n.dashboard, icon: "🏠", roles: ["admin", "planner", "team_member", "couple", "vendor"] },
-    { href: "/weddings",   label: n.weddings,  icon: "💍", roles: ["admin", "planner", "team_member"] },
-    { href: "/tasks",      label: n.myTasks,   icon: "✅", roles: ["planner", "team_member", "couple"] },
-    { href: "/guests",     label: n.guests,    icon: "👥", roles: ["planner", "team_member", "couple"] },
-    { href: "/budget",     label: n.budget,    icon: "💶", roles: ["planner", "team_member"] },
-    { href: "/draaiboek",  label: n.draaiboek, icon: "📋", roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/messages",   label: n.messages,  icon: "💬", roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/vendors",    label: n.vendors,   icon: "🤝", roles: ["planner", "team_member"] },
-    { href: "/admin",      label: n.admin,     icon: "⚙️", roles: ["admin"] },
+    { href: "/dashboard",  label: n.dashboard, roles: ["admin", "planner", "team_member", "couple", "vendor"] },
+    { href: "/weddings",   label: n.weddings,  roles: ["admin", "planner", "team_member"] },
+    { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
+    { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
+    { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
+    { href: "/draaiboek",  label: n.draaiboek, roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/messages",   label: n.messages,  roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/vendors",    label: n.vendors,   roles: ["planner", "team_member"] },
+    { href: "/admin",      label: n.admin,     roles: ["admin"] },
   ];
 
   async function handleLogout() {
@@ -53,27 +69,20 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside
       className="flex flex-col w-64 min-h-screen"
-      style={{
-        background: "white",
-        borderRight: "1px solid var(--border)",
-      }}
+      style={{ background: "white", borderRight: "1px solid var(--border)" }}
     >
       {/* Logo */}
       <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-primary)" }}
           >
-            💍
+            <Heart className="w-4 h-4 text-white fill-white" />
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)" }}>
-              DreamDay
-            </div>
-            <div className="text-xs leading-none mt-0.5" style={{ color: "var(--primary)" }}>
-              Partners
-            </div>
+            <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)" }}>DreamDay</div>
+            <div className="text-xs leading-none mt-0.5" style={{ color: "var(--primary)" }}>Partners</div>
           </div>
         </Link>
       </div>
@@ -94,9 +103,7 @@ export default function Sidebar({ user }: SidebarProps) {
                 {roleLabels[user.role] ?? user.role}
               </span>
               {user.isPremium && (
-                <span className="ddp-badge badge-premium" style={{ fontSize: "0.55rem", padding: "0.1rem 0.35rem" }}>
-                  Pro
-                </span>
+                <span className="ddp-badge badge-premium" style={{ fontSize: "0.55rem", padding: "0.1rem 0.35rem" }}>Pro</span>
               )}
             </div>
           </div>
@@ -107,13 +114,10 @@ export default function Sidebar({ user }: SidebarProps) {
       <nav className="flex-1 px-3 pb-3 space-y-0.5">
         {visibleItems.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          const Icon = NAV_ICONS[item.href] ?? Home;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`ddp-nav-item${active ? " active" : ""}`}
-            >
-              <span className="text-base w-5 text-center flex-shrink-0">{item.icon}</span>
+            <Link key={item.href} href={item.href} className={`ddp-nav-item${active ? " active" : ""}`}>
+              <Icon className="w-4 h-4 flex-shrink-0" />
               {item.label}
             </Link>
           );
@@ -122,19 +126,12 @@ export default function Sidebar({ user }: SidebarProps) {
 
       {/* Language + Logout */}
       <div className="px-3 py-3" style={{ borderTop: "1px solid var(--border)" }}>
-        <button
-          onClick={toggle}
-          className="ddp-nav-item w-full text-left"
-        >
-          <span className="text-base w-5 text-center flex-shrink-0">🌐</span>
+        <button onClick={toggle} className="ddp-nav-item w-full text-left">
+          <Globe className="w-4 h-4 flex-shrink-0" />
           <span>{t.common.switchLang}</span>
         </button>
-        <button
-          onClick={handleLogout}
-          className="ddp-nav-item w-full text-left mt-0.5"
-          style={{ color: "var(--muted)" }}
-        >
-          <span className="text-base w-5 text-center flex-shrink-0">🚪</span>
+        <button onClick={handleLogout} className="ddp-nav-item w-full text-left mt-0.5">
+          <LogOut className="w-4 h-4 flex-shrink-0" />
           {n.logout}
         </button>
       </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { Users, X } from "lucide-react";
 
 type Guest = {
   id: string;
@@ -201,7 +202,7 @@ export default function GuestsPage() {
                 </td>
                 <td className="px-4 py-3 text-xs" style={{ color: "var(--muted)" }}>{guest.dietary ?? "—"}</td>
                 <td className="px-4 py-3">
-                  <button onClick={() => deleteGuest(guest.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
+                  <button onClick={() => deleteGuest(guest.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-3.5 h-3.5" /></button>
                 </td>
               </tr>
             ))}
@@ -209,7 +210,7 @@ export default function GuestsPage() {
         </table>
         {filtered.length === 0 && (
           <div className="text-center py-10" style={{ color: "var(--muted)" }}>
-            <div className="text-3xl mb-2">👥</div>
+            <div className="flex justify-center mb-2"><Users className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
             <p>Geen gasten gevonden</p>
           </div>
         )}

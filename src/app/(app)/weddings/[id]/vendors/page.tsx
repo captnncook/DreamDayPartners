@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { Briefcase, User, Mail, Phone, Star, X, CheckCircle2 } from "lucide-react";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = {
@@ -10,10 +11,6 @@ type WeddingVendor = {
   vendor: Vendor;
 };
 
-const VENDOR_ICONS: Record<string, string> = {
-  bloemist: "🌸", dj: "🎵", catering: "🍽️", fotograaf: "📷", locatie: "🏰",
-  muziek: "🎶", video: "🎬", transport: "🚗", haar_make: "💄", default: "🤝",
-};
 const STATUS_COLORS: Record<string, string> = {
   contacted: "badge-neutral", quote_received: "badge-warning", booked: "badge-info", confirmed: "badge-success",
 };
@@ -106,7 +103,7 @@ export default function VendorsPage() {
 
       {!isPremium && (
         <div className="ddp-card mb-6 flex items-center gap-4" style={{ background: "#fef9ec", border: "1px solid #f5d080" }}>
-          <span className="text-2xl">⭐</span>
+          <Star className="w-5 h-5 flex-shrink-0" style={{ color: "var(--gold)" }} />
           <div>
             <div className="font-semibold text-sm">Leveranciersportaal is een Premium functie</div>
             <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
@@ -140,7 +137,7 @@ export default function VendorsPage() {
                 >
                   <option value="">Kies een leverancier...</option>
                   {available.map((v) => (
-                    <option key={v.id} value={v.id}>{VENDOR_ICONS[v.category] ?? "🤝"} {v.name} — {v.category}</option>
+                    <option key={v.id} value={v.id}>{v.name} — {v.category}</option>
                   ))}
                 </select>
               </div>
@@ -164,7 +161,7 @@ export default function VendorsPage() {
 
       {weddingVendors.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-          <div className="text-4xl mb-3">🤝</div>
+          <div className="flex justify-center mb-3"><Briefcase className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
           <h2 className="font-semibold text-lg mb-2">Nog geen leveranciers</h2>
           <p className="text-sm mb-4">Koppel leveranciers aan deze bruiloft</p>
           <button onClick={() => setShowAdd(true)} className="ddp-btn-primary">+ Leverancier koppelen</button>
@@ -174,9 +171,8 @@ export default function VendorsPage() {
           {weddingVendors.map((wv) => (
             <div key={wv.id} className="ddp-card">
               <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                  style={{ background: "var(--accent)" }}>
-                  {VENDOR_ICONS[wv.vendor.category] ?? VENDOR_ICONS.default}
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
+                  <Briefcase className="w-5 h-5" style={{ color: "var(--primary)" }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -185,7 +181,7 @@ export default function VendorsPage() {
                   </div>
                   <div className="text-xs capitalize mt-0.5" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
                 </div>
-                <button onClick={() => removeVendor(wv)} className="text-xs hover:opacity-70 flex-shrink-0" style={{ color: "var(--muted)" }}>✕</button>
+                <button onClick={() => removeVendor(wv)} className="text-xs hover:opacity-70 flex-shrink-0" style={{ color: "var(--muted)" }}><X className="w-4 h-4" /></button>
               </div>
 
               <div className="mt-3">
@@ -202,18 +198,19 @@ export default function VendorsPage() {
               </div>
 
               <div className="mt-3 space-y-1.5 text-xs" style={{ color: "var(--muted)" }}>
-                {wv.vendor.contactPerson && <div>👤 {wv.vendor.contactPerson}</div>}
+                {wv.vendor.contactPerson && <div className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</div>}
                 {wv.vendor.email && (
-                  <div><a href={`mailto:${wv.vendor.email}`} className="hover:underline" style={{ color: "var(--primary)" }}>✉️ {wv.vendor.email}</a></div>
+                  <div className="flex items-center gap-1"><Mail className="w-3 h-3" /><a href={`mailto:${wv.vendor.email}`} className="hover:underline" style={{ color: "var(--primary)" }}>{wv.vendor.email}</a></div>
                 )}
-                {wv.vendor.phone && <div>📞 {wv.vendor.phone}</div>}
+                {wv.vendor.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {wv.vendor.phone}</div>}
                 {wv.notes && <div className="italic">{wv.notes}</div>}
               </div>
 
               {isPremium && (
                 <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-                  <span className="text-xs" style={{ color: "var(--muted)" }}>
-                    {wv.portalAccess ? "✅ Portaltoegang actief" : "Geen portaltoegang"}
+                  <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}>
+                    {wv.portalAccess && <CheckCircle2 className="w-3 h-3" style={{ color: "var(--success)" }} />}
+                    {wv.portalAccess ? "Portaltoegang actief" : "Geen portaltoegang"}
                   </span>
                   <button
                     onClick={() => togglePortal(wv)}

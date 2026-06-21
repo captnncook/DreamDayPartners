@@ -2,8 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-
-const VENDOR_ICONS: Record<string, string> = { bloemist: "🌸", dj: "🎵", catering: "🍽️", fotograaf: "📷", locatie: "🏰", default: "🤝" };
+import { Briefcase, Phone } from "lucide-react";
 
 export default async function AllVendorsPage() {
   const user = await getSession();
@@ -31,13 +30,15 @@ export default async function AllVendorsPage() {
             {w.vendors.map((wv) => (
               <div key={wv.id} className="ddp-card p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">{VENDOR_ICONS[wv.vendor.category] ?? VENDOR_ICONS.default}</span>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
+                    <Briefcase className="w-4 h-4" style={{ color: "var(--primary)" }} />
+                  </div>
                   <div>
                     <div className="font-medium text-sm">{wv.vendor.name}</div>
                     <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
                   </div>
                 </div>
-                {wv.vendor.phone && <div className="text-xs" style={{ color: "var(--muted)" }}>📞 {wv.vendor.phone}</div>}
+                {wv.vendor.phone && <div className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><Phone className="w-3 h-3" /> {wv.vendor.phone}</div>}
               </div>
             ))}
           </div>

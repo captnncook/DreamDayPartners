@@ -4,14 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLang } from "@/components/LangProvider";
+import { Briefcase, User, Mail, Phone, Handshake } from "lucide-react";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = { id: string; status: string; portalAccess: boolean; notes?: string; vendor: Vendor };
-
-const VENDOR_ICONS: Record<string, string> = {
-  bloemist: "🌸", dj: "🎵", catering: "🍽️", fotograaf: "📷",
-  locatie: "🏰", muziek: "🎶", video: "🎬", transport: "🚗", haar_make: "💄",
-};
 
 export default function TeamPage() {
   const { id } = useParams<{ id: string }>();
@@ -53,7 +49,7 @@ export default function TeamPage() {
 
       {weddingVendors.length === 0 ? (
         <div className="ddp-card text-center py-20" style={{ color: "var(--muted)" }}>
-          <div className="text-5xl mb-4">🤝</div>
+          <div className="flex justify-center mb-4"><Handshake className="w-12 h-12" style={{ color: "var(--accent-dark)" }} /></div>
           <h2 className="font-semibold text-lg mb-2">{tm.noVendors}</h2>
           <p className="text-sm mb-6">{tm.noVendorsSub}</p>
           <Link href={`/weddings/${id}/vendors`} className="ddp-btn-primary">
@@ -63,7 +59,6 @@ export default function TeamPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {weddingVendors.map((wv) => {
-            const icon = VENDOR_ICONS[wv.vendor.category] ?? "🤝";
             const statusLabel = tm.statusLabels[wv.status as keyof typeof tm.statusLabels] ?? wv.status;
             const statusColor =
               wv.status === "confirmed" ? "badge-success"
@@ -80,10 +75,10 @@ export default function TeamPage() {
                 {/* Top: icon + name */}
                 <div className="flex items-start gap-4 mb-4">
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
                     style={{ background: "var(--accent)" }}
                   >
-                    {icon}
+                    <Briefcase className="w-6 h-6" style={{ color: "var(--primary)" }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-base truncate group-hover:underline" style={{ color: "var(--primary)" }}>
@@ -105,17 +100,17 @@ export default function TeamPage() {
 
                 {/* Contact info */}
                 <div className="space-y-1.5 text-xs border-t pt-3" style={{ color: "var(--muted)", borderColor: "var(--border)" }}>
-                  {wv.vendor.contactPerson && <div>👤 {wv.vendor.contactPerson}</div>}
+                  {wv.vendor.contactPerson && <div className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</div>}
                   {wv.vendor.email && (
                     <div
-                      className="truncate hover:underline"
+                      className="flex items-center gap-1 truncate hover:underline"
                       style={{ color: "var(--primary)" }}
                       onClick={(e) => e.preventDefault()}
                     >
-                      ✉️ {wv.vendor.email}
+                      <Mail className="w-3 h-3 flex-shrink-0" /> {wv.vendor.email}
                     </div>
                   )}
-                  {wv.vendor.phone && <div>📞 {wv.vendor.phone}</div>}
+                  {wv.vendor.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {wv.vendor.phone}</div>}
                   {wv.notes && <div className="italic pt-1">{wv.notes}</div>}
                 </div>
 

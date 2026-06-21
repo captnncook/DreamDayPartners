@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { X, Euro } from "lucide-react";
 
 type BudgetItem = {
   id: string;
@@ -132,7 +133,7 @@ export default function BudgetPage() {
               <input type="number" value={newTotal} onChange={(e) => setNewTotal(e.target.value)}
                 className="flex-1 border rounded-lg px-3 py-1.5 text-sm" style={{ borderColor: "var(--border)" }} />
               <button type="submit" className="ddp-btn-primary px-3 py-1.5 text-xs">Opslaan</button>
-              <button type="button" onClick={() => setEditTotal(false)} className="ddp-btn-secondary px-3 py-1.5 text-xs">✕</button>
+              <button type="button" onClick={() => setEditTotal(false)} className="ddp-btn-secondary px-3 py-1.5 text-xs"><X className="w-3.5 h-3.5" /></button>
             </form>
           ) : (
             <>
@@ -227,7 +228,7 @@ export default function BudgetPage() {
                         </button>
                       </td>
                       <td className="px-4 py-3">
-                        <button onClick={() => deleteItem(item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
+                        <button onClick={() => deleteItem(item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-3.5 h-3.5" /></button>
                       </td>
                     </tr>
                   ))}
@@ -240,7 +241,7 @@ export default function BudgetPage() {
 
       {budget.items.length === 0 && (
         <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-          <div className="text-3xl mb-2">💶</div>
+          <div className="flex justify-center mb-2"><Euro className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
           <p>Nog geen budgetposten. Voeg de eerste post toe.</p>
         </div>
       )}

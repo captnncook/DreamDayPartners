@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Users, CheckSquare, Briefcase, Heart } from "lucide-react";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
@@ -41,7 +42,7 @@ export default async function WeddingsPage() {
 
       {weddings.length === 0 ? (
         <div className="ddp-card text-center py-20" style={{ color: "var(--muted)" }}>
-          <div className="text-5xl mb-4">💍</div>
+          <div className="flex justify-center mb-4"><Heart className="w-12 h-12" style={{ color: "var(--accent-dark)" }} /></div>
           <h2 className="font-semibold text-lg mb-2">Nog geen bruiloften</h2>
           <p className="text-sm mb-6">Maak de eerste bruiloft aan om te beginnen</p>
           <Link href="/weddings/new" className="ddp-btn-primary">Bruiloft aanmaken</Link>
@@ -67,9 +68,9 @@ export default async function WeddingsPage() {
                   </div>
                   <div className="text-sm" style={{ color: "var(--muted)" }}>{w.venue ?? "Locatie onbekend"} · {formatDate(w.date)}</div>
                   <div className="flex items-center gap-4 mt-2 text-xs" style={{ color: "var(--muted)" }}>
-                    <span>👥 {w._count.guests} gasten</span>
-                    <span>✅ {w._count.tasks} taken</span>
-                    <span>🤝 {w._count.vendors} leveranciers</span>
+                    <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {w._count.guests} gasten</span>
+                    <span className="flex items-center gap-1"><CheckSquare className="w-3 h-3" /> {w._count.tasks} taken</span>
+                    <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {w._count.vendors} leveranciers</span>
                     <span className="font-mono">{w.weddingCode}</span>
                   </div>
                 </div>
