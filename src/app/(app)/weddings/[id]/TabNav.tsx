@@ -2,24 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const tabs = (id: string) => [
-  { href: `/weddings/${id}`, label: "Overzicht" },
-  { href: `/weddings/${id}/tasks`, label: "Taken" },
-  { href: `/weddings/${id}/guests`, label: "Gasten" },
-  { href: `/weddings/${id}/budget`, label: "Budget" },
-  { href: `/weddings/${id}/files`, label: "Bestanden" },
-  { href: `/weddings/${id}/draaiboek`, label: "Draaiboek" },
-  { href: `/weddings/${id}/messages`, label: "Berichten" },
-  { href: `/weddings/${id}/vendors`, label: "Leveranciers" },
-];
+import { useLang } from "@/components/LangProvider";
 
 export default function TabNav({ id }: { id: string }) {
   const pathname = usePathname();
+  const { t } = useLang();
+  const tb = t.tabs;
+
+  const tabs = [
+    { href: `/weddings/${id}`, label: tb.overview },
+    { href: `/weddings/${id}/tasks`, label: tb.tasks },
+    { href: `/weddings/${id}/guests`, label: tb.guests },
+    { href: `/weddings/${id}/budget`, label: tb.budget },
+    { href: `/weddings/${id}/files`, label: tb.files },
+    { href: `/weddings/${id}/draaiboek`, label: tb.draaiboek },
+    { href: `/weddings/${id}/messages`, label: tb.messages },
+    { href: `/weddings/${id}/vendors`, label: tb.vendors },
+    { href: `/weddings/${id}/team`, label: tb.team },
+  ];
 
   return (
     <div className="flex gap-1 border-b mb-6 overflow-x-auto" style={{ borderColor: "var(--border)" }}>
-      {tabs(id).map((tab) => {
+      {tabs.map((tab) => {
         const isActive = pathname === tab.href;
         return (
           <Link

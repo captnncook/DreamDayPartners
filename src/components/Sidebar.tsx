@@ -3,18 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
-
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: "🏠", roles: ["admin", "planner", "team_member", "couple", "vendor"] },
-  { href: "/weddings", label: "Bruiloften", icon: "💍", roles: ["admin", "planner", "team_member"] },
-  { href: "/tasks", label: "Mijn Taken", icon: "✅", roles: ["planner", "team_member", "couple"] },
-  { href: "/guests", label: "Gasten", icon: "👥", roles: ["planner", "team_member", "couple"] },
-  { href: "/budget", label: "Budget", icon: "💶", roles: ["planner", "team_member"] },
-  { href: "/draaiboek", label: "Draaiboek", icon: "📋", roles: ["planner", "team_member", "couple", "vendor"] },
-  { href: "/messages", label: "Berichten", icon: "💬", roles: ["planner", "team_member", "couple", "vendor"] },
-  { href: "/vendors", label: "Leveranciers", icon: "🤝", roles: ["planner", "team_member"] },
-  { href: "/admin", label: "Beheer", icon: "⚙️", roles: ["admin"] },
-];
+import { useLang } from "@/components/LangProvider";
 
 interface SidebarProps {
   user: User;
@@ -23,6 +12,20 @@ interface SidebarProps {
 export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t, toggle } = useLang();
+  const n = t.nav;
+
+  const NAV_ITEMS = [
+    { href: "/dashboard", label: n.dashboard, icon: "🏠", roles: ["admin", "planner", "team_member", "couple", "vendor"] },
+    { href: "/weddings", label: n.weddings, icon: "💍", roles: ["admin", "planner", "team_member"] },
+    { href: "/tasks", label: n.myTasks, icon: "✅", roles: ["planner", "team_member", "couple"] },
+    { href: "/guests", label: n.guests, icon: "👥", roles: ["planner", "team_member", "couple"] },
+    { href: "/budget", label: n.budget, icon: "💶", roles: ["planner", "team_member"] },
+    { href: "/draaiboek", label: n.draaiboek, icon: "📋", roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/messages", label: n.messages, icon: "💬", roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/vendors", label: n.vendors, icon: "🤝", roles: ["planner", "team_member"] },
+    { href: "/admin", label: n.admin, icon: "⚙️", roles: ["admin"] },
+  ];
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -66,7 +69,11 @@ export default function Sidebar({ user }: SidebarProps) {
             <div className="text-sm font-medium truncate">{user.name}</div>
             <div className="text-xs truncate" style={{ color: "var(--muted)" }}>
               {roleLabels[user.role] ?? user.role}
-              {user.isPremium && <span className="ml-1 ddp-badge badge-premium" style={{ fontSize: "0.55rem", padding: "0.1rem 0.4rem" }}>Premium</span>}
+              {user.isPremium && (
+                <span className="ml-1 ddp-badge badge-premium" style={{ fontSize: "0.55rem", padding: "0.1rem 0.4rem" }}>
+                  Premium
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -93,15 +100,23 @@ export default function Sidebar({ user }: SidebarProps) {
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="px-3 py-4 border-t" style={{ borderColor: "var(--border)" }}>
+      {/* Language + Logout */}
+      <div className="px-3 py-4 border-t space-y-1" style={{ borderColor: "var(--border)" }}>
+        <button
+          onClick={toggle}
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full transition-colors hover:bg-gray-50"
+          style={{ color: "var(--muted)" }}
+        >
+          <span>🌐</span>
+          <span>{t.common.switchLang}</span>
+        </button>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm w-full transition-colors hover:bg-gray-50"
           style={{ color: "var(--muted)" }}
         >
           <span>🚪</span>
-          Uitloggen
+          {n.logout}
         </button>
       </div>
     </aside>

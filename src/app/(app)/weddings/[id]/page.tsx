@@ -245,6 +245,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             <h3 className="font-semibold text-sm mb-3">Snelle toegang</h3>
             <div className="space-y-1">
               {[
+                { href: `/weddings/${id}/team`, label: "🤝 Dream Day Team", show: true },
                 { href: `/weddings/${id}/draaiboek`, label: "📋 Draaiboek openen", show: true },
                 { href: `/weddings/${id}/guests`, label: "👥 Gastenlijst", show: true },
                 { href: `/weddings/${id}/files`, label: "📂 Bestanden", show: true },

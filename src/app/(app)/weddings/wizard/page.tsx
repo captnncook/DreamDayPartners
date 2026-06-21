@@ -30,8 +30,8 @@ export default function WeddingWizardPage() {
     setForm((p) => ({ ...p, [key]: value }));
   }
 
-  function next() { setStep((s) => (s < 4 ? (s + 1) as Step : s); }
-  function prev() { setStep((s) => (s > 1 ? (s - 1) as Step : s); }
+  function next() { setStep((s) => (s < 4 ? (s + 1) as Step : s)); }
+  function prev() { setStep((s) => (s > 1 ? (s - 1) as Step : s)); }
 
   async function handleSubmit() {
     setSaving(true);
