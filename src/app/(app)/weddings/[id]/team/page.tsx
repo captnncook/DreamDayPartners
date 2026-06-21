@@ -36,7 +36,7 @@ export default function TeamPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>
           ← {t.tabs.overview}
         </Link>
         <div className="mt-4">
@@ -81,7 +81,7 @@ export default function TeamPage() {
                     <Briefcase className="w-6 h-6" style={{ color: "var(--primary)" }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-base truncate group-hover:underline" style={{ color: "var(--primary)" }}>
+                    <h3 className="font-semibold text-base truncate" style={{ color: "var(--primary)" }}>
                       {wv.vendor.name}
                     </h3>
                     <div className="text-xs capitalize mt-0.5" style={{ color: "var(--muted)" }}>
@@ -103,7 +103,7 @@ export default function TeamPage() {
                   {wv.vendor.contactPerson && <div className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</div>}
                   {wv.vendor.email && (
                     <div
-                      className="flex items-center gap-1 truncate hover:underline"
+                      className="flex items-center gap-1 truncate"
                       style={{ color: "var(--primary)" }}
                       onClick={(e) => e.preventDefault()}
                     >

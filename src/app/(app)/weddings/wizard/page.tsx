@@ -321,7 +321,7 @@ export default function WeddingWizardPage() {
         </div>
 
         <p className="text-center text-xs mt-4" style={{ color: "var(--muted)" }}>
-          <a href="/login" className="hover:underline">← Terug naar inloggen</a>
+          <a href="/login" className="">← Terug naar inloggen</a>
         </p>
       </div>
     </div>

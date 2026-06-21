@@ -45,7 +45,7 @@ export default async function MyTasksPage() {
                   <span className={`ddp-badge ${PRIORITY_COLORS[task.priority]}`}>{PRIORITY_LABELS[task.priority]}</span>
                 </div>
                 <div className="flex items-center gap-3 mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                  <Link href={`/weddings/${task.weddingId}`} className="flex items-center gap-1 hover:underline" style={{ color: "var(--primary)" }}><Heart className="w-3 h-3" /> {task.wedding.title}</Link>
+                  <Link href={`/weddings/${task.weddingId}`} className="flex items-center gap-1" style={{ color: "var(--primary)" }}><Heart className="w-3 h-3" /> {task.wedding.title}</Link>
                   {task.dueDate && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {formatDate(task.dueDate)}</span>}
                 </div>
               </div>

@@ -93,7 +93,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
   return (
     <div className="h-screen flex flex-col">
       <div className="px-8 py-5 border-b flex items-center gap-4" style={{ borderColor: "var(--border)", background: "white" }}>
-        <Link href={`/weddings/${weddingId}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug</Link>
+        <Link href={`/weddings/${weddingId}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
         <h1 className="font-bold text-lg">Berichten — {weddingTitle}</h1>
       </div>
 

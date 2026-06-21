@@ -162,7 +162,7 @@ export default function VendorDetailPage() {
     <div className="p-8 max-w-4xl mx-auto">
       {/* Breadcrumb */}
       <div className="mb-6">
-        <Link href={`/weddings/${id}/team`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>
+        <Link href={`/weddings/${id}/team`} className="text-sm" style={{ color: "var(--muted)" }}>
           {vd.back}
         </Link>
       </div>
@@ -181,9 +181,9 @@ export default function VendorDetailPage() {
             <div className="text-sm capitalize mt-0.5" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
             <div className="flex items-center gap-3 mt-2 flex-wrap text-xs" style={{ color: "var(--muted)" }}>
               {wv.vendor.contactPerson && <span className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</span>}
-              {wv.vendor.email && <a href={`mailto:${wv.vendor.email}`} className="flex items-center gap-1 hover:underline" style={{ color: "var(--primary)" }}><Mail className="w-3 h-3" /> {wv.vendor.email}</a>}
+              {wv.vendor.email && <a href={`mailto:${wv.vendor.email}`} className="flex items-center gap-1" style={{ color: "var(--primary)" }}><Mail className="w-3 h-3" /> {wv.vendor.email}</a>}
               {wv.vendor.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {wv.vendor.phone}</span>}
-              {wv.vendor.website && <a href={wv.vendor.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:underline" style={{ color: "var(--primary)" }}><Globe className="w-3 h-3" /> Website</a>}
+              {wv.vendor.website && <a href={wv.vendor.website} target="_blank" rel="noreferrer" className="flex items-center gap-1" style={{ color: "var(--primary)" }}><Globe className="w-3 h-3" /> Website</a>}
             </div>
           </div>
         </div>

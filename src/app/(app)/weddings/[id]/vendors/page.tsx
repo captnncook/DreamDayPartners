@@ -92,7 +92,7 @@ export default function VendorsPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug</Link>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
           <h1 className="text-2xl font-bold">Leveranciers</h1>
           <button onClick={() => setShowAdd(!showAdd)} className="ddp-btn-primary">
@@ -200,7 +200,7 @@ export default function VendorsPage() {
               <div className="mt-3 space-y-1.5 text-xs" style={{ color: "var(--muted)" }}>
                 {wv.vendor.contactPerson && <div className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</div>}
                 {wv.vendor.email && (
-                  <div className="flex items-center gap-1"><Mail className="w-3 h-3" /><a href={`mailto:${wv.vendor.email}`} className="hover:underline" style={{ color: "var(--primary)" }}>{wv.vendor.email}</a></div>
+                  <div className="flex items-center gap-1"><Mail className="w-3 h-3" /><a href={`mailto:${wv.vendor.email}`} className="" style={{ color: "var(--primary)" }}>{wv.vendor.email}</a></div>
                 )}
                 {wv.vendor.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {wv.vendor.phone}</div>}
                 {wv.notes && <div className="italic">{wv.notes}</div>}
