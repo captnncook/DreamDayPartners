@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import TabNav from "./TabNav";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
@@ -56,16 +57,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
     contacted: "badge-neutral", quote_received: "badge-warning", booked: "badge-info", confirmed: "badge-success",
   };
 
-  const tabs = [
-    { href: `/weddings/${id}`, label: "Overzicht" },
-    { href: `/weddings/${id}/tasks`, label: "Taken" },
-    { href: `/weddings/${id}/guests`, label: "Gasten" },
-    { href: `/weddings/${id}/budget`, label: "Budget" },
-    { href: `/weddings/${id}/files`, label: "Bestanden" },
-    { href: `/weddings/${id}/draaiboek`, label: "Draaiboek" },
-    { href: `/weddings/${id}/messages`, label: "Berichten" },
-    { href: `/weddings/${id}/vendors`, label: "Leveranciers" },
-  ];
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -101,18 +92,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b mb-6 overflow-x-auto" style={{ borderColor: "var(--border)" }}>
-        {tabs.map((tab) => (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className="px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors"
-            style={{ borderColor: "var(--primary)", color: "var(--primary)" }}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
+      <TabNav id={id} />
 
       {/* Overview grid */}
       <div className="grid grid-cols-3 gap-6">

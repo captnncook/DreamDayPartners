@@ -1,7 +1,14 @@
-import { getSession } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
-import { redirect, notFound } from "next/navigation";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
+
+type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
+type WeddingVendor = {
+  id: string; status: string; portalAccess: boolean; notes?: string;
+  vendor: Vendor;
+};
 
 const VENDOR_ICONS: Record<string, string> = {
   bloemist: "🌸", dj: "🎵", catering: "🍽️", fotograaf: "📷", locatie: "🏰",
@@ -14,23 +21,76 @@ const STATUS_LABELS: Record<string, string> = {
   contacted: "Gecontacteerd", quote_received: "Offerte ontvangen", booked: "Geboekt", confirmed: "Bevestigd",
 };
 
-export default async function VendorsPage({ params }: { params: Promise<{ id: string }> }) {
-  const user = await getSession();
-  if (!user) redirect("/login");
+export default function VendorsPage() {
+  const { id } = useParams<{ id: string }>();
+  const [weddingVendors, setWeddingVendors] = useState<WeddingVendor[]>([]);
+  const [allVendors, setAllVendors] = useState<Vendor[]>([]);
+  const [isPremium, setIsPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [selectedVendorId, setSelectedVendorId] = useState("");
+  const [addNotes, setAddNotes] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const { id } = await params;
+  const load = useCallback(async () => {
+    const [wvRes, vRes, wRes] = await Promise.all([
+      fetch(`/api/weddings/${id}/vendors`),
+      fetch("/api/vendors"),
+      fetch(`/api/weddings/${id}`),
+    ]);
+    const [wvData, vData, wData] = await Promise.all([wvRes.json(), vRes.json(), wRes.json()]);
+    setWeddingVendors(wvData.vendors ?? []);
+    setAllVendors(vData.vendors ?? []);
+    setIsPremium(wData.wedding?.isPremium ?? false);
+    setLoading(false);
+  }, [id]);
 
-  const wedding = await prisma.wedding.findUnique({
-    where: { id },
-    select: { id: true, title: true, isPremium: true },
-  });
-  if (!wedding) notFound();
+  useEffect(() => { load(); }, [load]);
 
-  const weddingVendors = await prisma.weddingVendor.findMany({
-    where: { weddingId: id },
-    include: { vendor: true },
-    orderBy: { createdAt: "asc" },
-  });
+  const linkedIds = new Set(weddingVendors.map((wv) => wv.vendor.id));
+  const available = allVendors.filter((v) => !linkedIds.has(v.id));
+
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedVendorId) return;
+    setSaving(true);
+    await fetch(`/api/weddings/${id}/vendors`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vendorId: selectedVendorId, notes: addNotes }),
+    });
+    setSelectedVendorId("");
+    setAddNotes("");
+    setShowAdd(false);
+    setSaving(false);
+    load();
+  }
+
+  async function togglePortal(wv: WeddingVendor) {
+    await fetch(`/api/weddings/${id}/vendors/${wv.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ portalAccess: !wv.portalAccess }),
+    });
+    load();
+  }
+
+  async function updateStatus(wv: WeddingVendor, status: string) {
+    await fetch(`/api/weddings/${id}/vendors/${wv.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    load();
+  }
+
+  async function removeVendor(wv: WeddingVendor) {
+    if (!confirm(`${wv.vendor.name} verwijderen uit deze bruiloft?`)) return;
+    await fetch(`/api/weddings/${id}/vendors/${wv.id}`, { method: "DELETE" });
+    load();
+  }
+
+  if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -38,27 +98,76 @@ export default async function VendorsPage({ params }: { params: Promise<{ id: st
         <Link href={`/weddings/${id}`} className="text-sm hover:underline" style={{ color: "var(--muted)" }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
           <h1 className="text-2xl font-bold">Leveranciers</h1>
+          <button onClick={() => setShowAdd(!showAdd)} className="ddp-btn-primary">
+            {showAdd ? "Annuleren" : "+ Leverancier koppelen"}
+          </button>
         </div>
       </div>
 
-      {!wedding.isPremium && (
+      {!isPremium && (
         <div className="ddp-card mb-6 flex items-center gap-4" style={{ background: "#fef9ec", border: "1px solid #f5d080" }}>
           <span className="text-2xl">⭐</span>
           <div>
             <div className="font-semibold text-sm">Leveranciersportaal is een Premium functie</div>
             <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-              Met een Premium account kunnen leveranciers inloggen en hun eigen draaiboek-items en communicatie bekijken.
+              Met Premium kunnen leveranciers inloggen en hun eigen draaiboek-items bekijken.
             </div>
           </div>
-          <button className="ddp-btn-primary ml-auto flex-shrink-0 text-sm">Upgrade naar Premium</button>
+          <button
+            onClick={() => alert("Premium upgrade: neem contact op met DreamDay Partners.")}
+            className="ddp-btn-primary ml-auto flex-shrink-0 text-sm"
+          >
+            Upgrade naar Premium
+          </button>
         </div>
+      )}
+
+      {showAdd && (
+        <form onSubmit={handleAdd} className="ddp-card mb-6 space-y-4">
+          <h3 className="font-semibold">Leverancier koppelen</h3>
+          {available.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--muted)" }}>Alle leveranciers zijn al gekoppeld.</p>
+          ) : (
+            <>
+              <div>
+                <label className="block text-xs font-medium mb-1">Leverancier</label>
+                <select
+                  required
+                  value={selectedVendorId}
+                  onChange={(e) => setSelectedVendorId(e.target.value)}
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <option value="">Kies een leverancier...</option>
+                  {available.map((v) => (
+                    <option key={v.id} value={v.id}>{VENDOR_ICONS[v.category] ?? "🤝"} {v.name} — {v.category}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1">Notities (optioneel)</label>
+                <input
+                  value={addNotes}
+                  onChange={(e) => setAddNotes(e.target.value)}
+                  placeholder="bijv. menu voor 80 personen besproken"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--border)" }}
+                />
+              </div>
+              <button type="submit" disabled={saving || !selectedVendorId} className="ddp-btn-primary w-full">
+                {saving ? "Koppelen..." : "Leverancier koppelen"}
+              </button>
+            </>
+          )}
+        </form>
       )}
 
       {weddingVendors.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
           <div className="text-4xl mb-3">🤝</div>
           <h2 className="font-semibold text-lg mb-2">Nog geen leveranciers</h2>
-          <p className="text-sm">Voeg leveranciers toe om ze te koppelen aan deze bruiloft</p>
+          <p className="text-sm mb-4">Koppel leveranciers aan deze bruiloft</p>
+          <button onClick={() => setShowAdd(true)} className="ddp-btn-primary">+ Leverancier koppelen</button>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
@@ -72,46 +181,52 @@ export default async function VendorsPage({ params }: { params: Promise<{ id: st
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-sm">{wv.vendor.name}</h3>
-                    <span className={`ddp-badge ${STATUS_COLORS[wv.status] ?? "badge-neutral"}`}>
-                      {STATUS_LABELS[wv.status] ?? wv.status}
-                    </span>
                     {wv.portalAccess && <span className="ddp-badge badge-premium">Portal</span>}
                   </div>
                   <div className="text-xs capitalize mt-0.5" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
                 </div>
+                <button onClick={() => removeVendor(wv)} className="text-xs hover:opacity-70 flex-shrink-0" style={{ color: "var(--muted)" }}>✕</button>
               </div>
 
-              <div className="mt-4 space-y-2 text-xs" style={{ color: "var(--muted)" }}>
-                {wv.vendor.contactPerson && (
-                  <div className="flex items-center gap-2"><span>👤</span><span>{wv.vendor.contactPerson}</span></div>
-                )}
+              <div className="mt-3">
+                <select
+                  value={wv.status}
+                  onChange={(e) => updateStatus(wv, e.target.value)}
+                  className="w-full border rounded-lg px-2 py-1.5 text-xs"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {Object.entries(STATUS_LABELS).map(([v, l]) => (
+                    <option key={v} value={v}>{l}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-3 space-y-1.5 text-xs" style={{ color: "var(--muted)" }}>
+                {wv.vendor.contactPerson && <div>👤 {wv.vendor.contactPerson}</div>}
                 {wv.vendor.email && (
-                  <div className="flex items-center gap-2">
-                    <span>✉️</span>
-                    <a href={`mailto:${wv.vendor.email}`} className="hover:underline" style={{ color: "var(--primary)" }}>{wv.vendor.email}</a>
-                  </div>
+                  <div><a href={`mailto:${wv.vendor.email}`} className="hover:underline" style={{ color: "var(--primary)" }}>✉️ {wv.vendor.email}</a></div>
                 )}
-                {wv.vendor.phone && (
-                  <div className="flex items-center gap-2"><span>📞</span><span>{wv.vendor.phone}</span></div>
-                )}
-                {wv.notes && (
-                  <div className="mt-2 pt-2 border-t" style={{ borderColor: "var(--border)" }}>
-                    <div className="font-medium text-xs mb-0.5">Notities</div>
-                    <p>{wv.notes}</p>
-                  </div>
-                )}
+                {wv.vendor.phone && <div>📞 {wv.vendor.phone}</div>}
+                {wv.notes && <div className="italic">{wv.notes}</div>}
               </div>
 
-              <div className="mt-4 pt-4 border-t flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-                <span className="text-xs" style={{ color: "var(--muted)" }}>
-                  {wv.portalAccess ? "✅ Leverancier heeft portaltoegang" : "Geen portaltoegang"}
-                </span>
-                {wedding.isPremium && (
-                  <button className="text-xs" style={{ color: "var(--primary)" }}>
+              {isPremium && (
+                <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+                  <span className="text-xs" style={{ color: "var(--muted)" }}>
+                    {wv.portalAccess ? "✅ Portaltoegang actief" : "Geen portaltoegang"}
+                  </span>
+                  <button
+                    onClick={() => togglePortal(wv)}
+                    className="text-xs px-2 py-1 rounded-md transition-colors"
+                    style={{
+                      background: wv.portalAccess ? "#fde8e8" : "var(--accent)",
+                      color: wv.portalAccess ? "var(--danger)" : "var(--primary)",
+                    }}
+                  >
                     {wv.portalAccess ? "Toegang intrekken" : "Portal uitnodigen"}
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

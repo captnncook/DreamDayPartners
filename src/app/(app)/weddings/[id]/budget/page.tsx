@@ -41,6 +41,22 @@ export default function BudgetPage() {
   const [form, setForm] = useState({ category: "Catering", description: "", estimated: "", actual: "", payStatus: "pending" });
   const [saving, setSaving] = useState(false);
 
+  async function deleteItem(itemId: string) {
+    if (!confirm("Budgetpost verwijderen?")) return;
+    await fetch(`/api/weddings/${id}/budget/${itemId}`, { method: "DELETE" });
+    load();
+  }
+
+  async function cyclePayStatus(item: BudgetItem) {
+    const next = item.payStatus === "pending" ? "deposit_paid" : item.payStatus === "deposit_paid" ? "paid" : "pending";
+    await fetch(`/api/weddings/${id}/budget/${item.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ payStatus: next }),
+    });
+    load();
+  }
+
   const load = useCallback(async () => {
     const res = await fetch(`/api/weddings/${id}/budget`);
     const data = await res.json();
@@ -202,7 +218,16 @@ export default function BudgetPage() {
                       <td className="px-4 py-3 text-sm text-right" style={{ color: "var(--muted)" }}>{euro(item.estimated)}</td>
                       <td className="px-4 py-3 text-sm text-right font-medium">{euro(item.actual)}</td>
                       <td className="px-4 py-3">
-                        <span className={`ddp-badge ${PAY_COLORS[item.payStatus]}`}>{PAY_LABELS[item.payStatus]}</span>
+                        <button
+                          onClick={() => cyclePayStatus(item)}
+                          className={`ddp-badge ${PAY_COLORS[item.payStatus]} cursor-pointer hover:opacity-80`}
+                          title="Klik om status te wijzigen"
+                        >
+                          {PAY_LABELS[item.payStatus]}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => deleteItem(item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
                       </td>
                     </tr>
                   ))}

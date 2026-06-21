@@ -108,6 +108,14 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
     setSaving(false);
   }
 
+  async function deleteItem(draaiboekId: string, itemId: string) {
+    if (!confirm("Item verwijderen?")) return;
+    await fetch(`/api/weddings/${weddingId}/draaiboek/${draaiboekId}/items/${itemId}`, { method: "DELETE" });
+    setDraaiboeken((prev) =>
+      prev.map((d) => d.id === draaiboekId ? { ...d, items: d.items.filter((i) => i.id !== itemId) } : d)
+    );
+  }
+
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
@@ -251,9 +259,12 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
                                   <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{item.description}</p>
                                 )}
                               </div>
-                              <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>
-                                {formatDuration(item.duration)}
-                              </span>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-xs" style={{ color: "var(--muted)" }}>{formatDuration(item.duration)}</span>
+                                {!isReadOnly && (
+                                  <button onClick={() => deleteItem(activeDraaiboekId!, item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
+                                )}
+                              </div>
                             </div>
                             <div className="flex items-center gap-3 mt-2 flex-wrap">
                               {item.location && (

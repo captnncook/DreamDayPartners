@@ -39,6 +39,9 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
   const [activeThreadId, setActiveThreadId] = useState<string | null>(initial[0]?.id ?? null);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [showNewThread, setShowNewThread] = useState(false);
+  const [newSubject, setNewSubject] = useState("");
+  const [newType, setNewType] = useState("internal");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activeThread = threads.find((t) => t.id === activeThreadId);
@@ -46,6 +49,22 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeThread?.messages.length]);
+
+  async function createThread(e: React.FormEvent) {
+    e.preventDefault();
+    const res = await fetch(`/api/weddings/${weddingId}/messages/threads`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: newType, subject: newSubject }),
+    });
+    const data = await res.json();
+    if (data.thread) {
+      setThreads((prev) => [data.thread, ...prev]);
+      setActiveThreadId(data.thread.id);
+    }
+    setNewSubject("");
+    setShowNewThread(false);
+  }
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -80,6 +99,37 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
       <div className="flex flex-1 min-h-0">
         <div className="w-64 border-r flex-shrink-0 overflow-y-auto" style={{ borderColor: "var(--border)", background: "white" }}>
           <div className="p-4 space-y-1">
+            <button
+              onClick={() => setShowNewThread(!showNewThread)}
+              className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium mb-2 transition-colors"
+              style={{ background: "var(--primary)", color: "white" }}
+            >
+              + Nieuw gesprek
+            </button>
+            {showNewThread && (
+              <form onSubmit={createThread} className="mb-3 space-y-2">
+                <input
+                  value={newSubject}
+                  onChange={(e) => setNewSubject(e.target.value)}
+                  placeholder="Onderwerp"
+                  className="w-full border rounded-lg px-2 py-1.5 text-xs"
+                  style={{ borderColor: "var(--border)" }}
+                />
+                <select
+                  value={newType}
+                  onChange={(e) => setNewType(e.target.value)}
+                  className="w-full border rounded-lg px-2 py-1.5 text-xs"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <option value="internal">🔒 Intern team</option>
+                  <option value="couple">💍 Bruidspaar</option>
+                  {isPremium && <option value="vendor">🤝 Leverancier</option>}
+                </select>
+                <button type="submit" className="w-full text-xs py-1.5 rounded-lg" style={{ background: "var(--accent)", color: "var(--primary)" }}>
+                  Aanmaken
+                </button>
+              </form>
+            )}
             {threads.length === 0 && (
               <p className="text-xs text-center pt-4" style={{ color: "var(--muted)" }}>Geen gesprekken</p>
             )}

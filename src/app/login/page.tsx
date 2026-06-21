@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
 
 const ROLE_OPTIONS: { value: DemoRole; label: string; icon: string; description: string }[] = [
@@ -133,6 +134,25 @@ export default function LoginPage() {
               {loading ? "Bezig met inloggen..." : `Inloggen als ${selected.label}`}
             </button>
           </form>
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 mt-4">
+          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+          <span className="text-xs" style={{ color: "var(--muted)" }}>of</span>
+          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+        </div>
+
+        {/* Register CTA */}
+        <div className="ddp-card shadow-lg mt-4 text-center">
+          <div className="text-2xl mb-2">💍</div>
+          <h2 className="font-semibold text-sm mb-1">Jullie bruiloft plannen?</h2>
+          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>
+            Maak gratis een DreamDay-account aan en begin direct met plannen.
+          </p>
+          <Link href="/weddings/wizard" className="ddp-btn-primary block w-full py-3 text-sm text-center">
+            Maak Dream Day account aan
+          </Link>
         </div>
 
         <p className="text-center text-xs mt-4" style={{ color: "var(--muted)" }}>
