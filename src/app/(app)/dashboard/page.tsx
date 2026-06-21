@@ -67,8 +67,8 @@ export default async function DashboardPage() {
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">{greetings[user.role] ?? "Welkom"}</h1>
-        <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
+        <h1 className="font-serif text-3xl font-bold tracking-tight">{greetings[user.role] ?? "Welkom"}</h1>
+        <p className="text-sm mt-1.5" style={{ color: "var(--muted)" }}>
           {new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
         </p>
       </div>
@@ -107,7 +107,7 @@ export default async function DashboardPage() {
                 const days = daysUntil(w.date);
                 return (
                   <Link key={w.id} href={`/weddings/${w.id}`}
-                    className="ddp-card flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer block">
+                    className="ddp-card ddp-card-hover flex items-center gap-4 cursor-pointer block">
                     <div className="w-12 h-12 rounded-xl flex flex-col items-center justify-center text-white text-xs font-bold flex-shrink-0"
                       style={{ background: days < 30 ? "#e05252" : days < 90 ? "var(--warning)" : "var(--primary)" }}>
                       <span className="text-lg leading-none">{new Date(w.date).getDate()}</span>
@@ -193,11 +193,23 @@ export default async function DashboardPage() {
 
 function StatCard({ label, value, icon }: { label: string; value: number; icon: string }) {
   return (
-    <div className="ddp-card flex items-center gap-3">
-      <span className="text-2xl">{icon}</span>
-      <div>
-        <div className="text-2xl font-bold">{value}</div>
-        <div className="text-xs" style={{ color: "var(--muted)" }}>{label}</div>
+    <div className="ddp-stat-card">
+      <div className="flex items-center justify-between">
+        <div>
+          <div
+            className="text-2xl font-bold tracking-tight mb-0.5"
+            style={{ color: "var(--foreground)" }}
+          >
+            {value}
+          </div>
+          <div className="text-xs font-medium" style={{ color: "var(--muted)" }}>{label}</div>
+        </div>
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+          style={{ background: "var(--accent)" }}
+        >
+          {icon}
+        </div>
       </div>
     </div>
   );
