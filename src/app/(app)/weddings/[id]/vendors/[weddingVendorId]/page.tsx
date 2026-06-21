@@ -16,6 +16,24 @@ const VENDOR_ICONS: Record<string, string> = {
   locatie: "🏰", muziek: "🎶", video: "🎬", transport: "🚗", haar_make: "💄",
 };
 
+function addMinutes(time: string, mins: number): string {
+  const [h, m] = time.split(":").map(Number);
+  const total = h * 60 + m + mins;
+  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+function diffMinutes(from: string, to: string): number {
+  const [fh, fm] = from.split(":").map(Number);
+  const [th, tm] = to.split(":").map(Number);
+  return Math.max(5, th * 60 + tm - (fh * 60 + fm));
+}
+
+function formatDuration(mins: number) {
+  if (mins < 60) return `${mins} min`;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return m > 0 ? `${h}u ${m}min` : `${h}u`;
+}
+
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -26,12 +44,6 @@ function fileIcon(mime: string) {
   if (mime.startsWith("image/")) return "🖼️";
   if (mime === "application/pdf") return "📄";
   return "📁";
-}
-
-function formatDuration(mins: number) {
-  if (mins < 60) return `${mins} min`;
-  const h = Math.floor(mins / 60), m = mins % 60;
-  return m > 0 ? `${h}u ${m}min` : `${h}u`;
 }
 
 export default function VendorDetailPage() {
@@ -51,11 +63,12 @@ export default function VendorDetailPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadName, setUploadName] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Schedule form state
   const [showScheduleForm, setShowScheduleForm] = useState(false);
-  const [scheduleForm, setScheduleForm] = useState({ draaiboekId: "", startTime: "09:00", duration: 30, title: "", location: "", notes: "" });
+  const [scheduleForm, setScheduleForm] = useState({ draaiboekId: "", startTime: "09:00", endTime: "09:30", title: "", location: "", notes: "" });
   const [savingSchedule, setSavingSchedule] = useState(false);
 
   const load = useCallback(async () => {
@@ -81,19 +94,27 @@ export default function VendorDetailPage() {
     e.preventDefault();
     if (!selectedFile) return;
     setUploading(true);
+    setUploadError("");
     const fd = new FormData();
     fd.append("file", selectedFile);
     fd.append("name", uploadName || selectedFile.name);
     fd.append("category", "inspiratie");
-    const res = await fetch(`/api/weddings/${id}/files`, { method: "POST", body: fd });
-    const data = await res.json();
-    if (data.document) {
-      setFiles((prev) => [data.document, ...prev]);
-      setSelectedFile(null);
-      setUploadName("");
-      setShowUpload(false);
+    try {
+      const res = await fetch(`/api/weddings/${id}/files`, { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.document) {
+        setFiles((prev) => [data.document, ...prev]);
+        setSelectedFile(null);
+        setUploadName("");
+        setShowUpload(false);
+      } else {
+        setUploadError(data.error ?? "Upload mislukt");
+      }
+    } catch {
+      setUploadError("Netwerkfout — probeer opnieuw");
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   }
 
   async function handleDeleteFile(fileId: string) {
@@ -115,12 +136,15 @@ export default function VendorDetailPage() {
     const res = await fetch(`/api/weddings/${id}/vendors/${weddingVendorId}/schedule`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(scheduleForm),
+      body: JSON.stringify({
+        ...scheduleForm,
+        duration: diffMinutes(scheduleForm.startTime, scheduleForm.endTime),
+      }),
     });
     const data = await res.json();
     if (data.item) {
       setSchedule((prev) => [...prev, data.item].sort((a, b) => a.startTime.localeCompare(b.startTime)));
-      setScheduleForm((p) => ({ ...p, startTime: "09:00", duration: 30, title: "", location: "", notes: "" }));
+      setScheduleForm((p) => ({ ...p, startTime: "09:00", endTime: "09:30", title: "", location: "", notes: "" }));
       setShowScheduleForm(false);
     }
     setSavingSchedule(false);
@@ -250,6 +274,11 @@ export default function VendorDetailPage() {
                   style={{ borderColor: "var(--border)" }}
                 />
               )}
+              {uploadError && (
+                <div className="p-3 rounded-lg text-sm" style={{ background: "#fde8e8", color: "var(--danger)" }}>
+                  ⚠️ {uploadError}
+                </div>
+              )}
               <button type="submit" disabled={!selectedFile || uploading} className="ddp-btn-primary w-full">
                 {uploading ? vd.uploading : "Uploaden"}
               </button>
@@ -328,25 +357,38 @@ export default function VendorDetailPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1">{vd.scheduleForm.time}</label>
+                  <label className="block text-xs font-medium mb-1">Van</label>
                   <input
                     type="time"
                     value={scheduleForm.startTime}
-                    onChange={(e) => setScheduleForm((p) => ({ ...p, startTime: e.target.value }))}
+                    onChange={(e) => {
+                      const start = e.target.value;
+                      setScheduleForm((p) => ({
+                        ...p,
+                        startTime: start,
+                        endTime: addMinutes(start, diffMinutes(p.startTime, p.endTime)),
+                      }));
+                    }}
                     className="w-full border rounded-lg px-3 py-2 text-sm"
                     style={{ borderColor: "var(--border)" }}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1">{vd.scheduleForm.duration}</label>
+                  <label className="block text-xs font-medium mb-1">Tot</label>
                   <input
-                    type="number"
-                    min={5} step={5}
-                    value={scheduleForm.duration}
-                    onChange={(e) => setScheduleForm((p) => ({ ...p, duration: parseInt(e.target.value) }))}
+                    type="time"
+                    value={scheduleForm.endTime}
+                    min={scheduleForm.startTime}
+                    onChange={(e) => setScheduleForm((p) => ({ ...p, endTime: e.target.value }))}
                     className="w-full border rounded-lg px-3 py-2 text-sm"
                     style={{ borderColor: "var(--border)" }}
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1">Duur</label>
+                  <div className="border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)", background: "var(--accent)", color: "var(--muted)" }}>
+                    {formatDuration(diffMinutes(scheduleForm.startTime, scheduleForm.endTime))}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium mb-1">{vd.scheduleForm.title} *</label>
@@ -410,7 +452,8 @@ export default function VendorDetailPage() {
                     <div className="flex items-start gap-4">
                       <div className="text-center flex-shrink-0 pt-0.5">
                         <div className="text-base font-bold" style={{ color: "var(--primary)" }}>{item.startTime}</div>
-                        <div className="text-xs" style={{ color: "var(--muted)" }}>{formatDuration(item.duration)}</div>
+                        <div className="text-xs" style={{ color: "var(--muted)" }}>– {addMinutes(item.startTime, item.duration)}</div>
+                        <div className="text-xs mt-0.5" style={{ color: "var(--muted)", opacity: 0.7 }}>{formatDuration(item.duration)}</div>
                       </div>
                       <div>
                         <div className="font-medium text-sm">{item.title}</div>

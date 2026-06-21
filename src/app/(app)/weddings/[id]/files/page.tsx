@@ -51,6 +51,7 @@ export default function FilesPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState("");
   const [form, setForm] = useState({ name: "", category: "inspiratie" });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -75,6 +76,7 @@ export default function FilesPage() {
     e.preventDefault();
     if (!selectedFile) return;
     setUploading(true);
+    setUploadError("");
     setUploadProgress(10);
 
     const formData = new FormData();
@@ -97,7 +99,11 @@ export default function FilesPage() {
         setSelectedFile(null);
         setShowUpload(false);
         if (fileInputRef.current) fileInputRef.current.value = "";
+      } else {
+        setUploadError(data.error ?? "Upload mislukt");
       }
+    } catch {
+      setUploadError("Netwerkfout — probeer opnieuw");
     } finally {
       setUploadProgress(100);
       setTimeout(() => { setUploading(false); setUploadProgress(0); }, 500);
@@ -213,6 +219,12 @@ export default function FilesPage() {
               <div className="text-xs mt-1 text-center" style={{ color: "var(--muted)" }}>
                 Uploaden naar Cloudflare R2...
               </div>
+            </div>
+          )}
+
+          {uploadError && (
+            <div className="mb-4 p-3 rounded-lg text-sm" style={{ background: "#fde8e8", color: "var(--danger)" }}>
+              ⚠️ {uploadError}
             </div>
           )}
 

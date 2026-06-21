@@ -34,22 +34,36 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const category = (formData.get("category") as string) || "overig";
   const name = (formData.get("name") as string) || file?.name || "bestand";
 
-  if (!file) return Response.json({ error: "Geen bestand" }, { status: 400 });
+  if (!file) return Response.json({ error: "Geen bestand meegegeven" }, { status: 400 });
+  if (file.size > 50 * 1024 * 1024) return Response.json({ error: "Bestand is groter dan 50 MB" }, { status: 400 });
+
+  // Validate R2 configuration
+  if (!process.env.R2_ACCOUNT_ID || !process.env.R2_ACCESS_KEY_ID || !process.env.R2_SECRET_ACCESS_KEY) {
+    return Response.json(
+      { error: "Cloudflare R2 is niet geconfigureerd. Voeg R2_ACCOUNT_ID, R2_ACCESS_KEY_ID en R2_SECRET_ACCESS_KEY toe als omgevingsvariabelen." },
+      { status: 503 }
+    );
+  }
 
   const ext = file.name.split(".").pop() ?? "";
   const fileKey = `weddings/${id}/${uuidv4()}${ext ? `.${ext}` : ""}`;
-
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  await r2.send(
-    new PutObjectCommand({
-      Bucket: R2_BUCKET,
-      Key: fileKey,
-      Body: buffer,
-      ContentType: file.type || "application/octet-stream",
-      ContentLength: buffer.length,
-    })
-  );
+  try {
+    await r2.send(
+      new PutObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: fileKey,
+        Body: buffer,
+        ContentType: file.type || "application/octet-stream",
+        ContentLength: buffer.length,
+      })
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Onbekende fout";
+    console.error("[R2 upload error]", err);
+    return Response.json({ error: `Upload mislukt: ${message}` }, { status: 502 });
+  }
 
   const document = await prisma.document.create({
     data: {

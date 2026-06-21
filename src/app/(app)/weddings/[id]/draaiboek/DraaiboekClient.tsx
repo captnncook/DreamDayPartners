@@ -43,6 +43,18 @@ const CATEGORY_ICONS: Record<string, string> = {
   bloemist: "🌸", dj: "🎵", catering: "🍽️", fotograaf: "📷", default: "🎊",
 };
 
+function addMinutes(time: string, mins: number): string {
+  const [h, m] = time.split(":").map(Number);
+  const total = h * 60 + m + mins;
+  return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+function diffMinutes(from: string, to: string): number {
+  const [fh, fm] = from.split(":").map(Number);
+  const [th, tm] = to.split(":").map(Number);
+  return Math.max(5, th * 60 + tm - (fh * 60 + fm));
+}
+
 function formatDuration(mins: number) {
   if (mins < 60) return `${mins} min`;
   const h = Math.floor(mins / 60);
@@ -58,7 +70,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
   const [newDraaiboekTitle, setNewDraaiboekTitle] = useState("");
   const [saving, setSaving] = useState(false);
   const [newItem, setNewItem] = useState({
-    startTime: "09:00", duration: 30, title: "", description: "", location: "", vendorId: "", notes: "",
+    startTime: "09:00", endTime: "09:30", title: "", description: "", location: "", vendorId: "", notes: "",
   });
 
   const activeDraaiboek = draaiboeken.find((d) => d.id === activeDraaiboekId);
@@ -86,11 +98,17 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
     e.preventDefault();
     if (!activeDraaiboekId) return;
     setSaving(true);
+    const duration = diffMinutes(newItem.startTime, newItem.endTime);
     const res = await fetch(`/api/weddings/${weddingId}/draaiboek/${activeDraaiboekId}/items`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...newItem,
+        startTime: newItem.startTime,
+        duration,
+        title: newItem.title,
+        description: newItem.description,
+        location: newItem.location,
+        notes: newItem.notes,
         vendorId: newItem.vendorId || null,
         sortOrder: (activeDraaiboek?.items.length ?? 0) + 1,
       }),
@@ -103,7 +121,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
         )
       );
     }
-    setNewItem({ startTime: "09:00", duration: 30, title: "", description: "", location: "", vendorId: "", notes: "" });
+    setNewItem({ startTime: "09:00", endTime: "09:30", title: "", description: "", location: "", vendorId: "", notes: "" });
     setShowAddItem(false);
     setSaving(false);
   }
@@ -192,16 +210,38 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
                     <h3 className="font-semibold">Item toevoegen</h3>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs font-medium mb-1">Starttijd</label>
-                        <input type="time" value={newItem.startTime} onChange={(e) => setNewItem((p) => ({ ...p, startTime: e.target.value }))}
+                        <label className="block text-xs font-medium mb-1">Van</label>
+                        <input
+                          type="time"
+                          value={newItem.startTime}
+                          onChange={(e) => {
+                            const start = e.target.value;
+                            setNewItem((p) => ({
+                              ...p,
+                              startTime: start,
+                              endTime: addMinutes(start, diffMinutes(p.startTime, p.endTime)),
+                            }));
+                          }}
                           className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium mb-1">Duur (min)</label>
-                        <input type="number" value={newItem.duration} onChange={(e) => setNewItem((p) => ({ ...p, duration: parseInt(e.target.value) }))}
-                          min={5} step={5} className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+                        <label className="block text-xs font-medium mb-1">Tot</label>
+                        <input
+                          type="time"
+                          value={newItem.endTime}
+                          min={newItem.startTime}
+                          onChange={(e) => setNewItem((p) => ({ ...p, endTime: e.target.value }))}
+                          className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
                       </div>
                       <div>
+                        <label className="block text-xs font-medium mb-1">Duur</label>
+                        <div className="border rounded-lg px-3 py-2 text-sm flex items-center" style={{ borderColor: "var(--border)", background: "var(--accent)", color: "var(--muted)" }}>
+                          {formatDuration(diffMinutes(newItem.startTime, newItem.endTime))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
                         <label className="block text-xs font-medium mb-1">Leverancier</label>
                         <select value={newItem.vendorId} onChange={(e) => setNewItem((p) => ({ ...p, vendorId: e.target.value }))}
                           className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
@@ -240,48 +280,54 @@ export default function DraaiboekClient({ weddingId, weddingTitle, weddingDate, 
                   </div>
                 ) : (
                   <div className="relative">
-                    <div className="absolute left-[4.5rem] top-0 bottom-0 w-0.5" style={{ background: "var(--border)", marginLeft: "-1px" }} />
+                    <div className="absolute left-[5.5rem] top-0 bottom-0 w-0.5" style={{ background: "var(--border)", marginLeft: "-1px" }} />
                     <div className="space-y-4">
-                      {activeDraaiboek.items.map((item) => (
-                        <div key={item.id} className="flex gap-4 relative">
-                          <div className="w-16 text-right flex-shrink-0 pt-3">
-                            <span className="text-sm font-bold" style={{ color: "var(--primary)" }}>{item.startTime}</span>
-                          </div>
-                          <div className="flex-shrink-0 w-4 flex items-start justify-center pt-3.5">
-                            <div className="w-3 h-3 rounded-full border-2 z-10"
-                              style={{ background: item.vendor ? "var(--primary)" : "white", borderColor: "var(--primary)" }} />
-                          </div>
-                          <div className="flex-1 ddp-card mb-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <div className="font-medium text-sm">{item.title}</div>
-                                {item.description && (
-                                  <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{item.description}</p>
-                                )}
+                      {activeDraaiboek.items.map((item) => {
+                        const endTime = addMinutes(item.startTime, item.duration);
+                        return (
+                          <div key={item.id} className="flex gap-4 relative">
+                            <div className="w-20 text-right flex-shrink-0 pt-3">
+                              <span className="text-sm font-bold" style={{ color: "var(--primary)" }}>{item.startTime}</span>
+                              <div className="text-xs" style={{ color: "var(--muted)" }}>{endTime}</div>
+                            </div>
+                            <div className="flex-shrink-0 w-4 flex items-start justify-center pt-3.5">
+                              <div className="w-3 h-3 rounded-full border-2 z-10"
+                                style={{ background: item.vendor ? "var(--primary)" : "white", borderColor: "var(--primary)" }} />
+                            </div>
+                            <div className="flex-1 ddp-card mb-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <div className="font-medium text-sm">{item.title}</div>
+                                  {item.description && (
+                                    <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{item.description}</p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <span className="text-xs font-medium px-2 py-0.5 rounded-md" style={{ background: "var(--accent)", color: "var(--muted)" }}>
+                                    {item.startTime} – {endTime}
+                                  </span>
+                                  {!isReadOnly && (
+                                    <button onClick={() => deleteItem(activeDraaiboekId!, item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
+                                  )}
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className="text-xs" style={{ color: "var(--muted)" }}>{formatDuration(item.duration)}</span>
-                                {!isReadOnly && (
-                                  <button onClick={() => deleteItem(activeDraaiboekId!, item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}>✕</button>
+                              <div className="flex items-center gap-3 mt-2 flex-wrap">
+                                {item.location && (
+                                  <span className="text-xs" style={{ color: "var(--muted)" }}>📍 {item.location}</span>
+                                )}
+                                {item.vendor && (
+                                  <span className="ddp-badge badge-info text-xs">
+                                    {CATEGORY_ICONS[item.vendor.category] ?? "🤝"} {item.vendor.name}
+                                  </span>
+                                )}
+                                {item.notes && (
+                                  <span className="text-xs" style={{ color: "var(--muted)" }}>💬 {item.notes}</span>
                                 )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-3 mt-2 flex-wrap">
-                              {item.location && (
-                                <span className="text-xs" style={{ color: "var(--muted)" }}>📍 {item.location}</span>
-                              )}
-                              {item.vendor && (
-                                <span className="ddp-badge badge-info text-xs">
-                                  {CATEGORY_ICONS[item.vendor.category] ?? "🤝"} {item.vendor.name}
-                                </span>
-                              )}
-                              {item.notes && (
-                                <span className="text-xs" style={{ color: "var(--muted)" }}>💬 {item.notes}</span>
-                              )}
-                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
