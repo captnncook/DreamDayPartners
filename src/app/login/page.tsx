@@ -6,12 +6,12 @@ import Link from "next/link";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
 
 const ROLE_OPTIONS: { value: DemoRole; label: string; icon: string; description: string }[] = [
-  { value: "admin", label: "Admin", icon: "⚙️", description: "Platform beheerder" },
-  { value: "planner", label: "Weddingplanner", icon: "💍", description: "Sophie van der Berg" },
-  { value: "couple", label: "Bruidspaar", icon: "👰", description: "Emma de Vries" },
-  { value: "bloemist", label: "Bloemist", icon: "🌸", description: "Roos Janssen" },
-  { value: "dj", label: "DJ", icon: "🎵", description: "DJ Marco" },
-  { value: "catering", label: "Catering", icon: "🍽️", description: "Tasty Events" },
+  { value: "admin",     label: "Admin",          icon: "⚙️", description: "Platform beheerder" },
+  { value: "planner",   label: "Weddingplanner", icon: "💍", description: "Sophie van der Berg" },
+  { value: "couple",    label: "Bruidspaar",     icon: "👰", description: "Emma de Vries" },
+  { value: "bloemist",  label: "Bloemist",       icon: "🌸", description: "Roos Janssen" },
+  { value: "dj",        label: "DJ",             icon: "🎵", description: "DJ Marco" },
+  { value: "catering",  label: "Catering",       icon: "🍽️", description: "Tasty Events" },
 ];
 
 export default function LoginPage() {
@@ -52,39 +52,60 @@ export default function LoginPage() {
   const selected = ROLE_OPTIONS.find((r) => r.value === selectedRole)!;
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
-      <div className="w-full max-w-md px-4">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      style={{ background: "var(--gradient-hero)" }}
+    >
+      {/* Decorative blob */}
+      <div
+        className="fixed top-0 right-0 w-[400px] h-[400px] rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, rgba(232,180,188,0.15) 0%, transparent 70%)",
+          transform: "translate(30%, -30%)",
+        }}
+      />
+
+      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
+
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <span className="text-3xl">💍</span>
-            <span className="text-2xl font-bold" style={{ color: "var(--primary)" }}>DreamDay Partners</span>
-          </div>
+          <Link href="/" className="inline-flex items-center gap-3 mb-3">
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+              style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-primary)" }}
+            >
+              💍
+            </div>
+            <div className="text-left">
+              <div className="font-serif text-xl font-bold" style={{ color: "var(--foreground)" }}>DreamDay</div>
+              <div className="text-sm font-medium" style={{ color: "var(--primary)" }}>Partners</div>
+            </div>
+          </Link>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
             Wedding management platform — Demo
           </p>
         </div>
 
         {/* Login card */}
-        <div className="ddp-card shadow-lg">
-          <h1 className="text-lg font-semibold mb-1">Inloggen</h1>
+        <div className="ddp-card" style={{ boxShadow: "var(--shadow-lg)", padding: "1.75rem" }}>
+          <h1 className="font-serif text-xl font-bold mb-1">Inloggen</h1>
           <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
             Kies een rol om de demo te verkennen
           </p>
 
-          <form onSubmit={handleLogin} className="space-y-5">
-            {/* Role dropdown */}
+          <form onSubmit={handleLogin} className="space-y-4">
+
+            {/* Role select */}
             <div>
-              <label className="block text-sm font-medium mb-2">Inloggen als</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: "var(--foreground)" }}>
+                Inloggen als
+              </label>
               <div className="relative">
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as DemoRole)}
-                  className="w-full appearance-none border rounded-lg px-4 py-3 pr-10 text-sm font-medium focus:outline-none focus:ring-2 cursor-pointer"
-                  style={{
-                    borderColor: "var(--border)",
-                    background: "white",
-                  }}
+                  className="ddp-select appearance-none pr-10 cursor-pointer font-medium"
+                  style={{ padding: "0.7rem 0.875rem" }}
                 >
                   {ROLE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -92,36 +113,44 @@ export default function LoginPage() {
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "var(--muted)" }}>
                   ▾
                 </div>
               </div>
             </div>
 
             {/* Role preview */}
-            <div className="rounded-lg p-4 flex items-center gap-3" style={{ background: "var(--accent)", border: "1px solid var(--border)" }}>
-              <span className="text-2xl">{selected.icon}</span>
-              <div>
-                <div className="font-medium text-sm">{selected.label}</div>
+            <div
+              className="rounded-xl p-4 flex items-center gap-3"
+              style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                style={{ background: "var(--accent)" }}
+              >
+                {selected.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm">{selected.label}</div>
                 <div className="text-xs" style={{ color: "var(--muted)" }}>{selected.description}</div>
               </div>
-              <div className="ml-auto">
-                <span className="ddp-badge badge-neutral text-xs">{DEMO_USERS[selectedRole].email}</span>
-              </div>
+              <span className="ddp-badge badge-neutral text-xs flex-shrink-0">
+                {DEMO_USERS[selectedRole].email}
+              </span>
             </div>
 
-            {/* Wat zie je per rol */}
-            <div className="text-xs space-y-1" style={{ color: "var(--muted)" }}>
-              {selectedRole === "admin" && <p>Overzicht alle bruiloften, gebruikers en platformbeheer</p>}
+            {/* Role description */}
+            <div className="text-xs leading-relaxed" style={{ color: "var(--muted)" }}>
+              {selectedRole === "admin"   && <p>Overzicht alle bruiloften, gebruikers en platformbeheer</p>}
               {selectedRole === "planner" && <p>Volledig bruiloftsbeheer: taken, gasten, budget, draaiboek, communicatie</p>}
-              {selectedRole === "couple" && <p>Overzicht van de eigen bruiloft, taken en communicatie met het team</p>}
+              {selectedRole === "couple"  && <p>Overzicht van de eigen bruiloft, taken en communicatie met het team</p>}
               {(selectedRole === "bloemist" || selectedRole === "dj" || selectedRole === "catering") && (
-                <p>Leveranciersportaal: eigen draaiboek-items en communicatie met het team (Premium)</p>
+                <p>Leveranciersportaal: eigen draaiboek-items en communicatie met het team <span className="ddp-badge badge-premium" style={{ fontSize: "0.6rem" }}>Premium</span></p>
               )}
             </div>
 
             {error && (
-              <div className="text-sm p-3 rounded-lg" style={{ background: "#fde8e8", color: "var(--danger)" }}>
+              <div className="text-sm p-3 rounded-lg" style={{ background: "var(--danger-bg)", color: "var(--danger)" }}>
                 {error}
               </div>
             )}
@@ -129,33 +158,38 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="ddp-btn-primary w-full py-3 text-base"
+              className="ddp-btn-primary w-full py-3 text-base mt-2"
             >
-              {loading ? "Bezig met inloggen..." : `Inloggen als ${selected.label}`}
+              {loading ? "Bezig…" : `Inloggen als ${selected.label}`}
             </button>
           </form>
         </div>
 
         {/* Divider */}
-        <div className="flex items-center gap-3 mt-4">
-          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 ddp-divider" />
           <span className="text-xs" style={{ color: "var(--muted)" }}>of</span>
-          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+          <div className="flex-1 ddp-divider" />
         </div>
 
         {/* Register CTA */}
-        <div className="ddp-card shadow-lg mt-4 text-center">
-          <div className="text-2xl mb-2">💍</div>
+        <div className="ddp-card text-center" style={{ boxShadow: "var(--shadow-md)" }}>
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mx-auto mb-3"
+            style={{ background: "var(--accent)" }}
+          >
+            💍
+          </div>
           <h2 className="font-semibold text-sm mb-1">Jullie bruiloft plannen?</h2>
           <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>
             Maak gratis een DreamDay-account aan en begin direct met plannen.
           </p>
-          <Link href="/weddings/wizard" className="ddp-btn-primary block w-full py-3 text-sm text-center">
+          <Link href="/weddings/wizard" className="ddp-btn-primary w-full py-2.5 text-sm">
             Maak Dream Day account aan
           </Link>
         </div>
 
-        <p className="text-center text-xs mt-4" style={{ color: "var(--muted)" }}>
+        <p className="text-center text-xs mt-5" style={{ color: "var(--muted-light)" }}>
           Dit is een demo-omgeving. Geen echte inloggegevens nodig.
         </p>
       </div>

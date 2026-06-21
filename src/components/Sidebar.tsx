@@ -16,15 +16,15 @@ export default function Sidebar({ user }: SidebarProps) {
   const n = t.nav;
 
   const NAV_ITEMS = [
-    { href: "/dashboard", label: n.dashboard, icon: "🏠", roles: ["admin", "planner", "team_member", "couple", "vendor"] },
-    { href: "/weddings", label: n.weddings, icon: "💍", roles: ["admin", "planner", "team_member"] },
-    { href: "/tasks", label: n.myTasks, icon: "✅", roles: ["planner", "team_member", "couple"] },
-    { href: "/guests", label: n.guests, icon: "👥", roles: ["planner", "team_member", "couple"] },
-    { href: "/budget", label: n.budget, icon: "💶", roles: ["planner", "team_member"] },
-    { href: "/draaiboek", label: n.draaiboek, icon: "📋", roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/messages", label: n.messages, icon: "💬", roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/vendors", label: n.vendors, icon: "🤝", roles: ["planner", "team_member"] },
-    { href: "/admin", label: n.admin, icon: "⚙️", roles: ["admin"] },
+    { href: "/dashboard",  label: n.dashboard, icon: "🏠", roles: ["admin", "planner", "team_member", "couple", "vendor"] },
+    { href: "/weddings",   label: n.weddings,  icon: "💍", roles: ["admin", "planner", "team_member"] },
+    { href: "/tasks",      label: n.myTasks,   icon: "✅", roles: ["planner", "team_member", "couple"] },
+    { href: "/guests",     label: n.guests,    icon: "👥", roles: ["planner", "team_member", "couple"] },
+    { href: "/budget",     label: n.budget,    icon: "💶", roles: ["planner", "team_member"] },
+    { href: "/draaiboek",  label: n.draaiboek, icon: "📋", roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/messages",   label: n.messages,  icon: "💬", roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/vendors",    label: n.vendors,   icon: "🤝", roles: ["planner", "team_member"] },
+    { href: "/admin",      label: n.admin,     icon: "⚙️", roles: ["admin"] },
   ];
 
   async function handleLogout() {
@@ -43,35 +43,59 @@ export default function Sidebar({ user }: SidebarProps) {
     vendor: user.vendorType ?? "Leverancier",
   };
 
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   return (
     <aside
-      className="flex flex-col w-64 min-h-screen border-r"
-      style={{ background: "white", borderColor: "var(--border)" }}
+      className="flex flex-col w-64 min-h-screen"
+      style={{
+        background: "white",
+        borderRight: "1px solid var(--border)",
+      }}
     >
       {/* Logo */}
-      <div className="px-5 py-5 border-b" style={{ borderColor: "var(--border)" }}>
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-xl">💍</span>
-          <span className="font-bold text-base" style={{ color: "var(--primary)" }}>DreamDay Partners</span>
+      <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+            style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-primary)" }}
+          >
+            💍
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)" }}>
+              DreamDay
+            </div>
+            <div className="text-xs leading-none mt-0.5" style={{ color: "var(--primary)" }}>
+              Partners
+            </div>
+          </div>
         </Link>
       </div>
 
       {/* User info */}
-      <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border)" }}>
+      <div className="px-4 py-3.5 mx-3 my-3 rounded-xl" style={{ background: "var(--surface-2)" }}>
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-            style={{ background: "var(--primary)" }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+            style={{ background: "var(--gradient-primary)", boxShadow: "0 2px 6px rgba(196,154,108,0.3)" }}
           >
-            {user.name.charAt(0)}
+            {initials}
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-medium truncate">{user.name}</div>
-            <div className="text-xs truncate" style={{ color: "var(--muted)" }}>
-              {roleLabels[user.role] ?? user.role}
+            <div className="text-sm font-semibold truncate" style={{ color: "var(--foreground)" }}>{user.name}</div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-xs" style={{ color: "var(--muted)" }}>
+                {roleLabels[user.role] ?? user.role}
+              </span>
               {user.isPremium && (
-                <span className="ml-1 ddp-badge badge-premium" style={{ fontSize: "0.55rem", padding: "0.1rem 0.4rem" }}>
-                  Premium
+                <span className="ddp-badge badge-premium" style={{ fontSize: "0.55rem", padding: "0.1rem 0.35rem" }}>
+                  Pro
                 </span>
               )}
             </div>
@@ -80,20 +104,16 @@ export default function Sidebar({ user }: SidebarProps) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 pb-3 space-y-0.5">
         {visibleItems.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
-              style={{
-                background: active ? "var(--accent)" : "transparent",
-                color: active ? "var(--primary-dark)" : "var(--foreground)",
-              }}
+              className={`ddp-nav-item${active ? " active" : ""}`}
             >
-              <span className="text-base">{item.icon}</span>
+              <span className="text-base w-5 text-center flex-shrink-0">{item.icon}</span>
               {item.label}
             </Link>
           );
@@ -101,21 +121,20 @@ export default function Sidebar({ user }: SidebarProps) {
       </nav>
 
       {/* Language + Logout */}
-      <div className="px-3 py-4 border-t space-y-1" style={{ borderColor: "var(--border)" }}>
+      <div className="px-3 py-3" style={{ borderTop: "1px solid var(--border)" }}>
         <button
           onClick={toggle}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full transition-colors hover:bg-gray-50"
-          style={{ color: "var(--muted)" }}
+          className="ddp-nav-item w-full text-left"
         >
-          <span>🌐</span>
+          <span className="text-base w-5 text-center flex-shrink-0">🌐</span>
           <span>{t.common.switchLang}</span>
         </button>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm w-full transition-colors hover:bg-gray-50"
+          className="ddp-nav-item w-full text-left mt-0.5"
           style={{ color: "var(--muted)" }}
         >
-          <span>🚪</span>
+          <span className="text-base w-5 text-center flex-shrink-0">🚪</span>
           {n.logout}
         </button>
       </div>
