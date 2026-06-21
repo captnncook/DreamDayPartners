@@ -391,6 +391,36 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESPONSIVE — sidebar hidden on mobile
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Sidebar: visible desktop only */
+.ddp-sidebar {
+  display: none;
+  flex-direction: column;
+  width: 256px;
+  min-height: 100vh;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .ddp-sidebar {
+    display: flex;
+  }
+}
+
+/* Mobile header + overlay: visible mobile only */
+.ddp-mobile-header {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .ddp-mobile-header {
+    display: none;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ANIMATIONS
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 

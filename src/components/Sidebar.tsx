@@ -68,7 +68,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
   return (
     <aside
-      className="hidden md:flex flex-col w-64 min-h-screen flex-shrink-0"
+      className="ddp-sidebar"
       style={{ background: "white", borderRight: "1px solid var(--border)" }}
     >
       {/* Logo */}

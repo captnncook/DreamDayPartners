@@ -7,6 +7,7 @@ import type { User } from "@prisma/client";
 import {
   Heart, Home, CheckSquare, Users, Euro, ClipboardList,
   MessageCircle, Briefcase, Settings, LogOut, Menu, X, Globe,
+  ChevronRight,
 } from "lucide-react";
 import { useLang } from "./LangProvider";
 
@@ -50,36 +51,58 @@ export default function MobileNav({ user }: { user: User }) {
 
   const visibleItems = NAV_ITEMS.filter((i) => i.roles.includes(user.role));
   const initials = user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+  const roleLabel = ROLE_LABELS[user.role] ?? user.vendorType ?? "Leverancier";
 
   async function handleLogout() {
+    setOpen(false);
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
     router.refresh();
   }
 
   return (
-    <>
-      {/* Top bar — mobile only */}
+    /* Only visible on mobile — hidden on md+ via CSS in globals.css */
+    <div className="ddp-mobile-header">
+
+      {/* ── Top bar ── */}
       <header
-        className="md:hidden sticky top-0 z-50 flex items-center justify-between px-4 h-14"
         style={{
-          background: "rgba(255,255,255,0.88)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 1rem",
+          height: "56px",
+          background: "rgba(255,255,255,0.92)",
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
           borderBottom: "1px solid rgba(0,0,0,0.08)",
+          position: "sticky",
+          top: 0,
+          zIndex: 40,
         }}
       >
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link
+          href="/dashboard"
+          style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
+        >
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "var(--gradient-primary)" }}
+            style={{
+              width: "30px",
+              height: "30px",
+              borderRadius: "8px",
+              background: "var(--gradient-primary)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
           >
-            <Heart className="w-3.5 h-3.5 text-white fill-white" />
+            <Heart style={{ width: "15px", height: "15px", color: "white", fill: "white" }} />
           </div>
           <span
             style={{
               fontWeight: 700,
-              fontSize: "0.9375rem",
+              fontSize: "15px",
               letterSpacing: "-0.03em",
               color: "var(--foreground)",
             }}
@@ -90,120 +113,266 @@ export default function MobileNav({ user }: { user: User }) {
 
         <button
           onClick={() => setOpen(true)}
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.06)" }}
-          aria-label="Menu openen"
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "10px",
+            background: "rgba(0,0,0,0.06)",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          aria-label="Open menu"
         >
-          <Menu className="w-5 h-5" style={{ color: "var(--foreground)" }} />
+          <Menu style={{ width: "20px", height: "20px", color: "var(--foreground)" }} />
         </button>
       </header>
 
-      {/* Backdrop */}
+      {/* ── Full-screen overlay ── */}
       {open && (
         <div
-          className="md:hidden fixed inset-0 z-40"
-          style={{ background: "rgba(0,0,0,0.35)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
-          onClick={() => setOpen(false)}
-        />
-      )}
-
-      {/* Slide-in drawer */}
-      <div
-        className="md:hidden fixed top-0 right-0 bottom-0 z-50 flex flex-col"
-        style={{
-          width: "280px",
-          background: "white",
-          boxShadow: "-12px 0 40px rgba(0,0,0,0.15)",
-          transform: open ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-        }}
-      >
-        {/* Drawer header */}
-        <div
-          className="flex items-center justify-between px-5 h-14 flex-shrink-0"
-          style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            background: "white",
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+          }}
         >
-          <span style={{ fontWeight: 700, fontSize: "0.9375rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
-            Menu
-          </span>
-          <button
-            onClick={() => setOpen(false)}
-            className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.06)" }}
-          >
-            <X className="w-4 h-4" style={{ color: "var(--foreground)" }} />
-          </button>
-        </div>
-
-        {/* User card */}
-        <div className="px-4 pt-4 pb-2 flex-shrink-0">
+          {/* Overlay header */}
           <div
-            className="flex items-center gap-3 px-3 py-3 rounded-2xl"
-            style={{ background: "var(--surface-2)" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 1rem",
+              height: "56px",
+              borderBottom: "1px solid rgba(0,0,0,0.08)",
+              flexShrink: 0,
+            }}
           >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-              style={{ background: "var(--gradient-primary)" }}
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: "17px",
+                letterSpacing: "-0.03em",
+                color: "var(--foreground)",
+              }}
             >
-              {initials}
-            </div>
-            <div className="min-w-0">
+              Menu
+            </span>
+            <button
+              onClick={() => setOpen(false)}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                background: "rgba(0,0,0,0.06)",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <X style={{ width: "16px", height: "16px", color: "var(--foreground)" }} />
+            </button>
+          </div>
+
+          {/* User card */}
+          <div style={{ padding: "16px 16px 8px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "14px 16px",
+                background: "#f5f5f7",
+                borderRadius: "14px",
+              }}
+            >
               <div
-                className="font-semibold truncate"
-                style={{ fontSize: "0.9375rem", color: "var(--foreground)", letterSpacing: "-0.01em" }}
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "50%",
+                  background: "var(--gradient-primary)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
               >
-                {user.name}
+                {initials}
               </div>
-              <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-                {ROLE_LABELS[user.role] ?? user.vendorType ?? "Leverancier"}
+              <div>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "15px",
+                    color: "var(--foreground)",
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {user.name}
+                </div>
+                <div style={{ fontSize: "13px", color: "var(--muted)", marginTop: "1px" }}>
+                  {roleLabel}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Nav items */}
-        <nav className="flex-1 px-3 py-2 overflow-y-auto space-y-0.5">
-          {visibleItems.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(item.href + "/");
-            const Icon = NAV_ICONS[item.href] ?? Home;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`ddp-nav-item${active ? " active" : ""}`}
-                style={{ fontSize: "0.9375rem", padding: "0.75rem 1rem" }}
+          {/* Nav items */}
+          <nav style={{ flex: 1, padding: "8px 16px" }}>
+            <div
+              style={{
+                background: "#f5f5f7",
+                borderRadius: "14px",
+                overflow: "hidden",
+              }}
+            >
+              {visibleItems.map((item, idx) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + "/");
+                const Icon = NAV_ICONS[item.href] ?? Home;
+                const isLast = idx === visibleItems.length - 1;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "14px 16px",
+                      textDecoration: "none",
+                      background: active ? "rgba(196,154,108,0.08)" : "transparent",
+                      borderBottom: isLast ? "none" : "1px solid rgba(0,0,0,0.06)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        borderRadius: "8px",
+                        background: active ? "rgba(196,154,108,0.15)" : "rgba(0,0,0,0.06)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Icon
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          color: active ? "var(--primary)" : "var(--muted)",
+                        }}
+                      />
+                    </div>
+                    <span
+                      style={{
+                        flex: 1,
+                        fontSize: "15px",
+                        fontWeight: active ? 600 : 400,
+                        color: active ? "var(--primary-dark)" : "var(--foreground)",
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                    <ChevronRight
+                      style={{ width: "16px", height: "16px", color: "rgba(0,0,0,0.2)", flexShrink: 0 }}
+                    />
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+
+          {/* Bottom actions */}
+          <div style={{ padding: "8px 16px 32px" }}>
+            <div
+              style={{
+                background: "#f5f5f7",
+                borderRadius: "14px",
+                overflow: "hidden",
+              }}
+            >
+              <button
+                onClick={() => { toggle(); }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "14px 16px",
+                  width: "100%",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  borderBottom: "1px solid rgba(0,0,0,0.06)",
+                }}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    background: "rgba(0,0,0,0.06)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Globe style={{ width: "16px", height: "16px", color: "var(--muted)" }} />
+                </div>
+                <span style={{ fontSize: "15px", color: "var(--foreground)", letterSpacing: "-0.01em" }}>
+                  {t.common.switchLang}
+                </span>
+              </button>
 
-        {/* Bottom actions */}
-        <div
-          className="px-3 py-3 flex-shrink-0 space-y-0.5"
-          style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}
-        >
-          <button
-            onClick={toggle}
-            className="ddp-nav-item w-full text-left"
-            style={{ fontSize: "0.9375rem", padding: "0.75rem 1rem" }}
-          >
-            <Globe className="w-5 h-5 flex-shrink-0" />
-            {t.common.switchLang}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="ddp-nav-item w-full text-left"
-            style={{ fontSize: "0.9375rem", padding: "0.75rem 1rem", color: "var(--danger)" }}
-          >
-            <LogOut className="w-5 h-5 flex-shrink-0" style={{ color: "var(--danger)" }} />
-            {n.logout}
-          </button>
+              <button
+                onClick={handleLogout}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "14px 16px",
+                  width: "100%",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    background: "rgba(255,59,48,0.10)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <LogOut style={{ width: "16px", height: "16px", color: "var(--danger)" }} />
+                </div>
+                <span style={{ fontSize: "15px", color: "var(--danger)", letterSpacing: "-0.01em" }}>
+                  {n.logout}
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
