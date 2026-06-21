@@ -13,6 +13,10 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "DreamDay Partners",
   description: "Wedding management platform voor planners, bruidsparen en leveranciers",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

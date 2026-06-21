@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
-  Heart, CheckSquare, Users, Euro, ClipboardList, Briefcase,
+  CheckSquare, Users, Euro, ClipboardList, Briefcase,
   MessageCircle, FolderOpen, Check, ArrowRight,
-  Shield, Star, Handshake, Calendar,
+  Shield, Star, Calendar,
 } from "lucide-react";
 
 /* ─── Feature data ─────────────────────────────────────── */
@@ -93,12 +94,7 @@ export default function LandingPage() {
         }}
       >
         <Link href="/" className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            <Heart className="w-4 h-4 text-white fill-white" />
-          </div>
+          <Image src="/logo.png" alt="DreamDay Partners" width={32} height={32} />
           <span style={{ fontWeight: 700, fontSize: "0.9375rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
             DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
           </span>
@@ -623,12 +619,7 @@ export default function LandingPage() {
           style={{ maxWidth: "1000px", margin: "0 auto" }}
         >
           <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: "var(--gradient-primary)" }}
-            >
-              <Heart className="w-3.5 h-3.5 text-white fill-white" />
-            </div>
+            <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} className="brightness-0 invert" />
             <span style={{ fontWeight: 600, fontSize: "0.9375rem", color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em" }}>
               DreamDay Partners
             </span>

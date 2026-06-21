@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import { useLang } from "@/components/LangProvider";
@@ -74,12 +75,7 @@ export default function Sidebar({ user }: SidebarProps) {
       {/* Logo */}
       <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-primary)" }}
-          >
-            <Heart className="w-4 h-4 text-white fill-white" />
-          </div>
+          <Image src="/logo.png" alt="DreamDay Partners" width={32} height={32} className="flex-shrink-0" />
           <div className="min-w-0">
             <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)" }}>DreamDay</div>
             <div className="text-xs leading-none mt-0.5" style={{ color: "var(--primary)" }}>Partners</div>
