@@ -128,8 +128,11 @@ export default function LandingPage() {
 
       {/* ── Nav ─────────────────────────────────────────── */}
       <nav
-        className="sticky top-0 z-50 px-5 md:px-10 h-12 flex items-center justify-between"
+        className="sticky top-0 z-50 px-5 md:px-10 h-12"
         style={{
+          display: "grid",
+          gridTemplateColumns: "1fr auto 1fr",
+          alignItems: "center",
           background: scrolled ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.72)",
           backdropFilter: "blur(24px) saturate(200%)",
           WebkitBackdropFilter: "blur(24px) saturate(200%)",
@@ -137,6 +140,7 @@ export default function LandingPage() {
           transition: "all 0.3s",
         }}
       >
+        {/* Logo — links */}
         <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} />
           <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
@@ -144,6 +148,7 @@ export default function LandingPage() {
           </span>
         </Link>
 
+        {/* Nav items — gecentreerd */}
         <div className="hidden md:flex items-center gap-0">
           {[
             { href: "#hoe-het-werkt", label: "Hoe het werkt" },
@@ -155,14 +160,15 @@ export default function LandingPage() {
               key={l.href}
               href={l.href}
               className="ddp-btn-ghost"
-              style={{ fontSize: "0.8125rem", fontWeight: 400, color: "var(--muted)", padding: "0.35rem 0.7rem" }}
+              style={{ fontSize: "0.8125rem", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.7rem" }}
             >
               {l.label}
             </a>
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Knoppen — rechts */}
+        <div className="flex items-center gap-2 justify-end">
           <Link
             href="/login"
             className="ddp-btn-ghost hidden sm:inline-flex"
@@ -180,15 +186,6 @@ export default function LandingPage() {
       <section className="flex flex-col items-center justify-center text-center px-5 pt-24 pb-32" style={{ background: "#ffffff" }}>
 
         <div className="animate-fade-in">
-          <p
-            className="font-semibold mb-6 inline-flex items-center gap-2"
-            style={{ fontSize: "0.75rem", color: "var(--primary)", letterSpacing: "0.10em", textTransform: "uppercase" }}
-          >
-            Wedding management platform
-          </p>
-        </div>
-
-        <div className="animate-fade-in delay-100">
           <h1
             style={{
               fontSize: "clamp(2.75rem, 9vw, 6rem)",
@@ -431,7 +428,7 @@ export default function LandingPage() {
             </ScrollReveal>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {FEATURES_COUPLES.map((f, i) => (
               <FeatureCard key={f.title} icon={f.icon} title={f.title} desc={f.desc} delay={i * 70} />
             ))}
@@ -474,7 +471,7 @@ export default function LandingPage() {
             </ScrollReveal>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {FEATURES_VENDORS.map((f, i) => (
               <FeatureCard key={f.title} icon={f.icon} title={f.title} desc={f.desc} delay={i * 70} />
             ))}
