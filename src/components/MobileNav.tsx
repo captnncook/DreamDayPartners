@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import {
@@ -85,20 +86,7 @@ export default function MobileNav({ user }: { user: User }) {
           href="/dashboard"
           style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
         >
-          <div
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "8px",
-              background: "var(--gradient-primary)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <Heart style={{ width: "15px", height: "15px", color: "white", fill: "white" }} />
-          </div>
+          <Image src="/logo.png" alt="DreamDay Partners" width={30} height={30} style={{ flexShrink: 0 }} />
           <span
             style={{
               fontWeight: 700,

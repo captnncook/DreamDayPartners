@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Heart } from "lucide-react";
 
 type Step = 1 | 2 | 3 | 4;
@@ -78,9 +79,11 @@ export default function WeddingWizardPage() {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex justify-center"><div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}><Heart className="w-7 h-7 text-white fill-white" /></div></div>
-          <h1 className="text-2xl font-bold mt-3" style={{ color: "var(--primary)" }}>Jouw bruiloft aanmaken</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Snel en eenvoudig — je kunt later alles aanpassen</p>
+          <div className="flex justify-center">
+            <Image src="/logo.png" alt="DreamDay Partners" width={56} height={56} />
+          </div>
+          <h1 className="text-2xl font-bold mt-3" style={{ color: "var(--primary)" }}>Begin jullie dream day</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>In een paar stappen klaar — alles kun je later aanpassen</p>
         </div>
 
         {/* Progress */}
@@ -247,8 +250,8 @@ export default function WeddingWizardPage() {
           {step === 4 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold">Alles klopt?</h2>
-                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Controleer de gegevens en maak je bruiloft aan.</p>
+                <h2 className="text-lg font-semibold">Klaar voor jullie dream day?</h2>
+                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Controleer de gegevens en start jullie bruiloft.</p>
               </div>
               <div className="space-y-3 rounded-xl p-4" style={{ background: "var(--accent)" }}>
                 <div className="flex justify-between text-sm">

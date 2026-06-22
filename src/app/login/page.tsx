@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
 import { Heart, Settings, Users, Leaf, Music, Utensils } from "lucide-react";
 
@@ -71,19 +72,14 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-3">
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center"
-              style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-primary)" }}
-            >
-              <Heart className="w-6 h-6 text-white fill-white" />
-            </div>
+            <Image src="/logo.png" alt="DreamDay Partners" width={48} height={48} />
             <div className="text-left">
               <div className="font-serif text-xl font-bold" style={{ color: "var(--foreground)" }}>DreamDay</div>
               <div className="text-sm font-medium" style={{ color: "var(--primary)" }}>Partners</div>
             </div>
           </Link>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Wedding management platform — Demo
+            Jouw dream day, zonder de stress — Demo
           </p>
         </div>
 
@@ -175,18 +171,13 @@ export default function LoginPage() {
 
         {/* Register CTA */}
         <div className="ddp-card text-center" style={{ boxShadow: "var(--shadow-md)" }}>
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-            style={{ background: "var(--accent)" }}
-          >
-            <Heart className="w-5 h-5" style={{ color: "var(--primary)" }} />
-          </div>
-          <h2 className="font-semibold text-sm mb-1">Jullie bruiloft plannen?</h2>
+          <Image src="/logo.png" alt="DreamDay" width={40} height={40} className="mx-auto mb-3" />
+          <h2 className="font-semibold text-sm mb-1">Jullie dream day plannen?</h2>
           <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>
-            Maak gratis een DreamDay-account aan en begin direct met plannen.
+            Stel jullie dream team samen en regel alles op één plek — gratis voor bruidsparen.
           </p>
           <Link href="/weddings/wizard" className="ddp-btn-primary w-full py-2.5 text-sm">
-            Maak Dream Day account aan
+            Begin gratis
           </Link>
         </div>
 

@@ -49,10 +49,10 @@ export default async function DashboardPage() {
 
   const greetings: Record<string, string> = {
     admin: "Platform overzicht",
-    planner: `Goedemorgen, ${user.name.split(" ")[0]}`,
+    planner: `Goedemorgen, ${user.name.split(" ")[0]} 👋`,
     team_member: `Goedemorgen, ${user.name.split(" ")[0]}`,
-    couple: `Welkom, ${user.name.split(" ")[0]}`,
-    vendor: `Welkom, ${user.name.split(" ")[0]}`,
+    couple: `Welkom bij jullie dream day`,
+    vendor: `Welkom in het dream team`,
   };
 
   const statusColors: Record<string, string> = {
@@ -182,7 +182,7 @@ export default async function DashboardPage() {
                 <div className="text-3xl font-bold text-center mb-1" style={{ color: "var(--primary)" }}>
                   {Math.max(0, daysUntil(weddings[0].date))}
                 </div>
-                <div className="text-xs text-center" style={{ color: "var(--muted)" }}>dagen tot de grote dag!</div>
+                <div className="text-xs text-center" style={{ color: "var(--muted)" }}>dagen tot jullie dream day</div>
                 <div className="mt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span style={{ color: "var(--muted)" }}>Datum</span>
