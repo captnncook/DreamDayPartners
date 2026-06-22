@@ -5,34 +5,121 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
   CheckSquare, Users, Euro, ClipboardList, Briefcase,
-  MessageCircle, FolderOpen, Check, ArrowRight,
+  MessageCircle, FolderOpen, Check, ArrowRight, ChevronDown,
   Shield, Star, Calendar,
 } from "lucide-react";
 
 /* ─── Feature data ─────────────────────────────────────── */
 
 const FEATURES_COUPLES = [
-  { icon: CheckSquare,   title: "Taken & checklist",   desc: "Van verloving tot de grote dag — alles bijgehouden op één plek." },
-  { icon: Users,         title: "Gastenlijst & RSVP",  desc: "Wie er komt, dieetwensen, tafelindeling en +1 bevestigingen." },
-  { icon: Euro,          title: "Budgetbeheer",         desc: "Realtime inzicht in wat je uitgeeft. Geen verrassingen achteraf." },
-  { icon: ClipboardList, title: "Draaiboek",            desc: "Een minuut-voor-minuut tijdlijn, gedeeld met heel het team." },
-  { icon: Briefcase,     title: "Leveranciers",         desc: "Bloemist, DJ, catering — altijd direct bereikbaar." },
-  { icon: MessageCircle, title: "Communicatie",         desc: "Chat met je planner en team. Geen lange e-mailketens meer." },
+  {
+    icon: Briefcase,
+    title: "Alle leveranciers op één plek",
+    desc: "Zoek, vergelijk en voeg je bloemist, DJ en fotograaf toe — zonder eindeloos googelen.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Contact via de app",
+    desc: "Geen losse app-gesprekken meer. Alles staat in je account, altijd terug te vinden.",
+  },
+  {
+    icon: Euro,
+    title: "Offertes & facturen geregeld",
+    desc: "Nooit meer zoeken in je mail. Alles wat je ontvangt staat netjes in je dossier.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Draaiboek voor jullie dag",
+    desc: "Een minuut-voor-minuut tijdlijn die je deelt met je dream team. Op de dag zelf hoef je nergens meer aan te denken.",
+  },
+  {
+    icon: CheckSquare,
+    title: "Overzicht & planning",
+    desc: "Van verloving tot de grote dag — taken, deadlines en voortgang in één helder dashboard.",
+  },
+  {
+    icon: Users,
+    title: "Gastenlijst & RSVP",
+    desc: "Wie er komt, dieetwensen, tafelindeling en bevestigingen — allemaal bijgehouden zonder gedoe.",
+  },
 ];
 
 const FEATURES_VENDORS = [
-  { icon: Calendar,      title: "Draaiboek toegang",    desc: "Ontvang je items direct in het portaal. Altijd up-to-date." },
-  { icon: MessageCircle, title: "Direct communiceren",  desc: "Chat met de planner en het bruidspaar vanuit één plek." },
-  { icon: FolderOpen,    title: "Documenten delen",     desc: "Upload offertes en contracten — veilig in de cloud." },
-  { icon: Briefcase,     title: "Meerdere bruiloften",  desc: "Beheer al je klantbruiloften vanuit één dashboard." },
-  { icon: Shield,        title: "Professioneel profiel", desc: "Presenteer jezelf als betrouwbare leverancier." },
-  { icon: Star,          title: "Premium analytics",    desc: "Inzicht in je prestaties. Groei je bedrijf slimmer." },
+  {
+    icon: Calendar,
+    title: "Draaiboek & planning",
+    desc: "Ontvang je schema direct in het portaal. Altijd up-to-date, nooit verwarring.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Direct communiceren",
+    desc: "Chat met de planner en het bruidspaar vanuit één plek. Geen mailketens meer.",
+  },
+  {
+    icon: FolderOpen,
+    title: "Documenten & offertes",
+    desc: "Upload contracten en offertes veilig in de cloud. Het bruidspaar ziet alles meteen.",
+  },
+  {
+    icon: Briefcase,
+    title: "Meerdere bruiloften",
+    desc: "Beheer al je klantbruiloften vanuit één dashboard. Overzicht, altijd.",
+  },
+  {
+    icon: Shield,
+    title: "Premium profiel",
+    desc: "Presenteer jezelf als betrouwbare leverancier met een professionele pagina.",
+  },
+  {
+    icon: Star,
+    title: "Analytisch dashboard",
+    desc: "Inzicht in je prestaties. Groei je bedrijf slimmer met data.",
+  },
 ];
 
 const HOW_IT_WORKS = [
-  { n: "1", title: "Maak een account",     desc: "In twee minuten geregistreerd. Kies of je een bruidspaar of leverancier bent." },
-  { n: "2", title: "Stel je bruiloft in",  desc: "Vul je datum en locatie in. Nodig je planner en leveranciers uit." },
-  { n: "3", title: "Jullie perfecte dag",  desc: "Volg de voortgang realtime. Op de dag zelf is alles geregeld." },
+  {
+    n: "1",
+    title: "Stel je dream team samen",
+    desc: "Kies je leveranciers uit de database met alle trouwcategorieën.",
+  },
+  {
+    n: "2",
+    title: "Regel alles in de app",
+    desc: "Contact, offertes en facturen op één plek — geen losse mailtjes of WhatsApp-groepen meer.",
+  },
+  {
+    n: "3",
+    title: "Maak je draaiboek",
+    desc: "En geniet van een dag die vlekkeloos verloopt. Jullie hoeven op de dag zelf nergens meer aan te denken.",
+  },
+];
+
+const FAQS = [
+  {
+    q: "Is DreamDay Partners gratis voor bruidsparen?",
+    a: "Ja, volledig. Bruidsparen betalen nooit iets — geen proefperiode, geen verborgen kosten. Het platform is voor altijd gratis voor jullie.",
+  },
+  {
+    q: "Hoe vind ik leveranciers?",
+    a: "Via de leveranciersdatabase zoek je op categorie — van fotograaf tot caterer. Je voegt ze toe aan jullie bruiloft en communiceert direct via de app.",
+  },
+  {
+    q: "Wat zit er in premium voor leveranciers?",
+    a: "Met het premium abonnement beheer je onbeperkt bruiloften, bewerk je het draaiboek, upload je documenten, heb je toegang tot een analytisch dashboard en profiteer je van prioriteit support.",
+  },
+  {
+    q: "Hoe werkt het contact met leveranciers?",
+    a: "Alles loopt via de ingebouwde chat. Geen losse apps, geen mailtjes kwijt — alle gesprekken staan in je account.",
+  },
+  {
+    q: "Wat is een draaiboek?",
+    a: "Het draaiboek is een minuut-voor-minuut tijdlijn van jullie trouwdag. Je vult het samen met je planner in en deelt het met alle leveranciers, zodat iedereen exact weet wat er wanneer moet gebeuren.",
+  },
+  {
+    q: "Kan ik de app ook gebruiken als ik geen weddingplanner heb?",
+    a: "Absoluut. DreamDay Partners is ontworpen zodat bruidsparen zelf de regie kunnen houden — met of zonder professionele planner.",
+  },
 ];
 
 /* ─── Sub-components ────────────────────────────────────── */
@@ -65,6 +152,38 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     >
       {children}
     </p>
+  );
+}
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      style={{ borderBottom: "1px solid rgba(0,0,0,0.07)", paddingBottom: "0" }}
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full text-left flex items-center justify-between py-5 gap-4"
+        style={{ background: "none", border: "none", cursor: "pointer" }}
+      >
+        <span style={{ fontSize: "1rem", fontWeight: 600, color: "var(--foreground)", letterSpacing: "-0.01em" }}>
+          {q}
+        </span>
+        <ChevronDown
+          className="w-5 h-5 flex-shrink-0"
+          style={{
+            color: "var(--muted)",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+          }}
+        />
+      </button>
+      {open && (
+        <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.65, paddingBottom: "1.25rem" }}>
+          {a}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -102,9 +221,10 @@ export default function LandingPage() {
 
         <div className="hidden md:flex items-center gap-0.5">
           {[
-            { href: "#stellen",      label: "Voor stellen" },
-            { href: "#leveranciers", label: "Voor leveranciers" },
-            { href: "#prijzen",      label: "Prijzen" },
+            { href: "#hoe-het-werkt", label: "Hoe het werkt" },
+            { href: "#leveranciers",  label: "Voor leveranciers" },
+            { href: "#prijzen",       label: "Prijzen" },
+            { href: "#faq",           label: "FAQ" },
           ].map((l) => (
             <a
               key={l.href}
@@ -146,16 +266,16 @@ export default function LandingPage() {
         <h1
           style={{
             fontFamily: "var(--font-geist-sans), -apple-system, 'SF Pro Display', sans-serif",
-            fontSize: "clamp(3rem, 9vw, 6.5rem)",
+            fontSize: "clamp(2.75rem, 8vw, 5.5rem)",
             fontWeight: 700,
             letterSpacing: "-0.05em",
-            lineHeight: 1.02,
+            lineHeight: 1.04,
             color: "var(--foreground)",
-            maxWidth: "900px",
+            maxWidth: "820px",
             marginBottom: "1.5rem",
           }}
         >
-          Plan jullie bruiloft.{" "}
+          Samen naar jullie dream day,{" "}
           <span
             style={{
               background: "var(--gradient-primary)",
@@ -164,32 +284,39 @@ export default function LandingPage() {
               backgroundClip: "text",
             }}
           >
-            Samen.
+            zonder de stress.
           </span>
         </h1>
 
         <p
           style={{
-            fontSize: "clamp(1.0625rem, 2.5vw, 1.25rem)",
+            fontSize: "clamp(1rem, 2.5vw, 1.1875rem)",
             color: "var(--muted)",
             maxWidth: "520px",
-            lineHeight: 1.55,
+            lineHeight: 1.6,
             marginBottom: "2.5rem",
           }}
         >
-          Het platform voor bruidsparen, planners en leveranciers. Overzichtelijk, eenvoudig en gratis voor stellen.
+          Stel je dream team van leveranciers samen, regel offertes en facturen en maak je draaiboek — alles in één app.
         </p>
 
-        <div className="flex flex-wrap gap-3 justify-center mb-20">
+        <div className="flex flex-wrap gap-3 justify-center mb-6">
           <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "1rem", padding: "0.75rem 2rem" }}>
-            Gratis starten
+            Begin gratis
           </Link>
           <Link href="/login" className="ddp-btn-secondary" style={{ fontSize: "1rem", padding: "0.75rem 2rem" }}>
             Demo bekijken
           </Link>
         </div>
 
-        {/* Clean product mockup */}
+        <a
+          href="#leveranciers"
+          style={{ fontSize: "0.875rem", color: "var(--muted)", textDecoration: "none", display: "flex", alignItems: "center", gap: "0.25rem", marginBottom: "4rem" }}
+        >
+          Trouwleverancier? Bekijk hier <ArrowRight className="w-3.5 h-3.5" />
+        </a>
+
+        {/* Product mockup */}
         <div
           style={{
             width: "100%",
@@ -247,43 +374,90 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Social proof bar ─────────────────────────────── */}
-      <div
-        className="flex justify-center gap-12 py-10 px-6"
-        style={{ background: "#f5f5f7", borderTop: "1px solid rgba(0,0,0,0.05)", borderBottom: "1px solid rgba(0,0,0,0.05)" }}
-      >
-        {[
-          { value: "500+", label: "Bruiloften gepland" },
-          { value: "100%", label: "Gratis voor stellen" },
-          { value: "24/7", label: "Overal beschikbaar" },
-        ].map((s) => (
-          <div key={s.label} className="text-center">
-            <div
+      {/* ── Herkenning ───────────────────────────────────── */}
+      <section className="py-24 px-6" style={{ background: "#f5f5f7" }}>
+        <div style={{ maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
+              fontSize: "clamp(1.75rem, 4vw, 2.625rem)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              color: "var(--foreground)",
+              marginBottom: "1.25rem",
+            }}
+          >
+            Een bruiloft plannen voelt al snel als een tweede baan.
+          </h2>
+          <p style={{ fontSize: "1.0625rem", color: "var(--muted)", lineHeight: 1.65 }}>
+            Losse mailtjes, WhatsApp-groepen vol met offertes en een Excel die steeds minder overzicht geeft. Je wil trouwen, geen projectmanager worden. DreamDay Partners brengt rust: alles op één plek, samen geregeld.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Hoe het werkt ────────────────────────────────── */}
+      <section id="hoe-het-werkt" className="py-28 px-6" style={{ background: "#ffffff" }}>
+        <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+          <div className="text-center mb-16">
+            <SectionLabel>Hoe het werkt</SectionLabel>
+            <h2
               style={{
                 fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
-                fontSize: "1.625rem",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 700,
                 letterSpacing: "-0.04em",
+                lineHeight: 1.06,
                 color: "var(--foreground)",
-                lineHeight: 1.1,
               }}
             >
-              {s.value}
-            </div>
-            <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "4px" }}>{s.label}</div>
+              Drie stappen. Dat is alles.
+            </h2>
           </div>
-        ))}
-      </div>
 
-      {/* ── Voor stellen ─────────────────────────────────── */}
-      <section id="stellen" className="py-28 px-6" style={{ background: "#ffffff" }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {HOW_IT_WORKS.map((step) => (
+              <div key={step.n}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-geist-sans), sans-serif",
+                    fontSize: "3.5rem",
+                    fontWeight: 700,
+                    letterSpacing: "-0.05em",
+                    color: "rgba(196,154,108,0.20)",
+                    lineHeight: 1,
+                    marginBottom: "0.75rem",
+                  }}
+                >
+                  {step.n}
+                </div>
+                <h3
+                  style={{
+                    fontSize: "1.125rem",
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: "var(--foreground)",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  {step.title}
+                </h3>
+                <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.6 }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Functies voor bruidsparen ─────────────────────── */}
+      <section id="stellen" className="py-28 px-6" style={{ background: "#f5f5f7" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
           <div className="mb-16">
             <SectionLabel>Voor bruidsparen</SectionLabel>
             <h2
               style={{
                 fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
-                fontSize: "clamp(2rem, 5vw, 3.25rem)",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 700,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.06,
@@ -294,8 +468,8 @@ export default function LandingPage() {
             >
               Altijd gratis. Voor altijd.
             </h2>
-            <p style={{ fontSize: "1.0625rem", color: "var(--muted)", maxWidth: "440px", lineHeight: 1.55 }}>
-              Maak een account en begin direct. Geen abonnement, geen verborgen kosten — ooit.
+            <p style={{ fontSize: "1.0625rem", color: "var(--muted)", maxWidth: "460px", lineHeight: 1.55 }}>
+              Maak een account en begin direct. Geen abonnement, geen proefperiode — ooit.
             </p>
           </div>
 
@@ -307,21 +481,21 @@ export default function LandingPage() {
 
           <div className="mt-14">
             <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "1rem", padding: "0.75rem 2rem" }}>
-              Gratis beginnen <ArrowRight className="w-4 h-4" />
+              Begin gratis <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* ── Voor leveranciers ────────────────────────────── */}
-      <section id="leveranciers" className="py-28 px-6" style={{ background: "#f5f5f7" }}>
+      <section id="leveranciers" className="py-28 px-6" style={{ background: "#ffffff" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
           <div className="mb-16">
             <SectionLabel>Voor leveranciers</SectionLabel>
             <h2
               style={{
                 fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
-                fontSize: "clamp(2rem, 5vw, 3.25rem)",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 700,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.06,
@@ -330,10 +504,10 @@ export default function LandingPage() {
                 marginBottom: "1rem",
               }}
             >
-              Jouw professionele portaal.
+              Beheer al je bruiloften op één plek.
             </h2>
-            <p style={{ fontSize: "1.0625rem", color: "var(--muted)", maxWidth: "440px", lineHeight: 1.55 }}>
-              Als bloemist, DJ of caterer beheer je alle bruiloften vanuit één slim platform.
+            <p style={{ fontSize: "1.0625rem", color: "var(--muted)", maxWidth: "460px", lineHeight: 1.55 }}>
+              Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk. DreamDay Partners geeft je één helder overzicht — en met premium ook toegang tot draaiboeken en inspiratie van bruidsparen.
             </p>
           </div>
 
@@ -344,10 +518,67 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-14">
-            <a href="#prijzen" className="ddp-btn-secondary" style={{ fontSize: "1rem", padding: "0.75rem 2rem" }}>
-              Bekijk plannen
-            </a>
+            <Link href="/login" className="ddp-btn-secondary" style={{ fontSize: "1rem", padding: "0.75rem 2rem" }}>
+              Word leverancier
+            </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ── Social proof ─────────────────────────────────── */}
+      <section className="py-24 px-6" style={{ background: "#f5f5f7" }}>
+        <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+          <div className="text-center mb-14">
+            <SectionLabel>Ervaringen</SectionLabel>
+            <h2
+              style={{
+                fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.06,
+                color: "var(--foreground)",
+              }}
+            >
+              Bruidsparen gingen je voor.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "Eindelijk één plek voor alles. We hadden nooit gedacht dat plannen zo overzichtelijk kon zijn.",
+                name: "Naam bruidspaar",
+              },
+              {
+                quote: "De combinatie van leveranciers, chat en draaiboek op één plek is echt een game changer.",
+                name: "Naam bruidspaar",
+              },
+              {
+                quote: "Op onze trouwdag hoefden we nergens aan te denken. Alles was geregeld, iedereen wist wat er moest gebeuren.",
+                name: "Naam bruidspaar",
+              },
+            ].map((r, i) => (
+              <div
+                key={i}
+                style={{
+                  background: "white",
+                  borderRadius: "16px",
+                  padding: "1.75rem",
+                  border: "1px solid rgba(0,0,0,0.05)",
+                }}
+              >
+                <p style={{ fontSize: "0.9375rem", color: "var(--foreground)", lineHeight: 1.65, marginBottom: "1.25rem", fontStyle: "italic" }}>
+                  &ldquo;{r.quote}&rdquo;
+                </p>
+                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--primary)" }}>{r.name}</p>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ textAlign: "center", marginTop: "1.5rem", fontSize: "0.8125rem", color: "var(--muted)", fontStyle: "italic" }}>
+            * Reviews worden aangevuld zodra we echte ervaringen hebben ontvangen.
+          </p>
         </div>
       </section>
 
@@ -359,7 +590,7 @@ export default function LandingPage() {
             <h2
               style={{
                 fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
-                fontSize: "clamp(2rem, 5vw, 3.25rem)",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 700,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.06,
@@ -370,13 +601,13 @@ export default function LandingPage() {
               Eerlijk geprijsd.
             </h2>
             <p style={{ fontSize: "1.0625rem", color: "var(--muted)" }}>
-              Stellen betalen nooit iets. Leveranciers kiezen wat past.
+              Bruidsparen betalen nooit iets. Leveranciers kiezen wat bij hen past.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
 
-            {/* Free couple */}
+            {/* Gratis voor bruidsparen */}
             <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "2rem" }}>
               <div className="ddp-badge badge-rose mb-5">Bruidspaar</div>
               <div
@@ -392,9 +623,16 @@ export default function LandingPage() {
               >
                 Gratis
               </div>
-              <div style={{ fontSize: "0.875rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Voor altijd</div>
+              <div style={{ fontSize: "0.875rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Voor altijd — geen creditcard nodig</div>
               <ul className="space-y-3 mb-7">
-                {["Taken & checklist", "Gastenlijst & RSVP", "Budgetbeheer", "Draaiboek", "Leveranciers", "Communicatie"].map((item) => (
+                {[
+                  "Leveranciersdatabase",
+                  "Contact via de app",
+                  "Offertes & facturen",
+                  "Draaiboek",
+                  "Gastenlijst & RSVP",
+                  "Budgetbeheer",
+                ].map((item) => (
                   <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>
                     <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
                     {item}
@@ -402,11 +640,11 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                Gratis starten
+                Begin gratis
               </Link>
             </div>
 
-            {/* Vendor free */}
+            {/* Leverancier gratis */}
             <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "2rem" }}>
               <div className="ddp-badge badge-neutral mb-5">Leverancier · Free</div>
               <div
@@ -424,7 +662,13 @@ export default function LandingPage() {
               </div>
               <div style={{ fontSize: "0.875rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Per maand</div>
               <ul className="space-y-3 mb-7">
-                {["Portaaltoegang (1 bruiloft)", "Draaiboek inzien", "Bestanden ontvangen", "Chatten met planner", "Basisprofiel"].map((item) => (
+                {[
+                  "Portaaltoegang (1 bruiloft)",
+                  "Draaiboek inzien",
+                  "Bestanden ontvangen",
+                  "Chatten met planner",
+                  "Basisprofiel",
+                ].map((item) => (
                   <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>
                     <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
                     {item}
@@ -432,7 +676,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link href="/login" className="ddp-btn-secondary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                Gratis registreren
+                Word leverancier
               </Link>
             </div>
 
@@ -482,9 +726,9 @@ export default function LandingPage() {
               <ul className="space-y-3 mb-7">
                 {[
                   "Onbeperkt bruiloften",
+                  "Draaiboek bewerken",
                   "Volledig bestandsbeheer",
                   "Geavanceerde chat",
-                  "Draaiboek bewerken",
                   "Premium profiel",
                   "Analytisch dashboard",
                   "Prioriteit support",
@@ -503,66 +747,40 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Hoe het werkt ────────────────────────────────── */}
-      <section className="py-28 px-6" style={{ background: "#f5f5f7" }}>
-        <div style={{ maxWidth: "960px", margin: "0 auto" }}>
-          <div className="text-center mb-16">
-            <SectionLabel>Hoe het werkt</SectionLabel>
+      {/* ── FAQ ──────────────────────────────────────────── */}
+      <section id="faq" className="py-28 px-6" style={{ background: "#f5f5f7" }}>
+        <div style={{ maxWidth: "680px", margin: "0 auto" }}>
+          <div className="text-center mb-14">
+            <SectionLabel>Vragen</SectionLabel>
             <h2
               style={{
                 fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
-                fontSize: "clamp(2rem, 5vw, 3.25rem)",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 700,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.06,
                 color: "var(--foreground)",
               }}
             >
-              Drie stappen. Dat is alles.
+              Veel gestelde vragen.
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {HOW_IT_WORKS.map((step) => (
-              <div key={step.n}>
-                <div
-                  style={{
-                    fontFamily: "var(--font-geist-sans), sans-serif",
-                    fontSize: "3.5rem",
-                    fontWeight: 700,
-                    letterSpacing: "-0.05em",
-                    color: "rgba(196,154,108,0.20)",
-                    lineHeight: 1,
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {step.n}
-                </div>
-                <h3
-                  style={{
-                    fontSize: "1.125rem",
-                    fontWeight: 600,
-                    letterSpacing: "-0.02em",
-                    color: "var(--foreground)",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  {step.title}
-                </h3>
-                <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.6 }}>{step.desc}</p>
-              </div>
+          <div style={{ background: "white", borderRadius: "20px", padding: "0 2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
+            {FAQS.map((faq) => (
+              <FaqItem key={faq.q} q={faq.q} a={faq.a} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Final CTA ────────────────────────────────────── */}
+      {/* ── Afsluitende CTA ──────────────────────────────── */}
       <section className="py-32 px-6 text-center" style={{ background: "var(--foreground)" }}>
         <div style={{ maxWidth: "600px", margin: "0 auto" }}>
           <h2
             style={{
               fontFamily: "var(--font-geist-sans), -apple-system, sans-serif",
-              fontSize: "clamp(2.25rem, 6vw, 4rem)",
+              fontSize: "clamp(2.25rem, 6vw, 3.75rem)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
               lineHeight: 1.04,
@@ -570,10 +788,10 @@ export default function LandingPage() {
               marginBottom: "1.25rem",
             }}
           >
-            Jullie dag. Jullie manier.
+            Klaar om met plezier te plannen?
           </h2>
           <p style={{ fontSize: "1.125rem", color: "rgba(255,255,255,0.55)", marginBottom: "2.5rem", lineHeight: 1.5 }}>
-            Sluit je aan bij honderden koppels die hun droomdag plannen met DreamDay Partners.
+            Sluit je aan bij honderden koppels die hun dream day plannen zonder de stress.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link
@@ -589,7 +807,7 @@ export default function LandingPage() {
                 letterSpacing: "-0.01em",
               }}
             >
-              Gratis starten <ArrowRight className="w-4 h-4" />
+              Begin gratis <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/login"
@@ -627,10 +845,11 @@ export default function LandingPage() {
 
           <div className="flex flex-wrap justify-center gap-6">
             {[
-              { href: "#stellen",      label: "Voor stellen" },
-              { href: "#leveranciers", label: "Voor leveranciers" },
-              { href: "#prijzen",      label: "Prijzen" },
-              { href: "/login",        label: "Inloggen" },
+              { href: "#hoe-het-werkt", label: "Hoe het werkt" },
+              { href: "#leveranciers",  label: "Voor leveranciers" },
+              { href: "#prijzen",       label: "Prijzen" },
+              { href: "#faq",           label: "FAQ" },
+              { href: "/login",         label: "Inloggen" },
             ].map((l) => (
               <a
                 key={l.href}
@@ -643,7 +862,7 @@ export default function LandingPage() {
           </div>
 
           <p style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.30)" }}>
-            © 2025 DreamDay Partners
+            © 2026 DreamDay Partners
           </p>
         </div>
       </footer>
