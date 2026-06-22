@@ -70,15 +70,20 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside
       className="ddp-sidebar"
-      style={{ background: "white", borderRight: "1px solid var(--border)" }}
+      style={{
+        background: "rgba(255,255,255,0.85)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        borderRight: "1px solid rgba(0,0,0,0.07)",
+      }}
     >
       {/* Logo */}
-      <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
+      <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <Image src="/logo.png" alt="DreamDay Partners" width={32} height={32} className="flex-shrink-0" />
+          <Image src="/logo.png" alt="DreamDay Partners" width={30} height={30} className="flex-shrink-0" />
           <div className="min-w-0">
-            <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)" }}>DreamDay</div>
-            <div className="text-xs leading-none mt-0.5" style={{ color: "var(--primary)" }}>Partners</div>
+            <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)", letterSpacing: "-0.02em" }}>DreamDay</div>
+            <div className="text-xs leading-none mt-0.5" style={{ color: "var(--primary)", fontSize: "0.7rem" }}>Partners</div>
           </div>
         </Link>
       </div>
