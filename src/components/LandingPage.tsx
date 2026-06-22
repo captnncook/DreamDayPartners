@@ -152,7 +152,7 @@ export default function LandingPage() {
         <div className="hidden md:flex items-center gap-0">
           {[
             { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-            { href: "#leveranciers",  label: "Leveranciers" },
+            { href: "/leveranciers",  label: "Leveranciers" },
             { href: "#prijzen",       label: "Prijzen" },
             { href: "#faq",           label: "FAQ" },
           ].map((l) => (
@@ -229,8 +229,8 @@ export default function LandingPage() {
           <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
             Begin gratis
           </Link>
-          <Link href="/login" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
-            Demo bekijken
+          <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+            Vind jouw Dream Partner!
           </Link>
         </div>
 
@@ -717,7 +717,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-5">
             {[
               { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-              { href: "#leveranciers",  label: "Leveranciers" },
+              { href: "/leveranciers",  label: "Leveranciers" },
               { href: "#prijzen",       label: "Prijzen" },
               { href: "#faq",           label: "FAQ" },
               { href: "/login",         label: "Inloggen" },

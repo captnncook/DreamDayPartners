@@ -1,0 +1,72 @@
+import { NextRequest, NextResponse } from "next/server";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSession } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
+import { r2, R2_BUCKET, getDownloadUrl } from "@/lib/r2";
+import { v4 as uuidv4 } from "uuid";
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getSession();
+  if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+
+  const { id } = await params;
+  const vendor = await prisma.vendor.findUnique({ where: { id } });
+  if (!vendor) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
+
+  if (vendor.userId !== user.id && user.role !== "admin") {
+    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  }
+
+  if (!process.env.R2_ACCOUNT_ID || !process.env.R2_ACCESS_KEY_ID || !process.env.R2_SECRET_ACCESS_KEY) {
+    return NextResponse.json({ error: "Opslag niet geconfigureerd" }, { status: 503 });
+  }
+
+  const formData = await req.formData();
+  const file = formData.get("file") as File | null;
+  if (!file) return NextResponse.json({ error: "Geen bestand meegegeven" }, { status: 400 });
+  if (file.size > 10 * 1024 * 1024) return NextResponse.json({ error: "Afbeelding mag max 10 MB zijn" }, { status: 400 });
+
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const fileKey = `vendors/${id}/${uuidv4()}.${ext}`;
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  await r2.send(
+    new PutObjectCommand({
+      Bucket: R2_BUCKET,
+      Key: fileKey,
+      Body: buffer,
+      ContentType: file.type || "image/jpeg",
+      ContentLength: buffer.length,
+    })
+  );
+
+  const updated = await prisma.vendor.update({
+    where: { id },
+    data: { photos: { push: fileKey } },
+  });
+
+  // Return signed URLs for all photos
+  const signedPhotos = await Promise.all(updated.photos.map((k) => getDownloadUrl(k, 3600)));
+  return NextResponse.json({ photos: signedPhotos, keys: updated.photos });
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getSession();
+  if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+
+  const { id } = await params;
+  const vendor = await prisma.vendor.findUnique({ where: { id } });
+  if (!vendor) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
+
+  if (vendor.userId !== user.id && user.role !== "admin") {
+    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  }
+
+  const { key } = await req.json();
+  const updated = await prisma.vendor.update({
+    where: { id },
+    data: { photos: { set: vendor.photos.filter((p) => p !== key) } },
+  });
+
+  return NextResponse.json({ photos: updated.photos });
+}
