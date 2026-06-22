@@ -7,7 +7,7 @@ import type { User } from "@prisma/client";
 import { useLang } from "@/components/LangProvider";
 import {
   Home, Heart, CheckSquare, Users, Euro, ClipboardList,
-  MessageCircle, Briefcase, Settings, Globe, LogOut,
+  MessageCircle, Briefcase, Settings, Globe, LogOut, UserCircle,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -15,15 +15,16 @@ interface SidebarProps {
 }
 
 const NAV_ICONS: Record<string, React.ElementType> = {
-  "/dashboard":  Home,
-  "/weddings":   Heart,
-  "/tasks":      CheckSquare,
-  "/guests":     Users,
-  "/budget":     Euro,
-  "/draaiboek":  ClipboardList,
-  "/messages":   MessageCircle,
-  "/vendors":    Briefcase,
-  "/admin":      Settings,
+  "/dashboard":                    Home,
+  "/weddings":                     Heart,
+  "/tasks":                        CheckSquare,
+  "/guests":                       Users,
+  "/budget":                       Euro,
+  "/draaiboek":                    ClipboardList,
+  "/messages":                     MessageCircle,
+  "/vendors":                      Briefcase,
+  "/admin":                        Settings,
+  "/leveranciers/mijn-profiel":    UserCircle,
 };
 
 export default function Sidebar({ user }: SidebarProps) {
@@ -38,10 +39,11 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
     { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
     { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
-    { href: "/draaiboek",  label: n.draaiboek, roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/messages",   label: n.messages,  roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/vendors",    label: n.vendors,   roles: ["planner", "team_member"] },
-    { href: "/admin",      label: n.admin,     roles: ["admin"] },
+    { href: "/draaiboek",                 label: n.draaiboek,    roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/messages",                  label: n.messages,     roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/vendors",                   label: n.vendors,      roles: ["planner", "team_member"] },
+    { href: "/leveranciers/mijn-profiel", label: "Mijn profiel", roles: ["vendor"] },
+    { href: "/admin",                     label: n.admin,        roles: ["admin"] },
   ];
 
   async function handleLogout() {
@@ -114,7 +116,10 @@ export default function Sidebar({ user }: SidebarProps) {
       {/* Nav */}
       <nav className="flex-1 px-3 pb-3 space-y-0.5">
         {visibleItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          const active =
+            pathname === item.href ||
+            pathname.startsWith(item.href + "/") ||
+            (item.href === "/leveranciers/mijn-profiel" && pathname.startsWith("/leveranciers/"));
           const Icon = NAV_ICONS[item.href] ?? Home;
           return (
             <Link key={item.href} href={item.href} className={`ddp-nav-item${active ? " active" : ""}`}>
