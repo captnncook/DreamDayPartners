@@ -91,8 +91,8 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
                     <div style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: "var(--foreground)", marginBottom: "3px" }}>{s.value}</div>
                     <div style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 500 }}>{s.label}</div>
                   </div>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
-                    <Icon className="w-4 h-4" style={{ color: "var(--primary)" }} />
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--color-blush-soft)" }}>
+                    <Icon className="w-4 h-4" style={{ color: "var(--color-charcoal)" }} />
                   </div>
                 </div>
               </div>
@@ -134,12 +134,13 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
       {/* Couple countdown */}
       {user.role === "couple" && weddings[0] && (
         <section className="mb-6">
-          <div className="ddp-card text-center">
-            <div style={{ fontSize: "3rem", fontWeight: 700, letterSpacing: "-0.05em", lineHeight: 1, color: "var(--primary)", marginBottom: "4px" }}>
+          <div className="ddp-card text-center" style={{ background: "var(--color-blush-soft)", borderColor: "var(--color-blush)" }}>
+            <p className="font-serif text-sm mb-1" style={{ color: "var(--muted)" }}>Nog</p>
+            <div style={{ fontSize: "3.5rem", fontWeight: 700, letterSpacing: "-0.05em", lineHeight: 1, color: "var(--color-charcoal)", marginBottom: "4px" }}>
               {Math.max(0, weddings[0].days)}
             </div>
-            <div style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>dagen tot jullie dream day</div>
-            <div className="mt-4 pt-4" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+            <div className="font-serif" style={{ fontSize: "0.9rem", color: "var(--muted)" }}>dagen tot jullie dream day</div>
+            <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--color-blush)" }}>
               <div className="flex justify-between text-sm mb-2">
                 <span style={{ color: "var(--muted)" }}>Datum</span>
                 <span className="font-medium">{formatDate(weddings[0].date)}</span>
@@ -268,31 +269,18 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
 function WeddingCard({ wedding }: { wedding: Wedding }) {
   const day = new Date(wedding.date).getDate();
   const month = new Intl.DateTimeFormat("nl-NL", { month: "short" }).format(new Date(wedding.date));
-  const bgColor = wedding.days < 30 ? "#e05252" : wedding.days < 90 ? "var(--warning)" : "var(--primary)";
+  const urgent = wedding.days < 30;
+  const soon = wedding.days < 90;
+  const badgeBg = urgent ? "var(--danger-bg)" : soon ? "var(--warning-bg)" : "var(--color-champagne)";
+  const badgeColor = urgent ? "var(--danger)" : soon ? "var(--warning)" : "#7a5c1a";
 
   return (
     <Link href={`/weddings/${wedding.id}`} style={{ textDecoration: "none", display: "block" }}>
-      <div
-        className="ddp-card ddp-card-hover"
-        style={{ padding: "0.875rem 1rem", display: "flex", alignItems: "center", gap: "0.875rem" }}
-      >
+      <div className="ddp-card ddp-card-hover" style={{ padding: "0.875rem 1rem", display: "flex", alignItems: "center", gap: "0.875rem" }}>
         {/* Date badge */}
-        <div
-          style={{
-            width: "44px",
-            height: "44px",
-            minWidth: "44px",
-            borderRadius: "10px",
-            background: bgColor,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-          }}
-        >
-          <span style={{ fontSize: "1.125rem", fontWeight: 700, lineHeight: 1 }}>{day}</span>
-          <span style={{ fontSize: "0.5625rem", fontWeight: 600, lineHeight: 1, marginTop: "1px", textTransform: "uppercase" }}>{month}</span>
+        <div style={{ width: "44px", height: "44px", minWidth: "44px", borderRadius: "12px", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ fontSize: "1.125rem", fontWeight: 700, lineHeight: 1, color: "var(--color-charcoal)" }}>{day}</span>
+          <span style={{ fontSize: "0.5625rem", fontWeight: 600, lineHeight: 1, marginTop: "1px", textTransform: "uppercase", color: "var(--muted)" }}>{month}</span>
         </div>
 
         {/* Info */}
@@ -308,16 +296,16 @@ function WeddingCard({ wedding }: { wedding: Wedding }) {
             <span className={`ddp-badge ${STATUS_COLORS[wedding.status] ?? "badge-neutral"}`} style={{ fontSize: "0.6rem" }}>
               {STATUS_LABELS[wedding.status] ?? wedding.status}
             </span>
-            {wedding.isPremium && <span className="ddp-badge badge-premium" style={{ fontSize: "0.6rem" }}>Premium</span>}
+            {wedding.isPremium && <span className="ddp-badge badge-champagne" style={{ fontSize: "0.6rem" }}>Premium</span>}
           </div>
         </div>
 
         {/* Days */}
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: wedding.days < 30 ? "#e05252" : "var(--primary)" }}>
+        <div style={{ textAlign: "right", flexShrink: 0, background: badgeBg, borderRadius: "10px", padding: "0.35rem 0.6rem", minWidth: "48px" }}>
+          <div style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: badgeColor }}>
             {Math.max(0, wedding.days)}
           </div>
-          <div style={{ fontSize: "0.6875rem", color: "var(--muted)", marginTop: "1px" }}>
+          <div style={{ fontSize: "0.6rem", color: badgeColor, marginTop: "1px", opacity: 0.8 }}>
             {wedding.days > 0 ? "dagen" : "geweest"}
           </div>
         </div>

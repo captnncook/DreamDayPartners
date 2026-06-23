@@ -56,41 +56,31 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside
       className="ddp-sidebar"
-      style={{
-        background: "rgba(255,255,255,0.85)",
-        backdropFilter: "blur(20px) saturate(180%)",
-        WebkitBackdropFilter: "blur(20px) saturate(180%)",
-        borderRight: "1px solid rgba(0,0,0,0.07)",
-      }}
+      style={{ background: "#ffffff", borderRight: "1px solid var(--border)" }}
     >
       {/* Logo */}
-      <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+      <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <Image src="/logo.png" alt="DreamDay Partners" width={30} height={30} className="flex-shrink-0" />
           <div className="min-w-0">
             <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)", letterSpacing: "-0.02em" }}>DreamDay</div>
-            <div className="text-xs leading-none mt-0.5" style={{ color: "var(--primary)", fontSize: "0.7rem" }}>Partners</div>
+            <div className="font-serif text-xs leading-none mt-0.5" style={{ color: "var(--primary)", fontSize: "0.7rem" }}>Partners</div>
           </div>
         </Link>
       </div>
 
       {/* User info */}
-      <div className="px-4 py-3.5 mx-3 my-3 rounded-xl" style={{ background: "var(--surface-2)" }}>
+      <div className="px-4 py-3 mx-3 my-3 rounded-2xl" style={{ background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)" }}>
         <div className="flex items-center gap-3">
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-            style={{ background: "var(--gradient-primary)", boxShadow: "0 2px 6px rgba(196,154,108,0.3)" }}
-          >
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "var(--color-charcoal)", color: "var(--color-cream)" }}>
             {initials}
           </div>
           <div className="min-w-0">
             <div className="text-sm font-semibold truncate" style={{ color: "var(--foreground)" }}>{user.name}</div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-xs" style={{ color: "var(--muted)" }}>
-                {roleLabels[user.role] ?? user.role}
-              </span>
+              <span className="text-xs" style={{ color: "var(--muted)" }}>{roleLabels[user.role] ?? user.role}</span>
               {user.isPremium && (
-                <span className="ddp-badge badge-premium" style={{ fontSize: "0.55rem", padding: "0.1rem 0.35rem" }}>Pro</span>
+                <span className="ddp-badge badge-champagne" style={{ fontSize: "0.55rem", padding: "0.1rem 0.35rem" }}>Pro</span>
               )}
             </div>
           </div>
@@ -113,7 +103,7 @@ export default function Sidebar({ user }: SidebarProps) {
       </nav>
 
       {/* Language + Logout + Website */}
-      <div className="px-3 py-3" style={{ borderTop: "1px solid var(--border)" }}>
+      <div className="px-3 py-3" style={{ borderTop: "1px solid var(--border)", background: "#fafaf8" }}>
         <Link href="/" className="ddp-nav-item w-full text-left">
           Naar website
         </Link>
