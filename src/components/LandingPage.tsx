@@ -114,7 +114,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 /* ─── Page ──────────────────────────────────────────────── */
 
-export default function LandingPage() {
+export default function LandingPage({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -169,16 +169,24 @@ export default function LandingPage() {
 
         {/* Knoppen — rechts */}
         <div className="flex items-center gap-2 justify-end">
-          <Link
-            href="/login"
-            className="ddp-btn-ghost hidden sm:inline-flex"
-            style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}
-          >
-            Inloggen
-          </Link>
-          <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
-            Begin gratis
-          </Link>
+          {isLoggedIn ? (
+            <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+              Dashboard →
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="ddp-btn-ghost hidden sm:inline-flex"
+                style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}
+              >
+                Inloggen
+              </Link>
+              <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+                Begin gratis
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -243,48 +251,6 @@ export default function LandingPage() {
           </a>
         </div>
 
-        {/* Browser mockup */}
-        <div className="animate-fade-in delay-500 w-full" style={{ maxWidth: "680px" }}>
-          <div
-            style={{
-              borderRadius: "18px",
-              overflow: "hidden",
-              boxShadow: "0 2px 0 rgba(0,0,0,0.05), 0 24px 80px rgba(0,0,0,0.13)",
-              border: "1px solid rgba(0,0,0,0.06)",
-            }}
-          >
-            <div
-              className="flex items-center gap-2 px-4"
-              style={{ height: "38px", background: "#f0f0f0", borderBottom: "1px solid rgba(0,0,0,0.07)" }}
-            >
-              <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#ff5f57" }} />
-                <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#febc2e" }} />
-                <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#28c840" }} />
-              </div>
-              <div
-                className="flex-1 mx-3 flex items-center px-3 text-xs rounded"
-                style={{ height: "22px", background: "white", color: "var(--muted)", border: "1px solid rgba(0,0,0,0.07)", fontSize: "0.6875rem" }}
-              >
-                dreamdaypartners.nl/dashboard
-              </div>
-            </div>
-            <div className="grid grid-cols-3" style={{ background: "white" }}>
-              {[
-                { label: "Draaiboek items", value: "14", color: "var(--primary)" },
-                { label: "Budget verbruikt", value: "68%", color: "var(--warning)" },
-                { label: "Gasten bevestigd", value: "84", color: "var(--success)" },
-              ].map((s, i) => (
-                <div key={s.label} className="py-8 text-center" style={{ borderRight: i < 2 ? "1px solid rgba(0,0,0,0.05)" : "none" }}>
-                  <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.04em", color: s.color, lineHeight: 1, marginBottom: "6px" }}>
-                    {s.value}
-                  </div>
-                  <div style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* ── Stats bar ─────────────────────────────────────── */}

@@ -25,14 +25,16 @@ export default function MobileNav({ user }: { user: User }) {
   const n = t.nav;
 
   const NAV_ITEMS = [
-    { href: "/dashboard",  label: n.dashboard, roles: ["admin", "planner", "team_member", "couple", "vendor"] },
-    { href: "/weddings",   label: n.weddings,  roles: ["admin", "planner", "team_member"] },
-    { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
-    { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
-    { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
-    { href: "/messages",   label: n.messages,  roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/vendors",    label: n.vendors,   roles: ["planner", "team_member"] },
-    { href: "/admin",      label: n.admin,     roles: ["admin"] },
+    { href: "/dashboard",                  label: n.dashboard,         roles: ["admin", "planner", "team_member", "couple", "vendor"] },
+    { href: "/weddings",                   label: n.weddings,          roles: ["admin", "planner", "team_member"] },
+    { href: "/tasks",                      label: n.myTasks,           roles: ["planner", "team_member", "couple"] },
+    { href: "/guests",                     label: n.guests,            roles: ["planner", "team_member", "couple"] },
+    { href: "/budget",                     label: n.budget,            roles: ["planner", "team_member"] },
+    { href: "/messages",                   label: n.messages,          roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/vendors",                    label: n.vendors,           roles: ["planner", "team_member"] },
+    { href: "/leveranciers",               label: "Leveranciers",      roles: ["admin", "planner", "couple"] },
+    { href: "/leveranciers/mijn-profiel",  label: "Mijn profiel",      roles: ["vendor"] },
+    { href: "/admin",                      label: n.admin,             roles: ["admin"] },
   ];
 
   const visibleItems = NAV_ITEMS.filter((i) => i.roles.includes(user.role));
@@ -251,6 +253,25 @@ export default function MobileNav({ user }: { user: User }) {
 
           {/* Bottom actions */}
           <div style={{ padding: "8px 16px 32px" }}>
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "12px 16px",
+                marginBottom: "8px",
+                borderRadius: "14px",
+                background: "#f5f5f7",
+                textDecoration: "none",
+                fontSize: "14px",
+                color: "var(--muted)",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Naar website
+            </Link>
             <div
               style={{
                 background: "#f5f5f7",

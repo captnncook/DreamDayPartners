@@ -23,10 +23,11 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
     { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
     { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
-    { href: "/messages",                  label: n.messages,     roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/vendors",                   label: n.vendors,      roles: ["planner", "team_member"] },
-    { href: "/leveranciers/mijn-profiel", label: "Mijn profiel", roles: ["vendor"] },
-    { href: "/admin",                     label: n.admin,        roles: ["admin"] },
+    { href: "/messages",                  label: n.messages,      roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/vendors",                   label: n.vendors,       roles: ["planner", "team_member"] },
+    { href: "/leveranciers",              label: "Leveranciers",  roles: ["admin", "planner", "couple"] },
+    { href: "/leveranciers/mijn-profiel", label: "Mijn profiel",  roles: ["vendor"] },
+    { href: "/admin",                     label: n.admin,         roles: ["admin"] },
   ];
 
   async function handleLogout() {
@@ -111,9 +112,12 @@ export default function Sidebar({ user }: SidebarProps) {
         })}
       </nav>
 
-      {/* Language + Logout */}
+      {/* Language + Logout + Website */}
       <div className="px-3 py-3" style={{ borderTop: "1px solid var(--border)" }}>
-        <button onClick={toggle} className="ddp-nav-item w-full text-left">
+        <Link href="/" className="ddp-nav-item w-full text-left">
+          Naar website
+        </Link>
+        <button onClick={toggle} className="ddp-nav-item w-full text-left mt-0.5">
           <Globe className="w-4 h-4 flex-shrink-0" />
           <span>{t.common.switchLang}</span>
         </button>
