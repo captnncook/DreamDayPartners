@@ -47,7 +47,7 @@ const FAQS = [
 
 /* ─── Sub-components ────────────────────────────────────── */
 
-function FeatureCard({ icon: Icon, title, desc, delay = 0 }: { icon: React.ElementType; title: string; desc: string; delay?: number }) {
+function FeatureCard({ title, desc, delay = 0 }: { icon?: React.ElementType; title: string; desc: string; delay?: number }) {
   return (
     <ScrollReveal delay={delay}>
       <div
@@ -71,12 +71,6 @@ function FeatureCard({ icon: Icon, title, desc, delay = 0 }: { icon: React.Eleme
           (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
         }}
       >
-        <div
-          className="w-11 h-11 rounded-2xl flex items-center justify-center mb-4 flex-shrink-0"
-          style={{ background: "rgba(196,154,108,0.10)" }}
-        >
-          <Icon className="w-5 h-5" style={{ color: "var(--primary)" }} />
-        </div>
         <h3 className="font-semibold mb-2" style={{ fontSize: "1rem", color: "var(--foreground)", letterSpacing: "-0.02em" }}>
           {title}
         </h3>
