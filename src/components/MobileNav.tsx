@@ -6,23 +6,9 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import {
-  Heart, Home, CheckSquare, Users, Euro, ClipboardList,
-  MessageCircle, Briefcase, Settings, LogOut, Menu, X, Globe,
-  ChevronRight,
+  LogOut, Menu, X, Globe, ChevronRight,
 } from "lucide-react";
 import { useLang } from "./LangProvider";
-
-const NAV_ICONS: Record<string, React.ElementType> = {
-  "/dashboard":  Home,
-  "/weddings":   Heart,
-  "/tasks":      CheckSquare,
-  "/guests":     Users,
-  "/budget":     Euro,
-  "/draaiboek":  ClipboardList,
-  "/messages":   MessageCircle,
-  "/vendors":    Briefcase,
-  "/admin":      Settings,
-};
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "Admin",
@@ -44,7 +30,6 @@ export default function MobileNav({ user }: { user: User }) {
     { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
     { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
     { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
-    { href: "/draaiboek",  label: n.draaiboek, roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/messages",   label: n.messages,  roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/vendors",    label: n.vendors,   roles: ["planner", "team_member"] },
     { href: "/admin",      label: n.admin,     roles: ["admin"] },
@@ -229,7 +214,6 @@ export default function MobileNav({ user }: { user: User }) {
             >
               {visibleItems.map((item, idx) => {
                 const active = pathname === item.href || pathname.startsWith(item.href + "/");
-                const Icon = NAV_ICONS[item.href] ?? Home;
                 const isLast = idx === visibleItems.length - 1;
                 return (
                   <Link
@@ -239,33 +223,12 @@ export default function MobileNav({ user }: { user: User }) {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "12px",
                       padding: "14px 16px",
                       textDecoration: "none",
                       background: active ? "rgba(196,154,108,0.08)" : "transparent",
                       borderBottom: isLast ? "none" : "1px solid rgba(0,0,0,0.06)",
                     }}
                   >
-                    <div
-                      style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "8px",
-                        background: active ? "rgba(196,154,108,0.15)" : "rgba(0,0,0,0.06)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Icon
-                        style={{
-                          width: "16px",
-                          height: "16px",
-                          color: active ? "var(--primary)" : "var(--muted)",
-                        }}
-                      />
-                    </div>
                     <span
                       style={{
                         flex: 1,

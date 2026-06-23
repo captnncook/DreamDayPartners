@@ -5,27 +5,11 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import { useLang } from "@/components/LangProvider";
-import {
-  Home, Heart, CheckSquare, Users, Euro, ClipboardList,
-  MessageCircle, Briefcase, Settings, Globe, LogOut, UserCircle,
-} from "lucide-react";
+import { Globe, LogOut } from "lucide-react";
 
 interface SidebarProps {
   user: User;
 }
-
-const NAV_ICONS: Record<string, React.ElementType> = {
-  "/dashboard":                    Home,
-  "/weddings":                     Heart,
-  "/tasks":                        CheckSquare,
-  "/guests":                       Users,
-  "/budget":                       Euro,
-  "/draaiboek":                    ClipboardList,
-  "/messages":                     MessageCircle,
-  "/vendors":                      Briefcase,
-  "/admin":                        Settings,
-  "/leveranciers/mijn-profiel":    UserCircle,
-};
 
 export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
@@ -39,7 +23,6 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
     { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
     { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
-    { href: "/draaiboek",                 label: n.draaiboek,    roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/messages",                  label: n.messages,     roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/vendors",                   label: n.vendors,      roles: ["planner", "team_member"] },
     { href: "/leveranciers/mijn-profiel", label: "Mijn profiel", roles: ["vendor"] },
@@ -120,10 +103,8 @@ export default function Sidebar({ user }: SidebarProps) {
             pathname === item.href ||
             pathname.startsWith(item.href + "/") ||
             (item.href === "/leveranciers/mijn-profiel" && pathname.startsWith("/leveranciers/"));
-          const Icon = NAV_ICONS[item.href] ?? Home;
           return (
             <Link key={item.href} href={item.href} className={`ddp-nav-item${active ? " active" : ""}`}>
-              <Icon className="w-4 h-4 flex-shrink-0" />
               {item.label}
             </Link>
           );
