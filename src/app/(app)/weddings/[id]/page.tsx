@@ -216,7 +216,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               <div className="space-y-1">
                 {draaiboek.items.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl" style={{ background: "rgba(0,0,0,0.02)" }}>
-                    <div className="flex items-center gap-1 flex-shrink-0" style={{ color: "var(--primary)", minWidth: "52px" }}>
+                    <div className="flex items-center gap-1 flex-shrink-0" style={{ color: "var(--muted)", minWidth: "52px" }}>
                       <Clock className="w-3 h-3" />
                       <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{formatTime(item.startTime)}</span>
                     </div>

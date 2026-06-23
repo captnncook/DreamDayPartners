@@ -148,18 +148,18 @@ export default function LeveranciersPage() {
 
         {/* Results header */}
         {!loading && vendors.length > 0 && (
-          <div className="flex items-center justify-between mb-5">
-            <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
+          <div className="flex items-center justify-between mb-5" style={{ gap: "0.75rem" }}>
+            <p style={{ fontSize: "0.875rem", color: "var(--muted)", minWidth: 0 }}>
               <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{vendors.length}</span>{" "}
               leverancier{vendors.length !== 1 ? "s" : ""} gevonden
               {category && ` · ${CATEGORY_MAP[category] ?? category}`}
             </p>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="hidden sm:flex items-center gap-1.5" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 <span>Premium eerst</span>
               </div>
-              <div className="flex items-center" style={{ border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
+              <div style={{ display: "flex", flexDirection: "row", border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
                 <button
                   onClick={() => setView("grid")}
                   style={{ padding: "0.375rem 0.625rem", background: view === "grid" ? "var(--color-charcoal)" : "transparent", color: view === "grid" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}

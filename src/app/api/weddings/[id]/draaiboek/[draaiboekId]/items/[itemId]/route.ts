@@ -29,8 +29,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ...(body.description !== undefined && { description: body.description }),
       ...(body.location !== undefined && { location: body.location }),
       ...(body.notes !== undefined && { notes: body.notes }),
+      ...(body.vendorId !== undefined && { vendorId: body.vendorId || null }),
     },
-    include: { vendor: true },
+    include: { vendor: { select: { id: true, name: true, category: true } } },
   });
 
   return NextResponse.json({ item });

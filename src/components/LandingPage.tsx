@@ -78,17 +78,17 @@ function FeatureCard({ title, desc, delay = 0 }: { title: string; desc: string; 
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
+    <div style={{ borderBottom: "1px solid rgba(0,0,0,0.10)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full text-left flex items-center justify-between py-5 gap-4"
-        style={{ background: "none", border: "none", cursor: "pointer" }}
+        className="w-full text-left flex items-center justify-between gap-4"
+        style={{ background: "none", border: "none", cursor: "pointer", padding: "1.375rem 0" }}
       >
         <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{q}</span>
         <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)", transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s" }} />
       </button>
       {open && (
-        <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.7, paddingBottom: "1.25rem" }}>{a}</p>
+        <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.7, paddingBottom: "1.375rem" }}>{a}</p>
       )}
     </div>
   );
@@ -110,26 +110,25 @@ export default function LandingPage() {
 
       {/* ── Nav ─────────────────────────────────────────── */}
       <nav
-        className="sticky top-0 z-50 px-5 md:px-10 h-12"
+        className="sticky top-0 z-50 flex items-center px-5 md:px-10"
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
-          alignItems: "center",
-          background: scrolled ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.72)",
+          height: "56px",
+          gap: "1rem",
+          background: scrolled ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.80)",
           backdropFilter: "blur(24px) saturate(200%)",
           WebkitBackdropFilter: "blur(24px) saturate(200%)",
           borderBottom: scrolled ? "1px solid rgba(0,0,0,0.08)" : "1px solid transparent",
           transition: "all 0.3s",
         }}
       >
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} />
           <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
             DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-0">
+        <div className="hidden md:flex items-center gap-0 flex-1 justify-center">
           {[
             { href: "#hoe-het-werkt", label: "Hoe het werkt" },
             { href: "/leveranciers",  label: "Leveranciers" },
@@ -142,11 +141,11 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 justify-end">
+        <div className="flex items-center gap-2 ml-auto flex-shrink-0">
           <Link href="/login" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
             Inloggen
           </Link>
-          <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+          <Link href="/login" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
             Begin gratis
           </Link>
         </div>
@@ -176,11 +175,11 @@ export default function LandingPage() {
               <p style={{ fontSize: "clamp(1rem, 2.5vw, 1.125rem)", color: "var(--muted)", maxWidth: "440px", lineHeight: 1.7, marginBottom: "2.5rem" }}>
                 Stel je dream team van leveranciers samen, regel offertes en facturen en maak je draaiboek — alles in één app.
               </p>
-              <div className="flex flex-wrap gap-3 mb-6">
-                <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+              <div className="flex flex-wrap gap-3 mb-6" style={{ position: "relative", zIndex: 1 }}>
+                <Link href="/login" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Begin gratis
                 </Link>
-                <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
                   Vind jouw Dream Partner!
                 </Link>
               </div>
@@ -318,7 +317,7 @@ export default function LandingPage() {
               </div>
 
               <ScrollReveal>
-                <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                <Link href="/login" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Begin gratis <ArrowRight className="w-4 h-4" />
                 </Link>
               </ScrollReveal>
@@ -471,7 +470,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
+                <Link href="/login" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
                   Begin gratis
                 </Link>
               </div>
@@ -560,7 +559,7 @@ export default function LandingPage() {
               Sluit je aan bij honderden koppels die hun dream day plannen zonder de stress.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
-              <Link href="/weddings/wizard" className="inline-flex items-center gap-2 font-semibold" style={{ background: "white", color: "var(--foreground)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "0.9375rem", textDecoration: "none" }}>
+              <Link href="/login" className="inline-flex items-center gap-2 font-semibold" style={{ background: "white", color: "var(--foreground)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "0.9375rem", textDecoration: "none" }}>
                 Begin gratis <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/leveranciers" className="inline-flex items-center font-medium" style={{ background: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.75)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "0.9375rem", textDecoration: "none" }}>
