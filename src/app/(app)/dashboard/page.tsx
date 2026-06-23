@@ -28,6 +28,7 @@ export default async function DashboardPage() {
       where: { vendors: { some: { vendor: { userId: user.id }, portalAccess: true } } },
       include: { owner: true, teamMembers: { include: { user: true } } },
       orderBy: { date: "asc" },
+      take: 50,
     });
   } else {
     weddings = await prisma.wedding.findMany({

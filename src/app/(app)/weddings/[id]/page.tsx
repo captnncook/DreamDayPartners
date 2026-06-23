@@ -22,8 +22,16 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
   const { id } = await params;
 
-  const wedding = await prisma.wedding.findUnique({
-    where: { id },
+  // Build access filter based on role
+  const accessWhere =
+    user.role === "admin"
+      ? { id }
+      : user.role === "vendor"
+      ? { id, vendors: { some: { vendor: { userId: user.id }, portalAccess: true } } }
+      : { id, teamMembers: { some: { userId: user.id } } };
+
+  const wedding = await prisma.wedding.findFirst({
+    where: accessWhere,
     include: {
       owner: true,
       teamMembers: { include: { user: true } },
