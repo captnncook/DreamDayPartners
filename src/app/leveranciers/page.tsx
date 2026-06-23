@@ -3,30 +3,27 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Star, MapPin, ArrowRight, ChevronDown } from "lucide-react";
+import { Search, MapPin, ArrowRight, SlidersHorizontal, X } from "lucide-react";
 
-const CATEGORIES = [
-  { value: "", label: "Alle categorieën" },
-  { value: "weddingplanner", label: "Weddingplanner" },
-  { value: "fotograaf", label: "Fotograaf" },
-  { value: "videograaf", label: "Videograaf" },
-  { value: "bloemist", label: "Bloemist" },
-  { value: "catering", label: "Catering" },
-  { value: "bakker", label: "Bruidstaart & Bakker" },
-  { value: "dj", label: "DJ" },
-  { value: "liveband", label: "Liveband & Muziek" },
-  { value: "ceremoniespreker", label: "Ceremoniespreker" },
-  { value: "trouwlocatie", label: "Trouwlocatie" },
-  { value: "haarstylist", label: "Haar & Make-up" },
-  { value: "vervoer", label: "Vervoer" },
-  { value: "decoratie", label: "Decoratie & Styling" },
-  { value: "fotocabine", label: "Fotocabine" },
-  { value: "overig", label: "Overig" },
+const CATEGORIES: { value: string; label: string; emoji: string }[] = [
+  { value: "trouwlocatie",    label: "Trouwlocaties",       emoji: "🏛️" },
+  { value: "fotograaf",       label: "Fotografen",          emoji: "📷" },
+  { value: "videograaf",      label: "Videografen",         emoji: "🎥" },
+  { value: "bloemist",        label: "Bloemisten",          emoji: "🌸" },
+  { value: "catering",        label: "Catering",            emoji: "🍽️" },
+  { value: "bakker",          label: "Bruidstaarten",       emoji: "🎂" },
+  { value: "weddingplanner",  label: "Wedding planners",    emoji: "💍" },
+  { value: "haarstylist",     label: "Hair & make-up",      emoji: "💄" },
+  { value: "dj",              label: "Muziek & DJ",         emoji: "🎧" },
+  { value: "liveband",        label: "Liveband",            emoji: "🎵" },
+  { value: "ceremoniespreker",label: "Ceremoniesprekers",   emoji: "🎤" },
+  { value: "decoratie",       label: "Decoratie & Styling", emoji: "✨" },
+  { value: "vervoer",         label: "Vervoer",             emoji: "🚗" },
+  { value: "fotocabine",      label: "Fotocabine",          emoji: "📸" },
+  { value: "overig",          label: "Overig",              emoji: "⭐" },
 ];
 
-const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
-  CATEGORIES.filter((c) => c.value).map((c) => [c.value, c.label])
-);
+const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.value, c.label]));
 
 type Vendor = {
   id: string;
@@ -36,9 +33,6 @@ type Vendor = {
   isPremium: boolean;
   photos: string[];
   city?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
 };
 
 export default function LeveranciersPage() {
@@ -66,6 +60,8 @@ export default function LeveranciersPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  const hasFilter = !!category || !!search;
+
   const grouped = category
     ? { [category]: vendors }
     : vendors.reduce<Record<string, Vendor[]>>((acc, v) => {
@@ -74,300 +70,213 @@ export default function LeveranciersPage() {
       }, {});
 
   return (
-    <div className="min-h-screen" style={{ background: "#ffffff", color: "var(--foreground)" }}>
-      {/* Header */}
-      <div
-        style={{
-          background: "var(--foreground)",
-          padding: "3rem 1.25rem 5rem",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
+
+      {/* ── Hero ─────────────────────────────────────── */}
+      <div style={{ background: "var(--color-cream)", borderBottom: "1px solid var(--border)", padding: "3rem 1.25rem 2.5rem" }}>
         <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
-          <Link
-            href="/"
-            className="flex items-center gap-2 mb-8"
-            style={{ textDecoration: "none", display: "inline-flex" }}
-          >
-            <Image src="/logo.png" alt="DreamDay Partners" width={24} height={24} className="brightness-0 invert" />
-            <span style={{ fontWeight: 700, fontSize: "0.875rem", color: "rgba(255,255,255,0.7)", letterSpacing: "-0.02em" }}>
-              DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
-            </span>
+
+          {/* Back */}
+          <Link href="/" className="inline-flex items-center gap-1.5 mb-6 text-sm" style={{ color: "var(--muted)" }}>
+            <Image src="/logo.png" alt="" width={18} height={18} />
+            DreamDay Partners
           </Link>
 
-          <h1
-            style={{
-              fontSize: "clamp(2rem, 5vw, 3.5rem)",
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
-              lineHeight: 1.05,
-              color: "white",
-              marginBottom: "1rem",
-            }}
-          >
-            Vind jouw{" "}
-            <span
-              style={{
-                background: "var(--gradient-primary)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Dream Partner
-            </span>
+          <p className="ddp-section-label mb-2">Leveranciersoverzicht</p>
+          <h1 className="font-serif" style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.1, color: "var(--foreground)", marginBottom: "0.75rem" }}>
+            Vind leveranciers die passen<br className="hidden md:block" /> bij jullie dag
           </h1>
-          <p style={{ fontSize: "1.0625rem", color: "rgba(255,255,255,0.55)", maxWidth: "480px", lineHeight: 1.65 }}>
-            Alle trouwleveranciers op één plek. Filter op categorie en voeg ze direct toe aan jullie Dream Team.
+          <p style={{ fontSize: "1rem", color: "var(--muted)", maxWidth: "460px", lineHeight: 1.65 }}>
+            Vergelijk fotografen, bloemisten, locaties en cateraars in één handig overzicht.
           </p>
+
+          {/* Search bar */}
+          <div className="flex gap-3 mt-6 flex-wrap">
+            <div style={{ position: "relative", flex: "1 1 260px", maxWidth: "420px" }}>
+              <Search className="w-4 h-4" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "var(--muted-light)", pointerEvents: "none" }} />
+              <input
+                type="text"
+                placeholder="Zoek op naam of stad…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ width: "100%", paddingLeft: "2.75rem", paddingRight: "1rem", paddingTop: "0.75rem", paddingBottom: "0.75rem", border: "1px solid var(--border)", borderRadius: "var(--radius-full)", fontSize: "0.9375rem", outline: "none", background: "white", color: "var(--foreground)", boxShadow: "var(--shadow-sm)" }}
+              />
+            </div>
+            {hasFilter && (
+              <button
+                onClick={() => { setSearch(""); setCategory(""); }}
+                className="ddp-btn-secondary flex items-center gap-1.5"
+                style={{ padding: "0.75rem 1.25rem", fontSize: "0.875rem" }}
+              >
+                <X className="w-3.5 h-3.5" /> Alles wissen
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Sticky search bar */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 40,
-          background: "rgba(255,255,255,0.92)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(0,0,0,0.07)",
-          padding: "0.875rem 1.25rem",
-          marginTop: "-2.5rem",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1040px",
-            margin: "0 auto",
-            display: "flex",
-            gap: "0.75rem",
-            flexWrap: "wrap",
-          }}
-        >
-          {/* Search input */}
-          <div style={{ position: "relative", flex: "1 1 220px" }}>
-            <Search
-              className="w-4 h-4"
-              style={{
-                position: "absolute",
-                left: "0.875rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--muted)",
-                pointerEvents: "none",
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Zoek leverancier of stad…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                width: "100%",
-                paddingLeft: "2.5rem",
-                paddingRight: "0.875rem",
-                paddingTop: "0.625rem",
-                paddingBottom: "0.625rem",
-                border: "1px solid rgba(0,0,0,0.12)",
-                borderRadius: "999px",
-                fontSize: "0.875rem",
-                outline: "none",
-                background: "white",
-              }}
-            />
-          </div>
-
-          {/* Category select */}
-          <div style={{ position: "relative", flex: "0 1 220px" }}>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              style={{
-                width: "100%",
-                appearance: "none",
-                padding: "0.625rem 2.5rem 0.625rem 1rem",
-                border: "1px solid rgba(0,0,0,0.12)",
-                borderRadius: "999px",
-                fontSize: "0.875rem",
-                outline: "none",
-                background: "white",
-                cursor: "pointer",
-              }}
+      {/* ── Category chips ───────────────────────────── */}
+      <div style={{ background: "white", borderBottom: "1px solid var(--border)", padding: "1rem 1.25rem", overflowX: "auto" }}>
+        <div style={{ maxWidth: "1040px", margin: "0 auto", display: "flex", gap: "0.5rem", flexWrap: "nowrap", minWidth: 0 }}>
+          <button
+            onClick={() => setCategory("")}
+            className={`ddp-chip${!category ? " active" : ""}`}
+            style={{ flexShrink: 0 }}
+          >
+            Alles
+          </button>
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.value}
+              onClick={() => setCategory(category === c.value ? "" : c.value)}
+              className={`ddp-chip${category === c.value ? " active" : ""}`}
+              style={{ flexShrink: 0 }}
             >
-              {CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value}>{c.label}</option>
-              ))}
-            </select>
-            <ChevronDown
-              className="w-4 h-4"
-              style={{
-                position: "absolute",
-                right: "0.875rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--muted)",
-                pointerEvents: "none",
-              }}
-            />
-          </div>
+              <span>{c.emoji}</span> {c.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Results */}
-      <div style={{ maxWidth: "1040px", margin: "0 auto", padding: "2.5rem 1.25rem" }}>
+      {/* ── Results ──────────────────────────────────── */}
+      <div style={{ maxWidth: "1040px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
+
+        {/* Results header */}
+        {!loading && vendors.length > 0 && (
+          <div className="flex items-center justify-between mb-5">
+            <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
+              <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{vendors.length}</span>{" "}
+              leverancier{vendors.length !== 1 ? "s" : ""} gevonden
+              {category && ` · ${CATEGORY_MAP[category] ?? category}`}
+            </p>
+            <div className="flex items-center gap-1.5" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Premium eerst</span>
+            </div>
+          </div>
+        )}
+
         {loading ? (
-          <div style={{ textAlign: "center", padding: "4rem", color: "var(--muted)", fontSize: "0.9375rem" }}>
-            Leveranciers laden…
+          <div style={{ textAlign: "center", padding: "5rem 0", color: "var(--muted)" }}>
+            <div style={{ fontSize: "2rem", marginBottom: "1rem", opacity: 0.4 }}>🌸</div>
+            <p style={{ fontSize: "0.9375rem" }}>Leveranciers laden…</p>
           </div>
         ) : vendors.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "4rem" }}>
-            <p style={{ color: "var(--muted)", fontSize: "0.9375rem" }}>
-              Geen leveranciers gevonden. Pas je zoekopdracht aan.
+          <div style={{ textAlign: "center", padding: "5rem 0" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.35 }}>🔍</div>
+            <h3 style={{ fontWeight: 700, fontSize: "1.125rem", marginBottom: "0.5rem" }}>Geen leveranciers gevonden</h3>
+            <p style={{ fontSize: "0.9375rem", color: "var(--muted)", marginBottom: "1.5rem" }}>
+              Pas je filters aan of zoek op een andere naam.
             </p>
+            <button onClick={() => { setSearch(""); setCategory(""); }} className="ddp-btn-secondary">
+              Alles wissen
+            </button>
           </div>
         ) : (
           Object.entries(grouped).map(([cat, items]) => (
             <div key={cat} style={{ marginBottom: "3rem" }}>
               {!category && (
-                <h2
-                  style={{
-                    fontSize: "1.125rem",
-                    fontWeight: 700,
-                    letterSpacing: "-0.02em",
-                    color: "var(--foreground)",
-                    marginBottom: "1rem",
-                    paddingBottom: "0.625rem",
-                    borderBottom: "1px solid rgba(0,0,0,0.06)",
-                  }}
-                >
-                  {CATEGORY_LABELS[cat] ?? cat}
-                  <span style={{ fontWeight: 400, color: "var(--muted)", fontSize: "0.875rem", marginLeft: "0.5rem" }}>
-                    ({items.length})
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)" }}>
+                    {CATEGORY_MAP[cat] ?? cat}
+                  </h2>
+                  <span style={{ fontSize: "0.8125rem", color: "var(--muted)", background: "rgba(31,36,40,0.05)", borderRadius: "var(--radius-full)", padding: "0.15rem 0.625rem" }}>
+                    {items.length}
                   </span>
-                </h2>
+                </div>
               )}
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {items.map((v) => (
-                  <VendorCard key={v.id} vendor={v} />
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {items.map((v) => <SupplierCard key={v.id} vendor={v} />)}
               </div>
             </div>
           ))
         )}
       </div>
-
-      {/* Footer nav */}
-      <div style={{ borderTop: "1px solid rgba(0,0,0,0.06)", padding: "1.5rem 1.25rem", textAlign: "center" }}>
-        <Link href="/" style={{ fontSize: "0.8125rem", color: "var(--muted)", textDecoration: "none" }}>
-          ← Terug naar DreamDay Partners
-        </Link>
-      </div>
     </div>
   );
 }
 
-function VendorCard({ vendor }: { vendor: Vendor }) {
+function SupplierCard({ vendor }: { vendor: Vendor }) {
+  const catLabel = CATEGORY_MAP[vendor.category] ?? vendor.category;
+  const emoji = CATEGORIES.find((c) => c.value === vendor.category)?.emoji ?? "⭐";
+
   return (
-    <Link
-      href={`/leveranciers/${vendor.id}`}
-      style={{ textDecoration: "none" }}
-    >
+    <Link href={`/leveranciers/${vendor.id}`} style={{ textDecoration: "none", display: "flex", flexDirection: "column", height: "100%" }}>
       <div
         style={{
           background: "white",
-          borderRadius: "16px",
-          border: "1px solid rgba(0,0,0,0.07)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
           overflow: "hidden",
-          transition: "box-shadow 0.2s, transform 0.2s",
-          cursor: "pointer",
           height: "100%",
           display: "flex",
           flexDirection: "column",
+          transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
+          cursor: "pointer",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 32px rgba(0,0,0,0.10)";
-          (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+          const el = e.currentTarget as HTMLDivElement;
+          el.style.transform = "translateY(-2px)";
+          el.style.boxShadow = "0 14px 36px rgba(31,36,40,0.08)";
+          el.style.borderColor = "#DDD1C4";
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-          (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+          const el = e.currentTarget as HTMLDivElement;
+          el.style.transform = "translateY(0)";
+          el.style.boxShadow = "none";
+          el.style.borderColor = "var(--border)";
         }}
       >
-        {/* Photo placeholder */}
-        <div
-          style={{
-            height: "140px",
-            background: vendor.isPremium
-              ? "linear-gradient(135deg, rgba(196,154,108,0.15), rgba(196,154,108,0.05))"
-              : "#f5f5f7",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-          }}
-        >
-          {vendor.isPremium && (
-            <div
-              style={{
-                position: "absolute",
-                top: "0.625rem",
-                right: "0.625rem",
-                background: "var(--gradient-primary)",
-                borderRadius: "999px",
-                padding: "3px 10px",
-                fontSize: "0.625rem",
-                fontWeight: 700,
-                color: "white",
-                letterSpacing: "0.05em",
-                display: "flex",
-                alignItems: "center",
-                gap: "3px",
-              }}
-            >
-              <Star className="w-2.5 h-2.5" /> PREMIUM
+        {/* Image area — 4:3 */}
+        <div style={{ aspectRatio: "4/3", background: "var(--color-blush-soft)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          <span style={{ fontSize: "3rem", opacity: 0.5 }}>{emoji}</span>
+
+          {/* Status badge */}
+          {vendor.isPremium ? (
+            <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", background: "var(--color-champagne)", color: "#7a5c1a", borderRadius: "var(--radius-full)", padding: "0.2rem 0.75rem", fontSize: "0.625rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              ✦ Aanbevolen
             </div>
-          )}
-          <span style={{ fontSize: "2.5rem" }}>
-            {getCategoryEmoji(vendor.category)}
-          </span>
+          ) : null}
         </div>
 
-        <div style={{ padding: "1rem 1.125rem 1.25rem", flex: 1, display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.25rem" }}>
-            {CATEGORY_LABELS[vendor.category] ?? vendor.category}
-          </div>
-          <h3 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "0.375rem" }}>
+        {/* Body */}
+        <div style={{ padding: "1.125rem 1.25rem 1.375rem", flex: 1, display: "flex", flexDirection: "column" }}>
+          {/* Category */}
+          <p style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted-light)", marginBottom: "0.3rem" }}>
+            {catLabel}
+          </p>
+
+          {/* Name */}
+          <h3 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "0.375rem", lineHeight: 1.25 }}>
             {vendor.name}
           </h3>
+
+          {/* Location */}
           {vendor.city && (
-            <div className="flex items-center gap-1" style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
-              <MapPin className="w-3 h-3" /> {vendor.city}
+            <div className="flex items-center gap-1 mb-2" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
+              <MapPin className="w-3 h-3 flex-shrink-0" />
+              <span>{vendor.city}</span>
             </div>
           )}
+
+          {/* Description */}
           {vendor.description && (
-            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", lineHeight: 1.6, flex: 1, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", lineHeight: 1.6, flex: 1, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", marginBottom: "0.875rem" }}>
               {vendor.description}
             </p>
           )}
-          <div className="flex items-center gap-1 mt-3" style={{ fontSize: "0.8125rem", color: "var(--primary)", fontWeight: 600 }}>
-            Bekijk profiel <ArrowRight className="w-3 h-3" />
+
+          <div style={{ flex: 1 }} />
+
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
+            <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Prijs op aanvraag</span>
+            <span className="flex items-center gap-1" style={{ fontSize: "0.8125rem", color: "var(--color-charcoal)", fontWeight: 600 }}>
+              Bekijk profiel <ArrowRight className="w-3 h-3" />
+            </span>
           </div>
         </div>
       </div>
     </Link>
   );
-}
-
-function getCategoryEmoji(cat: string): string {
-  const map: Record<string, string> = {
-    weddingplanner: "💍", fotograaf: "📷", videograaf: "🎥", bloemist: "🌸",
-    catering: "🍽️", bakker: "🎂", dj: "🎧", liveband: "🎵",
-    ceremoniespreker: "🎤", trouwlocatie: "🏛️", haarstylist: "💄",
-    vervoer: "🚗", decoratie: "✨", fotocabine: "📸", overig: "⭐",
-  };
-  return map[cat] ?? "⭐";
 }
