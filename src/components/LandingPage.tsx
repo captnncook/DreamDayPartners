@@ -229,22 +229,6 @@ export default function LandingPage() {
         </div>
       </ScrollReveal>
 
-      {/* ── Stats bar ─────────────────────────────────────── */}
-      <ScrollReveal>
-        <div className="flex flex-wrap justify-center gap-10 py-12 px-5" style={{ background: "#f5f5f7", borderTop: "1px solid rgba(0,0,0,0.05)", borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
-          {[
-            { value: "500+", label: "Bruiloften gepland" },
-            { value: "100%", label: "Gratis voor stellen" },
-            { value: "24/7", label: "Overal beschikbaar" },
-          ].map((s) => (
-            <div key={s.label} className="text-center">
-              <div style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1.1 }}>{s.value}</div>
-              <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "4px" }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </ScrollReveal>
-
       {/* ── Herkenning ───────────────────────────────────── */}
       <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
         <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
