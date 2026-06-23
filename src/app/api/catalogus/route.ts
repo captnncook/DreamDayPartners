@@ -31,6 +31,8 @@ export async function GET(req: NextRequest) {
       isPremium: true,
       photos: true,
       city: true,
+      latitude: true,
+      longitude: true,
     },
     orderBy: [{ isPremium: "desc" }, { name: "asc" }],
   });

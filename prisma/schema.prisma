@@ -86,6 +86,8 @@ model Vendor {
   isPremium     Boolean  @default(false)
   photos        String[]
   city          String?
+  latitude      Float?
+  longitude     Float?
   createdAt     DateTime @default(now())
 
   weddingVendors WeddingVendor[]

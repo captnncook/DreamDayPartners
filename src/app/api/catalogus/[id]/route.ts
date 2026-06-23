@@ -18,6 +18,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       isPremium: true,
       photos: true,
       city: true,
+      latitude: true,
+      longitude: true,
       userId: true,
     },
   });
@@ -42,6 +44,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = await req.json();
   const { description, city, contactPerson, phone, website } = body;
 
+  let geoData: { latitude?: number; longitude?: number } = {};
+  if (city !== undefined && city !== vendor.city && city.trim()) {
+    try {
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ", Nederland")}&format=json&limit=1`,
+        { headers: { "User-Agent": "DreamDayPartners/1.0 (info@dreamdaypartners.nl)" } }
+      );
+      const geoJson = await geoRes.json();
+      if (geoJson[0]) {
+        geoData = { latitude: parseFloat(geoJson[0].lat), longitude: parseFloat(geoJson[0].lon) };
+      }
+    } catch {
+      // geocoding is best-effort
+    }
+  }
+
   const updated = await prisma.vendor.update({
     where: { id },
     data: {
@@ -50,6 +68,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(contactPerson !== undefined ? { contactPerson } : {}),
       ...(phone !== undefined ? { phone } : {}),
       ...(website !== undefined ? { website } : {}),
+      ...geoData,
     },
   });
 

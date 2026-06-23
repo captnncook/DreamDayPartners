@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, ArrowRight, SlidersHorizontal, X } from "lucide-react";
+import { Search, MapPin, ArrowRight, SlidersHorizontal, X, LayoutGrid, Map } from "lucide-react";
+
+const VendorMap = lazy(() => import("@/components/VendorMap"));
 
 const CATEGORIES: { value: string; label: string; emoji: string }[] = [
   { value: "trouwlocatie",    label: "Trouwlocaties",       emoji: "🏛️" },
@@ -33,6 +35,8 @@ type Vendor = {
   isPremium: boolean;
   photos: string[];
   city?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export default function LeveranciersPage() {
@@ -41,6 +45,7 @@ export default function LeveranciersPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [view, setView] = useState<"grid" | "map">("grid");
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350);
@@ -149,9 +154,25 @@ export default function LeveranciersPage() {
               leverancier{vendors.length !== 1 ? "s" : ""} gevonden
               {category && ` · ${CATEGORY_MAP[category] ?? category}`}
             </p>
-            <div className="flex items-center gap-1.5" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Premium eerst</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>Premium eerst</span>
+              </div>
+              <div className="flex items-center" style={{ border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
+                <button
+                  onClick={() => setView("grid")}
+                  style={{ padding: "0.375rem 0.625rem", background: view === "grid" ? "var(--color-charcoal)" : "transparent", color: view === "grid" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setView("map")}
+                  style={{ padding: "0.375rem 0.625rem", background: view === "map" ? "var(--color-charcoal)" : "transparent", color: view === "map" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
+                >
+                  <Map className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -172,6 +193,14 @@ export default function LeveranciersPage() {
               Alles wissen
             </button>
           </div>
+        ) : view === "map" ? (
+          <Suspense fallback={
+            <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-blush-soft)", borderRadius: "var(--radius-lg)" }}>
+              <p style={{ color: "var(--muted)" }}>Kaart laden…</p>
+            </div>
+          }>
+            <VendorMap vendors={vendors} />
+          </Suspense>
         ) : (
           Object.entries(grouped).map(([cat, items]) => (
             <div key={cat} style={{ marginBottom: "3rem" }}>
