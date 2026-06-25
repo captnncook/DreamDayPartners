@@ -11,10 +11,16 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const { wvId } = await params;
   const wv = await prisma.weddingVendor.findUnique({
     where: { id: wvId },
-    include: { vendor: true },
+    include: {
+      vendor: true,
+      deliverables: { orderBy: { createdAt: "asc" } },
+      documents: { orderBy: { createdAt: "desc" } },
+      draaiboekItems: { orderBy: { startTime: "asc" } },
+      tasks: { orderBy: { dueDate: "asc" } },
+    },
   });
   if (!wv) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json({ weddingVendor: wv });
+  return NextResponse.json({ booking: wv });
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
