@@ -1060,8 +1060,9 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
 // ────────────────────────────────────────────────────────────
 
 export function getVendorTypeConfig(type: string): VendorTypeConfig {
+  const normalized = type.toLowerCase().trim();
   return (
-    VENDOR_TYPE_CONFIGS.find((c) => c.type === type) ??
+    VENDOR_TYPE_CONFIGS.find((c) => c.type === normalized) ??
     VENDOR_TYPE_CONFIGS.find((c) => c.type === "overig")!
   );
 }
