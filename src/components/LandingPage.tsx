@@ -98,11 +98,19 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setLoggedIn(Boolean(d?.user)))
+      .catch(() => {});
   }, []);
 
   return (
@@ -142,12 +150,20 @@ export default function LandingPage() {
         </div>
 
         <div className="flex items-center gap-2 ml-auto flex-shrink-0">
-          <Link href="/login" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
-            Inloggen
-          </Link>
-          <Link href="/login" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
-            Begin gratis
-          </Link>
+          {loggedIn ? (
+            <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+              Profiel
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
+                Inloggen
+              </Link>
+              <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+                Begin gratis
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -176,16 +192,13 @@ export default function LandingPage() {
                 Stel je dream team van leveranciers samen, regel offertes en facturen en maak je draaiboek — alles in één app.
               </p>
               <div className="flex flex-wrap gap-3 mb-6" style={{ position: "relative", zIndex: 1 }}>
-                <Link href="/login" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Begin gratis
                 </Link>
                 <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
                   Vind jouw Dream Partner!
                 </Link>
               </div>
-              <a href="#leveranciers" style={{ fontSize: "0.8125rem", color: "var(--muted)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-                Trouwleverancier? Bekijk hier <ArrowRight className="w-3 h-3" />
-              </a>
             </div>
 
             {/* Hero image */}
@@ -310,14 +323,14 @@ export default function LandingPage() {
                 </p>
               </ScrollReveal>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
                 {FEATURES_COUPLES.map((f, i) => (
                   <FeatureCard key={f.title} title={f.title} desc={f.desc} delay={i * 60} />
                 ))}
               </div>
 
               <ScrollReveal>
-                <Link href="/login" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Begin gratis <ArrowRight className="w-4 h-4" />
                 </Link>
               </ScrollReveal>
@@ -360,7 +373,7 @@ export default function LandingPage() {
                 </p>
               </ScrollReveal>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
                 {FEATURES_VENDORS.map((f, i) => (
                   <FeatureCard key={f.title} title={f.title} desc={f.desc} delay={i * 60} />
                 ))}
@@ -470,7 +483,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/login" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
+                <Link href="/aanmelden" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
                   Begin gratis
                 </Link>
               </div>
@@ -559,7 +572,7 @@ export default function LandingPage() {
               Sluit je aan bij honderden koppels die hun dream day plannen zonder de stress.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
-              <Link href="/login" className="inline-flex items-center gap-2 font-semibold" style={{ background: "white", color: "var(--foreground)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "0.9375rem", textDecoration: "none" }}>
+              <Link href="/aanmelden" className="inline-flex items-center gap-2 font-semibold" style={{ background: "white", color: "var(--foreground)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "0.9375rem", textDecoration: "none" }}>
                 Begin gratis <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/leveranciers" className="inline-flex items-center font-medium" style={{ background: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.75)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "0.9375rem", textDecoration: "none" }}>

@@ -11,6 +11,7 @@ async function main() {
       ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "city" TEXT;
       ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "latitude" DOUBLE PRECISION;
       ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "longitude" DOUBLE PRECISION;
+      ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "priceFrom" INTEGER;
       ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
     `);
     console.log("✅ Schema columns OK");

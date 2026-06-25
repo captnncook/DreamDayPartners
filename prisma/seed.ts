@@ -78,22 +78,37 @@ async function main() {
     });
   }
 
-  // Vendors
+  // Vendors (met prijsindicatie + coördinaten voor de kaart)
   const vendorBloemist = await prisma.vendor.upsert({
     where: { id: "vendor-bloemist-01" },
-    update: {},
-    create: { id: "vendor-bloemist-01", name: "Bloemenwinkel Roos", category: "bloemist", contactPerson: "Roos Janssen", email: "bloemen@roos.nl", phone: "06-12345678", userId: bloemist.id },
+    update: { city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 750, isPremium: true, description: "Sfeervolle bruidsboeketten en complete bloemstyling voor jullie dag." },
+    create: { id: "vendor-bloemist-01", name: "Bloemenwinkel Roos", category: "bloemist", contactPerson: "Roos Janssen", email: "bloemen@roos.nl", phone: "06-12345678", userId: bloemist.id, city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 750, isPremium: true, description: "Sfeervolle bruidsboeketten en complete bloemstyling voor jullie dag." },
   });
   const vendorDJ = await prisma.vendor.upsert({
     where: { id: "vendor-dj-01" },
-    update: {},
-    create: { id: "vendor-dj-01", name: "DJ Marco Productions", category: "dj", contactPerson: "Marco Pietersen", email: "dj@beats.nl", phone: "06-87654321", userId: dj.id },
+    update: { city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 950, description: "Ervaren bruiloft-DJ met eigen geluids- en lichtinstallatie." },
+    create: { id: "vendor-dj-01", name: "DJ Marco Productions", category: "dj", contactPerson: "Marco Pietersen", email: "dj@beats.nl", phone: "06-87654321", userId: dj.id, city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 950, description: "Ervaren bruiloft-DJ met eigen geluids- en lichtinstallatie." },
   });
   const vendorCatering = await prisma.vendor.upsert({
     where: { id: "vendor-catering-01" },
-    update: {},
-    create: { id: "vendor-catering-01", name: "Tasty Events Catering", category: "catering", contactPerson: "Maria Smit", email: "info@tasty.nl", phone: "020-9876543", userId: catering.id },
+    update: { city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 45, isPremium: true, description: "Verfijnde catering op maat, van diner tot walking dinner." },
+    create: { id: "vendor-catering-01", name: "Tasty Events Catering", category: "catering", contactPerson: "Maria Smit", email: "info@tasty.nl", phone: "020-9876543", userId: catering.id, city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 45, isPremium: true, description: "Verfijnde catering op maat, van diner tot walking dinner." },
   });
+
+  // Extra catalogus-leveranciers met locatie zodat de kaart gevuld is
+  const extraVendors: { id: string; name: string; category: string; contactPerson: string; email: string; phone: string; city: string; latitude: number; longitude: number; priceFrom: number; isPremium: boolean; description: string }[] = [
+    { id: "vendor-fotograaf-01", name: "Lichtvang Fotografie", category: "fotograaf", contactPerson: "Lara Vermeer", email: "hallo@lichtvang.nl", phone: "06-23456789", city: "Haarlem", latitude: 52.3874, longitude: 4.6462, priceFrom: 1450, isPremium: true, description: "Documentaire trouwfotografie met oog voor de kleine momenten." },
+    { id: "vendor-videograaf-01", name: "Studio Eeuwig", category: "videograaf", contactPerson: "Tom de Wit", email: "info@studioeeuwig.nl", phone: "06-34567890", city: "Rotterdam", latitude: 51.9244, longitude: 4.4777, priceFrom: 1650, isPremium: false, description: "Cinematische trouwfilms die jullie verhaal vertellen." },
+    { id: "vendor-locatie-01", name: "Kasteel de Haar Events", category: "trouwlocatie", contactPerson: "Eveline Boschma", email: "events@dehaar.nl", phone: "030-1234567", city: "Haarzuilens", latitude: 52.1153, longitude: 4.9869, priceFrom: 4500, isPremium: true, description: "Sprookjesachtige kasteellocatie voor een onvergetelijke bruiloft." },
+    { id: "vendor-bakker-01", name: "Zoet & Zo Taarten", category: "bakker", contactPerson: "Sanne Bakker", email: "sanne@zoetenzo.nl", phone: "06-45678901", city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 220, isPremium: false, description: "Ambachtelijke bruidstaarten, volledig naar jullie smaak." },
+    { id: "vendor-haar-01", name: "Glow Bridal Studio", category: "haarstylist", contactPerson: "Noa Pieters", email: "studio@glowbridal.nl", phone: "06-56789012", city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 295, isPremium: false, description: "Bruidskapsels en make-up die de hele dag perfect blijven." },
+    { id: "vendor-band-01", name: "The Velvet Notes", category: "liveband", contactPerson: "Daan Kroon", email: "boekingen@velvetnotes.nl", phone: "06-67890123", city: "Den Haag", latitude: 52.0705, longitude: 4.3007, priceFrom: 2200, isPremium: true, description: "Energieke liveband die elke dansvloer vult." },
+    { id: "vendor-vervoer-01", name: "Classic Wedding Cars", category: "vervoer", contactPerson: "Henk Visser", email: "rijden@classiccars.nl", phone: "06-78901234", city: "Rotterdam", latitude: 51.9244, longitude: 4.4777, priceFrom: 350, isPremium: false, description: "Stijlvol vervoer met klassieke trouwauto's en chauffeur." },
+    { id: "vendor-planner-01", name: "Forever Yours Weddings", category: "weddingplanner", contactPerson: "Isa Mulder", email: "hallo@foreveryours.nl", phone: "06-89012345", city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 1800, isPremium: true, description: "Volledige weddingplanning, van eerste idee tot laatste dans." },
+  ];
+  for (const v of extraVendors) {
+    await prisma.vendor.upsert({ where: { id: v.id }, update: { city: v.city, latitude: v.latitude, longitude: v.longitude, priceFrom: v.priceFrom, isPremium: v.isPremium, description: v.description }, create: v });
+  }
 
   // Link vendors
   for (const [vendorId, status, notes] of [

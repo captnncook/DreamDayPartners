@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, ArrowRight, SlidersHorizontal, X, LayoutGrid, Map } from "lucide-react";
+import { Search, MapPin, ArrowRight, SlidersHorizontal, X, LayoutGrid, Map, Plus } from "lucide-react";
 
 const VendorMap = lazy(() => import("@/components/VendorMap"));
 
@@ -37,6 +37,7 @@ type Vendor = {
   city?: string;
   latitude?: number | null;
   longitude?: number | null;
+  priceFrom?: number | null;
 };
 
 export default function LeveranciersPage() {
@@ -46,11 +47,21 @@ export default function LeveranciersPage() {
   const [category, setCategory] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [view, setView] = useState<"grid" | "map">("grid");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350);
     return () => clearTimeout(t);
   }, [search]);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { setIsAdmin(d?.user?.role === "admin"); setLoggedIn(Boolean(d?.user)); })
+      .catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -81,11 +92,22 @@ export default function LeveranciersPage() {
       <div style={{ background: "var(--color-cream)", borderBottom: "1px solid var(--border)", padding: "3rem 1.25rem 2.5rem" }}>
         <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
 
-          {/* Back */}
-          <Link href="/" className="inline-flex items-center gap-1.5 mb-6 text-sm" style={{ color: "var(--muted)" }}>
-            <Image src="/logo.png" alt="" width={18} height={18} />
-            DreamDay Partners
-          </Link>
+          {/* Top bar: logo linksboven + Profiel/Inloggen rechtsboven */}
+          <div className="flex items-center justify-between mb-6">
+            <Link href="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
+              <Image src="/logo.png" alt="" width={18} height={18} />
+              DreamDay Partners
+            </Link>
+            {loggedIn ? (
+              <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+                Profiel
+              </Link>
+            ) : (
+              <Link href="/login" className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
+                Inloggen
+              </Link>
+            )}
+          </div>
 
           <p className="ddp-section-label mb-2">Leveranciersoverzicht</p>
           <h1 className="font-serif" style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.1, color: "var(--foreground)", marginBottom: "0.75rem" }}>
@@ -114,6 +136,15 @@ export default function LeveranciersPage() {
                 style={{ padding: "0.75rem 1.25rem", fontSize: "0.875rem" }}
               >
                 <X className="w-3.5 h-3.5" /> Alles wissen
+              </button>
+            )}
+            {isAdmin && (
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="ddp-btn-primary flex items-center gap-1.5"
+                style={{ padding: "0.75rem 1.25rem", fontSize: "0.875rem" }}
+              >
+                <Plus className="w-4 h-4" /> Leverancier toevoegen
               </button>
             )}
           </div>
@@ -214,13 +245,17 @@ export default function LeveranciersPage() {
                   </span>
                 </div>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {items.map((v) => <SupplierCard key={v.id} vendor={v} />)}
               </div>
             </div>
           ))
         )}
       </div>
+
+      {isAdmin && showAddForm && (
+        <AddVendorModal onClose={() => setShowAddForm(false)} oncreated={() => { setShowAddForm(false); load(); }} />
+      )}
     </div>
   );
 }
@@ -297,15 +332,135 @@ function SupplierCard({ vendor }: { vendor: Vendor }) {
 
           <div style={{ flex: 1 }} />
 
-          {/* Footer */}
-          <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
-            <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Prijs op aanvraag</span>
-            <span className="flex items-center gap-1" style={{ fontSize: "0.8125rem", color: "var(--color-charcoal)", fontWeight: 600 }}>
-              Bekijk profiel <ArrowRight className="w-3 h-3" />
+          {/* Footer: prijs links, pijltje rechts */}
+          <div className="flex items-end justify-between mt-3 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
+            <div style={{ minWidth: 0 }}>
+              {vendor.priceFrom != null ? (
+                <>
+                  <div style={{ fontSize: "0.625rem", color: "var(--muted-light)", textTransform: "uppercase", letterSpacing: "0.06em" }}>vanaf</div>
+                  <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+                    €{vendor.priceFrom.toLocaleString("nl-NL")}
+                  </div>
+                </>
+              ) : (
+                <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Op aanvraag</span>
+              )}
+            </div>
+            <span
+              style={{
+                width: "32px", height: "32px", borderRadius: "var(--radius-full)", flexShrink: 0,
+                background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <ArrowRight className="w-4 h-4" style={{ color: "var(--color-charcoal)" }} />
             </span>
           </div>
         </div>
       </div>
     </Link>
+  );
+}
+
+function AddVendorModal({ onClose, oncreated }: { onClose: () => void; oncreated: () => void }) {
+  const [form, setForm] = useState({
+    name: "", category: "", contactPerson: "", email: "", phone: "",
+    website: "", city: "", description: "", priceFrom: "", isPremium: false,
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  function upd(key: keyof typeof form, value: string | boolean) {
+    setForm((p) => ({ ...p, [key]: value }));
+  }
+
+  async function submit() {
+    if (!form.name || !form.category) { setError("Naam en categorie zijn verplicht"); return; }
+    setSaving(true);
+    setError("");
+    const res = await fetch("/api/catalogus", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      setError(d.error ?? "Er ging iets mis");
+      setSaving(false);
+      return;
+    }
+    oncreated();
+  }
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "5vh 1rem", overflowY: "auto" }}
+    >
+      <div onClick={(e) => e.stopPropagation()} style={{ background: "white", borderRadius: "var(--radius-lg)", maxWidth: "520px", width: "100%", padding: "1.75rem" }}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em" }}>Leverancier toevoegen</h2>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)" }}>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Naam *</label>
+              <input className="ddp-input" value={form.name} onChange={(e) => upd("name", e.target.value)} placeholder="Bedrijfsnaam" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Categorie *</label>
+              <select className="ddp-input" value={form.category} onChange={(e) => upd("category", e.target.value)}>
+                <option value="">Kies…</option>
+                {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Plaats</label>
+              <input className="ddp-input" value={form.city} onChange={(e) => upd("city", e.target.value)} placeholder="bijv. Utrecht" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Prijs vanaf (€)</label>
+              <input className="ddp-input" type="number" value={form.priceFrom} onChange={(e) => upd("priceFrom", e.target.value)} placeholder="bijv. 1500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Contactpersoon</label>
+              <input className="ddp-input" value={form.contactPerson} onChange={(e) => upd("contactPerson", e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Telefoon</label>
+              <input className="ddp-input" value={form.phone} onChange={(e) => upd("phone", e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">E-mail</label>
+              <input className="ddp-input" type="email" value={form.email} onChange={(e) => upd("email", e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5">Website</label>
+              <input className="ddp-input" value={form.website} onChange={(e) => upd("website", e.target.value)} placeholder="https://…" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Omschrijving</label>
+            <textarea className="ddp-input resize-none" rows={3} value={form.description} onChange={(e) => upd("description", e.target.value)} />
+          </div>
+          <label className="flex items-center gap-2 text-sm" style={{ cursor: "pointer" }}>
+            <input type="checkbox" checked={form.isPremium} onChange={(e) => upd("isPremium", e.target.checked)} />
+            Premium leverancier
+          </label>
+
+          {error && <p style={{ fontSize: "0.8125rem", color: "var(--danger)" }}>{error}</p>}
+
+          <div className="flex gap-3 pt-2">
+            <button onClick={onClose} className="ddp-btn-secondary flex-1">Annuleren</button>
+            <button onClick={submit} disabled={saving} className="ddp-btn-primary flex-1">
+              {saving ? "Opslaan…" : "Toevoegen"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -58,6 +58,14 @@ export default function LoginPage() {
       className="min-h-screen flex items-center justify-center px-4 py-12"
       style={{ background: "var(--gradient-hero)" }}
     >
+      {/* Logo linksboven — terug naar home */}
+      <Link href="/" className="fixed top-4 left-5 md:left-10 inline-flex items-center gap-2 z-20" style={{ textDecoration: "none" }}>
+        <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} />
+        <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
+          DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
+        </span>
+      </Link>
+
       {/* Decorative blob */}
       <div
         className="fixed top-0 right-0 w-[400px] h-[400px] rounded-full pointer-events-none"
@@ -176,7 +184,7 @@ export default function LoginPage() {
           <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>
             Stel jullie dream team samen en regel alles op één plek — gratis voor bruidsparen.
           </p>
-          <Link href="/weddings/wizard" className="ddp-btn-primary w-full py-2.5 text-sm">
+          <Link href="/aanmelden" className="ddp-btn-primary w-full py-2.5 text-sm">
             Begin gratis
           </Link>
         </div>

@@ -110,10 +110,14 @@ export default function VendorProfilePage() {
 
       {/* ── Photo header ─────────────────────────────── */}
       <div style={{ position: "relative", background: "var(--color-blush-soft)", borderBottom: "1px solid var(--border)" }}>
-        {/* Back link */}
-        <div style={{ maxWidth: "1040px", margin: "0 auto", padding: "1.25rem 1.25rem 0" }}>
+        {/* Logo linksboven + back link */}
+        <div className="flex items-center justify-between" style={{ maxWidth: "1040px", margin: "0 auto", padding: "1.25rem 1.25rem 0" }}>
           <Link href="/leveranciers" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
             <ArrowLeft className="w-4 h-4" /> Alle leveranciers
+          </Link>
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)", textDecoration: "none" }}>
+            <Image src="/logo.png" alt="" width={18} height={18} />
+            <span style={{ fontWeight: 700 }}>DreamDay Partners</span>
           </Link>
         </div>
 
@@ -227,7 +231,7 @@ export default function VendorProfilePage() {
 
               {!currentUser ? (
                 <div className="flex flex-col gap-2">
-                  <Link href="/weddings/wizard" className="ddp-btn-primary" style={{ justifyContent: "center" }}>
+                  <Link href="/aanmelden" className="ddp-btn-primary" style={{ justifyContent: "center" }}>
                     Account aanmaken
                   </Link>
                   <Link href="/login" className="ddp-btn-secondary" style={{ justifyContent: "center" }}>
