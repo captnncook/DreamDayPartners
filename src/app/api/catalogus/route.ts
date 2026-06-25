@@ -51,7 +51,6 @@ export async function GET(req: NextRequest) {
       city: true,
       latitude: true,
       longitude: true,
-      priceFrom: true,
     },
     orderBy: [{ isPremium: "desc" }, { name: "asc" }],
   });
@@ -66,7 +65,7 @@ export async function POST(req: NextRequest) {
   if (user.role !== "admin") return NextResponse.json({ error: "Alleen admins kunnen leveranciers toevoegen" }, { status: 403 });
 
   const body = await req.json();
-  const { name, category, contactPerson, email, phone, website, city, description, priceFrom, isPremium } = body;
+  const { name, category, contactPerson, email, phone, website, city, description, isPremium } = body;
 
   if (!name || !category) {
     return NextResponse.json({ error: "Naam en categorie zijn verplicht" }, { status: 400 });
@@ -84,7 +83,6 @@ export async function POST(req: NextRequest) {
       website: website || null,
       city: city || null,
       description: description || null,
-      priceFrom: priceFrom === undefined || priceFrom === null || priceFrom === "" ? null : parseInt(String(priceFrom), 10),
       isPremium: Boolean(isPremium),
       ...(geo.latitude != null ? { latitude: geo.latitude, longitude: geo.longitude } : {}),
     },

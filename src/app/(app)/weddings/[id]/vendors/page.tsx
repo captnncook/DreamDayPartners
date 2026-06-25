@@ -206,24 +206,27 @@ export default function VendorsPage() {
                 {wv.notes && <div className="italic">{wv.notes}</div>}
               </div>
 
-              {isPremium && (
-                <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-                  <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}>
-                    {wv.portalAccess && <CheckCircle2 className="w-3 h-3" style={{ color: "var(--success)" }} />}
-                    {wv.portalAccess ? "Portaltoegang actief" : "Geen portaltoegang"}
-                  </span>
+              <div className="mt-3 pt-3 border-t flex items-center justify-between gap-2" style={{ borderColor: "var(--border)" }}>
+                <Link
+                  href={`/weddings/${id}/vendors/${wv.id}`}
+                  className="text-xs px-3 py-1.5 rounded-lg font-medium flex-1 text-center"
+                  style={{ background: "var(--primary)", color: "white", textDecoration: "none" }}
+                >
+                  Dashboard →
+                </Link>
+                {isPremium && (
                   <button
                     onClick={() => togglePortal(wv)}
-                    className="text-xs px-2 py-1 rounded-md transition-colors"
+                    className="text-xs px-2 py-1 rounded-md transition-colors flex-shrink-0"
                     style={{
                       background: wv.portalAccess ? "#fde8e8" : "var(--accent)",
                       color: wv.portalAccess ? "var(--danger)" : "var(--primary)",
                     }}
                   >
-                    {wv.portalAccess ? "Toegang intrekken" : "Portal uitnodigen"}
+                    {wv.portalAccess ? "Toegang intrekken" : "Portal"}
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
         </div>
