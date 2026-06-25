@@ -1,7 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
 import { getVendorTypeConfig } from "@/lib/vendorTypeConfigs";
-import StatusTracker from "./StatusTracker";
 import ContractPayment from "./ContractPayment";
 import IntakeForm from "./IntakeForm";
 import TimelinePlanner from "./TimelinePlanner";
@@ -12,6 +11,7 @@ import ChecklistDeadlines from "./ChecklistDeadlines";
 import GuestDataPanel from "./GuestDataPanel";
 import MoodboardUploader from "./MoodboardUploader";
 import ApprovalButton from "./ApprovalButton";
+import PhotoUploadPanel from "./PhotoUploadPanel";
 
 interface Deliverable {
   id: string;
@@ -62,6 +62,13 @@ export default function DashboardEngine({
   const isVendor = userRole === "vendor" && vendorUserId === userId;
   const intakeData = (booking.intakeData ?? {}) as Record<string, unknown>;
 
+  const modules = config.modules ?? [];
+  const hasIntake = (config.intakeFields?.length ?? 0) > 0;
+  const hasLogistics = (config.logisticsFields?.length ?? 0) > 0;
+  const hasDeliverables = (config.deliverables?.length ?? 0) > 0;
+  const hasTimeline = (config.timelineTemplate?.length ?? 0) > 0;
+  const showFileVault = !modules.includes("documentUpload") && modules.includes("fileVault");
+
   const patchBooking = useCallback(async (patch: Record<string, unknown>) => {
     const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}`, {
       method: "PATCH",
@@ -89,9 +96,7 @@ export default function DashboardEngine({
 
   const updateDeliverable = useCallback(async (id: string, patch: Record<string, unknown>) => {
     const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/deliverables/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch),
     });
     if (res.ok) {
       const { deliverable } = await res.json();
@@ -101,9 +106,7 @@ export default function DashboardEngine({
 
   const addDeliverable = useCallback(async (d: Omit<Deliverable, "id">) => {
     const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/deliverables`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(d),
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d),
     });
     if (res.ok) {
       const { deliverable } = await res.json();
@@ -116,22 +119,8 @@ export default function DashboardEngine({
     if (res.ok) setDeliverables(prev => prev.filter(d => d.id !== id));
   }, [weddingId, wvId]);
 
-  const modules = config.modules ?? [];
-  const hasIntake = config.intakeFields && config.intakeFields.length > 0;
-  const hasLogistics = config.logisticsFields && config.logisticsFields.length > 0;
-  const hasDeliverables = config.deliverables && config.deliverables.length > 0;
-  const hasTimeline = config.timelineTemplate && config.timelineTemplate.length > 0;
-
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
-      <StatusTracker
-        weddingId={weddingId}
-        wvId={wvId}
-        status={booking.status}
-        onUpdate={patchBooking}
-        isPlanner={isPlanner}
-      />
-
       <ContractPayment
         weddingId={weddingId}
         wvId={wvId}
@@ -146,7 +135,6 @@ export default function DashboardEngine({
         isPlanner={isPlanner}
       />
 
-      {/* ── Leverancier-specifieke secties ── */}
       {(hasIntake || hasLogistics || hasDeliverables || hasTimeline) && (
         <div style={{ borderTop: "2px solid var(--border)", paddingTop: "0.25rem" }}>
           <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.75rem" }}>
@@ -194,6 +182,21 @@ export default function DashboardEngine({
         <TimelinePlanner
           blocks={timelineBlocks}
           templates={config.timelineTemplate!}
+          weddingId={weddingId}
+          wvId={wvId}
+          isPlanner={isPlanner}
+          isVendor={isVendor}
+        />
+      )}
+
+      {modules.includes("photoUpload") && (
+        <PhotoUploadPanel
+          intakeData={intakeData}
+          onUpdate={patchIntake}
+          isVendor={isVendor}
+          isPlanner={isPlanner}
+          weddingId={weddingId}
+          wvId={wvId}
         />
       )}
 
@@ -209,7 +212,13 @@ export default function DashboardEngine({
         <ChecklistDeadlines tasks={tasks} weddingId={weddingId} />
       )}
 
-      <FileVault documents={documents} weddingId={weddingId} wvId={wvId} />
+      {modules.includes("documentUpload") && (
+        <FileVault documents={documents} weddingId={weddingId} wvId={wvId} />
+      )}
+
+      {showFileVault && (
+        <FileVault documents={documents} weddingId={weddingId} wvId={wvId} />
+      )}
 
       {isPlanner && (
         <ApprovalButton status={booking.status} onUpdate={patchBooking} isPlanner={isPlanner} />

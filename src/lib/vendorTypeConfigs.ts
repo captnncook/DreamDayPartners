@@ -44,7 +44,9 @@ export type ModuleKey =
   | "deliverablesTracker"
   | "moodboardUploader"
   | "guestDataPanel"
-  | "approvalButton";
+  | "approvalButton"
+  | "photoUpload"
+  | "documentUpload";
 
 export interface VendorTypeConfig {
   type: string;
@@ -416,30 +418,25 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "bloemist",
     label: "Bloemist",
     emoji: "🌸",
-    modules: ["moodboardUploader", "timelinePlanner", "deliverablesTracker"],
+    modules: ["photoUpload", "timelinePlanner", "documentUpload"],
     intakeFields: [
       { key: "palette", label: "Kleurenpalet", type: "color-multi" },
       { key: "flowers", label: "Gewenste bloemen & stijl", type: "text", placeholder: "Rozen, pioenrozen, wild/romantisch..." },
-      { key: "allergies", label: "Allergieën (bruidspaar of gasten)", type: "text", placeholder: "Bijv. stuifmeelgevoelig" },
+      { key: "allergies", label: "Allergieën (bruidspaar of gasten)", type: "longtext", placeholder: "Bijv. stuifmeelgevoelig, vermijd bepaalde bloemen..." },
     ],
-    deliverables: [
-      { key: "bruidsboeket", label: "Bruidsboeket" },
-      { key: "corsages", label: "Corsages & polsbloemen" },
-      { key: "ceremonieboog", label: "Ceremonieboog / bloemdecor" },
-      { key: "tafelstukken", label: "Tafelstukken" },
-      { key: "autobloemen", label: "Autobloemen / decoratie" },
-    ],
+    deliverables: [],
     timelineTemplate: [
       { key: "boeket-bruid", label: "Boeket bezorgen bij bruid", phase: "arrival", defaultDuration: 15 },
       { key: "decor-venue", label: "Bloemdecor naar venue", phase: "setup", defaultDuration: 30 },
-      { key: "opbouw-bloemen", label: "Opbouw bloemendecoraies", phase: "setup", defaultDuration: 120 },
+      { key: "opbouw-bloemen", label: "Opbouw bloemdecoraties", phase: "setup", defaultDuration: 120 },
       { key: "omzetten", label: "Ceremonie → diner omzetten", phase: "custom", defaultDuration: 30 },
       { key: "ophalen", label: "Ophalen huurmateriaal", phase: "teardown", defaultDuration: 60 },
     ],
     logisticsFields: [
-      { key: "koeling-water", label: "Koeling / water bij venue aanwezig?", type: "boolean" },
-      { key: "huurmateriaal-retour", label: "Huurmateriaal retour afspraak", type: "text" },
-      { key: "toegang-venue", label: "Toegangstijd venue voor opbouw", type: "time" },
+      { key: "water-venue", label: "Water bij venue aanwezig?", type: "boolean" },
+      { key: "koeling-venue", label: "Koeling bij venue aanwezig?", type: "boolean" },
+      { key: "huurmateriaal-retour", label: "Afspraak verhuurmateriaal retourneren", type: "text", placeholder: "bijv. maandag 14:00 bij venue" },
+      { key: "toegang-venue", label: "Toegangstijd venue (eerste mogelijke opbouwtijd)", type: "time" },
     ],
   },
 
