@@ -84,6 +84,13 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
   if (!wedding) notFound();
 
+  // For vendor users: find their own Vendor.id so we can filter the dashboard list
+  let ownVendorId: string | null = null;
+  if (user.role === "vendor") {
+    const ownVendor = await prisma.vendor.findFirst({ where: { userId: user.id }, select: { id: true } });
+    ownVendorId = ownVendor?.id ?? null;
+  }
+
   const days = daysUntil(wedding.date);
   const totalBudget = wedding.budget?.totalAmount ?? 0;
   const spent = wedding.budget?.items.reduce((s, i) => s + (i.actual ?? 0), 0) ?? 0;
@@ -328,25 +335,33 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
           </div>
 
           {/* Vendor-specifieke dashboards */}
-          {wedding.vendors.length > 0 && (
-            <div className="space-y-4">
-              <h2 style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
-                Leverancier Dashboards
-              </h2>
-              {wedding.vendors.map((wv) => (
-                <VendorDashboardInline
-                  key={wv.id}
-                  weddingId={id}
-                  wvId={wv.id}
-                  vendorName={wv.vendor.name}
-                  vendorCategory={wv.vendor.category}
-                  userRole={user.role}
-                  userId={user.id}
-                  vendorUserId={wv.vendor.userId}
-                />
-              ))}
-            </div>
-          )}
+          {(() => {
+            const visibleVendors = isVendor
+              ? wedding.vendors.filter((wv) => wv.vendor.id === ownVendorId)
+              : wedding.vendors;
+            if (visibleVendors.length === 0) return null;
+            return (
+              <div className="space-y-4">
+                {!isVendor && (
+                  <h2 style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
+                    Leverancier Dashboards
+                  </h2>
+                )}
+                {visibleVendors.map((wv) => (
+                  <VendorDashboardInline
+                    key={wv.id}
+                    weddingId={id}
+                    wvId={wv.id}
+                    vendorName={wv.vendor.name}
+                    vendorCategory={wv.vendor.category}
+                    userRole={user.role}
+                    userId={user.id}
+                    vendorUserId={wv.vendor.userId}
+                  />
+                ))}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Sidebar */}
