@@ -226,7 +226,7 @@ export default function VendorProfilePage() {
                 Toevoegen aan Dream Team
               </h3>
               <p style={{ fontSize: "0.8125rem", color: "var(--muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
-                Voeg {vendor.name} toe aan jullie bruiloft om samen te werken.
+                Nodig {vendor.name} uit voor jullie bruiloft. De leverancier ontvangt een verzoek en kan dit accepteren.
               </p>
 
               {!currentUser ? (
@@ -242,7 +242,7 @@ export default function VendorProfilePage() {
                 <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>Dit is jouw eigen profiel.</p>
               ) : added ? (
                 <div className="flex items-center gap-2" style={{ color: "var(--success)", fontSize: "0.9rem", fontWeight: 600 }}>
-                  <Check className="w-4 h-4" /> Toegevoegd!
+                  <Check className="w-4 h-4" /> Uitnodiging verstuurd!
                 </div>
               ) : isCouple ? (
                 <div className="flex flex-col gap-2.5">
@@ -269,7 +269,7 @@ export default function VendorProfilePage() {
                     className="ddp-btn-primary"
                     style={{ justifyContent: "center" }}
                   >
-                    {adding ? "Bezig…" : "Voeg toe aan Dream Team"}
+                    {adding ? "Bezig…" : "Uitnodigen voor Dream Team"}
                   </button>
                 </div>
               ) : (

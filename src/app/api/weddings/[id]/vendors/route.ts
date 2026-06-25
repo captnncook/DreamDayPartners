@@ -44,10 +44,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const existing = await prisma.weddingVendor.findFirst({ where: { weddingId: id, vendorId } });
   if (existing) return NextResponse.json({ error: "Al gekoppeld" }, { status: 409 });
 
+  // Maak een uitnodiging die de leverancier kan accepteren of afwijzen.
   const wv = await prisma.weddingVendor.create({
-    data: { weddingId: id, vendorId, notes: notes ?? null, status: "contacted" },
+    data: { weddingId: id, vendorId, notes: notes ?? null, status: "invited" },
     include: { vendor: true },
   });
+
+  // Stuur de gekoppelde leverancier-account een melding.
+  if (wv.vendor.userId) {
+    const wedding = await prisma.wedding.findUnique({ where: { id }, select: { title: true } });
+    await prisma.notification.create({
+      data: {
+        userId: wv.vendor.userId,
+        weddingId: id,
+        type: "vendor_invite",
+        content: `Je bent uitgenodigd voor het Dream Team van "${wedding?.title ?? "een bruiloft"}".`,
+        relatedType: "weddingVendor",
+        relatedId: wv.id,
+      },
+    });
+  }
 
   return NextResponse.json({ vendor: wv }, { status: 201 });
 }

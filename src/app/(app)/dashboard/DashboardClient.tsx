@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Heart, CheckSquare, Calendar, Sparkles, Trash2, Plus, MapPin, ChevronRight } from "lucide-react";
+import { Heart, CheckSquare, Calendar, Sparkles, Trash2, Plus, MapPin, ChevronRight, Check, X } from "lucide-react";
 
 const ICON_MAP: Record<string, React.ElementType> = { Heart, CheckSquare, Calendar, Sparkles };
 
@@ -27,6 +28,7 @@ function formatDateShort(iso: string) {
 type Wedding = { id: string; title: string; venue?: string | null; date: string; status: string; isPremium: boolean; days: number };
 type Task = { id: string; title: string; priority: string; dueDate?: string; weddingId: string; weddingTitle: string };
 type StatCard = { label: string; value: number; icon: string };
+type VendorRequest = { id: string; weddingTitle: string; weddingVenue?: string | null; weddingDate: string };
 
 interface Props {
   user: { id: string; name: string; role: string };
@@ -34,14 +36,33 @@ interface Props {
   statsCards: StatCard[];
   weddings: Wedding[];
   tasks: Task[];
+  vendorRequests?: VendorRequest[];
 }
 
-export default function DashboardClient({ user, greeting, statsCards, weddings, tasks: initialTasks }: Props) {
+export default function DashboardClient({ user, greeting, statsCards, weddings, tasks: initialTasks, vendorRequests = [] }: Props) {
+  const router = useRouter();
+  const [requests, setRequests] = useState(vendorRequests);
+  const [processingRequest, setProcessingRequest] = useState<string | null>(null);
   const [tasks, setTasks] = useState(initialTasks);
   const [showNewTask, setShowNewTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskWedding, setNewTaskWedding] = useState(weddings[0]?.id ?? "");
   const [savingTask, setSavingTask] = useState(false);
+
+  async function respondToRequest(wvId: string, action: "accept" | "decline") {
+    setProcessingRequest(wvId);
+    const res = await fetch(`/api/vendor/requests/${wvId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    if (res.ok) {
+      setRequests((prev) => prev.filter((r) => r.id !== wvId));
+      // Ververs zodat een geaccepteerde bruiloft in de lijst verschijnt.
+      if (action === "accept") router.refresh();
+    }
+    setProcessingRequest(null);
+  }
 
   async function deleteTask(taskId: string, weddingId: string) {
     await fetch(`/api/weddings/${weddingId}/tasks/${taskId}`, { method: "DELETE" });
@@ -99,6 +120,50 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
             );
           })}
         </div>
+      )}
+
+      {/* Dream Team-uitnodigingen (leverancier) */}
+      {user.role === "vendor" && requests.length > 0 && (
+        <section className="mb-6">
+          <h2 className="mb-3" style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
+            Nieuwe uitnodigingen
+          </h2>
+          <div className="space-y-2.5">
+            {requests.map((r) => {
+              const busy = processingRequest === r.id;
+              return (
+                <div key={r.id} className="ddp-card" style={{ padding: "1rem", borderColor: "var(--color-blush)", background: "var(--color-blush-soft)" }}>
+                  <div style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)" }}>{r.weddingTitle}</div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "4px", flexWrap: "wrap" }}>
+                    {r.weddingVenue && <><MapPin className="w-3 h-3 flex-shrink-0" /><span>{r.weddingVenue}</span><span>·</span></>}
+                    <span>{formatDate(r.weddingDate)}</span>
+                  </div>
+                  <p style={{ fontSize: "0.8125rem", color: "var(--muted)", margin: "0.625rem 0" }}>
+                    Je bent uitgenodigd voor het Dream Team van deze bruiloft.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => respondToRequest(r.id, "accept")}
+                      disabled={busy}
+                      className="ddp-btn-primary"
+                      style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}
+                    >
+                      <Check className="w-3.5 h-3.5" /> {busy ? "Bezig…" : "Accepteren"}
+                    </button>
+                    <button
+                      onClick={() => respondToRequest(r.id, "decline")}
+                      disabled={busy}
+                      className="ddp-btn-ghost"
+                      style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}
+                    >
+                      <X className="w-3.5 h-3.5" /> Afwijzen
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {/* Bruiloften */}

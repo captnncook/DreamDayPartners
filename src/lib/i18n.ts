@@ -66,10 +66,12 @@ export const translations = {
       viewDetail: "Bekijk details →",
       portal: "Portaltoegang actief",
       statusLabels: {
+        invited: "Uitgenodigd",
         contacted: "Gecontacteerd",
         quote_received: "Offerte ontvangen",
         booked: "Geboekt",
         confirmed: "Bevestigd",
+        declined: "Afgewezen",
       },
     },
     vendorDetail: {
@@ -170,10 +172,12 @@ export const translations = {
       viewDetail: "View details →",
       portal: "Portal access active",
       statusLabels: {
+        invited: "Invited",
         contacted: "Contacted",
         quote_received: "Quote received",
         booked: "Booked",
         confirmed: "Confirmed",
+        declined: "Declined",
       },
     },
     vendorDetail: {

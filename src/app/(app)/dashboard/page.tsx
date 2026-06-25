@@ -45,6 +45,20 @@ export default async function DashboardPage() {
     take: 5,
   }) : [];
 
+  // Openstaande Dream Team-uitnodigingen voor leveranciers.
+  const vendorRequests = user.role === "vendor" ? await prisma.weddingVendor.findMany({
+    where: { status: "invited", vendor: { userId: user.id } },
+    include: { wedding: true },
+    orderBy: { createdAt: "desc" },
+  }) : [];
+
+  const requestsData = vendorRequests.map((wv) => ({
+    id: wv.id,
+    weddingTitle: wv.wedding.title,
+    weddingVenue: wv.wedding.venue,
+    weddingDate: wv.wedding.date.toISOString(),
+  }));
+
   const greetings: Record<string, string> = {
     admin: "Platform overzicht",
     planner: `Goedemorgen, ${user.name.split(" ")[0]}`,
@@ -86,6 +100,7 @@ export default async function DashboardPage() {
       statsCards={statsCards}
       weddings={weddingsData}
       tasks={tasksData}
+      vendorRequests={requestsData}
     />
   );
 }

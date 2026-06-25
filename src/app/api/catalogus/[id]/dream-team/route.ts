@@ -33,9 +33,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ message: "Al toegevoegd", weddingVendor: existing });
   }
 
+  // Maak een uitnodiging die de leverancier kan accepteren of afwijzen.
+  // portalAccess blijft false totdat de leverancier accepteert.
   const weddingVendor = await prisma.weddingVendor.create({
-    data: { weddingId, vendorId, status: "contacted" },
+    data: { weddingId, vendorId, status: "invited" },
   });
+
+  // Stuur de gekoppelde leverancier-account een melding.
+  if (vendor.userId) {
+    await prisma.notification.create({
+      data: {
+        userId: vendor.userId,
+        weddingId,
+        type: "vendor_invite",
+        content: `Je bent uitgenodigd voor het Dream Team van "${wedding.title}".`,
+        relatedType: "weddingVendor",
+        relatedId: weddingVendor.id,
+      },
+    });
+  }
 
   return NextResponse.json({ weddingVendor });
 }
