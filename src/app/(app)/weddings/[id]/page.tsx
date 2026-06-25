@@ -99,10 +99,13 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
     planning: "Planning", intake: "Intake", execution: "Uitvoering", completed: "Afgerond",
   };
   const vendorStatusLabels: Record<string, string> = {
-    contacted: "Gecontacteerd", quote_received: "Offerte ontvangen", booked: "Geboekt", confirmed: "Bevestigd",
+    lead: "Lead", contacted: "Gecontacteerd", quote_received: "Offerte", booked: "Geboekt",
+    confirmed: "Bevestigd", in_progress: "Bezig", ready: "Klaar", completed: "Afgerond",
   };
   const vendorStatusColors: Record<string, string> = {
-    contacted: "badge-neutral", quote_received: "badge-warning", booked: "badge-info", confirmed: "badge-success",
+    lead: "badge-neutral", contacted: "badge-neutral", quote_received: "badge-warning",
+    booked: "badge-info", confirmed: "badge-success", in_progress: "badge-info",
+    ready: "badge-champagne", completed: "badge-success",
   };
 
   const isVendor = user.role === "vendor";
