@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Users, Heart, Handshake } from "lucide-react";
+import BulkVendorImport from "./BulkVendorImport";
 
 export default async function AdminPage() {
   const user = await getSession();
@@ -36,6 +37,9 @@ export default async function AdminPage() {
             <div><div className="text-3xl font-bold">{val}</div><div className="text-xs" style={{ color: "var(--muted)" }}>{label}</div></div>
           </div>
         ))}
+      </div>
+      <div className="mb-8">
+        <BulkVendorImport />
       </div>
       <div className="grid grid-cols-2 gap-6">
         <div>
