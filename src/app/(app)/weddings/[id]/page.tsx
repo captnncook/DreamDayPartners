@@ -309,10 +309,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             ) : (
               <div className="space-y-2">
                 {wedding.vendors.map((wv) => (
-                  <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="flex items-center gap-3 py-2 px-2 rounded-xl -mx-2" style={{ textDecoration: "none", color: "inherit", background: "transparent", transition: "background 0.15s" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "var(--accent)")}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                  >
+                  <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="flex items-center gap-3 py-2 px-2 rounded-xl -mx-2 hover:bg-accent" style={{ textDecoration: "none", color: "inherit" }}>
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold" style={{ background: "var(--accent)", color: "var(--primary)" }}>
                       {wv.vendor.name.charAt(0)}
                     </div>
