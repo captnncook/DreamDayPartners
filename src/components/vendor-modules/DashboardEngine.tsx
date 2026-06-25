@@ -117,6 +117,10 @@ export default function DashboardEngine({
   }, [weddingId, wvId]);
 
   const modules = config.modules ?? [];
+  const hasIntake = config.intakeFields && config.intakeFields.length > 0;
+  const hasLogistics = config.logisticsFields && config.logisticsFields.length > 0;
+  const hasDeliverables = config.deliverables && config.deliverables.length > 0;
+  const hasTimeline = config.timelineTemplate && config.timelineTemplate.length > 0;
 
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
@@ -142,11 +146,20 @@ export default function DashboardEngine({
         isPlanner={isPlanner}
       />
 
-      {config.intakeFields && config.intakeFields.length > 0 && (
+      {/* ── Leverancier-specifieke secties ── */}
+      {(hasIntake || hasLogistics || hasDeliverables || hasTimeline) && (
+        <div style={{ borderTop: "2px solid var(--border)", paddingTop: "0.25rem" }}>
+          <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.75rem" }}>
+            {config.emoji} {config.label} — specifiek
+          </p>
+        </div>
+      )}
+
+      {hasIntake && (
         <IntakeForm
           weddingId={weddingId}
           wvId={wvId}
-          fields={config.intakeFields}
+          fields={config.intakeFields!}
           intakeData={intakeData}
           onUpdate={patchIntake}
           isPlanner={isPlanner}
@@ -154,28 +167,21 @@ export default function DashboardEngine({
         />
       )}
 
-      {modules.includes("logisticsPanel") && config.logisticsFields && config.logisticsFields.length > 0 && (
+      {hasLogistics && (
         <LogisticsPanel
-          fields={config.logisticsFields}
+          fields={config.logisticsFields!}
           intakeData={intakeData}
           onUpdate={patchIntake}
           isPlanner={isPlanner}
         />
       )}
 
-      {modules.includes("timelinePlanner") && (
-        <TimelinePlanner
-          blocks={timelineBlocks}
-          templates={config.timelineTemplate ?? []}
-        />
-      )}
-
-      {modules.includes("deliverablesTracker") && (
+      {hasDeliverables && (
         <DeliverablesTracker
           weddingId={weddingId}
           wvId={wvId}
           deliverables={deliverables}
-          configs={config.deliverables ?? []}
+          configs={config.deliverables!}
           isPlanner={isPlanner}
           isVendor={isVendor}
           onUpdate={updateDeliverable}
@@ -184,19 +190,26 @@ export default function DashboardEngine({
         />
       )}
 
-      {modules.includes("checklistDeadlines") && (
-        <ChecklistDeadlines tasks={tasks} weddingId={weddingId} />
-      )}
-
-      <FileVault documents={documents} weddingId={weddingId} wvId={wvId} />
-
-      {modules.includes("guestDataPanel") && config.readsGuestData && (
-        <GuestDataPanel guests={guests} weddingId={weddingId} totalGuests={totalGuests} />
+      {hasTimeline && (
+        <TimelinePlanner
+          blocks={timelineBlocks}
+          templates={config.timelineTemplate!}
+        />
       )}
 
       {modules.includes("moodboardUploader") && (
         <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} />
       )}
+
+      {modules.includes("guestDataPanel") && config.readsGuestData && (
+        <GuestDataPanel guests={guests} weddingId={weddingId} totalGuests={totalGuests} />
+      )}
+
+      {modules.includes("checklistDeadlines") && (
+        <ChecklistDeadlines tasks={tasks} weddingId={weddingId} />
+      )}
+
+      <FileVault documents={documents} weddingId={weddingId} wvId={wvId} />
 
       {isPlanner && (
         <ApprovalButton status={booking.status} onUpdate={patchBooking} isPlanner={isPlanner} />

@@ -48,22 +48,34 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
             return (
               <div key={field.key}>
                 <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>{field.label}</label>
-                <input
-                  type={field.type === "number" ? "number" : "text"}
-                  value={(value as string) ?? ""}
-                  onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
-                  style={inputStyle}
-                  placeholder={field.placeholder}
-                />
+                {field.type === "boolean" ? (
+                  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(value)}
+                      onChange={e => setForm(f => ({ ...f, [field.key]: e.target.checked }))}
+                    />
+                    <span style={{ fontSize: "0.875rem" }}>Ja</span>
+                  </label>
+                ) : (
+                  <input
+                    type={field.type === "number" ? "number" : field.type === "time" ? "time" : "text"}
+                    value={(value as string) ?? ""}
+                    onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
+                    style={inputStyle}
+                    placeholder={field.placeholder}
+                  />
+                )}
               </div>
             );
           }
+          const display = value == null || value === "" ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>—</span>
+            : typeof value === "boolean" ? (value ? "✓ Ja" : "✗ Nee")
+            : String(value);
           return (
             <div key={field.key} style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
               <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}>{field.label}</span>
-              <span style={{ fontSize: "0.875rem", color: "var(--charcoal)" }}>
-                {value != null && value !== "" ? String(value) : <span style={{ color: "var(--muted)", fontStyle: "italic" }}>—</span>}
-              </span>
+              <span style={{ fontSize: "0.875rem", color: "var(--charcoal)" }}>{display}</span>
             </div>
           );
         })}

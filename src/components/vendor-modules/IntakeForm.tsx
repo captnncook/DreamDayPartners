@@ -81,6 +81,14 @@ export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, is
                     />
                     <span style={{ fontSize: "0.875rem" }}>{field.label}</span>
                   </label>
+                ) : field.type === "color-multi" ? (
+                  <input
+                    type="text"
+                    value={(value as string) ?? ""}
+                    onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
+                    style={inputStyle}
+                    placeholder={field.placeholder ?? "Bijv. blush, champagne, wit, groen"}
+                  />
                 ) : (
                   <input
                     type={field.type === "number" ? "number" : field.type === "time" ? "time" : "text"}
