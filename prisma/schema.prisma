@@ -99,18 +99,29 @@ model Vendor {
 }
 
 model WeddingVendor {
-  id           String   @id @default(uuid())
-  weddingId    String
-  vendorId     String
-  status       String   @default("contacted")
-  portalAccess Boolean  @default(false)
-  notes        String?
-  contractUrl  String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String    @id @default(uuid())
+  weddingId       String
+  vendorId        String
+  status          String    @default("lead")      // lead | booked | in_progress | ready | completed
+  portalAccess    Boolean   @default(false)
+  notes           String?
+  contractUrl     String?
+  intakeData      Json?
+  depositAmount   Float?
+  depositDue      DateTime?
+  depositPaid     Boolean   @default(false)
+  finalAmount     Float?
+  finalDue        DateTime?
+  finalPaid       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
-  vendor  Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  wedding        Wedding         @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  vendor         Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  deliverables   Deliverable[]
+  draaiboekItems DraaiboekItem[]
+  tasks          Task[]
+  documents      Document[]
 
   @@unique([weddingId, vendorId])
   @@map("wedding_vendors")
@@ -191,8 +202,11 @@ model Task {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  wedding      Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
-  assignedUser User?   @relation(fields: [assignedTo], references: [id])
+  vendorBookingId String?
+
+  wedding       Wedding        @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  assignedUser  User?          @relation(fields: [assignedTo], references: [id])
+  vendorBooking WeddingVendor? @relation(fields: [vendorBookingId], references: [id], onDelete: SetNull)
 
   @@map("tasks")
 }
@@ -213,20 +227,23 @@ model Draaiboek {
 }
 
 model DraaiboekItem {
-  id             String  @id @default(uuid())
-  draaiboekId    String
-  startTime      String
-  duration       Int     @default(30)
-  title          String
-  description    String?
-  location       String?
-  sortOrder      Int     @default(0)
-  assignedUserId String?
-  vendorId       String?
-  notes          String?
+  id              String  @id @default(uuid())
+  draaiboekId     String
+  startTime       String
+  duration        Int     @default(30)
+  title           String
+  description     String?
+  location        String?
+  sortOrder       Int     @default(0)
+  assignedUserId  String?
+  vendorId        String?
+  vendorBookingId String?
+  phase           String?  // arrival | setup | perform | teardown | custom
+  notes           String?
 
-  draaiboek Draaiboek @relation(fields: [draaiboekId], references: [id], onDelete: Cascade)
-  vendor    Vendor?   @relation(fields: [vendorId], references: [id])
+  draaiboek     Draaiboek      @relation(fields: [draaiboekId], references: [id], onDelete: Cascade)
+  vendor        Vendor?        @relation(fields: [vendorId], references: [id])
+  vendorBooking WeddingVendor? @relation(fields: [vendorBookingId], references: [id], onDelete: SetNull)
 
   @@map("draaiboek_items")
 }
@@ -298,10 +315,30 @@ model Document {
   uploadedBy String
   createdAt  DateTime @default(now())
 
-  wedding  Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
-  uploader User    @relation(fields: [uploadedBy], references: [id])
+  vendorBookingId String?
+
+  wedding       Wedding        @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  uploader      User           @relation(fields: [uploadedBy], references: [id])
+  vendorBooking WeddingVendor? @relation(fields: [vendorBookingId], references: [id], onDelete: SetNull)
 
   @@map("documents")
+}
+
+model Deliverable {
+  id               String    @id @default(uuid())
+  vendorBookingId  String
+  key              String
+  label            String
+  status           String    @default("pending") // pending | submitted | approved | rejected
+  dueDate          DateTime?
+  approvalRequired Boolean   @default(false)
+  notes            String?
+  fileUrl          String?
+  createdAt        DateTime  @default(now())
+
+  vendorBooking WeddingVendor @relation(fields: [vendorBookingId], references: [id], onDelete: Cascade)
+
+  @@map("deliverables")
 }
 
 model Notification {

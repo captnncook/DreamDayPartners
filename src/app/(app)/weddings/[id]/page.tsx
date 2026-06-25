@@ -305,7 +305,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             ) : (
               <div className="space-y-2">
                 {wedding.vendors.map((wv) => (
-                  <div key={wv.id} className="flex items-center gap-3 py-1.5">
+                  <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="flex items-center gap-3 py-1.5" style={{ textDecoration: "none", color: "inherit" }}>
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold" style={{ background: "var(--accent)", color: "var(--primary)" }}>
                       {wv.vendor.name.charAt(0)}
                     </div>
@@ -316,7 +316,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                     <span className={`ddp-badge ${vendorStatusColors[wv.status] ?? "badge-neutral"}`} style={{ fontSize: "0.6rem" }}>
                       {vendorStatusLabels[wv.status] ?? wv.status}
                     </span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
