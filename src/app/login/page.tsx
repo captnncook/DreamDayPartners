@@ -5,15 +5,23 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
-import { Heart, Settings, Users, Leaf, Music, Utensils } from "lucide-react";
+import { Heart, Settings, Users, Leaf, Music, Utensils, Camera, Video, Scissors, Mic2, Cake, MapPin, Car, CalendarCheck } from "lucide-react";
 
 const ROLE_OPTIONS: { value: DemoRole; label: string; Icon: React.ElementType; description: string }[] = [
-  { value: "admin",     label: "Admin",          Icon: Settings,  description: "Platform beheerder" },
-  { value: "planner",   label: "Weddingplanner", Icon: Heart,     description: "Sophie van der Berg" },
-  { value: "couple",    label: "Bruidspaar",     Icon: Users,     description: "Emma de Vries" },
-  { value: "bloemist",  label: "Bloemist",       Icon: Leaf,      description: "Roos Janssen" },
-  { value: "dj",        label: "DJ",             Icon: Music,     description: "DJ Marco" },
-  { value: "catering",  label: "Catering",       Icon: Utensils,  description: "Tasty Events" },
+  { value: "admin",               label: "Admin",              Icon: Settings,      description: "Platform beheerder" },
+  { value: "planner",             label: "Weddingplanner",     Icon: Heart,         description: "Sophie van der Berg" },
+  { value: "couple",              label: "Bruidspaar",         Icon: Users,         description: "Emma de Vries" },
+  { value: "bloemist",            label: "Bloemist",           Icon: Leaf,          description: "Roos Janssen" },
+  { value: "dj",                  label: "DJ",                 Icon: Music,         description: "DJ Marco" },
+  { value: "catering",            label: "Catering",           Icon: Utensils,      description: "Tasty Events" },
+  { value: "fotograaf",           label: "Fotograaf",          Icon: Camera,        description: "Lara Vermeer" },
+  { value: "videograaf",          label: "Videograaf",         Icon: Video,         description: "Tom de Wit" },
+  { value: "haarstylist",         label: "Haarstylist",        Icon: Scissors,      description: "Noa Pieters" },
+  { value: "liveband",            label: "Liveband",           Icon: Mic2,          description: "Daan Kroon" },
+  { value: "bakker",              label: "Bakker",             Icon: Cake,          description: "Sanne Bakker" },
+  { value: "trouwlocatie",        label: "Trouwlocatie",       Icon: MapPin,        description: "Kasteel de Haar" },
+  { value: "vervoer",             label: "Vervoer",            Icon: Car,           description: "Henk Visser" },
+  { value: "weddingplanner_vendor", label: "WP (leverancier)", Icon: CalendarCheck, description: "Isa Mulder" },
 ];
 
 export default function LoginPage() {
@@ -149,8 +157,8 @@ export default function LoginPage() {
               {selectedRole === "admin"   && <p>Overzicht alle bruiloften, gebruikers en platformbeheer</p>}
               {selectedRole === "planner" && <p>Volledig bruiloftsbeheer: taken, gasten, budget, draaiboek, communicatie</p>}
               {selectedRole === "couple"  && <p>Overzicht van de eigen bruiloft, taken en communicatie met het team</p>}
-              {(selectedRole === "bloemist" || selectedRole === "dj" || selectedRole === "catering") && (
-                <p>Leveranciersportaal: eigen draaiboek-items en communicatie met het team <span className="ddp-badge badge-premium" style={{ fontSize: "0.6rem" }}>Premium</span></p>
+              {!["admin","planner","couple"].includes(selectedRole) && (
+                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek <span className="ddp-badge badge-premium" style={{ fontSize: "0.6rem" }}>Premium</span></p>
               )}
             </div>
 

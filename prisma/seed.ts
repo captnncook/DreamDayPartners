@@ -51,6 +51,54 @@ async function main() {
     create: { email: "info@tasty.nl", name: "Tasty Events Catering", role: "vendor", vendorType: "catering", isPremium: false },
   });
 
+  const fotograaf = await prisma.user.upsert({
+    where: { email: "hallo@lichtvang.nl" },
+    update: {},
+    create: { email: "hallo@lichtvang.nl", name: "Lara Vermeer", role: "vendor", vendorType: "fotograaf", isPremium: true },
+  });
+
+  const videograaf = await prisma.user.upsert({
+    where: { email: "info@studioeeuwig.nl" },
+    update: {},
+    create: { email: "info@studioeeuwig.nl", name: "Tom de Wit", role: "vendor", vendorType: "videograaf", isPremium: false },
+  });
+
+  const haarstylist = await prisma.user.upsert({
+    where: { email: "studio@glowbridal.nl" },
+    update: {},
+    create: { email: "studio@glowbridal.nl", name: "Noa Pieters", role: "vendor", vendorType: "haarstylist", isPremium: false },
+  });
+
+  const liveband = await prisma.user.upsert({
+    where: { email: "boekingen@velvetnotes.nl" },
+    update: {},
+    create: { email: "boekingen@velvetnotes.nl", name: "Daan Kroon", role: "vendor", vendorType: "liveband", isPremium: true },
+  });
+
+  const bakker = await prisma.user.upsert({
+    where: { email: "sanne@zoetenzo.nl" },
+    update: {},
+    create: { email: "sanne@zoetenzo.nl", name: "Sanne Bakker", role: "vendor", vendorType: "bakker", isPremium: false },
+  });
+
+  const trouwlocatie = await prisma.user.upsert({
+    where: { email: "events@dehaar.nl" },
+    update: {},
+    create: { email: "events@dehaar.nl", name: "Eveline Boschma", role: "vendor", vendorType: "trouwlocatie", isPremium: true },
+  });
+
+  const vervoer = await prisma.user.upsert({
+    where: { email: "rijden@classiccars.nl" },
+    update: {},
+    create: { email: "rijden@classiccars.nl", name: "Henk Visser", role: "vendor", vendorType: "vervoer", isPremium: false },
+  });
+
+  const wpVendor = await prisma.user.upsert({
+    where: { email: "hallo@foreveryours.nl" },
+    update: {},
+    create: { email: "hallo@foreveryours.nl", name: "Isa Mulder", role: "vendor", vendorType: "weddingplanner", isPremium: true },
+  });
+
   // Demo wedding
   const wedding = await prisma.wedding.upsert({
     where: { weddingCode: "WED-DEMO01" },
@@ -96,29 +144,46 @@ async function main() {
   });
 
   // Extra catalogus-leveranciers met locatie zodat de kaart gevuld is
-  const extraVendors: { id: string; name: string; category: string; contactPerson: string; email: string; phone: string; city: string; latitude: number; longitude: number; priceFrom: number; isPremium: boolean; description: string }[] = [
-    { id: "vendor-fotograaf-01", name: "Lichtvang Fotografie", category: "fotograaf", contactPerson: "Lara Vermeer", email: "hallo@lichtvang.nl", phone: "06-23456789", city: "Haarlem", latitude: 52.3874, longitude: 4.6462, priceFrom: 1450, isPremium: true, description: "Documentaire trouwfotografie met oog voor de kleine momenten." },
-    { id: "vendor-videograaf-01", name: "Studio Eeuwig", category: "videograaf", contactPerson: "Tom de Wit", email: "info@studioeeuwig.nl", phone: "06-34567890", city: "Rotterdam", latitude: 51.9244, longitude: 4.4777, priceFrom: 1650, isPremium: false, description: "Cinematische trouwfilms die jullie verhaal vertellen." },
-    { id: "vendor-locatie-01", name: "Kasteel de Haar Events", category: "trouwlocatie", contactPerson: "Eveline Boschma", email: "events@dehaar.nl", phone: "030-1234567", city: "Haarzuilens", latitude: 52.1153, longitude: 4.9869, priceFrom: 4500, isPremium: true, description: "Sprookjesachtige kasteellocatie voor een onvergetelijke bruiloft." },
-    { id: "vendor-bakker-01", name: "Zoet & Zo Taarten", category: "bakker", contactPerson: "Sanne Bakker", email: "sanne@zoetenzo.nl", phone: "06-45678901", city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 220, isPremium: false, description: "Ambachtelijke bruidstaarten, volledig naar jullie smaak." },
-    { id: "vendor-haar-01", name: "Glow Bridal Studio", category: "haarstylist", contactPerson: "Noa Pieters", email: "studio@glowbridal.nl", phone: "06-56789012", city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 295, isPremium: false, description: "Bruidskapsels en make-up die de hele dag perfect blijven." },
-    { id: "vendor-band-01", name: "The Velvet Notes", category: "liveband", contactPerson: "Daan Kroon", email: "boekingen@velvetnotes.nl", phone: "06-67890123", city: "Den Haag", latitude: 52.0705, longitude: 4.3007, priceFrom: 2200, isPremium: true, description: "Energieke liveband die elke dansvloer vult." },
-    { id: "vendor-vervoer-01", name: "Classic Wedding Cars", category: "vervoer", contactPerson: "Henk Visser", email: "rijden@classiccars.nl", phone: "06-78901234", city: "Rotterdam", latitude: 51.9244, longitude: 4.4777, priceFrom: 350, isPremium: false, description: "Stijlvol vervoer met klassieke trouwauto's en chauffeur." },
-    { id: "vendor-planner-01", name: "Forever Yours Weddings", category: "weddingplanner", contactPerson: "Isa Mulder", email: "hallo@foreveryours.nl", phone: "06-89012345", city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 1800, isPremium: true, description: "Volledige weddingplanning, van eerste idee tot laatste dans." },
+  type VendorSeed = { id: string; name: string; category: string; contactPerson: string; email: string; phone: string; city: string; latitude: number; longitude: number; isPremium: boolean; description: string; userId?: string };
+  const extraVendors: VendorSeed[] = [
+    { id: "vendor-fotograaf-01", name: "Lichtvang Fotografie", category: "fotograaf", contactPerson: "Lara Vermeer", email: "hallo@lichtvang.nl", phone: "06-23456789", city: "Haarlem", latitude: 52.3874, longitude: 4.6462, isPremium: true, description: "Documentaire trouwfotografie met oog voor de kleine momenten.", userId: fotograaf.id },
+    { id: "vendor-videograaf-01", name: "Studio Eeuwig", category: "videograaf", contactPerson: "Tom de Wit", email: "info@studioeeuwig.nl", phone: "06-34567890", city: "Rotterdam", latitude: 51.9244, longitude: 4.4777, isPremium: false, description: "Cinematische trouwfilms die jullie verhaal vertellen.", userId: videograaf.id },
+    { id: "vendor-locatie-01", name: "Kasteel de Haar Events", category: "trouwlocatie", contactPerson: "Eveline Boschma", email: "events@dehaar.nl", phone: "030-1234567", city: "Haarzuilens", latitude: 52.1153, longitude: 4.9869, isPremium: true, description: "Sprookjesachtige kasteellocatie voor een onvergetelijke bruiloft.", userId: trouwlocatie.id },
+    { id: "vendor-bakker-01", name: "Zoet & Zo Taarten", category: "bakker", contactPerson: "Sanne Bakker", email: "sanne@zoetenzo.nl", phone: "06-45678901", city: "Utrecht", latitude: 52.0907, longitude: 5.1214, isPremium: false, description: "Ambachtelijke bruidstaarten, volledig naar jullie smaak.", userId: bakker.id },
+    { id: "vendor-haar-01", name: "Glow Bridal Studio", category: "haarstylist", contactPerson: "Noa Pieters", email: "studio@glowbridal.nl", phone: "06-56789012", city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, isPremium: false, description: "Bruidskapsels en make-up die de hele dag perfect blijven.", userId: haarstylist.id },
+    { id: "vendor-band-01", name: "The Velvet Notes", category: "liveband", contactPerson: "Daan Kroon", email: "boekingen@velvetnotes.nl", phone: "06-67890123", city: "Den Haag", latitude: 52.0705, longitude: 4.3007, isPremium: true, description: "Energieke liveband die elke dansvloer vult.", userId: liveband.id },
+    { id: "vendor-vervoer-01", name: "Classic Wedding Cars", category: "vervoer", contactPerson: "Henk Visser", email: "rijden@classiccars.nl", phone: "06-78901234", city: "Rotterdam", latitude: 51.9244, longitude: 4.4777, isPremium: false, description: "Stijlvol vervoer met klassieke trouwauto's en chauffeur.", userId: vervoer.id },
+    { id: "vendor-planner-01", name: "Forever Yours Weddings", category: "weddingplanner", contactPerson: "Isa Mulder", email: "hallo@foreveryours.nl", phone: "06-89012345", city: "Utrecht", latitude: 52.0907, longitude: 5.1214, isPremium: true, description: "Volledige weddingplanning, van eerste idee tot laatste dans.", userId: wpVendor.id },
   ];
+  const upsertedExtra: Record<string, string> = {};
   for (const v of extraVendors) {
-    await prisma.vendor.upsert({ where: { id: v.id }, update: { city: v.city, latitude: v.latitude, longitude: v.longitude, priceFrom: v.priceFrom, isPremium: v.isPremium, description: v.description }, create: v });
+    const result = await prisma.vendor.upsert({
+      where: { id: v.id },
+      update: { city: v.city, latitude: v.latitude, longitude: v.longitude, isPremium: v.isPremium, description: v.description, userId: v.userId },
+      create: v,
+    });
+    upsertedExtra[v.id] = result.id;
   }
 
-  // Link vendors
-  for (const [vendorId, status, notes] of [
+  // Link all vendors to the demo wedding with portalAccess
+  const allVendorLinks: [string, string, string][] = [
     [vendorBloemist.id, "booked", "Bruidsboeket wit/roze, 12 tafeldecoraties"],
-    [vendorDJ.id, "confirmed", "Avondfeest 20:00-01:00, eigen geluidsinstallatie"],
-    [vendorCatering.id, "quote_received", "Diner voor 80 personen, 3 gangen"],
-  ] as [string, string, string][]) {
+    [vendorDJ.id, "in_progress", "Avondfeest 20:00-01:00, eigen geluidsinstallatie"],
+    [vendorCatering.id, "lead", "Diner voor 80 personen, 3 gangen"],
+    ["vendor-fotograaf-01", "booked", "Hele dag fotograferen, gouden uur shoot"],
+    ["vendor-videograaf-01", "lead", "Cinematisch trouwfilm pakket"],
+    ["vendor-locatie-01", "completed", "Zaalverhuur + catering arrangement"],
+    ["vendor-bakker-01", "booked", "5-laagse bruidstaart, wit met bloemen"],
+    ["vendor-haar-01", "in_progress", "Bruid + 3 bruidsmeisjes"],
+    ["vendor-band-01", "lead", "Livemuziek ceremonie + eerste uur diner"],
+    ["vendor-vervoer-01", "booked", "Rolls Royce Silver Shadow"],
+    ["vendor-planner-01", "ready", "Dag-van coördinatie"],
+  ];
+
+  for (const [vendorId, status, notes] of allVendorLinks) {
     await prisma.weddingVendor.upsert({
       where: { weddingId_vendorId: { weddingId: wedding.id, vendorId } },
-      update: {},
+      update: { portalAccess: true },
       create: { weddingId: wedding.id, vendorId, status, portalAccess: true, notes },
     });
   }
