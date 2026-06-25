@@ -7,6 +7,7 @@ import {
   Users, Euro, MessageCircle, ClipboardList, ChevronRight,
   Clock, FileText, Handshake,
 } from "lucide-react";
+import DashboardEngine from "@/components/vendor-modules/DashboardEngine";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
@@ -54,6 +55,10 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 userId: true,
               },
             },
+            deliverables: { orderBy: { createdAt: "asc" } },
+            documents: { orderBy: { createdAt: "desc" } },
+            draaiboekItems: { orderBy: { startTime: "asc" } },
+            tasks: { orderBy: { dueDate: "asc" } },
           },
         },
         budget: { include: { items: true } },
@@ -328,6 +333,66 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               </div>
             )}
           </div>
+
+          {/* Vendor-specifieke dashboards */}
+          {wedding.vendors.length > 0 && (
+            <div className="space-y-4">
+              <h2 style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
+                Leverancier Dashboards
+              </h2>
+              {wedding.vendors.map((wv) => (
+                <div key={wv.id} className="ddp-card">
+                  <div className="flex items-center gap-3 mb-4 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0" style={{ background: "var(--accent)", color: "var(--primary)" }}>
+                      {wv.vendor.name.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-sm">{wv.vendor.name}</div>
+                      <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
+                    </div>
+                  </div>
+                  <DashboardEngine
+                    weddingId={id}
+                    wvId={wv.id}
+                    vendorType={wv.vendor.category}
+                    initialBooking={{
+                      status: wv.status,
+                      depositAmount: wv.depositAmount ?? null,
+                      depositDue: wv.depositDue?.toISOString() ?? null,
+                      depositPaid: wv.depositPaid,
+                      finalAmount: wv.finalAmount ?? null,
+                      finalDue: wv.finalDue?.toISOString() ?? null,
+                      finalPaid: wv.finalPaid,
+                      contractUrl: wv.contractUrl ?? null,
+                      intakeData: (wv.intakeData ?? null) as Record<string, unknown> | null,
+                    }}
+                    initialDeliverables={wv.deliverables.map(d => ({
+                      id: d.id, key: d.key, label: d.label, status: d.status,
+                      dueDate: d.dueDate?.toISOString() ?? null,
+                      approvalRequired: d.approvalRequired, notes: d.notes, fileUrl: d.fileUrl,
+                    }))}
+                    documents={wv.documents.map(d => ({
+                      id: d.id, name: d.name, fileKey: d.fileKey, mimeType: d.mimeType,
+                      fileSize: d.fileSize, category: d.category, createdAt: d.createdAt.toISOString(),
+                    }))}
+                    timelineBlocks={wv.draaiboekItems.map(item => ({
+                      id: item.id, startTime: item.startTime, duration: item.duration,
+                      title: item.title, description: item.description, location: item.location, phase: item.phase ?? null,
+                    }))}
+                    tasks={wv.tasks.map(t => ({
+                      id: t.id, title: t.title, status: t.status,
+                      dueDate: t.dueDate?.toISOString() ?? null, priority: t.priority,
+                    }))}
+                    guests={[]}
+                    totalGuests={0}
+                    userRole={user.role}
+                    userId={user.id}
+                    vendorUserId={wv.vendor.userId}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
