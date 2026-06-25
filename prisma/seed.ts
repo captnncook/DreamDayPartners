@@ -129,18 +129,18 @@ async function main() {
   // Vendors (met prijsindicatie + coördinaten voor de kaart)
   const vendorBloemist = await prisma.vendor.upsert({
     where: { id: "vendor-bloemist-01" },
-    update: { city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 750, isPremium: true, description: "Sfeervolle bruidsboeketten en complete bloemstyling voor jullie dag." },
-    create: { id: "vendor-bloemist-01", name: "Bloemenwinkel Roos", category: "bloemist", contactPerson: "Roos Janssen", email: "bloemen@roos.nl", phone: "06-12345678", userId: bloemist.id, city: "Utrecht", latitude: 52.0907, longitude: 5.1214, priceFrom: 750, isPremium: true, description: "Sfeervolle bruidsboeketten en complete bloemstyling voor jullie dag." },
+    update: { city: "Utrecht", latitude: 52.0907, longitude: 5.1214, isPremium: true, description: "Sfeervolle bruidsboeketten en complete bloemstyling voor jullie dag." },
+    create: { id: "vendor-bloemist-01", name: "Bloemenwinkel Roos", category: "bloemist", contactPerson: "Roos Janssen", email: "bloemen@roos.nl", phone: "06-12345678", userId: bloemist.id, city: "Utrecht", latitude: 52.0907, longitude: 5.1214, isPremium: true, description: "Sfeervolle bruidsboeketten en complete bloemstyling voor jullie dag." },
   });
   const vendorDJ = await prisma.vendor.upsert({
     where: { id: "vendor-dj-01" },
-    update: { city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 950, description: "Ervaren bruiloft-DJ met eigen geluids- en lichtinstallatie." },
-    create: { id: "vendor-dj-01", name: "DJ Marco Productions", category: "dj", contactPerson: "Marco Pietersen", email: "dj@beats.nl", phone: "06-87654321", userId: dj.id, city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 950, description: "Ervaren bruiloft-DJ met eigen geluids- en lichtinstallatie." },
+    update: { city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, description: "Ervaren bruiloft-DJ met eigen geluids- en lichtinstallatie." },
+    create: { id: "vendor-dj-01", name: "DJ Marco Productions", category: "dj", contactPerson: "Marco Pietersen", email: "dj@beats.nl", phone: "06-87654321", userId: dj.id, city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, description: "Ervaren bruiloft-DJ met eigen geluids- en lichtinstallatie." },
   });
   const vendorCatering = await prisma.vendor.upsert({
     where: { id: "vendor-catering-01" },
-    update: { city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 45, isPremium: true, description: "Verfijnde catering op maat, van diner tot walking dinner." },
-    create: { id: "vendor-catering-01", name: "Tasty Events Catering", category: "catering", contactPerson: "Maria Smit", email: "info@tasty.nl", phone: "020-9876543", userId: catering.id, city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, priceFrom: 45, isPremium: true, description: "Verfijnde catering op maat, van diner tot walking dinner." },
+    update: { city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, isPremium: true, description: "Verfijnde catering op maat, van diner tot walking dinner." },
+    create: { id: "vendor-catering-01", name: "Tasty Events Catering", category: "catering", contactPerson: "Maria Smit", email: "info@tasty.nl", phone: "020-9876543", userId: catering.id, city: "Amsterdam", latitude: 52.3676, longitude: 4.9041, isPremium: true, description: "Verfijnde catering op maat, van diner tot walking dinner." },
   });
 
   // Extra catalogus-leveranciers met locatie zodat de kaart gevuld is
