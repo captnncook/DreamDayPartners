@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { authorizeWeddingVendor } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
@@ -9,19 +10,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const { id: weddingId, wvId } = await params;
-
-  const booking = await prisma.weddingVendor.findFirst({
-    where: { id: wvId, weddingId },
-    include: { vendor: true },
-  });
-  if (!booking) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
-
-  const canEdit =
-    user.role === "admin" ||
-    user.role === "planner" ||
-    user.role === "team_member" ||
-    (user.role === "vendor" && booking.vendor.userId === user.id);
-  if (!canEdit) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
 
   const body = await req.json();
   const updated = await prisma.weddingVendor.update({

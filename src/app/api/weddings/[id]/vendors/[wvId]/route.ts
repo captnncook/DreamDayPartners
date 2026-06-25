@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { authorizeWeddingVendor } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
@@ -8,7 +9,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { wvId } = await params;
+  const { id: weddingId, wvId } = await params;
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
+
   const wv = await prisma.weddingVendor.findUnique({
     where: { id: wvId },
     include: {
@@ -19,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       tasks: { orderBy: { dueDate: "asc" } },
     },
   });
-  if (!wv) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
   return NextResponse.json({ booking: wv });
 }
 
@@ -28,14 +32,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const { id: weddingId, wvId } = await params;
-
-  const booking = await prisma.weddingVendor.findFirst({ where: { id: wvId, weddingId } });
-  if (!booking) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
 
   const body = await req.json();
 
-  // Planner-only fields
-  const isPlannerPatch = body.status !== undefined || body.depositAmount !== undefined || body.depositDue !== undefined || body.depositPaid !== undefined || body.finalAmount !== undefined || body.finalDue !== undefined || body.finalPaid !== undefined;
+  // Status and payment fields: planner/admin only
+  const isPlannerPatch =
+    body.status !== undefined ||
+    body.depositAmount !== undefined ||
+    body.depositDue !== undefined ||
+    body.depositPaid !== undefined ||
+    body.finalAmount !== undefined ||
+    body.finalDue !== undefined ||
+    body.finalPaid !== undefined;
+
   if (isPlannerPatch && !["admin", "planner", "team_member"].includes(user.role)) {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
@@ -56,14 +67,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     include: { vendor: true },
   });
 
-  return NextResponse.json({ booking: updated, vendor: updated });
+  return NextResponse.json({ booking: updated });
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { wvId } = await params;
+  if (!["admin", "planner", "team_member"].includes(user.role)) {
+    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  }
+
+  const { id: weddingId, wvId } = await params;
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
+
   await prisma.weddingVendor.delete({ where: { id: wvId } });
   return NextResponse.json({ ok: true });
 }

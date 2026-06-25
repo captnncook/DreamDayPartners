@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { authorizeWeddingVendor } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
@@ -8,7 +9,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { wvId } = await params;
+  const { id: weddingId, wvId } = await params;
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
 
   const wv = await prisma.weddingVendor.findUnique({
     where: { id: wvId },
@@ -35,8 +38,9 @@ export async function POST(req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { wvId } = await params;
-  const body = await req.json();
+  const { id: weddingId, wvId } = await params;
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
 
   const wv = await prisma.weddingVendor.findUnique({
     where: { id: wvId },
@@ -44,6 +48,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   });
   if (!wv) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  const body = await req.json();
   const { draaiboekId, startTime, duration, title, location, notes } = body;
   if (!draaiboekId || !startTime || !title) {
     return NextResponse.json({ error: "Verplichte velden ontbreken" }, { status: 400 });

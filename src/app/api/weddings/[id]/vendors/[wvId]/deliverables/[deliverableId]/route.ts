@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { authorizeWeddingVendor } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ id: string; wvId: string; deliverableId: string }> };
 
@@ -9,15 +10,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const { id: weddingId, wvId, deliverableId } = await params;
-
-  const booking = await prisma.weddingVendor.findFirst({ where: { id: wvId, weddingId } });
-  if (!booking) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
-
-  const canEdit =
-    ["admin", "planner", "team_member"].includes(user.role) ||
-    (user.role === "vendor" && booking.vendorId !== null);
-
-  if (!canEdit) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
 
   const body = await req.json();
   const deliverable = await prisma.deliverable.update({
@@ -43,7 +37,10 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
 
-  const { deliverableId } = await params;
+  const { id: weddingId, wvId, deliverableId } = await params;
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
+
   await prisma.deliverable.delete({ where: { id: deliverableId } });
   return NextResponse.json({ ok: true });
 }

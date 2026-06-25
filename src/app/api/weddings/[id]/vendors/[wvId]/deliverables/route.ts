@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { authorizeWeddingVendor } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
@@ -9,9 +10,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const { id: weddingId, wvId } = await params;
-
-  const booking = await prisma.weddingVendor.findFirst({ where: { id: wvId, weddingId } });
-  if (!booking) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
 
   const deliverables = await prisma.deliverable.findMany({
     where: { vendorBookingId: wvId },
@@ -30,9 +30,8 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   const { id: weddingId, wvId } = await params;
-
-  const booking = await prisma.weddingVendor.findFirst({ where: { id: wvId, weddingId } });
-  if (!booking) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
+  const auth = await authorizeWeddingVendor(user, wvId, weddingId);
+  if (!auth.ok) return auth.response;
 
   const body = await req.json();
   const deliverable = await prisma.deliverable.create({
