@@ -6,23 +6,11 @@ import IntakeForm from "./IntakeForm";
 import TimelinePlanner from "./TimelinePlanner";
 import LogisticsPanel from "./LogisticsPanel";
 import FileVault from "./FileVault";
-import DeliverablesTracker from "./DeliverablesTracker";
 import ChecklistDeadlines from "./ChecklistDeadlines";
 import GuestDataPanel from "./GuestDataPanel";
 import MoodboardUploader from "./MoodboardUploader";
 import ApprovalButton from "./ApprovalButton";
 import PhotoUploadPanel from "./PhotoUploadPanel";
-
-interface Deliverable {
-  id: string;
-  key: string;
-  label: string;
-  status: string;
-  dueDate?: string | null;
-  approvalRequired: boolean;
-  notes?: string | null;
-  fileUrl?: string | null;
-}
 
 interface Props {
   weddingId: string;
@@ -39,7 +27,6 @@ interface Props {
     contractUrl?: string | null;
     intakeData?: Record<string, unknown> | null;
   };
-  initialDeliverables: Deliverable[];
   documents: Array<{ id: string; name: string; fileKey: string; mimeType: string; fileSize: number; category: string; createdAt: string }>;
   timelineBlocks: Array<{ id: string; startTime: string; duration: number; title: string; description?: string | null; location?: string | null; phase?: string | null }>;
   tasks: Array<{ id: string; title: string; status: string; dueDate?: string | null; priority: string }>;
@@ -51,12 +38,11 @@ interface Props {
 }
 
 export default function DashboardEngine({
-  weddingId, wvId, vendorType, initialBooking, initialDeliverables,
+  weddingId, wvId, vendorType, initialBooking,
   documents, timelineBlocks, tasks, guests, totalGuests, userRole, userId, vendorUserId,
 }: Props) {
   const config = getVendorTypeConfig(vendorType);
   const [booking, setBooking] = useState(initialBooking);
-  const [deliverables, setDeliverables] = useState(initialDeliverables);
 
   const isPlanner = ["admin", "planner", "team_member"].includes(userRole);
   const isVendor = userRole === "vendor" && vendorUserId === userId;
@@ -65,7 +51,6 @@ export default function DashboardEngine({
   const modules = config.modules ?? [];
   const hasIntake = (config.intakeFields?.length ?? 0) > 0;
   const hasLogistics = (config.logisticsFields?.length ?? 0) > 0;
-  const hasDeliverables = (config.deliverables?.length ?? 0) > 0;
   const hasTimeline = (config.timelineTemplate?.length ?? 0) > 0;
   const showFileVault = !modules.includes("documentUpload") && modules.includes("fileVault");
 
@@ -93,31 +78,6 @@ export default function DashboardEngine({
       setBooking(updated);
     }
   }, [weddingId, wvId, intakeData]);
-
-  const updateDeliverable = useCallback(async (id: string, patch: Record<string, unknown>) => {
-    const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/deliverables/${id}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch),
-    });
-    if (res.ok) {
-      const { deliverable } = await res.json();
-      setDeliverables(prev => prev.map(d => d.id === id ? deliverable : d));
-    }
-  }, [weddingId, wvId]);
-
-  const addDeliverable = useCallback(async (d: Omit<Deliverable, "id">) => {
-    const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/deliverables`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d),
-    });
-    if (res.ok) {
-      const { deliverable } = await res.json();
-      setDeliverables(prev => [...prev, deliverable]);
-    }
-  }, [weddingId, wvId]);
-
-  const deleteDeliverable = useCallback(async (id: string) => {
-    const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/deliverables/${id}`, { method: "DELETE" });
-    if (res.ok) setDeliverables(prev => prev.filter(d => d.id !== id));
-  }, [weddingId, wvId]);
 
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
@@ -181,20 +141,6 @@ export default function DashboardEngine({
           onUpdate={patchIntake}
           isPlanner={isPlanner}
           isVendor={isVendor}
-        />
-      )}
-
-      {hasDeliverables && (
-        <DeliverablesTracker
-          weddingId={weddingId}
-          wvId={wvId}
-          deliverables={deliverables}
-          configs={config.deliverables!}
-          isPlanner={isPlanner}
-          isVendor={isVendor}
-          onUpdate={updateDeliverable}
-          onAdd={addDeliverable}
-          onDelete={deleteDeliverable}
         />
       )}
 

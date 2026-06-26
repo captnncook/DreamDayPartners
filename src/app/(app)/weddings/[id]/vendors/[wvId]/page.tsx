@@ -19,7 +19,6 @@ export default async function VendorBookingPage({
     where: { id: wvId, weddingId },
     include: {
       vendor: true,
-      deliverables: { orderBy: { createdAt: "asc" } },
       draaiboekItems: {
         orderBy: { startTime: "asc" },
         include: { draaiboek: { select: { title: true } } },
@@ -55,17 +54,6 @@ export default async function VendorBookingPage({
     contractUrl: b.contractUrl,
     intakeData: b.intakeData as Record<string, unknown> | null,
   });
-
-  const serializedDeliverables = booking.deliverables.map(d => ({
-    id: d.id,
-    key: d.key,
-    label: d.label,
-    status: d.status,
-    dueDate: d.dueDate?.toISOString() ?? null,
-    approvalRequired: d.approvalRequired,
-    notes: d.notes,
-    fileUrl: d.fileUrl,
-  }));
 
   const serializedBlocks = booking.draaiboekItems.map(item => ({
     id: item.id,
@@ -136,7 +124,6 @@ export default async function VendorBookingPage({
         wvId={wvId}
         vendorType={booking.vendor.category}
         initialBooking={isBookingSerializer(booking)}
-        initialDeliverables={serializedDeliverables}
         documents={serializedDocuments}
         timelineBlocks={serializedBlocks}
         tasks={serializedTasks}
