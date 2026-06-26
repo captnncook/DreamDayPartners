@@ -8,6 +8,7 @@ import {
   Clock, FileText, Handshake,
 } from "lucide-react";
 import VendorDashboardInline from "@/components/VendorDashboardInline";
+import VendorContactSheet from "@/components/VendorContactSheet";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
@@ -52,6 +53,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 contactPerson: true,
                 email: true,
                 phone: true,
+                website: true,
                 userId: true,
               },
             },
@@ -316,19 +318,15 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             ) : (
               <div className="space-y-2">
                 {wedding.vendors.map((wv) => (
-                  <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="flex items-center gap-3 py-2 px-2 rounded-xl -mx-2 hover:bg-accent" style={{ textDecoration: "none", color: "inherit" }}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold" style={{ background: "var(--accent)", color: "var(--primary)" }}>
-                      {wv.vendor.name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{wv.vendor.name}</div>
-                      <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
-                    </div>
-                    <span className={`ddp-badge ${vendorStatusColors[wv.status] ?? "badge-neutral"}`} style={{ fontSize: "0.6rem" }}>
-                      {vendorStatusLabels[wv.status] ?? wv.status}
-                    </span>
-                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)" }} />
-                  </Link>
+                  <VendorContactSheet
+                    key={wv.id}
+                    vendor={wv.vendor}
+                    weddingId={id}
+                    wvId={wv.id}
+                    status={wv.status}
+                    statusLabel={vendorStatusLabels[wv.status] ?? wv.status}
+                    statusColor={vendorStatusColors[wv.status] ?? "badge-neutral"}
+                  />
                 ))}
               </div>
             )}
