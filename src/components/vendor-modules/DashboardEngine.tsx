@@ -161,6 +161,7 @@ export default function DashboardEngine({
           intakeData={intakeData}
           onUpdate={patchIntake}
           isPlanner={isPlanner}
+          isVendor={isVendor}
         />
       )}
 

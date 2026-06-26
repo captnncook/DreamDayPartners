@@ -49,21 +49,31 @@ export async function POST(req: NextRequest, { params }: Params) {
   if (!wv) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { draaiboekId, startTime, duration, title, location, notes } = body;
-  if (!draaiboekId || !startTime || !title) {
+  const { startTime, duration, title, notes } = body;
+  if (!startTime || !title) {
     return NextResponse.json({ error: "Verplichte velden ontbreken" }, { status: 400 });
   }
 
-  const existing = await prisma.draaiboekItem.count({ where: { draaiboekId } });
+  // Find or create the main draaiboek for this wedding
+  let draaiboek = await prisma.draaiboek.findFirst({
+    where: { weddingId: wv.weddingId },
+    orderBy: { createdAt: "asc" },
+  });
+  if (!draaiboek) {
+    draaiboek = await prisma.draaiboek.create({
+      data: { weddingId: wv.weddingId, title: "Draaiboek", version: "1.0" },
+    });
+  }
+
+  const existing = await prisma.draaiboekItem.count({ where: { draaiboekId: draaiboek.id } });
 
   const item = await prisma.draaiboekItem.create({
     data: {
-      draaiboekId,
+      draaiboekId: draaiboek.id,
       vendorId: wv.vendorId,
       startTime,
       duration: duration ?? 30,
       title,
-      location: location || null,
       notes: notes || null,
       sortOrder: existing + 1,
     },
