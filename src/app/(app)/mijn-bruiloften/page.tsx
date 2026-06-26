@@ -60,8 +60,8 @@ export default function MijnBruiloftenPage() {
       setForm({ email1: "", email2: "", weddingDate: "", weddingTitle: "", notes: "" });
       setShowForm(false);
       setSuccess(data.matched
-        ? "✓ Bruiloft geregistreerd en direct gekoppeld — het bruidspaar heeft al een account!"
-        : "✓ Bruiloft geregistreerd. Zodra het bruidspaar zich aanmeldt worden jullie automatisch gekoppeld."
+        ? "✓ Bruiloft gevonden en direct gekoppeld aan een bestaand account!"
+        : "✓ Bruiloft aangemaakt — je hebt nu meteen toegang tot het dashboard. Zodra het bruidspaar zich aanmeldt worden ze automatisch gekoppeld."
       );
     }
     setSaving(false);
@@ -157,7 +157,7 @@ export default function MijnBruiloftenPage() {
                   <div style={{ marginTop: "2px" }}>
                     {linked
                       ? <CheckCircle className="w-5 h-5" style={{ color: "#22c55e" }} />
-                      : <Clock className="w-5 h-5" style={{ color: "var(--muted-light)" }} />
+                      : <CheckCircle className="w-5 h-5" style={{ color: "var(--primary)" }} />
                     }
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -173,22 +173,22 @@ export default function MijnBruiloftenPage() {
                     <div style={{ marginTop: "6px" }}>
                       {linked ? (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.75rem", fontWeight: 600, color: "#16a34a", background: "#f0fdf4", padding: "0.2rem 0.5rem", borderRadius: "6px" }}>
-                          <CheckCircle className="w-3 h-3" /> Gekoppeld
+                          <CheckCircle className="w-3 h-3" /> Bruidspaar gekoppeld
                         </span>
                       ) : (
-                        <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", background: "var(--border)", padding: "0.2rem 0.5rem", borderRadius: "6px" }}>
-                          Wacht op bruidspaar
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", background: "var(--border)", padding: "0.2rem 0.5rem", borderRadius: "6px" }}>
+                          <Clock className="w-3 h-3" /> Bruidspaar nog niet aangemeld
                         </span>
                       )}
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexShrink: 0 }}>
-                    {invite.wedding && (
+                    {invite.weddingId && (
                       <Link
-                        href={`/weddings/${invite.wedding.id}`}
+                        href={`/weddings/${invite.weddingId}`}
                         style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.8125rem", color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}
                       >
-                        <ExternalLink className="w-3.5 h-3.5" /> Open
+                        <ExternalLink className="w-3.5 h-3.5" /> Dashboard
                       </Link>
                     )}
                     <button onClick={() => handleDelete(invite.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: "4px", display: "flex" }}>
