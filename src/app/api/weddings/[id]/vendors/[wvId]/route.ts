@@ -37,19 +37,19 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   const body = await req.json();
 
-  // Status and payment fields: planner/admin only
-  const isPlannerPatch =
+  // Status and amounts: planner/admin only
+  const isPlannerOnlyPatch =
     body.status !== undefined ||
     body.depositAmount !== undefined ||
     body.depositDue !== undefined ||
-    body.depositPaid !== undefined ||
     body.finalAmount !== undefined ||
-    body.finalDue !== undefined ||
-    body.finalPaid !== undefined;
+    body.finalDue !== undefined;
 
-  if (isPlannerPatch && !["admin", "planner", "team_member"].includes(user.role)) {
+  if (isPlannerOnlyPatch && !["admin", "planner", "team_member"].includes(user.role)) {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
+
+  // Paid toggles are allowed for all authenticated users (vendor marks own invoice paid)
 
   const updated = await prisma.weddingVendor.update({
     where: { id: wvId },
