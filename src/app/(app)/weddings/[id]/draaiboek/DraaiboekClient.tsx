@@ -38,6 +38,7 @@ interface Props {
   vendors: WeddingVendor[];
   currentUser: { id: string; role: string; name: string };
   isPremium: boolean;
+  ownVendorId?: string | null;
 }
 
 function addMinutes(time: string, mins: number): string {
@@ -159,7 +160,7 @@ function ItemForm({
   );
 }
 
-export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: initial, vendors, currentUser }: Props) {
+export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: initial, vendors, currentUser, ownVendorId }: Props) {
   const [draaiboeken, setDraaiboeken] = useState<Draaiboek[]>(initial);
   const [activeDraaiboekId, setActiveDraaiboekId] = useState<string | null>(initial[0]?.id ?? null);
   const [showNewDraaiboek, setShowNewDraaiboek] = useState(false);
@@ -172,7 +173,16 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
   const emptyItem = { startTime: "09:00", endTime: "09:30", title: "", description: "", location: "", vendorId: "", notes: "" };
 
   const activeDraaiboek = draaiboeken.find((d) => d.id === activeDraaiboekId);
-  const isReadOnly = currentUser.role === "couple" || currentUser.role === "vendor";
+  const isPlanner = ["admin", "planner", "team_member"].includes(currentUser.role);
+  const isReadOnly = currentUser.role === "couple";
+  const isVendor = currentUser.role === "vendor";
+
+  function canEditItem(item: DraaiboekItem) {
+    if (isReadOnly) return false;
+    if (isPlanner) return true;
+    if (isVendor) return !!ownVendorId && item.vendorId === ownVendorId;
+    return false;
+  }
 
   // Collect unique vendor categories that appear in the active draaiboek
   const vendorCategories = Array.from(
@@ -292,16 +302,18 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
             <h1 style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.04em" }}>Draaiboek</h1>
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
-          {!isReadOnly && (
+          {(isPlanner || isVendor) && !isReadOnly && (
             <div className="flex gap-2">
               {activeDraaiboek && (
                 <button onClick={() => { setShowAddItem(!showAddItem); setEditingItemId(null); }} className="ddp-btn-primary inline-flex items-center gap-1.5">
                   <Plus className="w-3.5 h-3.5" /> Item toevoegen
                 </button>
               )}
-              <button onClick={() => setShowNewDraaiboek(!showNewDraaiboek)} className="ddp-btn-secondary">
-                + Nieuw draaiboek
-              </button>
+              {isPlanner && (
+                <button onClick={() => setShowNewDraaiboek(!showNewDraaiboek)} className="ddp-btn-secondary">
+                  + Nieuw draaiboek
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -418,7 +430,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
                         const isEditing = editingItemId === item.id;
                         return (
                           <div key={item.id}>
-                            {isEditing && !isReadOnly ? (
+                            {isEditing && canEditItem(item) ? (
                               <div style={{ paddingLeft: "6.5rem" }}>
                                 <ItemForm
                                   initial={{
@@ -464,7 +476,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
                                       <span style={{ fontSize: "0.75rem", padding: "0.15rem 0.5rem", borderRadius: "6px", background: "var(--color-blush-soft)", color: "var(--muted)", whiteSpace: "nowrap" }}>
                                         {item.startTime} – {endTime}
                                       </span>
-                                      {!isReadOnly && (
+                                      {canEditItem(item) && (
                                         <>
                                           <button
                                             onClick={() => { setEditingItemId(item.id); setShowAddItem(false); }}
@@ -501,7 +513,7 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
                                         <MessageSquare className="w-3 h-3" /> {item.notes}
                                       </span>
                                     )}
-                                    {!isReadOnly && (
+                                    {isPlanner && (
                                       <button
                                         onClick={() => togglePublic(activeDraaiboekId!, item.id, item.isPublic ?? false)}
                                         title={item.isPublic ? "Zichtbaar voor iedereen — klik om privé te maken" : "Alleen voor leverancier — klik om voor iedereen zichtbaar te maken"}

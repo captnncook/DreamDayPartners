@@ -27,8 +27,10 @@ export default async function DraaiboekPage({ params }: { params: Promise<{ id: 
   });
 
   let filteredDraaiboeken = draaiboeken;
+  let ownVendorId: string | null = null;
   if (user.role === "vendor") {
     const vendor = await prisma.vendor.findFirst({ where: { userId: user.id } });
+    ownVendorId = vendor?.id ?? null;
     filteredDraaiboeken = draaiboeken.map((d) => ({
       ...d,
       items: d.items.filter((item) =>
@@ -57,6 +59,7 @@ export default async function DraaiboekPage({ params }: { params: Promise<{ id: 
       vendors={JSON.parse(JSON.stringify(vendors))}
       currentUser={JSON.parse(JSON.stringify(user))}
       isPremium={wedding.isPremium}
+      ownVendorId={ownVendorId}
     />
   );
 }
