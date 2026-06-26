@@ -31,6 +31,32 @@ async function main() {
 
       ALTER TABLE "documents" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT;
 
+      CREATE TABLE IF NOT EXISTS "direct_conversations" (
+        "id" TEXT NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "direct_conversations_pkey" PRIMARY KEY ("id")
+      );
+
+      CREATE TABLE IF NOT EXISTS "direct_conversation_participants" (
+        "conversationId" TEXT NOT NULL,
+        "userId" TEXT NOT NULL,
+        CONSTRAINT "direct_conversation_participants_pkey" PRIMARY KEY ("conversationId", "userId"),
+        CONSTRAINT "dcp_conv_fk" FOREIGN KEY ("conversationId") REFERENCES "direct_conversations"("id") ON DELETE CASCADE,
+        CONSTRAINT "dcp_user_fk" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS "direct_messages" (
+        "id" TEXT NOT NULL,
+        "conversationId" TEXT NOT NULL,
+        "senderId" TEXT NOT NULL,
+        "content" TEXT NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "direct_messages_pkey" PRIMARY KEY ("id"),
+        CONSTRAINT "dm_conv_fk" FOREIGN KEY ("conversationId") REFERENCES "direct_conversations"("id") ON DELETE CASCADE,
+        CONSTRAINT "dm_sender_fk" FOREIGN KEY ("senderId") REFERENCES "users"("id")
+      );
+
       CREATE TABLE IF NOT EXISTS "deliverables" (
         "id" TEXT NOT NULL,
         "vendorBookingId" TEXT NOT NULL,

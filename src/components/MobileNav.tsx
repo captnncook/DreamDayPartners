@@ -30,7 +30,7 @@ export default function MobileNav({ user }: { user: User }) {
     { href: "/tasks",                      label: n.myTasks,           roles: ["planner", "team_member", "couple"] },
     { href: "/guests",                     label: n.guests,            roles: ["planner", "team_member", "couple"] },
     { href: "/budget",                     label: n.budget,            roles: ["planner", "team_member"] },
-    { href: "/messages",                   label: n.messages,          roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/dm",                         label: "Berichten",         roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/vendors",                    label: n.vendors,           roles: ["planner", "team_member"] },
     { href: "/leveranciers",               label: "Leveranciers",      roles: ["admin", "planner", "couple"] },
     { href: "/leveranciers/mijn-profiel",  label: "Mijn profiel",      roles: ["vendor"] },

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { X, MessageCircle, Globe, Mail, Phone, User } from "lucide-react";
 
 interface VendorContact {
@@ -10,6 +11,7 @@ interface VendorContact {
   email?: string | null;
   phone?: string | null;
   website?: string | null;
+  userId?: string | null;
 }
 
 interface Props {
@@ -21,8 +23,28 @@ interface Props {
   statusColor: string;
 }
 
-export default function VendorContactSheet({ vendor, weddingId, statusLabel, statusColor }: Props) {
+export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId: _wvId }: Props) {
   const [open, setOpen] = useState(false);
+  const [starting, setStarting] = useState(false);
+  const router = useRouter();
+
+  async function openChat() {
+    if (!vendor.userId) return;
+    setStarting(true);
+    try {
+      const res = await fetch("/api/dm/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otherUserId: vendor.userId }),
+      });
+      if (res.ok) {
+        const { conversation } = await res.json();
+        router.push(`/dm/${conversation.id}`);
+      }
+    } finally {
+      setStarting(false);
+    }
+  }
 
   return (
     <>
@@ -38,9 +60,6 @@ export default function VendorContactSheet({ vendor, weddingId, statusLabel, sta
           <div className="text-sm font-medium truncate">{vendor.name}</div>
           <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{vendor.category}</div>
         </div>
-        <span className={`ddp-badge ${statusColor}`} style={{ fontSize: "0.6rem" }}>
-          {statusLabel}
-        </span>
       </button>
 
       {open && (
@@ -59,6 +78,9 @@ export default function VendorContactSheet({ vendor, weddingId, statusLabel, sta
               boxShadow: "0 -4px 24px rgba(0,0,0,0.12)",
             }}
           >
+            {/* Drag handle */}
+            <div style={{ width: "2.5rem", height: "4px", background: "var(--border)", borderRadius: "2px", margin: "0 auto 1.25rem" }} />
+
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
               <div>
                 <div style={{ fontWeight: 700, fontSize: "1.0625rem", letterSpacing: "-0.02em" }}>{vendor.name}</div>
@@ -69,19 +91,33 @@ export default function VendorContactSheet({ vendor, weddingId, statusLabel, sta
               </button>
             </div>
 
-            <div style={{ display: "grid", gap: "0.75rem" }}>
-              <a
-                href={`/weddings/${weddingId}/messages`}
-                style={{
+            <div style={{ display: "grid", gap: "0.625rem" }}>
+              {vendor.userId ? (
+                <button
+                  onClick={openChat}
+                  disabled={starting}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "0.75rem",
+                    padding: "0.875rem 1rem", borderRadius: "0.875rem",
+                    background: "var(--primary)", color: "white",
+                    border: "none", cursor: "pointer", fontWeight: 600, fontSize: "0.9375rem",
+                    opacity: starting ? 0.7 : 1,
+                  }}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  {starting ? "Openen..." : "Stuur een bericht"}
+                </button>
+              ) : (
+                <div style={{
                   display: "flex", alignItems: "center", gap: "0.75rem",
                   padding: "0.875rem 1rem", borderRadius: "0.875rem",
-                  background: "var(--primary)", color: "white",
-                  textDecoration: "none", fontWeight: 600, fontSize: "0.9375rem",
-                }}
-              >
-                <MessageCircle className="w-5 h-5" />
-                Direct chatten
-              </a>
+                  background: "var(--accent)", color: "var(--muted)",
+                  fontSize: "0.875rem",
+                }}>
+                  <MessageCircle className="w-5 h-5" />
+                  Leverancier heeft nog geen account
+                </div>
+              )}
 
               {vendor.website && (
                 <a
@@ -96,7 +132,9 @@ export default function VendorContactSheet({ vendor, weddingId, statusLabel, sta
                   }}
                 >
                   <Globe className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <span className="truncate">{vendor.website.replace(/^https?:\/\//, "")}</span>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {vendor.website.replace(/^https?:\/\//, "")}
+                  </span>
                 </a>
               )}
 
@@ -111,7 +149,7 @@ export default function VendorContactSheet({ vendor, weddingId, statusLabel, sta
                   }}
                 >
                   <Mail className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <span className="truncate">{vendor.email}</span>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{vendor.email}</span>
                 </a>
               )}
 
@@ -131,13 +169,11 @@ export default function VendorContactSheet({ vendor, weddingId, statusLabel, sta
               )}
 
               {vendor.contactPerson && (
-                <div
-                  style={{
-                    display: "flex", alignItems: "center", gap: "0.75rem",
-                    padding: "0.875rem 1rem", borderRadius: "0.875rem",
-                    background: "var(--accent)", fontSize: "0.9375rem", color: "var(--muted)",
-                  }}
-                >
+                <div style={{
+                  display: "flex", alignItems: "center", gap: "0.75rem",
+                  padding: "0.875rem 1rem", borderRadius: "0.875rem",
+                  background: "var(--accent)", fontSize: "0.875rem", color: "var(--muted)",
+                }}>
                   <User className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   {vendor.contactPerson}
                 </div>

@@ -313,23 +313,27 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 </Link>
               )}
             </div>
-            {wedding.vendors.length === 0 ? (
-              <p className="text-sm text-center py-6" style={{ color: "var(--muted)" }}>Nog geen leveranciers</p>
-            ) : (
-              <div className="space-y-2">
-                {wedding.vendors.map((wv) => (
-                  <VendorContactSheet
-                    key={wv.id}
-                    vendor={wv.vendor}
-                    weddingId={id}
-                    wvId={wv.id}
-                    status={wv.status}
-                    statusLabel={vendorStatusLabels[wv.status] ?? wv.status}
-                    statusColor={vendorStatusColors[wv.status] ?? "badge-neutral"}
-                  />
-                ))}
-              </div>
-            )}
+            {(() => {
+              const confirmed = wedding.vendors.filter(wv => wv.status === "confirmed");
+              if (confirmed.length === 0) return (
+                <p className="text-sm text-center py-6" style={{ color: "var(--muted)" }}>Nog geen bevestigde leveranciers</p>
+              );
+              return (
+                <div className="space-y-2">
+                  {confirmed.map((wv) => (
+                    <VendorContactSheet
+                      key={wv.id}
+                      vendor={wv.vendor}
+                      weddingId={id}
+                      wvId={wv.id}
+                      status={wv.status}
+                      statusLabel={vendorStatusLabels[wv.status] ?? wv.status}
+                      statusColor={vendorStatusColors[wv.status] ?? "badge-neutral"}
+                    />
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Vendor-specifieke dashboards */}

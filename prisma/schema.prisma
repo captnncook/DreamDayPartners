@@ -18,14 +18,51 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  ownedWeddings     Wedding[]           @relation("WeddingOwner")
-  teamMemberships   WeddingTeamMember[]
-  sentMessages      Message[]
-  assignedTasks     Task[]
-  uploadedDocuments Document[]
-  notifications     Notification[]
+  ownedWeddings        Wedding[]                      @relation("WeddingOwner")
+  teamMemberships      WeddingTeamMember[]
+  sentMessages         Message[]
+  assignedTasks        Task[]
+  uploadedDocuments    Document[]
+  notifications        Notification[]
+  dmParticipations     DirectConversationParticipant[]
+  sentDirectMessages   DirectMessage[]
 
   @@map("users")
+}
+
+model DirectConversation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants DirectConversationParticipant[]
+  messages     DirectMessage[]
+
+  @@map("direct_conversations")
+}
+
+model DirectConversationParticipant {
+  conversationId String
+  userId         String
+
+  conversation DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@map("direct_conversation_participants")
+}
+
+model DirectMessage {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime @default(now())
+
+  conversation DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User               @relation(fields: [senderId], references: [id])
+
+  @@map("direct_messages")
 }
 
 model Wedding {
