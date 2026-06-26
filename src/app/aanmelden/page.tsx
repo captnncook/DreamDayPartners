@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -27,6 +27,10 @@ const VENDOR_CATEGORIES = [
 ];
 
 export default function AanmeldenPage() {
+  return <Suspense><AanmeldenForm /></Suspense>;
+}
+
+function AanmeldenForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [account, setAccount] = useState<Account>(null);
