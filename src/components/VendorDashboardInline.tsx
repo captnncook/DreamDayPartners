@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
 import DashboardEngine from "@/components/vendor-modules/DashboardEngine";
 
 interface Props {
@@ -14,7 +13,6 @@ interface Props {
 }
 
 export default function VendorDashboardInline({ weddingId, wvId, vendorName, vendorCategory, userRole, userId, vendorUserId }: Props) {
-  const [open, setOpen] = useState(false);
   const [data, setData] = useState<null | {
     booking: Parameters<typeof DashboardEngine>[0]["initialBooking"];
     deliverables: Parameters<typeof DashboardEngine>[0]["initialDeliverables"];
@@ -24,11 +22,9 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
     guests: Parameters<typeof DashboardEngine>[0]["guests"];
     totalGuests: number;
   }>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!open || data) return;
-    setLoading(true);
     fetch(`/api/weddings/${weddingId}/vendors/${wvId}`)
       .then(r => r.json())
       .then(json => {
@@ -54,15 +50,11 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
         });
       })
       .finally(() => setLoading(false));
-  }, [open, data, weddingId, wvId]);
+  }, [weddingId, wvId]);
 
   return (
     <div className="ddp-card">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 text-left"
-        style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
-      >
+      <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0" style={{ background: "var(--accent)", color: "var(--primary)" }}>
           {vendorName.charAt(0)}
         </div>
@@ -70,31 +62,28 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
           <div className="font-semibold text-sm">{vendorName}</div>
           <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{vendorCategory}</div>
         </div>
-        {open ? <ChevronUp className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)" }} /> : <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)" }} />}
-      </button>
+      </div>
 
-      {open && (
-        <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--border)" }}>
-          {loading && <p className="text-sm text-center py-4" style={{ color: "var(--muted)" }}>Laden...</p>}
-          {!loading && data && (
-            <DashboardEngine
-              weddingId={weddingId}
-              wvId={wvId}
-              vendorType={vendorCategory}
-              initialBooking={data.booking}
-              initialDeliverables={data.deliverables}
-              documents={data.documents}
-              timelineBlocks={data.timelineBlocks}
-              tasks={data.tasks}
-              guests={data.guests}
-              totalGuests={data.totalGuests}
-              userRole={userRole}
-              userId={userId}
-              vendorUserId={vendorUserId}
-            />
-          )}
-        </div>
-      )}
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
+        {loading && <p className="text-sm text-center py-4" style={{ color: "var(--muted)" }}>Laden...</p>}
+        {!loading && data && (
+          <DashboardEngine
+            weddingId={weddingId}
+            wvId={wvId}
+            vendorType={vendorCategory}
+            initialBooking={data.booking}
+            initialDeliverables={data.deliverables}
+            documents={data.documents}
+            timelineBlocks={data.timelineBlocks}
+            tasks={data.tasks}
+            guests={data.guests}
+            totalGuests={data.totalGuests}
+            userRole={userRole}
+            userId={userId}
+            vendorUserId={vendorUserId}
+          />
+        )}
+      </div>
     </div>
   );
 }
