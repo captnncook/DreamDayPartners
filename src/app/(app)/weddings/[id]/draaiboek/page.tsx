@@ -31,7 +31,9 @@ export default async function DraaiboekPage({ params }: { params: Promise<{ id: 
     const vendor = await prisma.vendor.findFirst({ where: { userId: user.id } });
     filteredDraaiboeken = draaiboeken.map((d) => ({
       ...d,
-      items: d.items.filter((item) => !vendor || item.vendorId === vendor.id),
+      items: d.items.filter((item) =>
+        !vendor || item.vendorId === vendor.id || (item as { isPublic?: boolean }).isPublic
+      ),
     }));
   }
 

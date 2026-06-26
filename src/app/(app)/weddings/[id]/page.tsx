@@ -70,8 +70,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
           include: {
             items: {
               orderBy: { sortOrder: "asc" },
-              take: 8,
-              include: { vendor: { select: { name: true } } },
+              include: { vendor: { select: { id: true, name: true, category: true } } },
             },
           },
           take: 1,
@@ -215,36 +214,44 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
           )}
 
           {/* Draaiboek preview */}
-          {draaiboek && (
-            <div className="ddp-card">
-              <div className="flex items-center justify-between mb-4">
-                <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
-                  <ClipboardList className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
-                  Draaiboek
-                </h3>
-                <Link href={`/weddings/${id}/draaiboek`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
-                  Volledig →
-                </Link>
-              </div>
-              <div className="space-y-1">
-                {draaiboek.items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl" style={{ background: "rgba(0,0,0,0.02)" }}>
-                    <div className="flex items-center gap-1 flex-shrink-0" style={{ color: "var(--muted)", minWidth: "52px" }}>
-                      <Clock className="w-3 h-3" />
-                      <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{formatTime(item.startTime)}</span>
+          {draaiboek && (() => {
+            const previewItems = isVendor
+              ? draaiboek.items.filter(item =>
+                  (item.vendor && item.vendor.id === ownVendorId) || (item as { isPublic?: boolean }).isPublic
+                ).slice(0, 8)
+              : draaiboek.items.slice(0, 8);
+            if (previewItems.length === 0 && isVendor) return null;
+            return (
+              <div className="ddp-card">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
+                    <ClipboardList className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
+                    Draaiboek
+                  </h3>
+                  <Link href={`/weddings/${id}/draaiboek`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
+                    Volledig →
+                  </Link>
+                </div>
+                <div className="space-y-1">
+                  {previewItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl" style={{ background: "rgba(0,0,0,0.02)" }}>
+                      <div className="flex items-center gap-1 flex-shrink-0" style={{ color: "var(--muted)", minWidth: "52px" }}>
+                        <Clock className="w-3 h-3" />
+                        <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{formatTime(item.startTime)}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{item.title}</div>
+                        {item.location && <div className="text-xs truncate" style={{ color: "var(--muted)" }}>{item.location}</div>}
+                      </div>
+                      {item.vendor && (
+                        <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>{item.vendor.name}</span>
+                      )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{item.title}</div>
-                      {item.location && <div className="text-xs truncate" style={{ color: "var(--muted)" }}>{item.location}</div>}
-                    </div>
-                    {item.vendor && (
-                      <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>{item.vendor.name}</span>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Taken — niet voor vendors */}
           {!isVendor && (
