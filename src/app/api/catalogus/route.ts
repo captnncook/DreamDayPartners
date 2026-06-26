@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { getDownloadUrl } from "@/lib/r2";
 
 async function geocodeCity(city?: string | null): Promise<{ latitude?: number; longitude?: number }> {
   if (!city) return {};
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest) {
       website: true,
       description: true,
       isPremium: true,
-      photos: true,
+      coverPhoto: true,
       city: true,
       latitude: true,
       longitude: true,
@@ -55,7 +56,15 @@ export async function GET(req: NextRequest) {
     orderBy: [{ isPremium: "desc" }, { name: "asc" }],
   });
 
-  return NextResponse.json({ vendors });
+  // Generate signed URLs for cover photos
+  const vendorsWithCover = await Promise.all(
+    vendors.map(async (v) => ({
+      ...v,
+      coverPhotoUrl: v.coverPhoto ? await getDownloadUrl(v.coverPhoto, 86400) : null,
+    }))
+  );
+
+  return NextResponse.json({ vendors: vendorsWithCover });
 }
 
 // Admin-only: nieuwe leverancier toevoegen aan de catalogus

@@ -33,7 +33,7 @@ type Vendor = {
   category: string;
   description?: string;
   isPremium: boolean;
-  photos: string[];
+  coverPhotoUrl?: string | null;
   city?: string;
   latitude?: number | null;
   longitude?: number | null;
@@ -293,9 +293,11 @@ function SupplierCard({ vendor }: { vendor: Vendor }) {
       >
         {/* Image area — 4:3 */}
         <div style={{ aspectRatio: "4/3", background: "var(--color-blush-soft)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-          <span style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{catLabel}</span>
-
-          {/* Status badge */}
+          {vendor.coverPhotoUrl ? (
+            <Image src={vendor.coverPhotoUrl} alt={vendor.name} fill style={{ objectFit: "cover" }} />
+          ) : (
+            <span style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{catLabel}</span>
+          )}
           {vendor.isPremium ? (
             <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", background: "var(--color-champagne)", color: "#7a5c1a", borderRadius: "var(--radius-full)", padding: "0.2rem 0.75rem", fontSize: "0.625rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Aanbevolen

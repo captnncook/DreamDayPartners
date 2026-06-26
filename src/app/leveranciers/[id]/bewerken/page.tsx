@@ -24,6 +24,8 @@ const CATEGORIES = [
   { value: "overig", label: "Overig" },
 ];
 
+void CATEGORIES;
+
 type Vendor = {
   id: string; name: string; category: string; contactPerson?: string;
   email?: string; phone?: string; website?: string; description?: string;
@@ -33,15 +35,19 @@ type Vendor = {
 export default function VendorEditPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [coverKey, setCoverKey] = useState<string | null>(null);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [photoKeys, setPhotoKeys] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({
@@ -74,6 +80,8 @@ export default function VendorEditPage() {
 
     const photosRes = await fetch(`/api/catalogus/${id}/signed-photos`);
     const pData = await photosRes.json();
+    setCoverUrl(pData.coverUrl ?? null);
+    setCoverKey(v.coverPhoto ?? null);
     setPhotoUrls(pData.urls ?? []);
     setPhotoKeys(v.photos ?? []);
 
@@ -100,17 +108,48 @@ export default function VendorEditPage() {
     setSaving(false);
   }
 
-  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
+    setUploadingCover(true);
+    setError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/catalogus/${id}/cover-photo`, { method: "POST", body: fd });
+      let data: Record<string, unknown> = {};
+      try { data = await res.json(); } catch { /* non-JSON */ }
+      if (!res.ok) {
+        setError((data.error as string) ?? `Upload mislukt (${res.status})`);
+      } else {
+        setCoverUrl(data.url as string);
+        setCoverKey(data.key as string);
+      }
+    } catch {
+      setError("Verbindingsfout tijdens upload");
+    } finally {
+      setUploadingCover(false);
+      if (coverInputRef.current) coverInputRef.current.value = "";
+    }
+  }
+
+  async function handleDeleteCover() {
+    const res = await fetch(`/api/catalogus/${id}/cover-photo`, { method: "DELETE" });
+    if (res.ok) { setCoverUrl(null); setCoverKey(null); }
+    void coverKey;
+  }
+
+  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingGallery(true);
     setError("");
     try {
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch(`/api/catalogus/${id}/photos`, { method: "POST", body: fd });
       let data: Record<string, unknown> = {};
-      try { data = await res.json(); } catch { /* non-JSON response */ }
+      try { data = await res.json(); } catch { /* non-JSON */ }
       if (!res.ok) {
         setError((data.error as string) ?? `Upload mislukt (${res.status})`);
       } else {
@@ -120,8 +159,8 @@ export default function VendorEditPage() {
     } catch {
       setError("Verbindingsfout tijdens upload");
     } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setUploadingGallery(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
     }
   }
 
@@ -132,10 +171,8 @@ export default function VendorEditPage() {
       body: JSON.stringify({ key }),
     });
     if (res.ok) {
-      const newUrls = photoUrls.filter((_, i) => i !== idx);
-      const newKeys = photoKeys.filter((k) => k !== key);
-      setPhotoUrls(newUrls);
-      setPhotoKeys(newKeys);
+      setPhotoUrls(photoUrls.filter((_, i) => i !== idx));
+      setPhotoKeys(photoKeys.filter((k) => k !== key));
     }
   }
 
@@ -174,9 +211,62 @@ export default function VendorEditPage() {
           </div>
         )}
 
-        {/* Foto's */}
+        {/* Profielfoto (cover) */}
         <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "1rem" }}>Foto&apos;s</h2>
+          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Profielfoto</h2>
+          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+            Wordt getoond op de leverancierskaart in het overzicht. Kies een opvallende foto die jullie werk goed vertegenwoordigt.
+          </p>
+
+          {coverUrl ? (
+            <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", aspectRatio: "4/3", maxWidth: "280px" }}>
+              <Image src={coverUrl} alt="Profielfoto" fill style={{ objectFit: "cover" }} />
+              <button
+                onClick={handleDeleteCover}
+                style={{
+                  position: "absolute", top: "8px", right: "8px",
+                  background: "rgba(0,0,0,0.65)", border: "none", borderRadius: "8px",
+                  padding: "6px", cursor: "pointer", display: "flex",
+                }}
+              >
+                <Trash2 className="w-3.5 h-3.5" style={{ color: "white" }} />
+              </button>
+              <button
+                onClick={() => coverInputRef.current?.click()}
+                style={{
+                  position: "absolute", bottom: "8px", right: "8px",
+                  background: "rgba(0,0,0,0.65)", border: "none", borderRadius: "8px",
+                  padding: "5px 10px", cursor: "pointer", color: "white", fontSize: "0.75rem", fontWeight: 600,
+                }}
+              >
+                Vervangen
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => coverInputRef.current?.click()}
+              disabled={uploadingCover}
+              style={{
+                width: "280px", aspectRatio: "4/3",
+                border: "2px dashed rgba(0,0,0,0.15)", borderRadius: "12px",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                gap: "0.5rem", cursor: "pointer", background: "none", color: "var(--muted)", fontSize: "0.8125rem",
+              }}
+            >
+              <Upload className="w-5 h-5" />
+              {uploadingCover ? "Uploaden…" : "Profielfoto toevoegen"}
+            </button>
+          )}
+          <input ref={coverInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
+          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.75rem" }}>Max 10 MB · JPG, PNG, WebP</p>
+        </section>
+
+        {/* Galerij */}
+        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Galerij</h2>
+          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+            Tot 12 foto&apos;s die worden getoond op jullie profielpagina. Laat zien wat jullie kunnen!
+          </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             {photoUrls.map((url, i) => (
@@ -195,33 +285,24 @@ export default function VendorEditPage() {
               </div>
             ))}
 
-            {photoUrls.length < 6 && (
+            {photoUrls.length < 12 && (
               <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
+                onClick={() => galleryInputRef.current?.click()}
+                disabled={uploadingGallery}
                 style={{
-                  aspectRatio: "4/3",
-                  border: "2px dashed rgba(0,0,0,0.15)",
-                  borderRadius: "10px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.5rem",
-                  cursor: "pointer",
-                  background: "none",
-                  color: "var(--muted)",
-                  fontSize: "0.8125rem",
+                  aspectRatio: "4/3", border: "2px dashed rgba(0,0,0,0.15)", borderRadius: "10px",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                  gap: "0.5rem", cursor: "pointer", background: "none", color: "var(--muted)", fontSize: "0.8125rem",
                 }}
               >
                 <Upload className="w-5 h-5" />
-                {uploading ? "Uploaden…" : "Foto toevoegen"}
+                {uploadingGallery ? "Uploaden…" : "Foto toevoegen"}
               </button>
             )}
           </div>
 
-          <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handlePhotoUpload} />
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Max 6 foto&apos;s · Max 10 MB per foto</p>
+          <input ref={galleryInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleGalleryUpload} />
+          <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Max 12 foto&apos;s · Max 10 MB per foto</p>
         </section>
 
         {/* Tekst & info */}
@@ -239,15 +320,9 @@ export default function VendorEditPage() {
                 rows={5}
                 placeholder="Schrijf een beschrijving over jullie diensten, aanpak en wat jullie uniek maakt…"
                 style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid rgba(0,0,0,0.12)",
-                  borderRadius: "10px",
-                  fontSize: "0.875rem",
-                  resize: "vertical",
-                  outline: "none",
-                  lineHeight: 1.6,
-                  fontFamily: "inherit",
+                  width: "100%", padding: "0.75rem", border: "1px solid rgba(0,0,0,0.12)",
+                  borderRadius: "10px", fontSize: "0.875rem", resize: "vertical", outline: "none",
+                  lineHeight: 1.6, fontFamily: "inherit",
                 }}
               />
             </div>
@@ -269,12 +344,8 @@ export default function VendorEditPage() {
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                     placeholder={placeholder}
                     style={{
-                      width: "100%",
-                      padding: "0.625rem 0.875rem",
-                      border: "1px solid rgba(0,0,0,0.12)",
-                      borderRadius: "10px",
-                      fontSize: "0.875rem",
-                      outline: "none",
+                      width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)",
+                      borderRadius: "10px", fontSize: "0.875rem", outline: "none",
                     }}
                   />
                 </div>

@@ -16,6 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       website: true,
       description: true,
       isPremium: true,
+      coverPhoto: true,
       photos: true,
       city: true,
       latitude: true,

@@ -26,6 +26,7 @@ export default function VendorProfilePage() {
   const { id } = useParams<{ id: string }>();
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [weddings, setWeddings] = useState<Wedding[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,10 +59,12 @@ export default function VendorProfilePage() {
       }
       const pData = await photosRes.json();
       setPhotoUrls(pData.urls ?? []);
+      setCoverUrl(pData.coverUrl ?? null);
     } else {
       const photosRes = await fetch(`/api/catalogus/${id}/signed-photos`);
       const pData = await photosRes.json();
       setPhotoUrls(pData.urls ?? []);
+      setCoverUrl(pData.coverUrl ?? null);
     }
     setLoading(false);
   }, [id]);
@@ -123,20 +126,42 @@ export default function VendorProfilePage() {
           </Link>
         </div>
 
-        {/* Photos grid */}
-        {photoUrls.length > 0 ? (
+        {/* Photos: cover left + gallery right (like screenshot) */}
+        {(coverUrl || photoUrls.length > 0) ? (
           <div style={{ maxWidth: "1040px", margin: "1.25rem auto 0", padding: "0 1.25rem" }}>
-            <div style={{ display: "grid", gridTemplateColumns: photoUrls.length === 1 ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))", gap: "8px", borderRadius: "var(--radius-lg)", overflow: "hidden", maxHeight: "340px" }}>
-              {photoUrls.slice(0, 3).map((url, i) => (
-                <div key={i} style={{ position: "relative", height: "240px" }}>
-                  <Image src={url} alt={`${vendor.name} foto ${i + 1}`} fill style={{ objectFit: "cover" }} />
+            <div style={{ display: "grid", gridTemplateColumns: photoUrls.length > 0 ? "1fr 1fr" : "1fr", gap: "4px", borderRadius: "var(--radius-lg)", overflow: "hidden", height: "380px" }}>
+              {/* Cover / hoofdfoto */}
+              <div style={{ position: "relative", height: "100%" }}>
+                {coverUrl ? (
+                  <Image src={coverUrl} alt={`${vendor.name}`} fill style={{ objectFit: "cover" }} />
+                ) : photoUrls[0] ? (
+                  <Image src={photoUrls[0]} alt={`${vendor.name}`} fill style={{ objectFit: "cover" }} />
+                ) : (
+                  <div style={{ height: "100%", background: "var(--color-blush)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.4 }}>{vendor.category}</span>
+                  </div>
+                )}
+                {photoUrls.length > 0 && (
+                  <div style={{ position: "absolute", bottom: "12px", right: "12px", background: "rgba(0,0,0,0.6)", color: "white", borderRadius: "8px", padding: "4px 10px", fontSize: "0.8125rem", fontWeight: 600 }}>
+                    {photoUrls.length} foto&apos;s
+                  </div>
+                )}
+              </div>
+              {/* Gallery grid (up to 4 thumbnails) */}
+              {photoUrls.length > 0 && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr", gap: "4px", height: "100%" }}>
+                  {(coverUrl ? photoUrls : photoUrls.slice(1)).slice(0, 4).map((url, i) => (
+                    <div key={i} style={{ position: "relative" }}>
+                      <Image src={url} alt={`${vendor.name} foto ${i + 2}`} fill style={{ objectFit: "cover" }} />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         ) : (
           <div style={{ maxWidth: "1040px", margin: "1.25rem auto 0", padding: "0 1.25rem" }}>
-            <div style={{ height: "220px", borderRadius: "var(--radius-lg)", background: "var(--color-blush)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--color-blush)" }}>
+            <div style={{ height: "220px", borderRadius: "var(--radius-lg)", background: "var(--color-blush)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.4 }}>{vendor.category}</span>
             </div>
           </div>

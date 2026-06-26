@@ -122,6 +122,7 @@ model Vendor {
   userId        String?
   description   String?
   isPremium     Boolean  @default(false)
+  coverPhoto    String?
   photos        String[]
   city          String?
   latitude      Float?
