@@ -147,6 +147,10 @@ export default function DashboardEngine({
         />
       )}
 
+      {(modules.includes("documentUpload") || showFileVault) && (
+        <FileVault documents={documents} weddingId={weddingId} wvId={wvId} isPlanner={isPlanner} isVendor={isVendor} />
+      )}
+
       {hasTimeline && (
         <TimelinePlanner
           blocks={timelineBlocks}
@@ -206,13 +210,6 @@ export default function DashboardEngine({
         <ChecklistDeadlines tasks={tasks} weddingId={weddingId} />
       )}
 
-      {modules.includes("documentUpload") && (
-        <FileVault documents={documents} weddingId={weddingId} wvId={wvId} />
-      )}
-
-      {showFileVault && (
-        <FileVault documents={documents} weddingId={weddingId} wvId={wvId} />
-      )}
 
       {isPlanner && (
         <ApprovalButton status={booking.status} onUpdate={patchBooking} isPlanner={isPlanner} />
