@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, Store, ArrowRight, ArrowLeft, Check } from "lucide-react";
@@ -28,6 +28,7 @@ const VENDOR_CATEGORIES = [
 
 export default function AanmeldenPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [account, setAccount] = useState<Account>(null);
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -39,6 +40,18 @@ export default function AanmeldenPage() {
   const [vendor, setVendor] = useState({
     businessName: "", category: "", contactPerson: "", phone: "", website: "", city: "", description: "", email: "",
   });
+
+  useEffect(() => {
+    const email = searchParams.get("email");
+    const name = searchParams.get("name") ?? "";
+    const provider = searchParams.get("provider");
+    if (email && provider) {
+      // Pre-fill for OAuth new user — skip to couple registration with email pre-filled
+      setCouple(c => ({ ...c, email, partner1: name }));
+      setAccount("couple");
+      setStep(1);
+    }
+  }, [searchParams]);
 
   const totalSteps = account === "couple" ? 4 : account === "vendor" ? 4 : 1;
 
