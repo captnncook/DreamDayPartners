@@ -30,6 +30,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ...(body.location !== undefined && { location: body.location }),
       ...(body.notes !== undefined && { notes: body.notes }),
       ...(body.vendorId !== undefined && { vendorId: body.vendorId || null }),
+      ...(body.isPublic !== undefined && { isPublic: body.isPublic }),
     },
     include: { vendor: { select: { id: true, name: true, category: true } } },
   });

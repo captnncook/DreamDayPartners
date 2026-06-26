@@ -14,6 +14,7 @@ type DraaiboekItem = {
   sortOrder: number;
   vendorId?: string;
   notes?: string;
+  isPublic?: boolean;
   vendor?: { id: string; name: string; category: string } | null;
 };
 
@@ -255,6 +256,22 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
     setSaving(false);
   }
 
+  async function togglePublic(draaiboekId: string, itemId: string, current: boolean) {
+    const res = await fetch(`/api/weddings/${weddingId}/draaiboek/${draaiboekId}/items/${itemId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isPublic: !current }),
+    });
+    const data = await res.json();
+    if (data.item) {
+      setDraaiboeken(prev =>
+        prev.map(d => d.id === draaiboekId
+          ? { ...d, items: d.items.map(i => i.id === itemId ? { ...i, isPublic: data.item.isPublic } : i) }
+          : d)
+      );
+    }
+  }
+
   async function deleteItem(draaiboekId: string, itemId: string) {
     if (!confirm("Item verwijderen?")) return;
     await fetch(`/api/weddings/${weddingId}/draaiboek/${draaiboekId}/items/${itemId}`, { method: "DELETE" });
@@ -482,6 +499,25 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
                                     {item.notes && (
                                       <span style={{ fontSize: "0.75rem", display: "flex", alignItems: "center", gap: "4px", color: "var(--muted)" }}>
                                         <MessageSquare className="w-3 h-3" /> {item.notes}
+                                      </span>
+                                    )}
+                                    {!isReadOnly && (
+                                      <button
+                                        onClick={() => togglePublic(activeDraaiboekId!, item.id, item.isPublic ?? false)}
+                                        title={item.isPublic ? "Zichtbaar voor iedereen — klik om privé te maken" : "Alleen voor leverancier — klik om voor iedereen zichtbaar te maken"}
+                                        style={{
+                                          fontSize: "0.6875rem", padding: "0.15rem 0.5rem", borderRadius: "6px", border: "none", cursor: "pointer",
+                                          background: item.isPublic ? "#22c55e20" : "var(--border)",
+                                          color: item.isPublic ? "#16a34a" : "var(--muted)",
+                                          fontWeight: 600,
+                                        }}
+                                      >
+                                        {item.isPublic ? "🌐 Publiek" : "🔒 Privé"}
+                                      </button>
+                                    )}
+                                    {isReadOnly && item.isPublic && (
+                                      <span style={{ fontSize: "0.6875rem", padding: "0.15rem 0.5rem", borderRadius: "6px", background: "#22c55e20", color: "#16a34a", fontWeight: 600 }}>
+                                        🌐 Publiek
                                       </span>
                                     )}
                                   </div>

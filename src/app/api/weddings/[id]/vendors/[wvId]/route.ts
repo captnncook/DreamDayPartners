@@ -24,7 +24,23 @@ export async function GET(_req: NextRequest, { params }: Params) {
     },
   });
 
-  return NextResponse.json({ booking: wv });
+  // Also fetch public draaiboek items for this wedding (visible to all vendors)
+  const publicItems = await prisma.draaiboekItem.findMany({
+    where: {
+      isPublic: true,
+      draaiboek: { weddingId },
+    },
+    orderBy: { startTime: "asc" },
+  });
+
+  // Merge: vendor-specific items + public items (deduplicate by id)
+  const vendorItemIds = new Set((wv?.draaiboekItems ?? []).map(i => i.id));
+  const mergedItems = [
+    ...(wv?.draaiboekItems ?? []),
+    ...publicItems.filter(i => !vendorItemIds.has(i.id)),
+  ].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+  return NextResponse.json({ booking: { ...wv, draaiboekItems: mergedItems } });
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {

@@ -303,38 +303,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
 
-          {/* Leveranciers */}
-          <div className="ddp-card">
-            <div className="flex items-center justify-between mb-4">
-              <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>Dream Team</h3>
-              {!isVendor && (
-                <Link href={`/weddings/${id}/vendors`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
-                  Beheren →
-                </Link>
-              )}
-            </div>
-            {(() => {
-              const confirmed = wedding.vendors.filter(wv => wv.status === "confirmed");
-              if (confirmed.length === 0) return (
-                <p className="text-sm text-center py-6" style={{ color: "var(--muted)" }}>Nog geen bevestigde leveranciers</p>
-              );
-              return (
-                <div className="space-y-2">
-                  {confirmed.map((wv) => (
-                    <VendorContactSheet
-                      key={wv.id}
-                      vendor={wv.vendor}
-                      weddingId={id}
-                      wvId={wv.id}
-                      status={wv.status}
-                      statusLabel={vendorStatusLabels[wv.status] ?? wv.status}
-                      statusColor={vendorStatusColors[wv.status] ?? "badge-neutral"}
-                    />
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
 
           {/* Vendor-specifieke dashboards */}
           {(() => {
@@ -369,12 +337,19 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
         {/* Sidebar */}
         <div className="space-y-5">
 
-          {/* Team */}
+          {/* Team — alle betrokkenen */}
           <div className="ddp-card">
-            <h3 className="mb-4" style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
-              <Handshake className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
-              Team
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
+                <Handshake className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
+                Team
+              </h3>
+              {!isVendor && (
+                <Link href={`/weddings/${id}/vendors`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
+                  Beheren →
+                </Link>
+              )}
+            </div>
             <div className="space-y-3">
               {wedding.teamMembers.map((m) => (
                 <div key={m.id} className="flex items-center gap-3">
@@ -388,6 +363,17 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                     </div>
                   </div>
                 </div>
+              ))}
+              {wedding.vendors.filter(wv => wv.status === "confirmed").map((wv) => (
+                <VendorContactSheet
+                  key={wv.id}
+                  vendor={wv.vendor}
+                  weddingId={id}
+                  wvId={wv.id}
+                  status={wv.status}
+                  statusLabel={vendorStatusLabels[wv.status] ?? wv.status}
+                  statusColor={vendorStatusColors[wv.status] ?? "badge-neutral"}
+                />
               ))}
             </div>
           </div>

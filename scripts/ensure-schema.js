@@ -25,6 +25,7 @@ async function main() {
       ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
       ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT;
+      ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "isPublic" BOOLEAN NOT NULL DEFAULT false;
       ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "phase" TEXT;
 
       ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT;

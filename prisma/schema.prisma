@@ -277,6 +277,7 @@ model DraaiboekItem {
   vendorBookingId String?
   phase           String?  // arrival | setup | perform | teardown | custom
   notes           String?
+  isPublic        Boolean  @default(false)
 
   draaiboek     Draaiboek      @relation(fields: [draaiboekId], references: [id], onDelete: Cascade)
   vendor        Vendor?        @relation(fields: [vendorId], references: [id])

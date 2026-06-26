@@ -135,13 +135,6 @@ export default function DashboardEngine({
         isPlanner={isPlanner}
       />
 
-      {(hasIntake || hasLogistics || hasDeliverables || hasTimeline) && (
-        <div style={{ borderTop: "2px solid var(--border)", paddingTop: "0.25rem" }}>
-          <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "0.75rem" }}>
-            {config.emoji} {config.label} — specifiek
-          </p>
-        </div>
-      )}
 
       {modules.includes("photoUpload") && (
         <PhotoUploadPanel
