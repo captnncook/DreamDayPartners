@@ -27,6 +27,7 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/vendors",                   label: n.vendors,       roles: ["planner", "team_member"] },
     { href: "/leveranciers",              label: "Leveranciers",  roles: ["admin", "planner", "couple"] },
     { href: "/leveranciers/mijn-profiel", label: "Mijn profiel",  roles: ["vendor"] },
+    { href: "/mijn-bruiloften",           label: "Mijn bruiloften", roles: ["vendor"] },
     { href: "/admin",                     label: n.admin,         roles: ["admin"] },
   ];
 

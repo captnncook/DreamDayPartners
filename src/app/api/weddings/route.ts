@@ -90,5 +90,34 @@ export async function POST(req: NextRequest) {
     data: { weddingId: wedding.id, totalAmount: 0 },
   });
 
+  // Auto-link vendors who pre-registered this wedding via VendorWeddingInvite
+  const dayStart = new Date(wedding.date);
+  dayStart.setUTCHours(0, 0, 0, 0);
+  const dayEnd = new Date(wedding.date);
+  dayEnd.setUTCHours(23, 59, 59, 999);
+
+  const matchingInvites = await prisma.vendorWeddingInvite.findMany({
+    where: {
+      weddingId: null,
+      weddingDate: { gte: dayStart, lte: dayEnd },
+      OR: [
+        { email1: coupleEmail1.toLowerCase() }, { email2: coupleEmail1.toLowerCase() },
+        { email1: coupleEmail2.toLowerCase() }, { email2: coupleEmail2.toLowerCase() },
+      ],
+    },
+  });
+
+  for (const invite of matchingInvites) {
+    await prisma.weddingVendor.upsert({
+      where: { weddingId_vendorId: { weddingId: wedding.id, vendorId: invite.vendorId } },
+      update: { portalAccess: true },
+      create: { weddingId: wedding.id, vendorId: invite.vendorId, status: "lead", portalAccess: true },
+    });
+    await prisma.vendorWeddingInvite.update({
+      where: { id: invite.id },
+      data: { weddingId: wedding.id },
+    });
+  }
+
   return NextResponse.json({ wedding }, { status: 201 });
 }

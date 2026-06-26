@@ -58,6 +58,21 @@ async function main() {
         CONSTRAINT "dm_sender_fk" FOREIGN KEY ("senderId") REFERENCES "users"("id")
       );
 
+      CREATE TABLE IF NOT EXISTS "vendor_wedding_invites" (
+        "id" TEXT NOT NULL,
+        "vendorId" TEXT NOT NULL,
+        "email1" TEXT NOT NULL,
+        "email2" TEXT,
+        "weddingDate" TIMESTAMP(3) NOT NULL,
+        "weddingTitle" TEXT,
+        "weddingId" TEXT,
+        "notes" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "vendor_wedding_invites_pkey" PRIMARY KEY ("id"),
+        CONSTRAINT "vwi_vendor_fk" FOREIGN KEY ("vendorId") REFERENCES "vendors"("id") ON DELETE CASCADE,
+        CONSTRAINT "vwi_wedding_fk" FOREIGN KEY ("weddingId") REFERENCES "weddings"("id") ON DELETE SET NULL
+      );
+
       CREATE TABLE IF NOT EXISTS "deliverables" (
         "id" TEXT NOT NULL,
         "vendorBookingId" TEXT NOT NULL,

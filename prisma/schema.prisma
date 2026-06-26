@@ -80,17 +80,18 @@ model Wedding {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  owner         User                @relation("WeddingOwner", fields: [ownerId], references: [id])
-  teamMembers   WeddingTeamMember[]
-  vendors       WeddingVendor[]
-  guests        Guest[]
-  budget        Budget?
-  tasks         Task[]
-  draaiboeken   Draaiboek[]
-  threads       MessageThread[]
-  documents     Document[]
-  notifications Notification[]
-  seatTables    SeatingTable[]
+  owner           User                  @relation("WeddingOwner", fields: [ownerId], references: [id])
+  teamMembers     WeddingTeamMember[]
+  vendors         WeddingVendor[]
+  guests          Guest[]
+  budget          Budget?
+  tasks           Task[]
+  draaiboeken     Draaiboek[]
+  threads         MessageThread[]
+  documents       Document[]
+  notifications   Notification[]
+  seatTables      SeatingTable[]
+  vendorInvites   VendorWeddingInvite[]
 
   @@map("weddings")
 }
@@ -128,11 +129,29 @@ model Vendor {
   priceFrom     Int?
   createdAt     DateTime @default(now())
 
-  weddingVendors WeddingVendor[]
-  draaiboekItems DraaiboekItem[]
-  budgetItems    BudgetItem[]
+  weddingVendors   WeddingVendor[]
+  draaiboekItems   DraaiboekItem[]
+  budgetItems      BudgetItem[]
+  weddingInvites   VendorWeddingInvite[]
 
   @@map("vendors")
+}
+
+model VendorWeddingInvite {
+  id           String    @id @default(uuid())
+  vendorId     String
+  email1       String
+  email2       String?
+  weddingDate  DateTime
+  weddingTitle String?
+  weddingId    String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  vendor  Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  wedding Wedding? @relation(fields: [weddingId], references: [id], onDelete: SetNull)
+
+  @@map("vendor_wedding_invites")
 }
 
 model WeddingVendor {
