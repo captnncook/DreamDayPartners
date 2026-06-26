@@ -42,6 +42,11 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
 
   useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
+  // Mark conversation as read on mount and when new messages arrive
+  useEffect(() => {
+    fetch(`/api/dm/conversations/${conversationId}/read`, { method: "POST" }).catch(() => {});
+  }, [conversationId, messages.length]);
+
   // Poll for new messages every 2.5s
   useEffect(() => {
     const poll = async () => {

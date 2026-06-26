@@ -44,6 +44,7 @@ model DirectConversation {
 model DirectConversationParticipant {
   conversationId String
   userId         String
+  lastReadAt     DateTime?
 
   conversation DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)

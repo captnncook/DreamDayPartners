@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { User } from "@prisma/client";
 import { useLang } from "@/components/LangProvider";
 import { Globe, LogOut } from "lucide-react";
@@ -36,6 +37,16 @@ export default function Sidebar({ user }: SidebarProps) {
     router.push("/login");
     router.refresh();
   }
+
+  const [unreadDm, setUnreadDm] = useState(0);
+
+  useEffect(() => {
+    const fetchUnread = () =>
+      fetch("/api/dm/unread").then(r => r.json()).then(d => setUnreadDm(d.count ?? 0)).catch(() => {});
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const visibleItems = NAV_ITEMS.filter((item) => item.roles.includes(user.role));
 
@@ -96,8 +107,17 @@ export default function Sidebar({ user }: SidebarProps) {
             pathname.startsWith(item.href + "/") ||
             (item.href === "/leveranciers/mijn-profiel" && pathname.startsWith("/leveranciers/"));
           return (
-            <Link key={item.href} href={item.href} className={`ddp-nav-item${active ? " active" : ""}`}>
-              {item.label}
+            <Link key={item.href} href={item.href} className={`ddp-nav-item${active ? " active" : ""}`} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>{item.label}</span>
+              {item.href === "/dm" && unreadDm > 0 && (
+                <span style={{
+                  background: "var(--primary)", color: "white",
+                  borderRadius: "9999px", fontSize: "0.625rem", fontWeight: 700,
+                  padding: "0.1rem 0.45rem", lineHeight: 1.6, minWidth: "1.25rem", textAlign: "center",
+                }}>
+                  {unreadDm > 99 ? "99+" : unreadDm}
+                </span>
+              )}
             </Link>
           );
         })}
