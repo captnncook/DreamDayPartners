@@ -74,14 +74,17 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
     setSending(true);
     setInput("");
 
+    const optimisticTime = new Date().toISOString();
     const optimistic: DmMessage = {
       id: `tmp-${Date.now()}`,
       conversationId,
       senderId: currentUserId,
       content: text,
-      createdAt: new Date().toISOString(),
+      createdAt: optimisticTime,
       sender: { id: currentUserId, name: "Jij" },
     };
+    // Advance lastCreatedAt immediately so the poll won't re-fetch this message
+    lastCreatedAt.current = optimisticTime;
     setMessages(prev => [...prev, optimistic]);
 
     try {
