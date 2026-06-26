@@ -143,13 +143,23 @@ export default function DashboardEngine({
         </div>
       )}
 
-      {hasIntake && (
-        <IntakeForm
-          weddingId={weddingId}
-          wvId={wvId}
-          fields={config.intakeFields!}
+      {modules.includes("photoUpload") && (
+        <PhotoUploadPanel
           intakeData={intakeData}
           onUpdate={patchIntake}
+          isVendor={isVendor}
+          isPlanner={isPlanner}
+          weddingId={weddingId}
+          wvId={wvId}
+        />
+      )}
+
+      {hasTimeline && (
+        <TimelinePlanner
+          blocks={timelineBlocks}
+          templates={config.timelineTemplate!}
+          weddingId={weddingId}
+          wvId={wvId}
           isPlanner={isPlanner}
           isVendor={isVendor}
         />
@@ -158,6 +168,18 @@ export default function DashboardEngine({
       {hasLogistics && (
         <LogisticsPanel
           fields={config.logisticsFields!}
+          intakeData={intakeData}
+          onUpdate={patchIntake}
+          isPlanner={isPlanner}
+          isVendor={isVendor}
+        />
+      )}
+
+      {hasIntake && (
+        <IntakeForm
+          weddingId={weddingId}
+          wvId={wvId}
+          fields={config.intakeFields!}
           intakeData={intakeData}
           onUpdate={patchIntake}
           isPlanner={isPlanner}
@@ -176,28 +198,6 @@ export default function DashboardEngine({
           onUpdate={updateDeliverable}
           onAdd={addDeliverable}
           onDelete={deleteDeliverable}
-        />
-      )}
-
-      {hasTimeline && (
-        <TimelinePlanner
-          blocks={timelineBlocks}
-          templates={config.timelineTemplate!}
-          weddingId={weddingId}
-          wvId={wvId}
-          isPlanner={isPlanner}
-          isVendor={isVendor}
-        />
-      )}
-
-      {modules.includes("photoUpload") && (
-        <PhotoUploadPanel
-          intakeData={intakeData}
-          onUpdate={patchIntake}
-          isVendor={isVendor}
-          isPlanner={isPlanner}
-          weddingId={weddingId}
-          wvId={wvId}
         />
       )}
 
