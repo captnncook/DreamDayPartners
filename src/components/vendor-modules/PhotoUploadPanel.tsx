@@ -1,6 +1,27 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, X, Camera } from "lucide-react";
+
+function PhotoCard({ fileKey, children }: { fileKey: string; children: React.ReactNode }) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/files/url?key=${encodeURIComponent(fileKey)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d?.url && setSrc(d.url))
+      .catch(() => {});
+  }, [fileKey]);
+
+  return (
+    <div style={{ position: "relative", aspectRatio: "1", background: "#f0ebe8", overflow: "hidden" }}>
+      {src
+        ? <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><Camera size={20} style={{ color: "var(--muted)" }} /></div>
+      }
+      {children}
+    </div>
+  );
+}
 
 const CATEGORIES = [
   { key: "bruidsboeket", label: "Bruidsboeket" },
@@ -46,16 +67,19 @@ export default function PhotoUploadPanel({ intakeData, onUpdate, isVendor, isPla
 
     try {
       const res = await fetch(`/api/weddings/${weddingId}/files`, { method: "POST", body: formData });
-      if (res.ok) {
-        const { file: uploaded } = await res.json();
-        const newPhoto: Photo = {
-          id: uploaded.id,
-          url: uploaded.fileKey,
-          category: selectedCategory,
-          caption: "",
-        };
-        onUpdate({ photos: [...photos, newPhoto] });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error ?? "Upload mislukt");
+        return;
       }
+      const { document: uploaded } = await res.json();
+      const newPhoto: Photo = {
+        id: uploaded.id,
+        url: uploaded.fileKey,
+        category: selectedCategory,
+        caption: "",
+      };
+      onUpdate({ photos: [...photos, newPhoto] });
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -122,18 +146,14 @@ export default function PhotoUploadPanel({ intakeData, onUpdate, isVendor, isPla
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "0.625rem" }}>
             {photos.filter(p => p.category === cat.key).map(photo => (
               <div key={photo.id} style={{ borderRadius: "0.625rem", overflow: "hidden", border: "1px solid var(--border)", background: "var(--blush-soft)" }}>
-                <div style={{ position: "relative", aspectRatio: "1", background: "#f0ebe8" }}>
-                  {/* Toon filename als placeholder — echte signed URL vereist aparte fetch */}
-                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "var(--muted)", textAlign: "center", padding: "0.5rem" }}>
-                    📷 {photo.url.split("/").pop()}
-                  </div>
+                <PhotoCard fileKey={photo.url}>
                   {canEdit && (
                     <button onClick={() => removePhoto(photo.id)}
                       style={{ position: "absolute", top: "0.25rem", right: "0.25rem", background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "9999px", color: "white", cursor: "pointer", padding: "0.125rem", display: "flex" }}>
                       <X size={12} />
                     </button>
                   )}
-                </div>
+                </PhotoCard>
                 <div style={{ padding: "0.375rem" }}>
                   {canEdit ? (
                     <>
