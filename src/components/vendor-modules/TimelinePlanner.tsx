@@ -47,7 +47,54 @@ const emptyForm = { startTime: "09:00", endTime: "09:30", description: "" };
 const inputStyle = { padding: "0.5rem 0.75rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", width: "100%", boxSizing: "border-box" as const };
 const selectStyle = { padding: "0.375rem 0.5rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white" };
 
-export default function TimelinePlanner({ blocks: initial, templates, weddingId, wvId, isPlanner, isVendor }: Props) {
+// Top-level so React never remounts them on parent re-render
+function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <select value={value} onChange={e => onChange(e.target.value)} style={selectStyle}>
+      {TIME_OPTS.map(t => <option key={t} value={t}>{t}</option>)}
+    </select>
+  );
+}
+
+interface EntryFormProps {
+  form: typeof emptyForm;
+  setForm: React.Dispatch<React.SetStateAction<typeof emptyForm>>;
+  saving: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+  saveLabel: string;
+}
+
+function EntryForm({ form, setForm, saving, onSave, onCancel, saveLabel }: EntryFormProps) {
+  return (
+    <div style={{ background: "var(--accent)", borderRadius: "0.625rem", padding: "1rem", display: "grid", gap: "0.625rem" }}>
+      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Van</span>
+        <TimeSelect value={form.startTime} onChange={v => setForm(f => ({ ...f, startTime: v }))} />
+        <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>tot</span>
+        <TimeSelect value={form.endTime} onChange={v => setForm(f => ({ ...f, endTime: v }))} />
+      </div>
+      <input
+        placeholder="Wat moet er geleverd worden?"
+        value={form.description}
+        onChange={e => { const val = e.target.value; setForm(f => ({ ...f, description: val })); }}
+        style={inputStyle}
+      />
+      <div style={{ display: "flex", gap: "0.5rem" }}>
+        <button onClick={onSave} disabled={saving}
+          style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          {saving ? "Opslaan..." : saveLabel}
+        </button>
+        <button onClick={onCancel}
+          style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "rgba(0,0,0,0.06)", color: "var(--muted)", border: "none", cursor: "pointer", fontSize: "0.8125rem" }}>
+          Annuleren
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function TimelinePlanner({ blocks: initial, weddingId, wvId, isPlanner, isVendor }: Props) {
   const [blocks, setBlocks] = useState(initial);
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -107,43 +154,6 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
     setAdding(false);
   }
 
-  function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-    return (
-      <select value={value} onChange={e => onChange(e.target.value)} style={selectStyle}>
-        {TIME_OPTS.map(t => <option key={t} value={t}>{t}</option>)}
-      </select>
-    );
-  }
-
-  function EntryForm({ onSave, onCancel, saveLabel }: { onSave: () => void; onCancel: () => void; saveLabel: string }) {
-    return (
-      <div style={{ background: "var(--accent)", borderRadius: "0.625rem", padding: "1rem", display: "grid", gap: "0.625rem" }}>
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Van</span>
-          <TimeSelect value={form.startTime} onChange={v => setForm(f => ({ ...f, startTime: v }))} />
-          <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>tot</span>
-          <TimeSelect value={form.endTime} onChange={v => setForm(f => ({ ...f, endTime: v }))} />
-        </div>
-        <input
-          placeholder="Wat moet er geleverd worden?"
-          value={form.description}
-          onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-          style={inputStyle}
-        />
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={onSave} disabled={saving}
-            style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
-            {saving ? "Opslaan..." : saveLabel}
-          </button>
-          <button onClick={onCancel}
-            style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "rgba(0,0,0,0.06)", color: "var(--muted)", border: "none", cursor: "pointer", fontSize: "0.8125rem" }}>
-            Annuleren
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="card" style={{ padding: "1.5rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
@@ -156,7 +166,11 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
         )}
       </div>
 
-      {adding && <div style={{ marginBottom: "0.75rem" }}><EntryForm onSave={saveNew} onCancel={() => setAdding(false)} saveLabel="Toevoegen" /></div>}
+      {adding && (
+        <div style={{ marginBottom: "0.75rem" }}>
+          <EntryForm form={form} setForm={setForm} saving={saving} onSave={saveNew} onCancel={() => setAdding(false)} saveLabel="Toevoegen" />
+        </div>
+      )}
 
       {blocks.length === 0 && !adding && (
         <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
@@ -168,7 +182,7 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
         {blocks.map(b => (
           <div key={b.id}>
             {editingId === b.id
-              ? <EntryForm onSave={() => saveEdit(b.id)} onCancel={() => setEditingId(null)} saveLabel="Opslaan" />
+              ? <EntryForm form={form} setForm={setForm} saving={saving} onSave={() => saveEdit(b.id)} onCancel={() => setEditingId(null)} saveLabel="Opslaan" />
               : (
                 <div style={{ display: "flex", gap: "0.75rem", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.5rem", alignItems: "flex-start" }}>
                   <div style={{ flexShrink: 0, minWidth: "6.5rem" }}>
