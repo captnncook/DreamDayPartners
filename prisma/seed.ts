@@ -195,50 +195,51 @@ async function main() {
     create: { weddingId: wedding.id, totalAmount: 25000, currency: "EUR" },
   });
 
-  const budgetItems = [
-    { category: "Locatie", description: "Kasteel de Haar zaalverhuur", estimated: 6000, actual: 6000, payStatus: "paid", vendorId: null },
-    { category: "Catering", description: "Diner & dranken 80 personen", estimated: 8000, actual: 0, payStatus: "pending", vendorId: vendorCatering.id },
-    { category: "Bloemen", description: "Bruidsboeket & decoratie", estimated: 2500, actual: 2500, payStatus: "deposit_paid", vendorId: vendorBloemist.id },
-    { category: "Muziek", description: "DJ avondfeest", estimated: 1500, actual: 0, payStatus: "pending", vendorId: vendorDJ.id },
-    { category: "Fotografie", description: "Huwelijksfotograaf", estimated: 3000, actual: 0, payStatus: "pending", vendorId: null },
-    { category: "Kleding", description: "Bruidsjurk & pak", estimated: 2500, actual: 1800, payStatus: "paid", vendorId: null },
-    { category: "Diversen", description: "Uitnodigingen, bedankjes etc.", estimated: 500, actual: 320, payStatus: "paid", vendorId: null },
-  ];
-  for (const item of budgetItems) {
-    await prisma.budgetItem.create({ data: { budgetId: budget.id, ...item } }).catch(() => {});
-  }
+  // Wipe and recreate so re-runs don't produce duplicates
+  await prisma.budgetItem.deleteMany({ where: { budgetId: budget.id } });
+  await prisma.budgetItem.createMany({
+    data: [
+      { budgetId: budget.id, category: "Locatie", description: "Kasteel de Haar zaalverhuur", estimated: 6000, actual: 6000, payStatus: "paid", vendorId: null },
+      { budgetId: budget.id, category: "Catering", description: "Diner & dranken 80 personen", estimated: 8000, actual: 0, payStatus: "pending", vendorId: vendorCatering.id },
+      { budgetId: budget.id, category: "Bloemen", description: "Bruidsboeket & decoratie", estimated: 2500, actual: 2500, payStatus: "deposit_paid", vendorId: vendorBloemist.id },
+      { budgetId: budget.id, category: "Muziek", description: "DJ avondfeest", estimated: 1500, actual: 0, payStatus: "pending", vendorId: vendorDJ.id },
+      { budgetId: budget.id, category: "Fotografie", description: "Huwelijksfotograaf", estimated: 3000, actual: 0, payStatus: "pending", vendorId: null },
+      { budgetId: budget.id, category: "Kleding", description: "Bruidsjurk & pak", estimated: 2500, actual: 1800, payStatus: "paid", vendorId: null },
+      { budgetId: budget.id, category: "Diversen", description: "Uitnodigingen, bedankjes etc.", estimated: 500, actual: 320, payStatus: "paid", vendorId: null },
+    ],
+  });
 
   // Tasks
-  const tasks = [
-    { title: "Locatie definitief boeken", category: "venue", dueDate: new Date("2026-01-15"), status: "done", priority: "high", assignedTo: planner.id },
-    { title: "Catering offerte vergelijken", category: "catering", dueDate: new Date("2026-02-01"), status: "done", priority: "high", assignedTo: planner.id },
-    { title: "Uitnodigingen versturen", category: "general", dueDate: new Date("2026-03-01"), status: "done", priority: "medium", assignedTo: couple1.id },
-    { title: "Menu definitief bevestigen bij catering", category: "catering", dueDate: new Date("2026-07-01"), status: "open", priority: "high", assignedTo: planner.id },
-    { title: "Draaiboek finaliseren", category: "general", dueDate: new Date("2026-08-15"), status: "in_progress", priority: "high", assignedTo: planner.id },
-    { title: "Zitplaatsindeling maken", category: "general", dueDate: new Date("2026-08-01"), status: "open", priority: "medium", assignedTo: couple1.id },
-    { title: "DJ playlist doorgeven", category: "general", dueDate: new Date("2026-09-01"), status: "open", priority: "medium", assignedTo: couple2.id },
-    { title: "Bloemen finale bespreking", category: "decoration", dueDate: new Date("2026-07-15"), status: "open", priority: "medium", assignedTo: planner.id },
-  ];
-  for (const task of tasks) {
-    await prisma.task.create({ data: { weddingId: wedding.id, ...task } }).catch(() => {});
-  }
+  await prisma.task.deleteMany({ where: { weddingId: wedding.id } });
+  await prisma.task.createMany({
+    data: [
+      { weddingId: wedding.id, title: "Locatie definitief boeken", category: "venue", dueDate: new Date("2026-01-15"), status: "done", priority: "high", assignedTo: planner.id },
+      { weddingId: wedding.id, title: "Catering offerte vergelijken", category: "catering", dueDate: new Date("2026-02-01"), status: "done", priority: "high", assignedTo: planner.id },
+      { weddingId: wedding.id, title: "Uitnodigingen versturen", category: "general", dueDate: new Date("2026-03-01"), status: "done", priority: "medium", assignedTo: couple1.id },
+      { weddingId: wedding.id, title: "Menu definitief bevestigen bij catering", category: "catering", dueDate: new Date("2026-07-01"), status: "open", priority: "high", assignedTo: planner.id },
+      { weddingId: wedding.id, title: "Draaiboek finaliseren", category: "general", dueDate: new Date("2026-08-15"), status: "in_progress", priority: "high", assignedTo: planner.id },
+      { weddingId: wedding.id, title: "Zitplaatsindeling maken", category: "general", dueDate: new Date("2026-08-01"), status: "open", priority: "medium", assignedTo: couple1.id },
+      { weddingId: wedding.id, title: "DJ playlist doorgeven", category: "general", dueDate: new Date("2026-09-01"), status: "open", priority: "medium", assignedTo: couple2.id },
+      { weddingId: wedding.id, title: "Bloemen finale bespreking", category: "decoration", dueDate: new Date("2026-07-15"), status: "open", priority: "medium", assignedTo: planner.id },
+    ],
+  });
 
   // Guests
-  const guests = [
-    { name: "Jan de Vries", email: "jan@example.nl", side: "bride", rsvpStatus: "confirmed" },
-    { name: "Ria de Vries", email: "ria@example.nl", side: "bride", rsvpStatus: "confirmed", dietary: "vegetarisch" },
-    { name: "Piet Bakker", email: "piet@example.nl", side: "groom", rsvpStatus: "confirmed" },
-    { name: "Els Bakker", email: "els@example.nl", side: "groom", rsvpStatus: "confirmed" },
-    { name: "Sanne Willems", email: "sanne@example.nl", side: "both", rsvpStatus: "confirmed" },
-    { name: "Kevin Smits", email: "kevin@example.nl", side: "both", rsvpStatus: "declined" },
-    { name: "Laura Hendriks", email: "laura@example.nl", side: "bride", rsvpStatus: "no_response" },
-    { name: "Mark Jansen", email: "mark@example.nl", side: "groom", rsvpStatus: "confirmed", dietary: "glutenvrij" },
-    { name: "Anita Visser", email: "anita@example.nl", side: "both", rsvpStatus: "invited" },
-    { name: "Rob Peters", email: "rob@example.nl", side: "groom", rsvpStatus: "confirmed" },
-  ];
-  for (const guest of guests) {
-    await prisma.guest.create({ data: { weddingId: wedding.id, ...guest } }).catch(() => {});
-  }
+  await prisma.guest.deleteMany({ where: { weddingId: wedding.id } });
+  await prisma.guest.createMany({
+    data: [
+      { weddingId: wedding.id, name: "Jan de Vries", email: "jan@example.nl", side: "bride", rsvpStatus: "confirmed" },
+      { weddingId: wedding.id, name: "Ria de Vries", email: "ria@example.nl", side: "bride", rsvpStatus: "confirmed", dietary: "vegetarisch" },
+      { weddingId: wedding.id, name: "Piet Bakker", email: "piet@example.nl", side: "groom", rsvpStatus: "confirmed" },
+      { weddingId: wedding.id, name: "Els Bakker", email: "els@example.nl", side: "groom", rsvpStatus: "confirmed" },
+      { weddingId: wedding.id, name: "Sanne Willems", email: "sanne@example.nl", side: "both", rsvpStatus: "confirmed" },
+      { weddingId: wedding.id, name: "Kevin Smits", email: "kevin@example.nl", side: "both", rsvpStatus: "declined" },
+      { weddingId: wedding.id, name: "Laura Hendriks", email: "laura@example.nl", side: "bride", rsvpStatus: "no_response" },
+      { weddingId: wedding.id, name: "Mark Jansen", email: "mark@example.nl", side: "groom", rsvpStatus: "confirmed", dietary: "glutenvrij" },
+      { weddingId: wedding.id, name: "Anita Visser", email: "anita@example.nl", side: "both", rsvpStatus: "invited" },
+      { weddingId: wedding.id, name: "Rob Peters", email: "rob@example.nl", side: "groom", rsvpStatus: "confirmed" },
+    ],
+  });
 
   // Draaiboek
   const draaiboek = await prisma.draaiboek.upsert({
@@ -247,20 +248,20 @@ async function main() {
     create: { id: "draaiboek-demo-01", weddingId: wedding.id, title: "Draaiboek Trouwdag 12 september 2026", version: "1.2", status: "draft" },
   });
 
-  const draaiboekItems = [
-    { startTime: "10:00", duration: 60, title: "Bruidsopkomst & voorbereiding", location: "Bruidskamer Kasteel", sortOrder: 1, vendorId: null },
-    { startTime: "11:00", duration: 30, title: "Bloemiste arriveert voor decoratie", location: "Feestzaal", sortOrder: 2, vendorId: vendorBloemist.id },
-    { startTime: "12:00", duration: 30, title: "Huwelijksinzegening", location: "Kapel Kasteel", sortOrder: 3, vendorId: null },
-    { startTime: "12:30", duration: 60, title: "Receptie & welkomstdrankje", location: "Terras Kasteel", sortOrder: 4, vendorId: vendorCatering.id },
-    { startTime: "14:00", duration: 15, title: "Fotosessie buiten", location: "Kasteeltuin", sortOrder: 5, vendorId: null },
-    { startTime: "17:00", duration: 120, title: "Diner", location: "Feestzaal", sortOrder: 6, vendorId: vendorCatering.id },
-    { startTime: "19:30", duration: 30, title: "Speeches & taart aansnijden", location: "Feestzaal", sortOrder: 7, vendorId: null },
-    { startTime: "20:00", duration: 300, title: "Avondfeest & DJ", location: "Feestzaal", sortOrder: 8, vendorId: vendorDJ.id },
-    { startTime: "01:00", duration: 30, title: "Afsluiting & vertrek gasten", location: "Entree Kasteel", sortOrder: 9, vendorId: null },
-  ];
-  for (const item of draaiboekItems) {
-    await prisma.draaiboekItem.create({ data: { draaiboekId: draaiboek.id, ...item } }).catch(() => {});
-  }
+  await prisma.draaiboekItem.deleteMany({ where: { draaiboekId: draaiboek.id } });
+  await prisma.draaiboekItem.createMany({
+    data: [
+      { draaiboekId: draaiboek.id, startTime: "10:00", duration: 60, title: "Bruidsopkomst & voorbereiding", location: "Bruidskamer Kasteel", sortOrder: 1, vendorId: null },
+      { draaiboekId: draaiboek.id, startTime: "11:00", duration: 30, title: "Bloemiste arriveert voor decoratie", location: "Feestzaal", sortOrder: 2, vendorId: vendorBloemist.id },
+      { draaiboekId: draaiboek.id, startTime: "12:00", duration: 30, title: "Huwelijksinzegening", location: "Kapel Kasteel", sortOrder: 3, vendorId: null },
+      { draaiboekId: draaiboek.id, startTime: "12:30", duration: 60, title: "Receptie & welkomstdrankje", location: "Terras Kasteel", sortOrder: 4, vendorId: vendorCatering.id },
+      { draaiboekId: draaiboek.id, startTime: "14:00", duration: 15, title: "Fotosessie buiten", location: "Kasteeltuin", sortOrder: 5, vendorId: null },
+      { draaiboekId: draaiboek.id, startTime: "17:00", duration: 120, title: "Diner", location: "Feestzaal", sortOrder: 6, vendorId: vendorCatering.id },
+      { draaiboekId: draaiboek.id, startTime: "19:30", duration: 30, title: "Speeches & taart aansnijden", location: "Feestzaal", sortOrder: 7, vendorId: null },
+      { draaiboekId: draaiboek.id, startTime: "20:00", duration: 300, title: "Avondfeest & DJ", location: "Feestzaal", sortOrder: 8, vendorId: vendorDJ.id },
+      { draaiboekId: draaiboek.id, startTime: "01:00", duration: 30, title: "Afsluiting & vertrek gasten", location: "Entree Kasteel", sortOrder: 9, vendorId: null },
+    ],
+  });
 
   // Message threads
   const internalThread = await prisma.messageThread.upsert({
@@ -275,9 +276,14 @@ async function main() {
     create: { id: "thread-couple-01", weddingId: wedding.id, type: "couple", subject: "Communicatie met bruidspaar" },
   });
 
-  await prisma.message.create({ data: { threadId: internalThread.id, senderId: planner.id, content: "Catering heeft de offerte gestuurd, ik ga deze vandaag nog reviewen." } }).catch(() => {});
-  await prisma.message.create({ data: { threadId: coupleThread.id, senderId: planner.id, content: "Goedemorgen Emma & Thomas! De locatie is definitief geboekt 🎉" } }).catch(() => {});
-  await prisma.message.create({ data: { threadId: coupleThread.id, senderId: couple1.id, content: "Geweldig, dank je Sophie! We zijn zo blij 😊 Wanneer kunnen we de tafeldecoratie bespreken?" } }).catch(() => {});
+  await prisma.message.deleteMany({ where: { threadId: { in: [internalThread.id, coupleThread.id] } } });
+  await prisma.message.createMany({
+    data: [
+      { threadId: internalThread.id, senderId: planner.id, content: "Catering heeft de offerte gestuurd, ik ga deze vandaag nog reviewen." },
+      { threadId: coupleThread.id, senderId: planner.id, content: "Goedemorgen Emma & Thomas! De locatie is definitief geboekt 🎉" },
+      { threadId: coupleThread.id, senderId: couple1.id, content: "Geweldig, dank je Sophie! We zijn zo blij 😊 Wanneer kunnen we de tafeldecoratie bespreken?" },
+    ],
+  });
 
   console.log("✅ Seed data aangemaakt!");
   console.log(`   Wedding: ${wedding.weddingCode} - ${wedding.title}`);
