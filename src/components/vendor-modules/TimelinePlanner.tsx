@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import type { TimelineBlockTemplate } from "@/lib/vendorTypeConfigs";
 
 interface TimelineBlock {
@@ -191,8 +192,8 @@ export default function TimelinePlanner({ blocks: initial, weddingId, wvId, isPl
                   <div style={{ flex: 1, fontSize: "0.875rem", color: "var(--charcoal)" }}>{b.description || b.title}</div>
                   {canEdit && (
                     <div style={{ display: "flex", gap: "0.625rem", flexShrink: 0 }}>
-                      <button onClick={() => startEdit(b)} style={{ fontSize: "0.75rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>✏️</button>
-                      <button onClick={() => del(b.id)} style={{ fontSize: "0.75rem", color: "#e53e3e", background: "none", border: "none", cursor: "pointer" }}>🗑️</button>
+                      <button onClick={() => startEdit(b)} style={{ color: "var(--primary)", background: "none", border: "none", cursor: "pointer", display: "flex" }}><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => del(b.id)} style={{ color: "#e53e3e", background: "none", border: "none", cursor: "pointer", display: "flex" }}><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   )}
                 </div>

@@ -37,9 +37,6 @@ const CATEGORIES = [
 
 const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(CATEGORIES.map(c => [c.key, c.label]));
 
-const ICONS: Record<string, string> = {
-  offerte: "📋", factuur: "🧾", contract: "📄", moodboard: "🎨", inspiratie: "💡", overig: "📁",
-};
 
 export default function FileVault({ documents: initial, weddingId, isPlanner, isVendor }: Props) {
   const [docs, setDocs] = useState<Doc[]>(initial);
@@ -120,7 +117,7 @@ export default function FileVault({ documents: initial, weddingId, isPlanner, is
             <div key={doc.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.625rem 0.75rem", background: "var(--blush-soft)", borderRadius: "0.5rem", gap: "0.75rem" }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--charcoal)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {ICONS[doc.category] ?? "📁"} {doc.name}
+                  {doc.name}
                 </div>
                 <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
                   {CATEGORY_LABELS[doc.category] ?? doc.category} · {fmtSize(doc.fileSize)}

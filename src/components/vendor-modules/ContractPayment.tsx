@@ -71,7 +71,7 @@ export default function ContractPayment({ depositAmount, depositDue, depositPaid
       {contractUrl && (
         <a href={contractUrl} target="_blank" rel="noopener noreferrer"
           style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "0.875rem", color: "var(--primary)", marginBottom: "1rem" }}>
-          📄 Contract bekijken
+          Contract bekijken
         </a>
       )}
 
@@ -128,7 +128,7 @@ export default function ContractPayment({ depositAmount, depositDue, depositPaid
                   cursor: "pointer",
                 }}
               >
-                {row.paid ? "✓ Betaald" : "Nog niet betaald"}
+                {row.paid ? "Betaald" : "Nog niet betaald"}
               </button>
             </div>
           ))}

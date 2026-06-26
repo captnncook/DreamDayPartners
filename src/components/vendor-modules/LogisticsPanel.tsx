@@ -72,7 +72,7 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
           const display = value == null || value === ""
             ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>—</span>
             : typeof value === "boolean"
-            ? (value ? "✓ Ja" : "✗ Nee")
+            ? (value ? "Ja" : "Nee")
             : String(value);
 
           return (

@@ -18,7 +18,7 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor }: Pr
 
       {moodboardUrl && (
         <a href={moodboardUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "0.875rem", color: "var(--primary)", marginBottom: "0.75rem" }}>
-          🎨 Moodboard bekijken
+          Moodboard bekijken
         </a>
       )}
 

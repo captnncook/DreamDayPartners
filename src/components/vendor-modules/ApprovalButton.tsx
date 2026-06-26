@@ -12,7 +12,7 @@ export default function ApprovalButton({ status, onUpdate, isPlanner }: Props) {
     return (
       <div className="card" style={{ padding: "1.5rem", background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <span style={{ fontSize: "1.5rem" }}>✅</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#166534" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
           <div>
             <div style={{ fontWeight: 600, color: "#166534" }}>Afgerond & Goedgekeurd</div>
             <div style={{ fontSize: "0.875rem", color: "#16a34a" }}>Deze leverancier is succesvol afgerond.</div>

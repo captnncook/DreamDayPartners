@@ -50,7 +50,7 @@ export default function ChecklistDeadlines({ tasks, weddingId }: Props) {
           ))}
           {done.length > 0 && (
             <div style={{ fontSize: "0.75rem", color: "var(--muted)", paddingTop: "0.25rem" }}>
-              {done.length} {done.length === 1 ? "taak" : "taken"} afgerond ✓
+              {done.length} {done.length === 1 ? "taak" : "taken"} afgerond
             </div>
           )}
         </div>

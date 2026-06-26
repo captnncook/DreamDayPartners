@@ -50,7 +50,7 @@ export default function VendorMap({ vendors }: Props) {
     return (
       <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-blush-soft)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border)" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.4 }}>🗺️</div>
+          <div style={{ marginBottom: "1rem", opacity: 0.4, display: "flex", justifyContent: "center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></div>
           <p style={{ color: "var(--muted)", fontSize: "0.9375rem" }}>
             Nog geen leveranciers met locatie beschikbaar.
           </p>
@@ -80,7 +80,7 @@ export default function VendorMap({ vendors }: Props) {
               <div style={{ minWidth: "160px" }}>
                 {v.isPremium && (
                   <div style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.06em", color: "#7a5c1a", marginBottom: "4px" }}>
-                    ✦ AANBEVOLEN
+                    AANBEVOLEN
                   </div>
                 )}
                 <div style={{ fontWeight: 700, fontSize: "0.9rem", marginBottom: "2px" }}>{v.name}</div>

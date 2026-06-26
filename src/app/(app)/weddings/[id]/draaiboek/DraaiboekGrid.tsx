@@ -316,7 +316,7 @@ export default function DraaiboekGrid({
                 onClick={() => onTogglePublic(selItem.id, selItem.isPublic ?? false)}
                 style={{ fontSize: "0.75rem", padding: "0.25rem 0.625rem", borderRadius: "6px", border: "none", cursor: "pointer", fontWeight: 600, background: selItem.isPublic ? "#22c55e20" : "var(--border)", color: selItem.isPublic ? "#16a34a" : "var(--muted)" }}
               >
-                {selItem.isPublic ? "🌐 Publiek" : "🔒 Privé"}
+                {selItem.isPublic ? "Publiek" : "Privé"}
               </button>
             )}
             {canEditItem(selItem) && (

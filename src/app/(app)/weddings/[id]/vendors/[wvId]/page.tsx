@@ -113,7 +113,7 @@ export default async function VendorBookingPage({
           </div>
           {booking.vendor.email && (
             <a href={`mailto:${booking.vendor.email}`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>
-              ✉ Contact
+              Contact
             </a>
           )}
         </div>

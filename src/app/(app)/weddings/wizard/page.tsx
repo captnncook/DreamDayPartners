@@ -98,7 +98,7 @@ export default function WeddingWizardPage() {
                     color: step >= s.n ? "white" : "var(--muted)",
                   }}
                 >
-                  {step > s.n ? "✓" : s.n}
+                  {step > s.n ? "" : s.n}
                 </div>
                 <span className="text-xs text-center hidden sm:block" style={{ color: step === s.n ? "var(--primary)" : "var(--muted)" }}>
                   {s.label}

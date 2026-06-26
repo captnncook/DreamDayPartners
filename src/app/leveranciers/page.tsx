@@ -7,22 +7,22 @@ import { Search, MapPin, ArrowRight, SlidersHorizontal, X, LayoutGrid, Map, Plus
 
 const VendorMap = lazy(() => import("@/components/VendorMap"));
 
-const CATEGORIES: { value: string; label: string; emoji: string }[] = [
-  { value: "trouwlocatie",    label: "Trouwlocaties",       emoji: "🏛️" },
-  { value: "fotograaf",       label: "Fotografen",          emoji: "📷" },
-  { value: "videograaf",      label: "Videografen",         emoji: "🎥" },
-  { value: "bloemist",        label: "Bloemisten",          emoji: "🌸" },
-  { value: "catering",        label: "Catering",            emoji: "🍽️" },
-  { value: "bakker",          label: "Bruidstaarten",       emoji: "🎂" },
-  { value: "weddingplanner",  label: "Wedding planners",    emoji: "💍" },
-  { value: "haarstylist",     label: "Hair & make-up",      emoji: "💄" },
-  { value: "dj",              label: "Muziek & DJ",         emoji: "🎧" },
-  { value: "liveband",        label: "Liveband",            emoji: "🎵" },
-  { value: "ceremoniespreker",label: "Ceremoniesprekers",   emoji: "🎤" },
-  { value: "decoratie",       label: "Decoratie & Styling", emoji: "✨" },
-  { value: "vervoer",         label: "Vervoer",             emoji: "🚗" },
-  { value: "fotocabine",      label: "Fotocabine",          emoji: "📸" },
-  { value: "overig",          label: "Overig",              emoji: "⭐" },
+const CATEGORIES: { value: string; label: string }[] = [
+  { value: "trouwlocatie",    label: "Trouwlocaties" },
+  { value: "fotograaf",       label: "Fotografen" },
+  { value: "videograaf",      label: "Videografen" },
+  { value: "bloemist",        label: "Bloemisten" },
+  { value: "catering",        label: "Catering" },
+  { value: "bakker",          label: "Bruidstaarten" },
+  { value: "weddingplanner",  label: "Wedding planners" },
+  { value: "haarstylist",     label: "Hair & make-up" },
+  { value: "dj",              label: "Muziek & DJ" },
+  { value: "liveband",        label: "Liveband" },
+  { value: "ceremoniespreker",label: "Ceremoniesprekers" },
+  { value: "decoratie",       label: "Decoratie & Styling" },
+  { value: "vervoer",         label: "Vervoer" },
+  { value: "fotocabine",      label: "Fotocabine" },
+  { value: "overig",          label: "Overig" },
 ];
 
 const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.value, c.label]));
@@ -168,7 +168,7 @@ export default function LeveranciersPage() {
               className={`ddp-chip${category === c.value ? " active" : ""}`}
               style={{ flexShrink: 0 }}
             >
-              <span>{c.emoji}</span> {c.label}
+              {c.label}
             </button>
           ))}
         </div>
@@ -210,12 +210,11 @@ export default function LeveranciersPage() {
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "5rem 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: "2rem", marginBottom: "1rem", opacity: 0.4 }}>🌸</div>
             <p style={{ fontSize: "0.9375rem" }}>Leveranciers laden…</p>
           </div>
         ) : vendors.length === 0 ? (
           <div style={{ textAlign: "center", padding: "5rem 0" }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: "1rem", opacity: 0.35 }}>🔍</div>
+            <Search className="w-8 h-8 mx-auto mb-3" style={{ color: "var(--muted)", opacity: 0.4 }} />
             <h3 style={{ fontWeight: 700, fontSize: "1.125rem", marginBottom: "0.5rem" }}>Geen leveranciers gevonden</h3>
             <p style={{ fontSize: "0.9375rem", color: "var(--muted)", marginBottom: "1.5rem" }}>
               Pas je filters aan of zoek op een andere naam.
@@ -262,7 +261,6 @@ export default function LeveranciersPage() {
 
 function SupplierCard({ vendor }: { vendor: Vendor }) {
   const catLabel = CATEGORY_MAP[vendor.category] ?? vendor.category;
-  const emoji = CATEGORIES.find((c) => c.value === vendor.category)?.emoji ?? "⭐";
 
   return (
     <Link href={`/leveranciers/${vendor.id}`} style={{ textDecoration: "none", display: "flex", flexDirection: "column", height: "100%" }}>
@@ -293,12 +291,12 @@ function SupplierCard({ vendor }: { vendor: Vendor }) {
       >
         {/* Image area — 4:3 */}
         <div style={{ aspectRatio: "4/3", background: "var(--color-blush-soft)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-          <span style={{ fontSize: "3rem", opacity: 0.5 }}>{emoji}</span>
+          <span style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{catLabel}</span>
 
           {/* Status badge */}
           {vendor.isPremium ? (
             <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", background: "var(--color-champagne)", color: "#7a5c1a", borderRadius: "var(--radius-full)", padding: "0.2rem 0.75rem", fontSize: "0.625rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              ✦ Aanbevolen
+              Aanbevolen
             </div>
           ) : null}
         </div>

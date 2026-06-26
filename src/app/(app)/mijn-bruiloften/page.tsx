@@ -60,8 +60,8 @@ export default function MijnBruiloftenPage() {
       setForm({ email1: "", email2: "", weddingDate: "", weddingTitle: "", notes: "" });
       setShowForm(false);
       setSuccess(data.matched
-        ? "✓ Bruiloft gevonden en direct gekoppeld aan een bestaand account!"
-        : "✓ Bruiloft aangemaakt — je hebt nu meteen toegang tot het dashboard. Zodra het bruidspaar zich aanmeldt worden ze automatisch gekoppeld."
+        ? "Bruiloft gevonden en direct gekoppeld aan een bestaand account!"
+        : "Bruiloft aangemaakt — je hebt nu meteen toegang tot het dashboard. Zodra het bruidspaar zich aanmeldt worden ze automatisch gekoppeld."
       );
     }
     setSaving(false);

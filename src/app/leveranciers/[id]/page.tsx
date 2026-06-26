@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Globe, Phone, Mail, ArrowLeft, Check, ChevronDown, Heart, Pencil } from "lucide-react";
+import { MapPin, Globe, Phone, Mail, ArrowLeft, Check, ChevronDown, Heart, Pencil, User } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
   weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
@@ -135,7 +135,7 @@ export default function VendorProfilePage() {
         ) : (
           <div style={{ maxWidth: "1040px", margin: "1.25rem auto 0", padding: "0 1.25rem" }}>
             <div style={{ height: "220px", borderRadius: "var(--radius-lg)", background: "var(--color-blush)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--color-blush)" }}>
-              <span style={{ fontSize: "4rem", opacity: 0.35 }}>🌸</span>
+              <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.4 }}>{vendor.category}</span>
             </div>
           </div>
         )}
@@ -145,7 +145,7 @@ export default function VendorProfilePage() {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
               {vendor.isPremium && (
-                <span className="ddp-badge badge-champagne mb-2" style={{ display: "inline-flex" }}>✦ Aanbevolen leverancier</span>
+                <span className="ddp-badge badge-champagne mb-2" style={{ display: "inline-flex" }}>Aanbevolen leverancier</span>
               )}
               <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2.25rem)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1.1, marginBottom: "0.375rem" }}>
                 {vendor.name}
@@ -194,7 +194,7 @@ export default function VendorProfilePage() {
               </h2>
               <div className="flex flex-col gap-3">
                 {vendor.contactPerson && (
-                  <ContactRow icon="👤" label={vendor.contactPerson} />
+                  <ContactRow icon={<User className="w-3.5 h-3.5" />} label={vendor.contactPerson} />
                 )}
                 {vendor.email && (
                   <a href={`mailto:${vendor.email}`} style={{ textDecoration: "none" }}>
