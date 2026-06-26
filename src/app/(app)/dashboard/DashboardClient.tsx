@@ -357,12 +357,6 @@ function WeddingCard({ wedding }: { wedding: Wedding }) {
             {wedding.venue && <><MapPin className="w-3 h-3 flex-shrink-0" /><span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{wedding.venue}</span><span>·</span></>}
             <span style={{ whiteSpace: "nowrap" }}>{new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(wedding.date))}</span>
           </div>
-          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-            <span className={`ddp-badge ${STATUS_COLORS[wedding.status] ?? "badge-neutral"}`} style={{ fontSize: "0.6rem" }}>
-              {STATUS_LABELS[wedding.status] ?? wedding.status}
-            </span>
-            {wedding.isPremium && <span className="ddp-badge badge-champagne" style={{ fontSize: "0.6rem" }}>Premium</span>}
-          </div>
         </div>
 
         {/* Days */}

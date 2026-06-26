@@ -15,7 +15,6 @@ interface Props {
 export default function VendorDashboardInline({ weddingId, wvId, vendorName, vendorCategory, userRole, userId, vendorUserId }: Props) {
   const [data, setData] = useState<null | {
     booking: Parameters<typeof DashboardEngine>[0]["initialBooking"];
-    deliverables: Parameters<typeof DashboardEngine>[0]["initialDeliverables"];
     documents: Parameters<typeof DashboardEngine>[0]["documents"];
     timelineBlocks: Parameters<typeof DashboardEngine>[0]["timelineBlocks"];
     tasks: Parameters<typeof DashboardEngine>[0]["tasks"];
@@ -41,7 +40,6 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
             contractUrl: b.contractUrl ?? null,
             intakeData: b.intakeData ?? null,
           },
-          deliverables: b.deliverables ?? [],
           documents: b.documents ?? [],
           timelineBlocks: b.draaiboekItems ?? [],
           tasks: b.tasks ?? [],
@@ -72,7 +70,6 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
             wvId={wvId}
             vendorType={vendorCategory}
             initialBooking={data.booking}
-            initialDeliverables={data.deliverables}
             documents={data.documents}
             timelineBlocks={data.timelineBlocks}
             tasks={data.tasks}

@@ -105,18 +105,24 @@ export default function VendorEditPage() {
     if (!file) return;
     setUploading(true);
     setError("");
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch(`/api/catalogus/${id}/photos`, { method: "POST", body: fd });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error ?? "Upload mislukt");
-    } else {
-      setPhotoUrls(data.photos ?? []);
-      setPhotoKeys(data.keys ?? []);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/catalogus/${id}/photos`, { method: "POST", body: fd });
+      let data: Record<string, unknown> = {};
+      try { data = await res.json(); } catch { /* non-JSON response */ }
+      if (!res.ok) {
+        setError((data.error as string) ?? `Upload mislukt (${res.status})`);
+      } else {
+        setPhotoUrls((data.photos as string[]) ?? []);
+        setPhotoKeys((data.keys as string[]) ?? []);
+      }
+    } catch {
+      setError("Verbindingsfout tijdens upload");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   async function handleDeletePhoto(key: string, idx: number) {

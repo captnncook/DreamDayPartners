@@ -96,7 +96,35 @@ async function main() {
         ORDER BY "draaiboekId", "vendorId", title, "startTime", "createdAt" ASC
       );
     `);
-    console.log("✅ Draaiboek duplicates cleaned");
+    // Remove duplicate guests — keep earliest per (weddingId, email)
+    await pool.query(`
+      DELETE FROM "guests"
+      WHERE email IS NOT NULL AND id NOT IN (
+        SELECT DISTINCT ON ("weddingId", email) id
+        FROM "guests"
+        WHERE email IS NOT NULL
+        ORDER BY "weddingId", email, "createdAt" ASC
+      );
+    `);
+    // Remove duplicate budget items — keep earliest per (budgetId, description)
+    await pool.query(`
+      DELETE FROM "budget_items"
+      WHERE id NOT IN (
+        SELECT DISTINCT ON ("budgetId", description) id
+        FROM "budget_items"
+        ORDER BY "budgetId", description, "createdAt" ASC
+      );
+    `);
+    // Remove duplicate tasks — keep earliest per (weddingId, title)
+    await pool.query(`
+      DELETE FROM "tasks"
+      WHERE id NOT IN (
+        SELECT DISTINCT ON ("weddingId", title) id
+        FROM "tasks"
+        ORDER BY "weddingId", title, "createdAt" ASC
+      );
+    `);
+    console.log("✅ Duplicates cleaned");
     console.log("✅ Schema columns OK");
   } catch (err) {
     console.error("⚠️  Schema migration warning:", err.message);

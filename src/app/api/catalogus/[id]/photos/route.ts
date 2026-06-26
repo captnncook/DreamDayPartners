@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { r2, R2_BUCKET, getDownloadUrl } from "@/lib/r2";
+import { r2, R2_BUCKET, getDownloadUrl, deleteFile } from "@/lib/r2";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -30,15 +30,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const fileKey = `vendors/${id}/${uuidv4()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  await r2.send(
-    new PutObjectCommand({
-      Bucket: R2_BUCKET,
-      Key: fileKey,
-      Body: buffer,
-      ContentType: file.type || "image/jpeg",
-      ContentLength: buffer.length,
-    })
-  );
+  try {
+    await r2.send(
+      new PutObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: fileKey,
+        Body: buffer,
+        ContentType: file.type || "image/jpeg",
+        ContentLength: buffer.length,
+      })
+    );
+  } catch (err) {
+    console.error("R2 upload error:", err);
+    return NextResponse.json({ error: "Upload naar opslag mislukt. Controleer de R2-instellingen." }, { status: 502 });
+  }
 
   const updated = await prisma.vendor.update({
     where: { id },
@@ -67,6 +72,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     where: { id },
     data: { photos: { set: vendor.photos.filter((p) => p !== key) } },
   });
+
+  try { await deleteFile(key); } catch { /* ignore — already removed from DB */ }
 
   return NextResponse.json({ photos: updated.photos });
 }
