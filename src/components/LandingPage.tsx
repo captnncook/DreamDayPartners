@@ -151,9 +151,18 @@ export default function LandingPage() {
 
         <div className="flex items-center gap-2 ml-auto flex-shrink-0">
           {loggedIn ? (
-            <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
-              Profiel
-            </Link>
+            <>
+              <button
+                onClick={() => fetch("/api/auth/logout", { method: "POST" }).then(() => { window.location.href = "/login"; })}
+                className="ddp-btn-ghost hidden sm:inline-flex"
+                style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}
+              >
+                Uitloggen
+              </button>
+              <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+                Dashboard
+              </Link>
+            </>
           ) : (
             <>
               <Link href="/login" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>

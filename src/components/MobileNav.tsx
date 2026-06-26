@@ -255,6 +255,8 @@ export default function MobileNav({ user }: { user: User }) {
           <div style={{ padding: "8px 16px 32px" }}>
             <Link
               href="/"
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setOpen(false)}
               style={{
                 display: "flex",

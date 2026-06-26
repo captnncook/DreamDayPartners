@@ -104,7 +104,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
       {/* Language + Logout + Website */}
       <div className="px-3 py-3" style={{ borderTop: "1px solid var(--border)", background: "#fafaf8" }}>
-        <Link href="/" className="ddp-nav-item w-full text-left">
+        <Link href="/" className="ddp-nav-item w-full text-left" target="_blank" rel="noopener noreferrer">
           Naar website
         </Link>
         <button onClick={toggle} className="ddp-nav-item w-full text-left mt-0.5">
