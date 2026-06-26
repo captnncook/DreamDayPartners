@@ -10,8 +10,8 @@ export async function POST() {
 
   // Find all duplicate groups and keep the earliest item per unique combo
   const allItems = await prisma.draaiboekItem.findMany({
-    select: { id: true, draaiboekId: true, vendorId: true, title: true, startTime: true, createdAt: true },
-    orderBy: { createdAt: "asc" },
+    select: { id: true, draaiboekId: true, vendorId: true, title: true, startTime: true },
+    orderBy: { sortOrder: "asc" },
   });
 
   const seen = new Map<string, string>();
