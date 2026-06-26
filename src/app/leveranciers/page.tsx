@@ -95,8 +95,10 @@ export default function LeveranciersPage() {
           {/* Top bar: logo linksboven + Profiel/Inloggen rechtsboven */}
           <div className="flex items-center justify-between mb-6">
             <Link href="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
-              <Image src="/logo.png" alt="" width={18} height={18} />
-              DreamDay Partners
+              <Image src="/logo.png" alt="" width={22} height={22} />
+              <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
+                DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
+              </span>
             </Link>
             {loggedIn ? (
               <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>

@@ -116,8 +116,10 @@ export default function VendorProfilePage() {
             <ArrowLeft className="w-4 h-4" /> Alle leveranciers
           </Link>
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)", textDecoration: "none" }}>
-            <Image src="/logo.png" alt="" width={18} height={18} />
-            <span style={{ fontWeight: 700 }}>DreamDay Partners</span>
+            <Image src="/logo.png" alt="" width={22} height={22} />
+            <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
+              DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
+            </span>
           </Link>
         </div>
 
