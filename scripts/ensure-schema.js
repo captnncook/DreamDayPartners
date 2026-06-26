@@ -72,6 +72,16 @@ async function main() {
         CONSTRAINT "deliverables_pkey" PRIMARY KEY ("id")
       );
     `);
+    // Remove duplicate draaiboek items — keep the earliest per (draaiboekId, vendorId, title, startTime)
+    await pool.query(`
+      DELETE FROM "draaiboek_items"
+      WHERE id NOT IN (
+        SELECT DISTINCT ON ("draaiboekId", "vendorId", title, "startTime") id
+        FROM "draaiboek_items"
+        ORDER BY "draaiboekId", "vendorId", title, "startTime", "createdAt" ASC
+      );
+    `);
+    console.log("✅ Draaiboek duplicates cleaned");
     console.log("✅ Schema columns OK");
   } catch (err) {
     console.error("⚠️  Schema migration warning:", err.message);

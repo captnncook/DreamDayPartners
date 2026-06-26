@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { authorizeWeddingVendor } from "@/lib/vendorAuth";
+import { authorizeWeddingVendor, getOwnVendorId } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ id: string; wvId: string; itemId: string }> };
+
+async function resolveItem(itemId: string) {
+  return prisma.draaiboekItem.findUnique({ where: { id: itemId }, select: { id: true, vendorId: true } });
+}
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   const user = await getSession();
@@ -12,6 +16,13 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   const { id: weddingId, wvId, itemId } = await params;
   const auth = await authorizeWeddingVendor(user, wvId, weddingId);
   if (!auth.ok) return auth.response;
+
+  if (user.role === "vendor") {
+    const [item, ownVendorId] = await Promise.all([resolveItem(itemId), getOwnVendorId(user.id)]);
+    if (!item || item.vendorId !== ownVendorId) {
+      return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+    }
+  }
 
   const body = await req.json();
   const item = await prisma.draaiboekItem.update({
@@ -34,6 +45,13 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   const { id: weddingId, wvId, itemId } = await params;
   const auth = await authorizeWeddingVendor(user, wvId, weddingId);
   if (!auth.ok) return auth.response;
+
+  if (user.role === "vendor") {
+    const [item, ownVendorId] = await Promise.all([resolveItem(itemId), getOwnVendorId(user.id)]);
+    if (!item || item.vendorId !== ownVendorId) {
+      return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+    }
+  }
 
   await prisma.draaiboekItem.delete({ where: { id: itemId } });
   return NextResponse.json({ ok: true });
