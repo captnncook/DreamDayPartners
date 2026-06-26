@@ -154,12 +154,11 @@ export default function LeveranciersPage() {
       </div>
 
       {/* ── Category chips ───────────────────────────── */}
-      <div style={{ background: "white", borderBottom: "1px solid var(--border)", padding: "1rem 1.25rem", overflowX: "auto" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto", display: "flex", gap: "0.5rem", flexWrap: "nowrap", minWidth: 0 }}>
+      <div style={{ background: "white", borderBottom: "1px solid var(--border)", padding: "1rem 1.25rem" }}>
+        <div style={{ maxWidth: "1040px", margin: "0 auto", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <button
             onClick={() => setCategory("")}
             className={`ddp-chip${!category ? " active" : ""}`}
-            style={{ flexShrink: 0 }}
           >
             Alles
           </button>
@@ -168,7 +167,6 @@ export default function LeveranciersPage() {
               key={c.value}
               onClick={() => setCategory(category === c.value ? "" : c.value)}
               className={`ddp-chip${category === c.value ? " active" : ""}`}
-              style={{ flexShrink: 0 }}
             >
               {c.label}
             </button>
