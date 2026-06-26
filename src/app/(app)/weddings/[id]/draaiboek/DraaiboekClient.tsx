@@ -166,11 +166,25 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [newDraaiboekTitle, setNewDraaiboekTitle] = useState("");
   const [saving, setSaving] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
 
   const emptyItem = { startTime: "09:00", endTime: "09:30", title: "", description: "", location: "", vendorId: "", notes: "" };
 
   const activeDraaiboek = draaiboeken.find((d) => d.id === activeDraaiboekId);
   const isReadOnly = currentUser.role === "couple" || currentUser.role === "vendor";
+
+  // Collect unique vendor categories that appear in the active draaiboek
+  const vendorCategories = Array.from(
+    new Set(
+      (activeDraaiboek?.items ?? [])
+        .map(i => i.vendor?.category)
+        .filter(Boolean) as string[]
+    )
+  ).sort();
+
+  const visibleItems = (activeDraaiboek?.items ?? []).filter(item =>
+    filterCategory === "all" || item.vendor?.category === filterCategory
+  );
 
   async function createDraaiboek(e: React.FormEvent) {
     e.preventDefault();
@@ -335,17 +349,54 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
                   />
                 )}
 
+                {/* Filter chips */}
+                {vendorCategories.length > 0 && (
+                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+                    <button
+                      onClick={() => setFilterCategory("all")}
+                      style={{
+                        padding: "0.3rem 0.75rem", borderRadius: "9999px", fontSize: "0.8125rem", fontWeight: 600,
+                        border: "1px solid", cursor: "pointer",
+                        borderColor: filterCategory === "all" ? "var(--primary)" : "var(--border)",
+                        background: filterCategory === "all" ? "var(--primary)" : "white",
+                        color: filterCategory === "all" ? "white" : "var(--muted)",
+                      }}
+                    >
+                      Alles
+                    </button>
+                    {vendorCategories.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setFilterCategory(cat === filterCategory ? "all" : cat)}
+                        style={{
+                          padding: "0.3rem 0.75rem", borderRadius: "9999px", fontSize: "0.8125rem", fontWeight: 600,
+                          border: "1px solid", cursor: "pointer", textTransform: "capitalize",
+                          borderColor: filterCategory === cat ? "var(--primary)" : "var(--border)",
+                          background: filterCategory === cat ? "var(--primary)" : "white",
+                          color: filterCategory === cat ? "white" : "var(--muted)",
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {activeDraaiboek.items.length === 0 ? (
                   <div className="ddp-card text-center py-12" style={{ color: "var(--muted)" }}>
                     <Clock className="w-8 h-8 mx-auto mb-3" style={{ color: "var(--color-rose)" }} />
                     <p style={{ fontSize: "0.9375rem" }}>Nog geen items. Voeg het eerste moment toe.</p>
+                  </div>
+                ) : visibleItems.length === 0 ? (
+                  <div className="ddp-card text-center py-12" style={{ color: "var(--muted)" }}>
+                    <p style={{ fontSize: "0.9375rem" }}>Geen items voor dit filter.</p>
                   </div>
                 ) : (
                   <div style={{ position: "relative" }}>
                     {/* Timeline line */}
                     <div style={{ position: "absolute", left: "5.25rem", top: 0, bottom: 0, width: "1px", background: "var(--border)" }} />
                     <div className="flex flex-col gap-3">
-                      {activeDraaiboek.items.map((item) => {
+                      {visibleItems.map((item) => {
                         const endTime = addMinutes(item.startTime, item.duration);
                         const isEditing = editingItemId === item.id;
                         return (
@@ -423,8 +474,9 @@ export default function DraaiboekClient({ weddingId, weddingTitle, draaiboeken: 
                                       </span>
                                     )}
                                     {item.vendor && (
-                                      <span className="ddp-badge badge-champagne" style={{ fontSize: "0.6875rem", display: "flex", alignItems: "center", gap: "4px" }}>
-                                        <Briefcase className="w-3 h-3" /> {item.vendor.name}
+                                      <span className="ddp-badge badge-champagne" style={{ fontSize: "0.6875rem", display: "flex", alignItems: "center", gap: "4px", textTransform: "capitalize" }}>
+                                        <Briefcase className="w-3 h-3" />
+                                        {item.vendor.category} · {item.vendor.name}
                                       </span>
                                     )}
                                     {item.notes && (
