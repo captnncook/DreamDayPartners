@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Check, ArrowRight, ChevronDown } from "lucide-react";
 
@@ -99,11 +99,24 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [heroPassed, setHeroPassed] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroPassed(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(hero);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -176,8 +189,44 @@ export default function LandingPage() {
         </div>
       </nav>
 
+      {/* ── Sticky mobile CTA ────────────────────────────── */}
+      {heroPassed && !loggedIn && (
+        <div
+          className="md:hidden"
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 40,
+            background: "rgba(255,255,255,0.96)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderTop: "1px solid rgba(0,0,0,0.08)",
+            padding: "0.875rem 1.25rem",
+            display: "flex",
+            gap: "0.625rem",
+          }}
+        >
+          <Link
+            href="/aanmelden"
+            className="ddp-btn-primary"
+            style={{ flex: 1, justifyContent: "center", padding: "0.75rem", fontSize: "0.9375rem" }}
+          >
+            Begin gratis
+          </Link>
+          <Link
+            href="/leveranciers"
+            className="ddp-btn-secondary"
+            style={{ flex: 1, justifyContent: "center", padding: "0.75rem", fontSize: "0.9375rem" }}
+          >
+            Vind leveranciers
+          </Link>
+        </div>
+      )}
+
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ background: "#ffffff", minHeight: "90vh", display: "flex", alignItems: "center" }}>
+      <section ref={heroRef} className="relative overflow-hidden" style={{ background: "#ffffff", minHeight: "90vh", display: "flex", alignItems: "center" }}>
         <div className="w-full px-5 md:px-10 py-20 md:py-28" style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
             {/* Text */}
@@ -489,7 +538,7 @@ export default function LandingPage() {
               <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
                 <div className="ddp-badge badge-neutral mb-5">Leverancier · Free</div>
                 <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>€0</div>
-                <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Per maand</div>
+                <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Per maand · Gratis proberen, 1 bruiloft inbegrepen</div>
                 <ul className="space-y-3 mb-7">
                   {["Portaaltoegang (1 bruiloft)", "Draaiboek inzien", "Bestanden ontvangen", "Chatten met planner", "Basisprofiel"].map((item) => (
                     <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "0.875rem" }}>

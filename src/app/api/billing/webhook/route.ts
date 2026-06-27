@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.mode !== "subscription") break;
-      const userId = session.subscription_data?.metadata?.userId ?? session.metadata?.userId;
+      const userId = session.metadata?.userId;
       if (!userId) break;
       await prisma.user.update({
         where: { id: userId },
