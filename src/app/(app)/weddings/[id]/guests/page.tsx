@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Users, X } from "lucide-react";
+import { Users, X, Upload } from "lucide-react";
+import { SkeletonCard } from "@/components/Skeleton";
 
 type Guest = {
   id: string;
@@ -33,13 +34,24 @@ export default function GuestsPage() {
   const [filterRsvp, setFilterRsvp] = useState("all");
   const [form, setForm] = useState({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false });
   const [saving, setSaving] = useState(false);
+  const [csvImporting, setCsvImporting] = useState(false);
+  const [rsvpToken, setRsvpToken] = useState<string | null>(null);
+  const [rsvpCopied, setRsvpCopied] = useState(false);
+  const csvRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/weddings/${id}/guests`);
     const data = await res.json();
     setGuests(data.guests ?? []);
+    setRsvpToken(data.rsvpToken ?? null);
     setLoading(false);
   }, [id]);
+
+  function copyRsvpLink() {
+    if (!rsvpToken) return;
+    const url = `${window.location.origin}/rsvp/${rsvpToken}`;
+    navigator.clipboard.writeText(url).then(() => { setRsvpCopied(true); setTimeout(() => setRsvpCopied(false), 2000); });
+  }
 
   useEffect(() => { load(); }, [load]);
 
@@ -66,6 +78,39 @@ export default function GuestsPage() {
     load();
   }
 
+  async function handleCsvImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCsvImporting(true);
+    const text = await file.text();
+    const lines = text.trim().split("\n");
+    const header = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/"/g, ""));
+    const col = (row: string[], name: string) => {
+      const i = header.indexOf(name);
+      return i >= 0 ? row[i]?.trim().replace(/"/g, "") : "";
+    };
+    const rows = lines.slice(1).map(l => l.split(","));
+    for (const row of rows) {
+      const name = col(row, "naam") || col(row, "name");
+      if (!name) continue;
+      await fetch(`/api/weddings/${id}/guests`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email: col(row, "email") || "",
+          phone: col(row, "telefoon") || col(row, "phone") || "",
+          side: col(row, "kant") || col(row, "side") || "both",
+          dietary: col(row, "dieet") || col(row, "dietary") || "",
+          plusOne: false,
+        }),
+      });
+    }
+    if (csvRef.current) csvRef.current.value = "";
+    setCsvImporting(false);
+    load();
+  }
+
   async function deleteGuest(guestId: string) {
     if (!confirm("Gast verwijderen?")) return;
     await fetch(`/api/weddings/${id}/guests/${guestId}`, { method: "DELETE" });
@@ -86,7 +131,7 @@ export default function GuestsPage() {
     no_response: guests.filter((g) => g.rsvpStatus === "no_response").length,
   };
 
-  if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
+  if (loading) return <div className="p-8 max-w-5xl mx-auto space-y-3">{Array.from({length:6}).map((_,i)=><SkeletonCard key={i} rows={2}/>)}</div>;
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -94,11 +139,29 @@ export default function GuestsPage() {
         <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
           <h1 className="text-2xl font-bold">Gastenlijst</h1>
-          <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary">
-            {showForm ? "Annuleren" : "+ Gast toevoegen"}
-          </button>
+          <div className="flex gap-2">
+            <input ref={csvRef} type="file" accept=".csv" onChange={handleCsvImport} className="hidden" id="csv-import" />
+            <label htmlFor="csv-import" className="ddp-btn-secondary cursor-pointer flex items-center gap-1">
+              <Upload className="w-3.5 h-3.5" />{csvImporting ? "Importeren…" : "CSV import"}
+            </label>
+            <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary">
+              {showForm ? "Annuleren" : "+ Gast toevoegen"}
+            </button>
+          </div>
         </div>
       </div>
+
+      {rsvpToken && (
+        <div className="ddp-card mb-6 flex items-center gap-3 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold mb-0.5">RSVP-link voor gasten</p>
+            <p className="text-xs truncate" style={{ color: "var(--muted)" }}>{typeof window !== "undefined" ? `${window.location.origin}/rsvp/${rsvpToken}` : `/rsvp/${rsvpToken}`}</p>
+          </div>
+          <button onClick={copyRsvpLink} className="ddp-btn-secondary flex-shrink-0 text-xs">
+            {rsvpCopied ? "Gekopieerd!" : "Kopieer link"}
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-4 gap-3 mb-6">
         {Object.entries(stats).map(([key, count]) => (

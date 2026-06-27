@@ -523,6 +523,11 @@ h1, h2, h3, h4, h5, h6 {
 .animate-fade-in    { animation: fadeIn 0.4s ease both; }
 .animate-scale-in   { animation: scaleIn 0.4s ease both; }
 
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .delay-100 { animation-delay: 0.10s; }
 .delay-200 { animation-delay: 0.20s; }
 .delay-300 { animation-delay: 0.30s; }

@@ -7,13 +7,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const { id } = await params;
-  const guests = await prisma.guest.findMany({
-    where: { weddingId: id },
-    include: { seatingTable: true },
-    orderBy: { name: "asc" },
-  });
+  const [guests, wedding] = await Promise.all([
+    prisma.guest.findMany({
+      where: { weddingId: id },
+      include: { seatingTable: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.wedding.findUnique({ where: { id }, select: { rsvpToken: true } }),
+  ]);
 
-  return NextResponse.json({ guests });
+  return NextResponse.json({ guests, rsvpToken: wedding?.rsvpToken ?? null });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

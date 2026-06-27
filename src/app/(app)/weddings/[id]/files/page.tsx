@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Palette, ClipboardList, Receipt, FileSignature, FolderOpen, Image as ImageIcon, FileText, File, Upload, X, AlertCircle } from "lucide-react";
+import { SkeletonCard } from "@/components/Skeleton";
 
 type Document = {
   id: string;
@@ -48,6 +49,7 @@ export default function FilesPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -124,7 +126,16 @@ export default function FilesPage() {
 
   const filtered = documents.filter((d) => activeCategory === "all" || d.category === activeCategory);
 
-  if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
+  async function loadSignedUrlsForImages(docs: Document[]) {
+    const images = docs.filter(d => d.mimeType.startsWith("image/") && !signedUrls[d.id]);
+    await Promise.all(images.map(async (doc) => {
+      const res = await fetch(`/api/weddings/${id}/files/${doc.id}`);
+      const data = await res.json();
+      if (data.url) setSignedUrls(prev => ({ ...prev, [doc.id]: data.url }));
+    }));
+  }
+
+  if (loading) return <div className="p-8 max-w-5xl mx-auto"><div className="grid grid-cols-2 md:grid-cols-3 gap-4">{Array.from({length:6}).map((_,i)=><SkeletonCard key={i} rows={3}/>)}</div></div>;
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -273,19 +284,28 @@ export default function FilesPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className={activeCategory === "inspiratie" ? "columns-2 md:columns-3 gap-4 space-y-4" : "grid grid-cols-2 md:grid-cols-3 gap-4"}>
           {filtered.map((doc) => {
             const isImage = doc.mimeType.startsWith("image/");
             const catInfo = CATEGORIES.find((c) => c.value === doc.category);
+            const previewUrl = signedUrls[doc.id];
+            if (isImage && !previewUrl) loadSignedUrlsForImages([doc]);
             return (
-              <div key={doc.id} className="ddp-card p-0 overflow-hidden group">
+              <div key={doc.id} className={`ddp-card p-0 overflow-hidden group ${activeCategory === "inspiratie" ? "break-inside-avoid mb-4" : ""}`}>
                 {/* Preview area */}
                 <div
-                  className="h-32 flex items-center justify-center cursor-pointer"
-                  style={{ background: "var(--accent)" }}
+                  className="flex items-center justify-center cursor-pointer"
+                  style={{ background: "var(--accent)", minHeight: activeCategory === "inspiratie" && isImage ? undefined : "8rem" }}
                   onClick={() => handleDownload(doc)}
                 >
-                  <FileIcon mimeType={doc.mimeType} className="w-12 h-12" style={{ color: "var(--primary)" }} />
+                  {isImage && previewUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={previewUrl} alt={doc.name} style={{ width: "100%", display: "block", objectFit: "cover" }} />
+                  ) : (
+                    <div className="h-32 flex items-center justify-center w-full">
+                      <FileIcon mimeType={doc.mimeType} className="w-12 h-12" style={{ color: "var(--primary)" }} />
+                    </div>
+                  )}
                 </div>
 
                 {/* Info */}

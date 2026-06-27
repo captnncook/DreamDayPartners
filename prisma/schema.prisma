@@ -80,6 +80,7 @@ model Wedding {
   ownerId      String
   isPremium    Boolean  @default(false)
   notes        String?
+  rsvpToken    String   @unique @default(uuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

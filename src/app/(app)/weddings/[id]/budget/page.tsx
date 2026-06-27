@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { X, Euro } from "lucide-react";
+import { SkeletonCard, SkeletonBlock } from "@/components/Skeleton";
 
 type BudgetItem = {
   id: string;
@@ -35,6 +36,7 @@ function euro(n: number) {
 export default function BudgetPage() {
   const { id } = useParams<{ id: string }>();
   const [budget, setBudget] = useState<Budget | null>(null);
+  const [confirmedGuests, setConfirmedGuests] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editTotal, setEditTotal] = useState(false);
@@ -59,9 +61,15 @@ export default function BudgetPage() {
   }
 
   const load = useCallback(async () => {
-    const res = await fetch(`/api/weddings/${id}/budget`);
-    const data = await res.json();
-    setBudget(data.budget);
+    const [budgetRes, guestsRes] = await Promise.all([
+      fetch(`/api/weddings/${id}/budget`),
+      fetch(`/api/weddings/${id}/guests`),
+    ]);
+    const budgetData = await budgetRes.json();
+    const guestsData = await guestsRes.json();
+    setBudget(budgetData.budget);
+    const confirmed = (guestsData.guests ?? []).filter((g: { rsvpStatus: string }) => g.rsvpStatus === "confirmed").length;
+    setConfirmedGuests(confirmed);
     setLoading(false);
   }, [id]);
 
@@ -96,7 +104,7 @@ export default function BudgetPage() {
     load();
   }
 
-  if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
+  if (loading) return <div className="p-8 max-w-5xl mx-auto"><div className="grid grid-cols-4 gap-4 mb-6">{Array.from({length:4}).map((_,i)=><SkeletonCard key={i} rows={3}/>)}</div><div className="space-y-3">{Array.from({length:4}).map((_,i)=><SkeletonBlock key={i} style={{height:"3rem"}}/>)}</div></div>;
   if (!budget) return <div className="p-8">Geen budget gevonden</div>;
 
   const totalEstimated = budget.items.reduce((s, i) => s + i.estimated, 0);
@@ -108,6 +116,14 @@ export default function BudgetPage() {
     acc[item.category] = [...(acc[item.category] ?? []), item];
     return acc;
   }, {});
+
+  const costPerGuest = confirmedGuests > 0 ? totalActual / confirmedGuests : null;
+
+  const categoryTotals = Object.entries(byCategory).map(([cat, items]) => ({
+    cat,
+    actual: items.reduce((s, i) => s + i.actual, 0),
+  })).sort((a, b) => b.actual - a.actual);
+  const maxCategoryActual = Math.max(...categoryTotals.map(c => c.actual), 1);
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -121,7 +137,7 @@ export default function BudgetPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="ddp-card col-span-2">
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-medium">Totaalbudget</span>
@@ -160,7 +176,31 @@ export default function BudgetPage() {
           </div>
           <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>{remaining < 0 ? "over budget!" : "beschikbaar"}</div>
         </div>
+        <div className="ddp-card">
+          <div className="text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Kosten per gast</div>
+          <div className="text-xl font-bold">{costPerGuest !== null ? euro(costPerGuest) : "—"}</div>
+          <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>{confirmedGuests} bevestigde gasten</div>
+        </div>
       </div>
+
+      {categoryTotals.length > 0 && (
+        <div className="ddp-card mb-6">
+          <h3 className="font-semibold text-sm mb-4">Kosten per categorie</h3>
+          <div className="space-y-2.5">
+            {categoryTotals.map(({ cat, actual }) => (
+              <div key={cat}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span style={{ color: "var(--foreground)" }}>{cat}</span>
+                  <span style={{ color: "var(--muted)" }}>{euro(actual)}</span>
+                </div>
+                <div style={{ height: "6px", borderRadius: "9999px", background: "var(--accent)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", borderRadius: "9999px", background: "var(--primary)", width: `${Math.round((actual / maxCategoryActual) * 100)}%`, transition: "width 0.5s ease" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={handleAdd} className="ddp-card mb-6 space-y-4">

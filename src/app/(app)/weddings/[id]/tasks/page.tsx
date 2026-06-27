@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, RefreshCw, Circle, Calendar, User, X, CheckSquare } from "lucide-react";
+import { SkeletonCard } from "@/components/Skeleton";
 
 type Task = {
   id: string;
@@ -34,6 +35,7 @@ export default function TasksPage() {
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState<"all" | "open" | "done">("all");
   const [sort, setSort] = useState<"deadline" | "priority" | "status">("deadline");
+  const [view, setView] = useState<"list" | "timeline">("list");
   const [form, setForm] = useState({ title: "", description: "", dueDate: "", category: "general", priority: "medium" });
   const [saving, setSaving] = useState(false);
 
@@ -45,6 +47,12 @@ export default function TasksPage() {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  async function seedTasks() {
+    if (!confirm("20 standaardtaken toevoegen?")) return;
+    await fetch(`/api/weddings/${id}/tasks/seed`, { method: "POST" });
+    load();
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -92,7 +100,7 @@ export default function TasksPage() {
       return (STATUS_ORDER[a.status] ?? 1) - (STATUS_ORDER[b.status] ?? 1);
     });
 
-  if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
+  if (loading) return <div className="p-8 max-w-4xl mx-auto space-y-3">{Array.from({length:5}).map((_,i)=><SkeletonCard key={i} rows={2}/>)}</div>;
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -165,10 +173,18 @@ export default function TasksPage() {
             <option value="priority">Prioriteit</option>
             <option value="status">Status</option>
           </select>
+          <button onClick={() => setView(v => v === "list" ? "timeline" : "list")}
+            className="text-xs rounded-lg px-2 py-1.5 border"
+            style={{ borderColor: "var(--border)", background: view === "timeline" ? "var(--primary)" : "white", color: view === "timeline" ? "white" : "var(--foreground)", cursor: "pointer" }}>
+            {view === "list" ? "Tijdlijn" : "Lijst"}
+          </button>
           <span className="text-xs" style={{ color: "var(--muted)" }}>{filtered.length} taken</span>
         </div>
       </div>
 
+      {view === "timeline" ? (
+        <TimelineView tasks={filtered} onToggle={toggleStatus} />
+      ) : (
       <div className="space-y-2">
         {filtered.map((task) => {
           const daysLeft = task.dueDate ? Math.ceil((new Date(task.dueDate).getTime() - Date.now()) / 86400000) : null;
@@ -203,10 +219,78 @@ export default function TasksPage() {
         {filtered.length === 0 && (
           <div className="text-center py-12" style={{ color: "var(--muted)" }}>
             <div className="flex justify-center mb-2"><CheckSquare className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
-            <p>Geen taken gevonden</p>
+            <p className="mb-3">Geen taken gevonden</p>
+            {tasks.length === 0 && (
+              <button onClick={seedTasks} className="ddp-btn-secondary text-sm">
+                Gebruik standaardchecklist (20 taken)
+              </button>
+            )}
           </div>
         )}
       </div>
+      )}
+    </div>
+  );
+}
+
+function TimelineView({ tasks, onToggle }: { tasks: Task[]; onToggle: (t: Task) => void }) {
+  const withDate = tasks.filter(t => t.dueDate);
+  const noDate = tasks.filter(t => !t.dueDate);
+
+  const byMonth = withDate.reduce<Record<string, Task[]>>((acc, t) => {
+    const key = new Date(t.dueDate!).toLocaleDateString("nl-NL", { year: "numeric", month: "long" });
+    acc[key] = [...(acc[key] ?? []), t];
+    return acc;
+  }, {});
+
+  return (
+    <div>
+      {Object.entries(byMonth).map(([month, monthTasks]) => (
+        <div key={month} className="mb-6 flex gap-4">
+          <div style={{ width: "100px", flexShrink: 0, paddingTop: "0.25rem" }}>
+            <span className="text-xs font-semibold" style={{ color: "var(--primary)", textTransform: "capitalize" }}>{month}</span>
+          </div>
+          <div style={{ flex: 1, borderLeft: "2px solid var(--border)", paddingLeft: "1.25rem" }}>
+            <div className="space-y-2">
+              {monthTasks.map(t => {
+                const Icon = STATUS_ICON_MAP[t.status] ?? Circle;
+                return (
+                  <div key={t.id} className="flex items-start gap-3" style={{ position: "relative" }}>
+                    <div style={{ position: "absolute", left: "-1.625rem", top: "0.125rem", background: "white", padding: "1px" }}>
+                      <button onClick={() => onToggle(t)}>
+                        <Icon className="w-4 h-4" style={{ color: STATUS_ICON_COLOR[t.status] }} />
+                      </button>
+                    </div>
+                    <div className="ddp-card py-2 px-3 flex-1" style={{ opacity: t.status === "done" ? 0.6 : 1 }}>
+                      <span className={`text-sm font-medium ${t.status === "done" ? "line-through" : ""}`}>{t.title}</span>
+                      <div className="flex gap-2 mt-1">
+                        <span className={`ddp-badge ${PRIORITY_COLORS[t.priority]}`} style={{ fontSize: "0.65rem" }}>{PRIORITY_LABELS[t.priority]}</span>
+                        {t.dueDate && <span className="text-xs" style={{ color: "var(--muted)" }}>{formatDate(t.dueDate)}</span>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ))}
+      {noDate.length > 0 && (
+        <div className="mb-6 flex gap-4">
+          <div style={{ width: "100px", flexShrink: 0, paddingTop: "0.25rem" }}>
+            <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>Geen datum</span>
+          </div>
+          <div style={{ flex: 1, borderLeft: "2px solid var(--border)", paddingLeft: "1.25rem" }}>
+            <div className="space-y-2">
+              {noDate.map(t => (
+                <div key={t.id} className="ddp-card py-2 px-3">
+                  <span className="text-sm font-medium">{t.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ClipboardList, Plus } from "lucide-react";
+import { ClipboardList, Plus, Printer } from "lucide-react";
 import DraaiboekGrid, { type GridItem, type WeddingVendorRef } from "./DraaiboekGrid";
 
 type DraaiboekItem = GridItem;
@@ -142,11 +142,16 @@ export default function DraaiboekClient({
             <h1 style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.04em" }}>Draaiboek</h1>
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
-          {isPlanner && (
-            <button onClick={() => setShowNewDraaiboek(!showNewDraaiboek)} className="ddp-btn-secondary">
-              <Plus className="inline w-3.5 h-3.5 mr-1" />Nieuw draaiboek
+          <div className="flex gap-2">
+            <button onClick={() => window.print()} className="ddp-btn-secondary">
+              <Printer className="inline w-3.5 h-3.5 mr-1" />Exporteren
             </button>
-          )}
+            {isPlanner && (
+              <button onClick={() => setShowNewDraaiboek(!showNewDraaiboek)} className="ddp-btn-secondary">
+                <Plus className="inline w-3.5 h-3.5 mr-1" />Nieuw draaiboek
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

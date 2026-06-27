@@ -129,6 +129,9 @@ export default function Sidebar({ user, coupleWeddingId }: SidebarProps) {
 
       {/* Language + Logout + Website */}
       <div className="px-3 py-3" style={{ borderTop: "1px solid var(--border)", background: "#fafaf8" }}>
+        <Link href="/instellingen" className="ddp-nav-item w-full text-left">
+          Instellingen
+        </Link>
         <Link href="/" className="ddp-nav-item w-full text-left" target="_blank" rel="noopener noreferrer">
           Naar website
         </Link>
