@@ -57,7 +57,7 @@ export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId
           {vendor.name.charAt(0)}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium truncate">{vendor.name}</div>
+          <div className="text-sm font-medium truncate" title={vendor.name}>{vendor.name}</div>
           <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{vendor.category}</div>
         </div>
       </button>

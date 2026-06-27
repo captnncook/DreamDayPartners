@@ -10,16 +10,20 @@ import { Globe, LogOut } from "lucide-react";
 
 interface SidebarProps {
   user: User;
+  coupleWeddingId?: string | null;
 }
 
-export default function Sidebar({ user }: SidebarProps) {
+export default function Sidebar({ user, coupleWeddingId }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { t, toggle } = useLang();
   const n = t.nav;
 
+  const coupleWeddingHref = coupleWeddingId ? `/weddings/${coupleWeddingId}` : null;
+
   const NAV_ITEMS = [
     { href: "/dashboard",  label: n.dashboard, roles: ["admin", "planner", "team_member", "couple", "vendor"] },
+    ...(coupleWeddingHref ? [{ href: coupleWeddingHref, label: "Onze bruiloft", roles: ["couple"] }] : []),
     { href: "/weddings",   label: n.weddings,  roles: ["admin", "planner", "team_member"] },
     { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
     { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },

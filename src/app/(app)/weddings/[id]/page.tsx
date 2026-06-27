@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import VendorDashboardInline from "@/components/VendorDashboardInline";
 import VendorContactSheet from "@/components/VendorContactSheet";
+import EditableNotes from "@/components/EditableNotes";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
@@ -85,6 +86,10 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
   if (!wedding) notFound();
 
+  const tasksDoneCount = user.role !== "vendor" ? await prisma.task.count({
+    where: { weddingId: id, status: "done" },
+  }) : 0;
+
   // For vendor users: find their own Vendor.id so we can filter the dashboard list
   let ownVendorId: string | null = null;
   if (user.role === "vendor") {
@@ -96,8 +101,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
   const totalBudget = wedding.budget?.totalAmount ?? 0;
   const spent = wedding.budget?.items.reduce((s, i) => s + (i.actual ?? 0), 0) ?? 0;
   const budgetPct = totalBudget > 0 ? Math.min(100, Math.round((spent / totalBudget) * 100)) : 0;
-  const tasksDone = wedding.tasks.filter((t) => t.status === "done").length;
-  const tasksOpen = wedding.tasks.filter((t) => t.status !== "done").length;
+  const tasksOpen = wedding._count.tasks - tasksDoneCount;
   const guestConfirmed = wedding.guests.filter((g) => g.rsvpStatus === "confirmed").length;
   const draaiboek = wedding.draaiboeken[0] ?? null;
 
@@ -194,23 +198,43 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
           {/* Stats — alleen voor niet-vendors */}
           {!isVendor && (
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { value: guestConfirmed, sub: `van ${wedding._count.guests} gasten`, label: "Bevestigd" },
-                { value: tasksOpen, sub: `${tasksDone} afgerond`, label: "Taken open" },
-                { value: wedding.vendors.length, sub: "gekoppeld", label: "Leveranciers" },
-              ].map((stat) => (
-                <div key={stat.label} className="ddp-card text-center" style={{ padding: "1.25rem 0.75rem" }}>
-                  <div style={{ fontSize: "clamp(1.75rem, 6vw, 2.5rem)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: "var(--primary)", marginBottom: "4px" }}>
-                    {stat.value}
+            <>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { value: guestConfirmed, sub: `van ${wedding._count.guests} gasten`, label: "Bevestigd" },
+                  { value: tasksOpen, sub: `${tasksDoneCount} afgerond`, label: "Taken open" },
+                  { value: wedding.vendors.length, sub: "gekoppeld", label: "Leveranciers" },
+                ].map((stat) => (
+                  <div key={stat.label} className="ddp-card text-center" style={{ padding: "1.25rem 0.75rem" }}>
+                    <div style={{ fontSize: "clamp(1.75rem, 6vw, 2.5rem)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: "var(--primary)", marginBottom: "4px" }}>
+                      {stat.value}
+                    </div>
+                    <div style={{ fontSize: "0.6875rem", color: "var(--muted)", lineHeight: 1.3 }}>
+                      <div className="font-semibold" style={{ color: "var(--foreground)", fontSize: "0.75rem" }}>{stat.label}</div>
+                      <div>{stat.sub}</div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: "0.6875rem", color: "var(--muted)", lineHeight: 1.3 }}>
-                    <div className="font-semibold" style={{ color: "var(--foreground)", fontSize: "0.75rem" }}>{stat.label}</div>
-                    <div>{stat.sub}</div>
+                ))}
+              </div>
+              {wedding._count.tasks > 0 && (
+                <div className="ddp-card" style={{ padding: "1rem 1.125rem" }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>Planningsvoortgang</span>
+                    <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>{tasksDoneCount} van {wedding._count.tasks} taken afgerond</span>
+                  </div>
+                  <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.06)" }}>
+                    <div className="h-full rounded-full" style={{
+                      width: `${Math.round((tasksDoneCount / wedding._count.tasks) * 100)}%`,
+                      background: "var(--gradient-primary)",
+                      transition: "width 0.5s ease",
+                    }} />
+                  </div>
+                  <div className="text-right mt-1" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                    {Math.round((tasksDoneCount / wedding._count.tasks) * 100)}% klaar
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
 
           {/* Draaiboek preview */}
@@ -385,11 +409,8 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
-          {wedding.notes && (
-            <div className="ddp-card">
-              <h3 className="mb-2" style={{ fontWeight: 600, fontSize: "0.9375rem" }}>Notities</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{wedding.notes}</p>
-            </div>
+          {!isVendor && (
+            <EditableNotes weddingId={id} initialNotes={wedding.notes ?? ""} />
           )}
 
           {/* Snelle toegang */}

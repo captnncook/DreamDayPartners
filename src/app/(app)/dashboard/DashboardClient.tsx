@@ -37,9 +37,10 @@ interface Props {
   weddings: Wedding[];
   tasks: Task[];
   vendorRequests?: VendorRequest[];
+  taskProgress?: { total: number; done: number };
 }
 
-export default function DashboardClient({ user, greeting, statsCards, weddings, tasks: initialTasks, vendorRequests = [] }: Props) {
+export default function DashboardClient({ user, greeting, statsCards, weddings, tasks: initialTasks, vendorRequests = [], taskProgress }: Props) {
   const router = useRouter();
   const [requests, setRequests] = useState(vendorRequests);
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
@@ -65,6 +66,7 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
   }
 
   async function deleteTask(taskId: string, weddingId: string) {
+    if (!confirm("Taak verwijderen?")) return;
     await fetch(`/api/weddings/${weddingId}/tasks/${taskId}`, { method: "DELETE" });
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }
@@ -225,7 +227,21 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
       {user.role !== "vendor" && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "-0.02em" }}>Mijn taken</h2>
+            <div>
+              <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
+                {user.role === "couple" ? "Taken" : "Mijn taken"}
+                {taskProgress && taskProgress.total > 0 && (
+                  <span style={{ fontSize: "0.8125rem", fontWeight: 400, color: "var(--muted)", marginLeft: "0.5rem" }}>
+                    {taskProgress.done} van {taskProgress.total} afgerond
+                  </span>
+                )}
+              </h2>
+              {taskProgress && taskProgress.total > 0 && (
+                <div className="h-1.5 rounded-full mt-1.5 overflow-hidden" style={{ background: "rgba(0,0,0,0.06)", width: "160px" }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.round((taskProgress.done / taskProgress.total) * 100)}%`, background: "var(--gradient-primary)" }} />
+                </div>
+              )}
+            </div>
             {weddings.length > 0 && (
               <button
                 onClick={() => setShowNewTask(true)}

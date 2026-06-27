@@ -38,11 +38,23 @@ export default async function DashboardPage() {
     });
   }
 
+  // Couple users: show all wedding tasks (not just ones assigned to them)
+  // Other roles: show tasks assigned to them
+  const coupleWeddingIds = user.role === "couple" ? weddings.map(w => w.id) : [];
   const myTasks = user.role !== "vendor" ? await prisma.task.findMany({
-    where: { assignedTo: user.id, status: { not: "done" } },
+    where: user.role === "couple"
+      ? { weddingId: { in: coupleWeddingIds }, status: { not: "done" } }
+      : { assignedTo: user.id, status: { not: "done" } },
     include: { wedding: true },
     orderBy: { dueDate: "asc" },
     take: 5,
+  }) : [];
+
+  // For couple: also get total task counts for progress display
+  const taskCounts = user.role === "couple" && coupleWeddingIds.length > 0 ? await prisma.task.groupBy({
+    by: ["status"],
+    where: { weddingId: { in: coupleWeddingIds } },
+    _count: true,
   }) : [];
 
   // Openstaande Dream Team-uitnodigingen voor leveranciers.
@@ -93,6 +105,9 @@ export default async function DashboardPage() {
     weddingTitle: t.wedding.title,
   }));
 
+  const totalTasks = taskCounts.reduce((s, g) => s + g._count, 0);
+  const doneTasks = taskCounts.find(g => g.status === "done")?._count ?? 0;
+
   return (
     <DashboardClient
       user={{ id: user.id, name: user.name, role: user.role }}
@@ -100,6 +115,7 @@ export default async function DashboardPage() {
       statsCards={statsCards}
       weddings={weddingsData}
       tasks={tasksData}
+      taskProgress={user.role === "couple" ? { total: totalTasks, done: doneTasks } : undefined}
       vendorRequests={requestsData}
     />
   );

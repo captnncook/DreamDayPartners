@@ -67,6 +67,7 @@ export default function GuestsPage() {
   }
 
   async function deleteGuest(guestId: string) {
+    if (!confirm("Gast verwijderen?")) return;
     await fetch(`/api/weddings/${id}/guests/${guestId}`, { method: "DELETE" });
     load();
   }

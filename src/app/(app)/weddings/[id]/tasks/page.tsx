@@ -33,6 +33,7 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState<"all" | "open" | "done">("all");
+  const [sort, setSort] = useState<"deadline" | "priority" | "status">("deadline");
   const [form, setForm] = useState({ title: "", description: "", dueDate: "", category: "general", priority: "medium" });
   const [saving, setSaving] = useState(false);
 
@@ -70,13 +71,26 @@ export default function TasksPage() {
   }
 
   async function deleteTask(taskId: string) {
+    if (!confirm("Taak verwijderen?")) return;
     await fetch(`/api/weddings/${id}/tasks/${taskId}`, { method: "DELETE" });
     load();
   }
 
-  const filtered = tasks.filter((t) =>
-    filter === "all" ? true : filter === "done" ? t.status === "done" : t.status !== "done"
-  );
+  const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+  const STATUS_ORDER: Record<string, number> = { in_progress: 0, open: 1, done: 2 };
+
+  const filtered = tasks
+    .filter((t) => filter === "all" ? true : filter === "done" ? t.status === "done" : t.status !== "done")
+    .sort((a, b) => {
+      if (sort === "deadline") {
+        if (!a.dueDate && !b.dueDate) return 0;
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }
+      if (sort === "priority") return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1);
+      return (STATUS_ORDER[a.status] ?? 1) - (STATUS_ORDER[b.status] ?? 1);
+    });
 
   if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
 
@@ -131,7 +145,7 @@ export default function TasksPage() {
         </form>
       )}
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4 items-center">
         {(["all", "open", "done"] as const).map((f) => (
           <button key={f} onClick={() => setFilter(f)}
             className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
@@ -142,12 +156,25 @@ export default function TasksPage() {
             {f === "all" ? "Alles" : f === "open" ? "Open" : "Klaar"}
           </button>
         ))}
-        <span className="text-sm ml-2" style={{ color: "var(--muted)", lineHeight: "2" }}>{filtered.length} taken</span>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span className="text-xs" style={{ color: "var(--muted)" }}>Sorteren:</span>
+          <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
+            className="text-xs rounded-lg px-2 py-1.5 border"
+            style={{ borderColor: "var(--border)", background: "white", cursor: "pointer" }}>
+            <option value="deadline">Deadline</option>
+            <option value="priority">Prioriteit</option>
+            <option value="status">Status</option>
+          </select>
+          <span className="text-xs" style={{ color: "var(--muted)" }}>{filtered.length} taken</span>
+        </div>
       </div>
 
       <div className="space-y-2">
-        {filtered.map((task) => (
-          <div key={task.id} className="ddp-card flex items-start gap-4">
+        {filtered.map((task) => {
+          const daysLeft = task.dueDate ? Math.ceil((new Date(task.dueDate).getTime() - Date.now()) / 86400000) : null;
+          const isUrgent = daysLeft !== null && daysLeft <= 7 && task.status !== "done";
+          return (
+          <div key={task.id} className="ddp-card flex items-start gap-4" style={isUrgent ? { borderColor: "var(--danger)", background: "var(--danger-bg)" } : {}}>
             <button onClick={() => toggleStatus(task)} className="mt-0.5 flex-shrink-0" title="Status wijzigen">
               {(() => { const Icon = STATUS_ICON_MAP[task.status] ?? Circle; return <Icon className="w-5 h-5" style={{ color: STATUS_ICON_COLOR[task.status] ?? "var(--muted-light)" }} />; })()}
             </button>
@@ -171,7 +198,8 @@ export default function TasksPage() {
             </div>
             <button onClick={() => deleteTask(task.id)} className="flex-shrink-0 hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-4 h-4" /></button>
           </div>
-        ))}
+          );
+        })}
         {filtered.length === 0 && (
           <div className="text-center py-12" style={{ color: "var(--muted)" }}>
             <div className="flex justify-center mb-2"><CheckSquare className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
