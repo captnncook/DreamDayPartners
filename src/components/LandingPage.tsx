@@ -139,7 +139,7 @@ export default function LandingPage() {
         <div className="hidden md:flex items-center gap-0 flex-1 justify-center">
           {[
             { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-            { href: "/leveranciers",  label: "Leveranciers" },
+            { href: "/leveranciers",  label: "Vind leveranciers" },
             { href: "#prijzen",       label: "Prijzen" },
             { href: "#faq",           label: "FAQ" },
           ].map((l) => (
@@ -193,7 +193,7 @@ export default function LandingPage() {
                 }}
               >
                 Samen naar jullie dream day,{" "}
-                <span style={{ background: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                <span style={{ color: "var(--primary)", background: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                   zonder de stress.
                 </span>
               </h1>
@@ -204,8 +204,8 @@ export default function LandingPage() {
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Begin gratis
                 </Link>
-                <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
-                  Vind jouw Dream Partner!
+                <Link href="/leveranciers" style={{ fontSize: "0.9375rem", color: "var(--muted)", textDecoration: "underline", textUnderlineOffset: "3px", padding: "0.75rem 0.25rem" }}>
+                  Vind jouw Dream Partner
                 </Link>
               </div>
             </div>
@@ -416,52 +416,39 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Social proof ─────────────────────────────────── */}
+      {/* ── Early access / beta ───────────────────────────── */}
       <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
         <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
           <ScrollReveal>
-            <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Ervaringen</p>
-            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3.5rem" }}>
-              Bruidsparen gingen{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>je voor.</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", marginBottom: "1.25rem" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", background: "var(--gradient-primary)", borderRadius: "999px", padding: "0.25rem 0.875rem", fontSize: "0.6875rem", fontWeight: 700, color: "white", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                Beta
+              </span>
+              <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Beperkte toegang · Wees er vroeg bij</span>
+            </div>
+            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "1rem" }}>
+              Wees één van de eersten.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>En help mee bouwen.</span>
             </h2>
+            <p style={{ fontSize: "1rem", color: "var(--muted)", lineHeight: 1.7, maxWidth: "520px", marginBottom: "3rem" }}>
+              DreamDay Partners is momenteel in bèta. Vroege gebruikers krijgen directe toegang, persoonlijke support en de kans om het platform mee te vormen.
+            </p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Featured photo quote */}
-            <ScrollReveal delay={0} className="md:col-span-1">
-              <div style={{ borderRadius: "20px", overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.08)", height: "100%", display: "flex", flexDirection: "column" }}>
-                <div style={{ position: "relative", height: "220px" }}>
-                  <Image src="/images/bride-sofa.png" alt="Tevreden bruid" fill style={{ objectFit: "cover", objectPosition: "center top" }} />
+            {[
+              { icon: "✦", title: "Vroege toegang", desc: "Registreer nu en gebruik het platform terwijl het groeit. Jouw feedback vormt de volgende versie." },
+              { icon: "✦", title: "Directe support", desc: "Tijdens de bèta heb je direct contact met het team. Geen wachtrij, geen bot." },
+              { icon: "✦", title: "Gratis voor bruidsparen", desc: "Nu, later, altijd. Bruidsparen betalen nooit voor DreamDay Partners." },
+            ].map((item, i) => (
+              <ScrollReveal key={item.title} delay={i * 100}>
+                <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
+                  <div style={{ fontSize: "1.25rem", color: "var(--primary)", marginBottom: "0.75rem" }}>{item.icon}</div>
+                  <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.02em", marginBottom: "0.5rem" }}>{item.title}</h3>
+                  <p style={{ fontSize: "0.9rem", color: "var(--muted)", lineHeight: 1.65 }}>{item.desc}</p>
                 </div>
-                <div style={{ padding: "1.5rem", background: "white", flex: 1 }}>
-                  <p style={{ fontSize: "0.9375rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1rem", fontStyle: "italic" }}>
-                    &ldquo;Eindelijk één plek voor alles. We hadden nooit gedacht dat plannen zo overzichtelijk kon zijn.&rdquo;
-                  </p>
-                  <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--primary)" }}>Emma & Thomas</p>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <div className="md:col-span-2 grid grid-cols-1 gap-4">
-              {[
-                { quote: "De combinatie van leveranciers, chat en draaiboek op één plek is echt een game changer.", name: "Sophie & Lars" },
-                { quote: "Op onze trouwdag hoefden we nergens aan te denken. Alles was geregeld dankzij DreamDay.", name: "Nora & Daan" },
-              ].map((r, i) => (
-                <ScrollReveal key={i} delay={(i + 1) * 100}>
-                  <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
-                    <p style={{ fontSize: "0.9375rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1.25rem", fontStyle: "italic" }}>
-                      &ldquo;{r.quote}&rdquo;
-                    </p>
-                    <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--primary)" }}>{r.name}</p>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
+              </ScrollReveal>
+            ))}
           </div>
-
-          <p style={{ marginTop: "1.5rem", fontSize: "0.75rem", color: "var(--muted)", fontStyle: "italic" }}>
-            * Reviews worden aangevuld zodra we echte ervaringen hebben ontvangen.
-          </p>
         </div>
       </section>
 
@@ -602,7 +589,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-5">
             {[
               { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-              { href: "/leveranciers",  label: "Leveranciers" },
+              { href: "/leveranciers",  label: "Vind leveranciers" },
               { href: "#prijzen",       label: "Prijzen" },
               { href: "#faq",           label: "FAQ" },
               { href: "/login",         label: "Inloggen" },

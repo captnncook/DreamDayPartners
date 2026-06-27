@@ -13,6 +13,13 @@ export default function ScrollReveal({ children, delay = 0, className = "" }: Pr
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Respect user's motion preference — show immediately without animation
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.classList.add("sr-visible");
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
