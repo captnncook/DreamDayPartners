@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Upload, Trash2, Save, Check } from "lucide-react";
+import { ArrowLeft, Upload, Trash2, Save, Check, Star } from "lucide-react";
 
 const CATEGORIES = [
   { value: "weddingplanner", label: "Weddingplanner" },
@@ -32,13 +32,24 @@ type Vendor = {
   isPremium: boolean; photos: string[]; city?: string; userId?: string;
 };
 
-export default function VendorEditPage() {
+import { Suspense } from "react";
+
+export default function VendorEditPageWrapper() {
+  return <Suspense><VendorEditPage /></Suspense>;
+}
+
+function VendorEditPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
+  const searchParams = useSearchParams();
+  const upgradeStatus = searchParams.get("upgrade");
+
   const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [isUserPremium, setIsUserPremium] = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverKey, setCoverKey] = useState<string | null>(null);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
@@ -70,6 +81,7 @@ export default function VendorEditPage() {
 
     const v = vData.vendor;
     setVendor(v);
+    setIsUserPremium(meData.user?.isPremium ?? false);
     setForm({
       description: v.description ?? "",
       city: v.city ?? "",
@@ -174,6 +186,22 @@ export default function VendorEditPage() {
       setPhotoUrls(photoUrls.filter((_, i) => i !== idx));
       setPhotoKeys(photoKeys.filter((k) => k !== key));
     }
+  }
+
+  async function handleUpgrade() {
+    setBillingLoading(true);
+    const res = await fetch("/api/billing/checkout", { method: "POST" });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else { setError(data.error ?? "Kan niet verbinden met betaalservice"); setBillingLoading(false); }
+  }
+
+  async function handlePortal() {
+    setBillingLoading(true);
+    const res = await fetch("/api/billing/portal", { method: "POST" });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else { setError(data.error ?? "Kan niet verbinden met betaalservice"); setBillingLoading(false); }
   }
 
   if (loading) {
@@ -351,6 +379,53 @@ export default function VendorEditPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Premium */}
+        {upgradeStatus === "success" && (
+          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534", marginBottom: "1rem" }}>
+            Premium actief — welkom bij DreamDay Partners Pro!
+          </div>
+        )}
+        {upgradeStatus === "cancelled" && (
+          <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#92400e", marginBottom: "1rem" }}>
+            Betaling geannuleerd. Je kunt het altijd opnieuw proberen.
+          </div>
+        )}
+
+        <section style={{ background: isUserPremium ? "#fffbeb" : "var(--foreground)", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: `1px solid ${isUserPremium ? "#fde68a" : "transparent"}` }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
+                <Star className="w-4 h-4" style={{ color: isUserPremium ? "#d97706" : "#C9A96E" }} />
+                <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: isUserPremium ? "#92400e" : "white" }}>
+                  {isUserPremium ? "Premium actief" : "Upgrade naar Premium"}
+                </span>
+              </div>
+              <p style={{ fontSize: "0.8125rem", color: isUserPremium ? "#b45309" : "rgba(255,255,255,0.55)", maxWidth: "360px" }}>
+                {isUserPremium
+                  ? "Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen."
+                  : "Kom bovenaan zoekresultaten, toon het Aanbevolen-label en bereik meer bruidsparen. Slechts €29/maand."}
+              </p>
+            </div>
+            {isUserPremium ? (
+              <button
+                onClick={handlePortal}
+                disabled={billingLoading}
+                style={{ padding: "0.625rem 1.25rem", borderRadius: "9999px", background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}
+              >
+                {billingLoading ? "Laden…" : "Abonnement beheren"}
+              </button>
+            ) : (
+              <button
+                onClick={handleUpgrade}
+                disabled={billingLoading}
+                style={{ padding: "0.625rem 1.5rem", borderRadius: "9999px", background: "#C9A96E", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700 }}
+              >
+                {billingLoading ? "Laden…" : "Upgrade — €29/maand"}
+              </button>
+            )}
           </div>
         </section>
 
