@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { stripe, STRIPE_PRICE_ID } from "@/lib/stripe";
+import { getStripe, STRIPE_PRICE_ID } from "@/lib/stripe";
 
 export async function POST() {
   const user = await getSession();
@@ -20,7 +20,7 @@ export async function POST() {
   // Get or create Stripe customer
   let customerId = dbUser.stripeCustomerId;
   if (!customerId) {
-    const customer = await stripe.customers.create({
+    const customer = await getStripe().customers.create({
       email: dbUser.email,
       name: dbUser.name,
       metadata: { userId: dbUser.id },
@@ -29,7 +29,7 @@ export async function POST() {
     await prisma.user.update({ where: { id: dbUser.id }, data: { stripeCustomerId: customerId } });
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
     line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
