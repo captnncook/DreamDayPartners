@@ -48,16 +48,10 @@ export default function DreamTeamPage() {
       <div className="mb-6">
         <h1 style={{ fontSize: "1.625rem", fontWeight: 700, letterSpacing: "-0.04em" }}>Dream Team</h1>
         <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "4px" }}>
-          {loading ? "Laden…" : `${filled} van ${total} leveranciers gekozen`}
+          Overzicht van jullie leveranciers per categorie
         </p>
       </div>
 
-      {/* Progress bar */}
-      {!loading && (
-        <div style={{ height: "6px", borderRadius: "999px", background: "var(--border)", marginBottom: "2rem", overflow: "hidden" }}>
-          <div style={{ height: "100%", borderRadius: "999px", background: "var(--primary)", width: `${(filled / total) * 100}%`, transition: "width 0.4s" }} />
-        </div>
-      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
         {SLOTS.map(({ category, label }) => {
