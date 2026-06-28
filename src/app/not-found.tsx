@@ -16,7 +16,7 @@ export default function NotFound() {
       }}
     >
       <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "3rem", textDecoration: "none" }}>
-        <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} />
+        <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
         <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
           DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
         </span>

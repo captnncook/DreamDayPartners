@@ -68,7 +68,7 @@ export default function LoginPage() {
     >
       {/* Logo linksboven — terug naar home */}
       <Link href="/" className="fixed top-4 left-5 md:left-10 inline-flex items-center gap-2 z-20" style={{ textDecoration: "none" }}>
-        <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} />
+        <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
         <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
           DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
         </span>
@@ -88,7 +88,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-3">
-            <Image src="/logo.png" alt="DreamDay Partners" width={48} height={48} />
+            <Image src="/images/logo.svg" alt="DreamDay Partners" width={48} height={48} />
             <div className="text-left">
               <div className="font-serif text-xl font-bold" style={{ color: "var(--foreground)" }}>DreamDay</div>
               <div className="text-sm font-medium" style={{ color: "var(--primary)" }}>Partners</div>
@@ -214,7 +214,7 @@ export default function LoginPage() {
 
         {/* Register CTA */}
         <div className="ddp-card text-center" style={{ boxShadow: "var(--shadow-md)" }}>
-          <Image src="/logo.png" alt="DreamDay" width={40} height={40} className="mx-auto mb-3" />
+          <Image src="/images/logo.svg" alt="DreamDay" width={40} height={40} className="mx-auto mb-3" />
           <h2 className="font-semibold text-sm mb-1">Jullie dream day plannen?</h2>
           <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>
             Stel jullie dream team samen en regel alles op één plek — gratis voor bruidsparen.

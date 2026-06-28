@@ -80,7 +80,7 @@ export default function WeddingWizardPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center">
-            <Image src="/logo.png" alt="DreamDay Partners" width={56} height={56} />
+            <Image src="/images/logo.svg" alt="DreamDay Partners" width={56} height={56} />
           </div>
           <h1 className="text-2xl font-bold mt-3" style={{ color: "var(--primary)" }}>Begin jullie dream day</h1>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>In een paar stappen klaar — alles kun je later aanpassen</p>

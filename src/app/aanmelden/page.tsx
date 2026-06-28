@@ -107,7 +107,7 @@ function AanmeldenForm() {
       {/* Logo linksboven — terug naar home */}
       <div className="px-5 md:px-10 py-4">
         <Link href="/" className="inline-flex items-center gap-2">
-          <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} />
+          <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
           <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
             DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
           </span>
