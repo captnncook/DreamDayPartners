@@ -18,6 +18,7 @@ export async function GET() {
   const thisYear = now.getFullYear();
 
   const byMonth: Record<number, number> = {};
+  const byMonthRevenue: Record<number, number> = {};
   const byYear: Record<number, number> = {};
   let totalRevenue = 0;
 
@@ -27,12 +28,13 @@ export async function GET() {
     const y = d.getFullYear();
     byMonth[m] = (byMonth[m] ?? 0) + 1;
     byYear[y] = (byYear[y] ?? 0) + 1;
-    if (wv.finalAmount) totalRevenue += wv.finalAmount;
-    else if (wv.depositAmount) totalRevenue += wv.depositAmount;
+    const rev = wv.finalAmount ?? wv.depositAmount ?? 0;
+    totalRevenue += rev;
+    byMonthRevenue[m] = (byMonthRevenue[m] ?? 0) + rev;
   }
 
   const monthNames = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
-  const monthsData = monthNames.map((name, i) => ({ name, count: byMonth[i] ?? 0 }));
+  const monthsData = monthNames.map((name, i) => ({ name, count: byMonth[i] ?? 0, revenue: byMonthRevenue[i] ?? 0 }));
 
   const upcoming = weddingVendors.filter(wv => new Date(wv.wedding.date) >= now).length;
   const past = weddingVendors.filter(wv => new Date(wv.wedding.date) < now).length;

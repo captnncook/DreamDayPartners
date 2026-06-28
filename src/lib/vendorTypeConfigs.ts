@@ -46,7 +46,8 @@ export type ModuleKey =
   | "guestDataPanel"
   | "approvalButton"
   | "photoUpload"
-  | "documentUpload";
+  | "documentUpload"
+  | "setlistPlanner";
 
 export interface VendorTypeConfig {
   type: string;
@@ -305,7 +306,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "dj",
     label: "DJ / Muziek",
     emoji: "🎧",
-    modules: ["timelinePlanner", "deliverablesTracker", "logisticsPanel"],
+    modules: ["setlistPlanner", "timelinePlanner", "deliverablesTracker", "logisticsPanel"],
     intakeFields: [
       { key: "vibe", label: "Gewenste vibe & muziekstijlen", type: "longtext", placeholder: "Commercieel, R&B, jaren 80, latin..." },
       { key: "firstDanceSong", label: "Openingsdansnummer", type: "text", placeholder: "Artiest - Titel" },

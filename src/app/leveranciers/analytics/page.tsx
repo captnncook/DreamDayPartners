@@ -10,7 +10,7 @@ type AnalyticsData = {
   upcoming: number;
   past: number;
   totalRevenue: number;
-  monthsData: { name: string; count: number }[];
+  monthsData: { name: string; count: number; revenue: number }[];
   byYear: { year: number; count: number }[];
 };
 
@@ -28,6 +28,7 @@ export default function VendorAnalyticsPage() {
   }, []);
 
   const maxMonth = data ? Math.max(...data.monthsData.map(m => m.count), 1) : 1;
+  const maxMonthRevenue = data ? Math.max(...data.monthsData.map(m => m.revenue), 1) : 1;
 
   return (
     <div className="min-h-screen" style={{ background: "#f5f5f7" }}>
@@ -63,7 +64,7 @@ export default function VendorAnalyticsPage() {
                 { label: "Totaal bruiloften", value: data.total, icon: <Star className="w-4 h-4" />, color: "var(--primary)" },
                 { label: "Dit jaar", value: data.thisYear, icon: <Calendar className="w-4 h-4" />, color: "#7c3aed" },
                 { label: "Aankomend", value: data.upcoming, icon: <TrendingUp className="w-4 h-4" />, color: "#16a34a" },
-                { label: "Totale omzet", value: data.totalRevenue > 0 ? `€${data.totalRevenue.toLocaleString("nl-NL")}` : "–", icon: <Euro className="w-4 h-4" />, color: "#d97706", isString: true },
+                { label: "Totale omzet", value: new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(data.totalRevenue), icon: <Euro className="w-4 h-4" />, color: "#d97706", isString: true },
               ].map(({ label, value, icon, color }) => (
                 <div key={label} style={{ background: "white", borderRadius: "16px", padding: "1.25rem", border: "1px solid rgba(0,0,0,0.06)" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -94,6 +95,26 @@ export default function VendorAnalyticsPage() {
                 ))}
               </div>
             </div>
+
+            {/* Omzet per maand */}
+            {data.monthsData.some(m => m.revenue > 0) && (
+              <div style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
+                <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "1.25rem" }}>Omzet per maand</h2>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", height: "120px" }}>
+                  {data.monthsData.map(m => (
+                    <div key={m.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                      <div style={{
+                        width: "100%", borderRadius: "4px 4px 0 0",
+                        height: `${Math.max(4, (m.revenue / maxMonthRevenue) * 100)}px`,
+                        background: m.revenue > 0 ? "#d97706" : "var(--color-blush-soft)",
+                        transition: "height 0.3s ease",
+                      }} />
+                      <span style={{ fontSize: "0.5625rem", color: "var(--muted)", textAlign: "center" }}>{m.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Per jaar */}
             {data.byYear.length > 1 && (

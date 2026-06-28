@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLang } from "@/components/LangProvider";
-import { Briefcase, User, Mail, Phone, Handshake } from "lucide-react";
+import { Briefcase, User, Mail, Phone, Handshake, Crown, Heart } from "lucide-react";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = { id: string; status: string; portalAccess: boolean; notes?: string; vendor: Vendor };
+type WeddingMember = { id: string; name: string; email: string; role: string };
 
 export default function TeamPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,7 @@ export default function TeamPage() {
   const tm = t.team;
 
   const [weddingVendors, setWeddingVendors] = useState<WeddingVendor[]>([]);
+  const [members, setMembers] = useState<WeddingMember[]>([]);
   const [weddingTitle, setWeddingTitle] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -26,6 +28,16 @@ export default function TeamPage() {
     const [wvData, wData] = await Promise.all([wvRes.json(), wRes.json()]);
     setWeddingVendors(wvData.vendors ?? []);
     setWeddingTitle(wData.wedding?.title ?? "");
+    // Derive planner/couple members from wedding data
+    const w = wData.wedding;
+    if (w) {
+      const m: WeddingMember[] = [];
+      if (w.owner) m.push({ id: w.owner.id, name: w.owner.name, email: w.owner.email, role: w.owner.role });
+      (w.teamMembers ?? []).forEach((tm: { user: WeddingMember }) => {
+        if (!m.find(x => x.id === tm.user.id)) m.push({ id: tm.user.id, name: tm.user.name, email: tm.user.email, role: tm.user.role });
+      });
+      setMembers(m);
+    }
     setLoading(false);
   }, [id]);
 
@@ -124,6 +136,37 @@ export default function TeamPage() {
               </Link>
             );
           })}
+        </div>
+      )}
+
+      {/* Planner / couple members */}
+      {members.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-semibold mb-3 text-sm" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Planningsteam</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {members.map(m => {
+              const Icon = m.role === "couple" ? Heart : m.role === "planner" ? Crown : User;
+              const roleLabel = m.role === "couple" ? "Bruidspaar" : m.role === "planner" ? "Trouwplanner" : m.role === "admin" ? "Beheerder" : "Teamlid";
+              return (
+                <div key={m.id} className="ddp-card" style={{ padding: "1rem" }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--color-blush-soft)" }}>
+                      <Icon className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm truncate">{m.name}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{roleLabel}</div>
+                    </div>
+                  </div>
+                  {m.email && (
+                    <div className="mt-2 flex items-center gap-1 text-xs truncate" style={{ color: "var(--primary)" }}>
+                      <Mail className="w-3 h-3 flex-shrink-0" /> {m.email}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

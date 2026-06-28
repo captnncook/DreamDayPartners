@@ -14,6 +14,15 @@ type Invite = {
   weddingId: string | null;
   wedding: { id: string; title: string; date: string } | null;
   createdAt: string;
+  source?: "invite" | "direct";
+  vendorStatus?: string;
+};
+
+const VENDOR_STATUS_LABELS: Record<string, string> = {
+  lead: "Interesse", confirmed: "Bevestigd", booked: "Geboekt", quote_received: "Offerte ontvangen", declined: "Afgewezen",
+};
+const VENDOR_STATUS_COLORS: Record<string, string> = {
+  lead: "#6b7280", confirmed: "#16a34a", booked: "#2563eb", quote_received: "#d97706", declined: "#dc2626",
 };
 
 const INP: React.CSSProperties = {
@@ -171,7 +180,7 @@ export default function MijnBruiloftenPage() {
                     {invite.notes && (
                       <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "4px" }}>{invite.notes}</div>
                     )}
-                    <div style={{ marginTop: "6px" }}>
+                    <div style={{ marginTop: "6px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {linked ? (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.75rem", fontWeight: 600, color: "#16a34a", background: "#f0fdf4", padding: "0.2rem 0.5rem", borderRadius: "6px" }}>
                           <CheckCircle className="w-3 h-3" /> Bruidspaar gekoppeld
@@ -179,6 +188,11 @@ export default function MijnBruiloftenPage() {
                       ) : (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", background: "var(--border)", padding: "0.2rem 0.5rem", borderRadius: "6px" }}>
                           <Clock className="w-3 h-3" /> Bruidspaar nog niet aangemeld
+                        </span>
+                      )}
+                      {invite.vendorStatus && (
+                        <span style={{ display: "inline-flex", alignItems: "center", fontSize: "0.75rem", fontWeight: 600, padding: "0.2rem 0.5rem", borderRadius: "6px", color: VENDOR_STATUS_COLORS[invite.vendorStatus] ?? "var(--muted)", background: `${VENDOR_STATUS_COLORS[invite.vendorStatus] ?? "#6b7280"}18` }}>
+                          {VENDOR_STATUS_LABELS[invite.vendorStatus] ?? invite.vendorStatus}
                         </span>
                       )}
                     </div>

@@ -11,6 +11,7 @@ import GuestDataPanel from "./GuestDataPanel";
 import MoodboardUploader from "./MoodboardUploader";
 import ApprovalButton from "./ApprovalButton";
 import PhotoUploadPanel from "./PhotoUploadPanel";
+import SetlistPlanner from "./SetlistPlanner";
 
 interface Props {
   weddingId: string;
@@ -95,6 +96,10 @@ export default function DashboardEngine({
         isPlanner={isPlanner}
       />
 
+
+      {modules.includes("setlistPlanner") && (
+        <SetlistPlanner intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
 
       {modules.includes("photoUpload") && (
         <PhotoUploadPanel

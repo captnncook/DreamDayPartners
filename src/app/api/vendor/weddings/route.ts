@@ -12,13 +12,42 @@ export async function GET() {
   const vendorId = await getOwnVendorId(user.id);
   if (!vendorId) return NextResponse.json({ invites: [] });
 
-  const invites = await prisma.vendorWeddingInvite.findMany({
-    where: { vendorId },
-    include: { wedding: { select: { id: true, title: true, date: true } } },
-    orderBy: { weddingDate: "asc" },
-  });
+  const [invites, directLinks] = await Promise.all([
+    prisma.vendorWeddingInvite.findMany({
+      where: { vendorId },
+      include: { wedding: { select: { id: true, title: true, date: true } } },
+      orderBy: { weddingDate: "asc" },
+    }),
+    prisma.weddingVendor.findMany({
+      where: { vendorId, portalAccess: true },
+      include: { wedding: { select: { id: true, title: true, date: true } } },
+    }),
+  ]);
 
-  return NextResponse.json({ invites });
+  // Merge: invites take precedence; add direct links that have no corresponding invite
+  const inviteWeddingIds = new Set(invites.map(i => i.weddingId).filter(Boolean));
+  const extra = directLinks
+    .filter(wv => !inviteWeddingIds.has(wv.weddingId))
+    .map(wv => ({
+      id: `wv-${wv.id}`,
+      email1: "",
+      email2: null,
+      weddingDate: wv.wedding.date.toISOString(),
+      weddingTitle: wv.wedding.title,
+      notes: null,
+      weddingId: wv.weddingId,
+      wedding: wv.wedding,
+      vendorStatus: wv.status,
+      createdAt: wv.wedding.date.toISOString(),
+      source: "direct" as const,
+    }));
+
+  const allInvites = [
+    ...invites.map(i => ({ ...i, vendorStatus: undefined, source: "invite" as const })),
+    ...extra,
+  ].sort((a, b) => new Date(a.weddingDate).getTime() - new Date(b.weddingDate).getTime());
+
+  return NextResponse.json({ invites: allInvites });
 }
 
 export async function POST(req: NextRequest) {

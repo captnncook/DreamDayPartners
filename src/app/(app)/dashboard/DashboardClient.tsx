@@ -235,7 +235,7 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
                         {w.venue && <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}><MapPin className="w-3 h-3 inline mr-0.5" />{w.venue}</div>}
                       </div>
                       <div style={{ fontSize: "0.75rem", color: urgent ? "var(--danger)" : "var(--muted)", flexShrink: 0, fontWeight: urgent ? 700 : 400 }}>
-                        {w.days === 0 ? "Vandaag" : w.days > 0 ? `${w.days}d` : `${Math.abs(w.days)}d geleden`}
+                        {w.days === 0 ? "Vandaag" : w.days > 0 ? `${w.days} dagen` : `${Math.abs(w.days)}d geleden`}
                       </div>
                     </div>
                   </Link>
@@ -245,8 +245,8 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
         </section>
       )}
 
-      {/* Bruiloften */}
-      <section className="mb-6">
+      {/* Bruiloften — hidden for vendor (Agenda covers it) */}
+      {user.role !== "vendor" && <section className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
             {user.role === "vendor" ? "Jouw bruiloften" : user.role === "couple" ? "Onze bruiloft" : "Bruiloften"}
@@ -279,7 +279,7 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
             ))}
           </div>
         )}
-      </section>
+      </section>}
 
       {/* Couple countdown */}
       {user.role === "couple" && weddings[0] && (
