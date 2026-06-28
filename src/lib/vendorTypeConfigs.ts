@@ -52,7 +52,9 @@ export type ModuleKey =
   | "couvertCalculator"
   | "shotlistBuilder"
   | "galleryDelivery"
-  | "videoDelivery";
+  | "videoDelivery"
+  | "bruidsteamBuilder"
+  | "materialChecklist";
 
 export interface VendorTypeConfig {
   type: string;
@@ -779,20 +781,23 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "haarstylist",
     label: "Haar & Make-up",
     emoji: "💄",
-    modules: ["moodboardUploader", "timelinePlanner"],
+    modules: ["moodboardUploader", "timelinePlanner", "bruidsteamBuilder", "materialChecklist"],
     intakeFields: [
-      { key: "trialDatum", label: "Datum proefsessie", type: "text" },
-      { key: "lookPerPersoon", label: "Look per persoon", type: "longtext", placeholder: "Bruid, moeder, bruidsmeisjes, getuigen..." },
+      { key: "trialDatum", label: "Datum proefsessie", type: "date" },
       { key: "allergies", label: "Productallergieën", type: "text", placeholder: "Bijv. latex, parfum, specifieke ingrediënten" },
       { key: "aantalPersonen", label: "Aantal personen", type: "number" },
+      { key: "behandeltijdPerPersoon", label: "Behandeltijd per persoon (minuten)", type: "number", placeholder: "Bijv. 45" },
     ],
     deliverables: [
       { key: "trial-resultaat", label: "Trial resultaat (foto's)", approvalRequired: true },
       { key: "definitieve-look", label: "Definitieve look bevestigd" },
     ],
     timelineTemplate: [
-      { key: "ochtend-tijdschema", label: "Ochtend haar & make-up schema", phase: "setup", defaultDuration: 180 },
-      { key: "touch-up", label: "Touch-up voor ceremonie", phase: "custom", defaultDuration: 15 },
+      { key: "aankomst-opbouw", label: "Aankomst & opbouw materiaal", phase: "arrival", defaultDuration: 30 },
+      { key: "bruid-haar-makeup", label: "Bruid — haar & make-up", phase: "perform", defaultDuration: 90 },
+      { key: "bruidsmeisjes", label: "Bruidsmeisjes & moeder", phase: "perform", defaultDuration: 120 },
+      { key: "check-touchup", label: "Check & touch-ups voor ceremonie", phase: "custom", defaultDuration: 15 },
+      { key: "einde-sessie", label: "Einde sessie & opruimen", phase: "teardown", defaultDuration: 20 },
     ],
     logisticsFields: [
       { key: "locatie-sessie", label: "Locatie sessie (thuis / hotel / venue)", type: "text" },
@@ -806,7 +811,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     emoji: "💋",
     modules: ["moodboardUploader", "timelinePlanner"],
     intakeFields: [
-      { key: "trialDatum", label: "Datum proefsessie", type: "text" },
+      { key: "trialDatum", label: "Datum proefsessie", type: "date" },
       { key: "look", label: "Gewenste make-up look", type: "longtext", placeholder: "Natural, dramatic, smoky eye, no-make-up look..." },
       { key: "allergies", label: "Productallergieën", type: "text", placeholder: "Bijv. latex, parfum, specifieke ingrediënten" },
     ],

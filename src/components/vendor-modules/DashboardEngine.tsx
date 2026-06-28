@@ -17,6 +17,8 @@ import CouvertCalculator from "./CouvertCalculator";
 import ShotlistBuilder from "./ShotlistBuilder";
 import GalleryDelivery from "./GalleryDelivery";
 import VideoDelivery from "./VideoDelivery";
+import BruidsteamBuilder from "./BruidsteamBuilder";
+import MaterialChecklist from "./MaterialChecklist";
 
 interface Props {
   weddingId: string;
@@ -126,6 +128,14 @@ export default function DashboardEngine({
         <VideoDelivery intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
       )}
 
+      {modules.includes("bruidsteamBuilder") && (
+        <BruidsteamBuilder intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("materialChecklist") && (
+        <MaterialChecklist intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
       {modules.includes("photoUpload") && (
         <PhotoUploadPanel
           intakeData={intakeData}
@@ -175,7 +185,7 @@ export default function DashboardEngine({
       )}
 
       {modules.includes("moodboardUploader") && (
-        <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} />
+        <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
       )}
 
       {modules.includes("guestDataPanel") && config.readsGuestData && (
