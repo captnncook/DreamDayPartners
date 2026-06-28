@@ -5,10 +5,18 @@ import { User, Bell, LogOut, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SkeletonBlock } from "@/components/Skeleton";
 
-type UserInfo = { id: string; name: string; email: string; role: string };
+type UserInfo = { id: string; name: string; email: string; role: string; vendorType?: string | null };
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "Beheerder", planner: "Trouwplanner", team_member: "Teamlid", couple: "Bruidspaar", vendor: "Leverancier",
+};
+
+const VENDOR_TYPE_LABELS: Record<string, string> = {
+  weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
+  bloemist: "Bloemist", dj: "DJ / Muziek", catering: "Catering", bakker: "Bruidstaart & Bakker",
+  haarstylist: "Haarstylist", visagist: "Visagist", trouwlocatie: "Trouwlocatie",
+  vervoer: "Vervoer", verhuur: "Verhuur", tentverhuur: "Tentverhuur", trouwauto: "Trouwauto",
+  bar: "Bar / Cocktails", koffiebar: "Koffiebar / Foodtruck",
 };
 
 const NOTIF_DEFAULTS = {
@@ -107,7 +115,9 @@ export default function InstellingenPage() {
           <div>
             <label className="block text-xs font-medium mb-1">Rol</label>
             <div className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)", background: "var(--accent)", color: "var(--muted)" }}>
-              {ROLE_LABELS[user?.role ?? ""] ?? user?.role}
+              {user?.role === "vendor" && user.vendorType
+                ? (VENDOR_TYPE_LABELS[user.vendorType] ?? user.vendorType)
+                : (ROLE_LABELS[user?.role ?? ""] ?? user?.role)}
             </div>
           </div>
           <button type="submit" disabled={saving} className="ddp-btn-primary">

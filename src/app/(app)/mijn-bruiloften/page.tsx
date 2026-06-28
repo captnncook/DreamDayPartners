@@ -19,11 +19,14 @@ type Invite = {
 };
 
 const VENDOR_STATUS_LABELS: Record<string, string> = {
-  lead: "Interesse", confirmed: "Bevestigd", booked: "Geboekt", quote_received: "Offerte ontvangen", declined: "Afgewezen",
+  lead: "Interesse", confirmed: "Bevestigd", booked: "Geboekt", quote_received: "Offerte ontvangen",
+  declined: "Afgewezen", ready: "Klaar voor de dag", in_progress: "In voorbereiding",
+  invited: "Uitgenodigd", contacted: "Gecontacteerd", interest: "Interesse", completed: "Afgerond", pending: "In behandeling",
 };
 const VENDOR_STATUS_COLORS: Record<string, string> = {
   lead: "#f59e0b", confirmed: "#16a34a", booked: "#2563eb", quote_received: "#d97706", declined: "#dc2626",
-  interest: "#9ca3af",
+  interest: "#9ca3af", ready: "#059669", in_progress: "#7c3aed", invited: "#64748b",
+  contacted: "#0891b2", completed: "#2563eb", pending: "#6b7280",
 };
 
 const INP: React.CSSProperties = {

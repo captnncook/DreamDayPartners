@@ -119,6 +119,24 @@ function VendorEditPage() {
   const searchParams = useSearchParams();
   const upgradeStatus = searchParams.get("upgrade");
 
+  const SPECIALIZATIONS_PLACEHOLDER: Record<string, string> = {
+    weddingplanner: "bijv. full-service planning, dag-van coördinatie, bestemmingsbruiloft",
+    fotograaf: "bijv. documentair, editorial, bruidsfotografie, portret",
+    videograaf: "bijv. cinematic films, same-day edits, drone, documentair",
+    bloemist: "bijv. bruidsboeket, corsages, tafeldecoratie, bloemenboog",
+    dj: "bijv. bruiloften, openingsdans, liveoptredens, MC",
+    catering: "bijv. walking dinner, diner, buffet, foodtruck",
+    bakker: "bijv. bruidstaart, cupcakes, donutwall, taartproeverij",
+    haarstylist: "bijv. bruidsopsteekhaar, bruidsstyling, extensions",
+    visagist: "bijv. bruidsmake-up, airbrush, HMUA",
+    trouwlocatie: "bijv. buitenlocatie, landgoed, industrieel, intiem",
+    vervoer: "bijv. oldtimers, limousines, bruidsbussen, vintage",
+    trouwauto: "bijv. oldtimer, cabriolet, limousine, elektrisch",
+    verhuur: "bijv. meubilair, linnen, servies, podium",
+    bar: "bijv. cocktails, wijnproeverij, champagnebar",
+    koffiebar: "bijv. barista, specialty coffee, foodtruck",
+  };
+
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [isUserPremium, setIsUserPremium] = useState(false);
   const [billingLoading, setBillingLoading] = useState(false);
@@ -538,7 +556,7 @@ function VendorEditPage() {
               type="text"
               value={form.specializations}
               onChange={(e) => setForm({ ...form, specializations: e.target.value })}
-              placeholder="bijv. bruidsboeket, corsages, tafeldecoratie"
+              placeholder={SPECIALIZATIONS_PLACEHOLDER[vendor?.category ?? ""] ?? "bijv. bruidsboeket, corsages, fotografie..."}
               style={{ width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }}
             />
           </div>
@@ -546,10 +564,7 @@ function VendorEditPage() {
 
         {/* Beschikbaarheid */}
         <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Beschikbaarheid</h2>
-          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
-            Klik op een datum om hem te blokkeren. Rood = niet beschikbaar.
-          </p>
+          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "1rem" }}>Beschikbaarheid</h2>
           <BusyCalendar busyDates={busyDates} onToggle={toggleBusyDate} />
         </section>
 

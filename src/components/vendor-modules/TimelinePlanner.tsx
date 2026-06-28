@@ -112,6 +112,7 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
+  const [showTemplateConfirm, setShowTemplateConfirm] = useState(false);
 
   const canEdit = isPlanner || isVendor;
 
@@ -119,6 +120,7 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
 
   async function applyTemplate() {
     if (!templates || templates.length === 0) return;
+    setShowTemplateConfirm(false);
     setLoadingTemplate(true);
     let currentTime = "09:00";
     const created: typeof blocks = [];
@@ -203,6 +205,12 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
               <Download className="w-3.5 h-3.5" /> Exporteren
             </button>
           )}
+          {canEdit && templates && templates.length > 0 && blocks.length > 0 && !adding && !editingId && (
+            <button onClick={() => setShowTemplateConfirm(true)} disabled={loadingTemplate}
+              style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
+              {loadingTemplate ? "Laden…" : "✨ Template"}
+            </button>
+          )}
           {canEdit && !adding && !editingId && (
             <button onClick={() => { setAdding(true); setForm(emptyForm); }}
               style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
@@ -225,13 +233,36 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
           </p>
           {canEdit && templates && templates.length > 0 && (
             <button
-              onClick={applyTemplate}
+              onClick={() => setShowTemplateConfirm(true)}
               disabled={loadingTemplate}
               style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.4rem 0.875rem", cursor: "pointer", fontWeight: 600 }}
             >
               {loadingTemplate ? "Template laden…" : "✨ Template toepassen"}
             </button>
           )}
+        </div>
+      )}
+
+      {showTemplateConfirm && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+          <div style={{ background: "white", borderRadius: "16px", padding: "1.5rem", maxWidth: "380px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.18)" }}>
+            <h3 style={{ fontWeight: 700, fontSize: "1rem", marginBottom: "0.5rem" }}>Template toepassen?</h3>
+            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginBottom: "0.75rem" }}>
+              Dit voegt {templates.length} tijdblokken toe aan de tijdlijn. Bestaande items worden niet verwijderd.
+            </p>
+            <ul style={{ fontSize: "0.8125rem", color: "var(--foreground)", marginBottom: "1rem", paddingLeft: "1rem" }}>
+              {templates.slice(0, 6).map(t => <li key={t.key} style={{ marginBottom: "0.2rem" }}>{t.label}{t.defaultDuration ? ` (${t.defaultDuration} min)` : ""}</li>)}
+              {templates.length > 6 && <li style={{ color: "var(--muted)" }}>+ {templates.length - 6} meer…</li>}
+            </ul>
+            <div style={{ display: "flex", gap: "0.625rem" }}>
+              <button onClick={applyTemplate} style={{ flex: 1, background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", padding: "0.625rem", cursor: "pointer", fontWeight: 600, fontSize: "0.875rem" }}>
+                Toepassen
+              </button>
+              <button onClick={() => setShowTemplateConfirm(false)} style={{ flex: 1, background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.625rem", cursor: "pointer", fontWeight: 600, fontSize: "0.875rem", color: "var(--foreground)" }}>
+                Annuleren
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

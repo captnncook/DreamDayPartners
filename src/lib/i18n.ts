@@ -77,6 +77,7 @@ export const translations = {
         completed: "Afgerond",
         declined: "Afgewezen",
         pending: "In behandeling",
+        ready: "Klaar voor de dag",
       },
     },
     vendorDetail: {
@@ -188,6 +189,7 @@ export const translations = {
         completed: "Completed",
         declined: "Declined",
         pending: "Pending",
+        ready: "Ready for the day",
       },
     },
     vendorDetail: {
