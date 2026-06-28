@@ -14,6 +14,7 @@ interface Props {
   guests: Guest[];
   weddingId: string;
   totalGuests: number;
+  isPlanner?: boolean;
 }
 
 function exportGuestsCsv(guests: Guest[]) {
@@ -29,7 +30,7 @@ function exportGuestsCsv(guests: Guest[]) {
   URL.revokeObjectURL(url);
 }
 
-export default function GuestDataPanel({ guests, weddingId }: Props) {
+export default function GuestDataPanel({ guests, weddingId, isPlanner }: Props) {
   const total = guests.length;
   const confirmed = guests.filter(g => g.rsvpStatus === "confirmed");
   const withDietary = guests.filter(g => g.dietary && g.dietary.trim());
@@ -54,7 +55,9 @@ export default function GuestDataPanel({ guests, weddingId }: Props) {
               <Download className="w-3.5 h-3.5" /> CSV
             </button>
           )}
-          <a href={`/weddings/${weddingId}/guests`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alle gasten →</a>
+          {isPlanner && (
+            <a href={`/weddings/${weddingId}/guests`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alle gasten →</a>
+          )}
         </div>
       </div>
 

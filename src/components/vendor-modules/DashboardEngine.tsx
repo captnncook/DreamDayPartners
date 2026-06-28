@@ -24,6 +24,7 @@ import VendorAccessTimes from "./VendorAccessTimes";
 import DayOfContact from "./DayOfContact";
 import RittenPlanner from "./RittenPlanner";
 import ChauffeurInfo from "./ChauffeurInfo";
+import PortieCalculator from "./PortieCalculator";
 
 interface Props {
   weddingId: string;
@@ -213,8 +214,12 @@ export default function DashboardEngine({
         <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
       )}
 
+      {modules.includes("portieCalculator") && (
+        <PortieCalculator guests={guests} totalGuests={totalGuests} intakeData={intakeData} />
+      )}
+
       {modules.includes("guestDataPanel") && config.readsGuestData && (
-        <GuestDataPanel guests={guests} weddingId={weddingId} totalGuests={totalGuests} />
+        <GuestDataPanel guests={guests} weddingId={weddingId} totalGuests={totalGuests} isPlanner={isPlanner} />
       )}
 
       {modules.includes("checklistDeadlines") && (

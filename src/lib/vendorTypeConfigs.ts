@@ -59,7 +59,8 @@ export type ModuleKey =
   | "vendorAccessTimes"
   | "dayOfContact"
   | "rittenPlanner"
-  | "chauffeurInfo";
+  | "chauffeurInfo"
+  | "portieCalculator";
 
 export interface VendorTypeConfig {
   type: string;
@@ -551,13 +552,14 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "bakker",
     label: "Bruidstaart & Bakker",
     emoji: "🎂",
-    modules: ["approvalButton", "guestDataPanel", "timelinePlanner"],
+    modules: ["portieCalculator", "moodboardUploader", "timelinePlanner"],
     readsGuestData: ["counts", "allergies"],
     intakeFields: [
       { key: "smaak", label: "Smaak(combinaties)", type: "text", placeholder: "Vanille/framboos, chocolade/salted caramel..." },
-      { key: "proeverijDatum", label: "Datum proeverij", type: "text" },
+      { key: "proeverijDatum", label: "Datum proeverij", type: "date" },
       { key: "designOmschrijving", label: "Taartdesign omschrijving", type: "longtext", placeholder: "Stijl, kleuren, decoraties, topper..." },
       { key: "verdiepingen", label: "Aantal verdiepingen", type: "number" },
+      { key: "portiesExtra", label: "Extra porties (buffet/gasten onzeker)", type: "number", placeholder: "bv. 10" },
     ],
     deliverables: [
       { key: "smaakproef", label: "Smaakproef resultaat" },
@@ -566,11 +568,15 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     ],
     timelineTemplate: [
       { key: "bezorging-taart", label: "Bezorging taart bij venue", phase: "arrival", defaultDuration: 30 },
+      { key: "opbouw-taart", label: "Opbouw / plaatsing taart", phase: "setup", defaultDuration: 20 },
       { key: "aansnijmoment", label: "Aansnijmoment", phase: "perform", defaultDuration: 15 },
     ],
     logisticsFields: [
       { key: "koeling-taart", label: "Koelruimte bij venue aanwezig?", type: "boolean" },
       { key: "taartmes-aanwezig", label: "Taartmes & schep aanwezig bij venue?", type: "boolean" },
+      { key: "bezorgmoment", label: "Bezorg- of ophaalmoment", type: "text", placeholder: "bv. zaterdag 10:00 bij de venue" },
+      { key: "afleveradres", label: "Afleveradres venue", type: "text", placeholder: "Straatnaam + huisnummer, Stad" },
+      { key: "contactVenue", label: "Contactpersoon op de venue", type: "text", placeholder: "Naam + telefoonnummer" },
     ],
   },
 
