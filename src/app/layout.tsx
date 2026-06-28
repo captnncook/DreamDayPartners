@@ -33,8 +33,11 @@ export const metadata: Metadata = {
     images: ["/images/og-image.png"],
   },
   icons: {
-    icon: "/images/logo-wit.svg",
-    apple: "/images/logo-wit.svg",
+    icon: [
+      { url: "/images/logo.svg", media: "(prefers-color-scheme: light)" },
+      { url: "/images/logo-wit.svg", media: "(prefers-color-scheme: dark)" },
+    ],
+    apple: "/images/logo.svg",
   },
 };
 
