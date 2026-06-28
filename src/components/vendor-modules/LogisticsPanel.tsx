@@ -59,6 +59,11 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
                     <option value="ja">Ja</option>
                     <option value="nee">Nee</option>
                   </select>
+                ) : field.type === "select" ? (
+                  <select value={(value as string) ?? ""} onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))} style={inputStyle}>
+                    <option value="">Kies...</option>
+                    {field.options?.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
                 ) : (
                   <input
                     type={field.type === "number" ? "number" : field.type === "time" ? "time" : "text"}

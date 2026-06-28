@@ -16,6 +16,7 @@ import MenuBuilder from "./MenuBuilder";
 import CouvertCalculator from "./CouvertCalculator";
 import ShotlistBuilder from "./ShotlistBuilder";
 import GalleryDelivery from "./GalleryDelivery";
+import VideoDelivery from "./VideoDelivery";
 
 interface Props {
   weddingId: string;
@@ -119,6 +120,10 @@ export default function DashboardEngine({
 
       {modules.includes("galleryDelivery") && (
         <GalleryDelivery intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("videoDelivery") && (
+        <VideoDelivery intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
       )}
 
       {modules.includes("photoUpload") && (

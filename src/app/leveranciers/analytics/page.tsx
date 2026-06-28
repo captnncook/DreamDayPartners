@@ -72,7 +72,14 @@ export default function VendorAnalyticsPage() {
                       <div style={{ fontSize: typeof value === "string" ? "1.375rem" : "2rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1 }}>{value}</div>
                       <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "4px", display: "flex", alignItems: "center", gap: "0.25rem" }}>
                         {label}
-                        {tooltip && <span title={tooltip} style={{ cursor: "help", color: "var(--muted)", fontSize: "0.6875rem", border: "1px solid var(--border)", borderRadius: "50%", width: "14px", height: "14px", display: "inline-flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>?</span>}
+                        {tooltip && (
+                          <span style={{ position: "relative", display: "inline-flex" }}>
+                            <span style={{ cursor: "help", color: "var(--muted)", fontSize: "0.6875rem", border: "1px solid var(--border)", borderRadius: "50%", width: "14px", height: "14px", display: "inline-flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}
+                              onMouseEnter={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) t.style.display = "block"; }}
+                              onMouseLeave={e => { const t = e.currentTarget.nextElementSibling as HTMLElement; if (t) t.style.display = "none"; }}>?</span>
+                            <span style={{ display: "none", position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "#1a1a1a", color: "white", fontSize: "0.6875rem", padding: "0.375rem 0.625rem", borderRadius: "8px", whiteSpace: "nowrap", zIndex: 10, pointerEvents: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.2)" }}>{tooltip}</span>
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", color }}>{icon}</div>

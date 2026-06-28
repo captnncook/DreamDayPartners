@@ -95,8 +95,10 @@ export default function Sidebar({ user, coupleWeddingId }: SidebarProps) {
             <div className="text-sm font-semibold truncate" style={{ color: "var(--foreground)" }}>{user.name}</div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="text-xs" style={{ color: "var(--muted)" }}>{roleLabels[user.role] ?? user.role}</span>
-              {user.isPremium && (
+              {user.isPremium ? (
                 <span className="ddp-badge badge-champagne" style={{ fontSize: "0.55rem", padding: "0.1rem 0.35rem" }}>Pro</span>
+              ) : user.role === "vendor" && (
+                <span style={{ fontSize: "0.55rem", padding: "0.1rem 0.35rem", background: "rgba(0,0,0,0.07)", color: "var(--muted)", borderRadius: "4px", fontWeight: 600, letterSpacing: "0.03em" }}>Gratis</span>
               )}
             </div>
           </div>

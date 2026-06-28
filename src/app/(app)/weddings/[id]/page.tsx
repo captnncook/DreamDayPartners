@@ -375,7 +375,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                   </div>
                 </div>
               ))}
-              {wedding.vendors.filter(wv => wv.status === "confirmed").map((wv) => (
+              {wedding.vendors.filter(wv => wv.status !== "declined").map((wv) => (
                 <VendorContactSheet
                   key={wv.id}
                   vendor={wv.vendor}

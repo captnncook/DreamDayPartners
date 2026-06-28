@@ -51,7 +51,8 @@ export type ModuleKey =
   | "menuBuilder"
   | "couvertCalculator"
   | "shotlistBuilder"
-  | "galleryDelivery";
+  | "galleryDelivery"
+  | "videoDelivery";
 
 export interface VendorTypeConfig {
   type: string;
@@ -190,16 +191,18 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "videograaf",
     label: "Videograaf",
     emoji: "🎥",
-    modules: ["deliverablesTracker", "timelinePlanner"],
+    modules: ["deliverablesTracker", "timelinePlanner", "videoDelivery"],
     intakeFields: [
       {
         key: "eindproduct",
         label: "Eindproduct",
         type: "select",
-        options: ["korte film", "lange film", "beide"],
+        options: ["Highlight film (3–5 min)", "Cinematic film (10–15 min)", "Documentary (30+ min)", "Same-day edit"],
       },
       { key: "drone", label: "Drone-opnames gewenst?", type: "boolean" },
       { key: "audioGeloften", label: "Aparte audio geloften opnemen?", type: "boolean" },
+      { key: "muziekstijl", label: "Favoriete muziekstijl voor de film", type: "text", placeholder: "Bijv. klassiek, emotioneel, jaren 80..." },
+      { key: "muziekNummers", label: "Specifieke nummers voor de film", type: "longtext", placeholder: "Geef nummers op die je wil verwerken..." },
     ],
     deliverables: [
       { key: "ceremonie-audio", label: "Ceremonie-audio (ruwe cut)" },
@@ -208,14 +211,22 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "trouwfilm", label: "Trouwfilm (definitief)", approvalRequired: true },
     ],
     timelineTemplate: [
-      { key: "ceremonie-audio-opname", label: "Ceremonie-audio opname", phase: "perform", defaultDuration: 45 },
-      { key: "speeches-opname", label: "Speeches opname", phase: "perform", defaultDuration: 60 },
-      { key: "teaser-deadline", label: "Teaser deadline", phase: "custom", defaultDuration: 0 },
-      { key: "film-deadline", label: "Film deadline", phase: "custom", defaultDuration: 0 },
+      { key: "voorbereiding", label: "Voorbereiding / getting ready", phase: "arrival", defaultDuration: 60 },
+      { key: "aankomst-ceremonie", label: "Aankomst ceremonie", phase: "arrival", defaultDuration: 30 },
+      { key: "ceremonie", label: "Ceremonie & geloften", phase: "perform", defaultDuration: 45 },
+      { key: "eerste-dans", label: "Eerste dans", phase: "perform", defaultDuration: 10 },
+      { key: "speeches", label: "Speeches", phase: "perform", defaultDuration: 30 },
+      { key: "drone-shot", label: "Drone-shots buitenlocatie", phase: "perform", defaultDuration: 20 },
+      { key: "film-deadline", label: "Film deadline levering", phase: "custom", defaultDuration: 0 },
     ],
     logisticsFields: [
       { key: "stroombehoefte", label: "Stroombehoefte (Watt)", type: "number" },
-      { key: "drone-vergunning", label: "Drone-vergunning geregeld?", type: "boolean" },
+      {
+        key: "drone-vergunning",
+        label: "Drone-vergunning status",
+        type: "select",
+        options: ["Nog niet aangevraagd", "Aangevraagd", "Goedgekeurd"],
+      },
     ],
   },
 

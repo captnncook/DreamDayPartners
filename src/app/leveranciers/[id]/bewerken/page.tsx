@@ -38,11 +38,9 @@ import { Suspense } from "react";
 const WEEKDAYS = ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"];
 const MONTHS_NL = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
 
-function BusyCalendar({ busyDates, onToggle, newBusyDate, setNewBusyDate }: {
+function BusyCalendar({ busyDates, onToggle }: {
   busyDates: string[];
   onToggle: (date: string) => void;
-  newBusyDate: string;
-  setNewBusyDate: (d: string) => void;
 }) {
   const [calMonth, setCalMonth] = useState(() => {
     const now = new Date();
@@ -93,15 +91,7 @@ function BusyCalendar({ busyDates, onToggle, newBusyDate, setNewBusyDate }: {
           );
         })}
       </div>
-      {/* Quick date input for dates not visible */}
-      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.875rem", alignItems: "center" }}>
-        <input type="date" value={newBusyDate} onChange={e => setNewBusyDate(e.target.value)}
-          style={{ padding: "0.5rem 0.75rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }} />
-        <button onClick={() => { if (newBusyDate) { onToggle(newBusyDate); setNewBusyDate(""); } }} disabled={!newBusyDate}
-          style={{ padding: "0.5rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
-          Toevoegen
-        </button>
-      </div>
+      <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.75rem" }}>Klik op een dag in de kalender om hem te blokkeren of deblokkeren.</p>
       {busyDates.length > 0 && (
         <div style={{ marginTop: "0.75rem", display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
           {busyDates.sort().map(d => (
@@ -560,19 +550,19 @@ function VendorEditPage() {
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
             Klik op een datum om hem te blokkeren. Rood = niet beschikbaar.
           </p>
-          <BusyCalendar busyDates={busyDates} onToggle={toggleBusyDate} newBusyDate={newBusyDate} setNewBusyDate={setNewBusyDate} />
+          <BusyCalendar busyDates={busyDates} onToggle={toggleBusyDate} />
         </section>
 
-        <section style={{ background: isUserPremium ? "#fffbeb" : "var(--foreground)", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: `1px solid ${isUserPremium ? "#fde68a" : "transparent"}` }}>
+        <section style={{ background: isUserPremium ? "#fffbeb" : "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: `1px solid ${isUserPremium ? "#fde68a" : "#C9A96E"}` }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
                 <Star className="w-4 h-4" style={{ color: isUserPremium ? "#d97706" : "#C9A96E" }} />
-                <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: isUserPremium ? "#92400e" : "white" }}>
+                <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: isUserPremium ? "#92400e" : "var(--foreground)" }}>
                   {isUserPremium ? "Premium actief" : "Upgrade naar Premium"}
                 </span>
               </div>
-              <p style={{ fontSize: "0.8125rem", color: isUserPremium ? "#b45309" : "rgba(255,255,255,0.55)", maxWidth: "360px" }}>
+              <p style={{ fontSize: "0.8125rem", color: isUserPremium ? "#b45309" : "var(--muted)", maxWidth: "360px" }}>
                 {isUserPremium
                   ? "Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen."
                   : "Kom bovenaan zoekresultaten, toon het Aanbevolen-label en bereik meer bruidsparen. Slechts €29/maand."}

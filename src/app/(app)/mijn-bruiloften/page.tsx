@@ -22,7 +22,8 @@ const VENDOR_STATUS_LABELS: Record<string, string> = {
   lead: "Interesse", confirmed: "Bevestigd", booked: "Geboekt", quote_received: "Offerte ontvangen", declined: "Afgewezen",
 };
 const VENDOR_STATUS_COLORS: Record<string, string> = {
-  lead: "#6b7280", confirmed: "#16a34a", booked: "#2563eb", quote_received: "#d97706", declined: "#dc2626",
+  lead: "#f59e0b", confirmed: "#16a34a", booked: "#2563eb", quote_received: "#d97706", declined: "#dc2626",
+  interest: "#9ca3af",
 };
 
 const INP: React.CSSProperties = {
@@ -145,6 +146,28 @@ export default function MijnBruiloftenPage() {
             </div>
           </div>
         </form>
+      )}
+
+      {/* Status flow legend */}
+      {!loading && invites.length > 0 && (
+        <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "12px", padding: "0.875rem 1rem", marginBottom: "1rem" }}>
+          <p style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Statusflow</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexWrap: "wrap" }}>
+            {[
+              { label: "Aanvraag", color: "#9ca3af" },
+              { label: "Interesse", color: "#6b7280" },
+              { label: "Lead", color: "#f59e0b" },
+              { label: "Geboekt", color: "#16a34a" },
+              { label: "Afgerond", color: "#2563eb" },
+            ].map(({ label, color }, i, arr) => (
+              <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem" }}>
+                <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: color }} />
+                <span style={{ color: "var(--foreground)", fontWeight: 500 }}>{label}</span>
+                {i < arr.length - 1 && <span style={{ color: "var(--muted)", marginLeft: "0.125rem" }}>→</span>}
+              </span>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* List */}
