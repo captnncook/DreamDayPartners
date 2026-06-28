@@ -35,6 +35,87 @@ type Vendor = {
 
 import { Suspense } from "react";
 
+const WEEKDAYS = ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"];
+const MONTHS_NL = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
+
+function BusyCalendar({ busyDates, onToggle, newBusyDate, setNewBusyDate }: {
+  busyDates: string[];
+  onToggle: (date: string) => void;
+  newBusyDate: string;
+  setNewBusyDate: (d: string) => void;
+}) {
+  const [calMonth, setCalMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+
+  const year = calMonth.getFullYear();
+  const month = calMonth.getMonth();
+  const firstDay = new Date(year, month, 1);
+  // Monday-based: getDay() 0=Sun → pos 6, 1=Mon → pos 0, etc.
+  const startOffset = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (number | null)[] = Array(startOffset).fill(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  function pad(n: number) { return String(n).padStart(2, "0"); }
+  function dateStr(d: number) { return `${year}-${pad(month + 1)}-${pad(d)}`; }
+
+  return (
+    <div>
+      {/* Month navigator */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+        <button onClick={() => setCalMonth(new Date(year, month - 1, 1))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.25rem", color: "var(--muted)", padding: "0.25rem 0.5rem" }}>‹</button>
+        <span style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{MONTHS_NL[month]} {year}</span>
+        <button onClick={() => setCalMonth(new Date(year, month + 1, 1))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.25rem", color: "var(--muted)", padding: "0.25rem 0.5rem" }}>›</button>
+      </div>
+      {/* Weekday headers */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "2px" }}>
+        {WEEKDAYS.map(w => <div key={w} style={{ textAlign: "center", fontSize: "0.6875rem", fontWeight: 600, color: "var(--muted)", padding: "0.25rem 0" }}>{w}</div>)}
+      </div>
+      {/* Day cells */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
+        {cells.map((day, i) => {
+          if (!day) return <div key={`e-${i}`} />;
+          const ds = dateStr(day);
+          const isBusy = busyDates.includes(ds);
+          const isPast = new Date(ds) < new Date(new Date().toDateString());
+          return (
+            <button key={ds} onClick={() => !isPast && onToggle(ds)} style={{
+              padding: "0.375rem 0.25rem", borderRadius: "6px", border: "none", cursor: isPast ? "default" : "pointer",
+              background: isBusy ? "#fee2e2" : "var(--accent)",
+              color: isBusy ? "#b91c1c" : isPast ? "var(--muted)" : "var(--foreground)",
+              fontWeight: isBusy ? 700 : 400, fontSize: "0.8125rem", transition: "background 0.1s",
+              opacity: isPast ? 0.4 : 1,
+            }}>
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      {/* Quick date input for dates not visible */}
+      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.875rem", alignItems: "center" }}>
+        <input type="date" value={newBusyDate} onChange={e => setNewBusyDate(e.target.value)}
+          style={{ padding: "0.5rem 0.75rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }} />
+        <button onClick={() => { if (newBusyDate) { onToggle(newBusyDate); setNewBusyDate(""); } }} disabled={!newBusyDate}
+          style={{ padding: "0.5rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+          Toevoegen
+        </button>
+      </div>
+      {busyDates.length > 0 && (
+        <div style={{ marginTop: "0.75rem", display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+          {busyDates.sort().map(d => (
+            <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", background: "#fee2e2", color: "#b91c1c", borderRadius: "9999px", padding: "0.2rem 0.625rem", fontSize: "0.75rem", fontWeight: 500 }}>
+              {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(new Date(d))}
+              <button onClick={() => onToggle(d)} style={{ background: "none", border: "none", cursor: "pointer", color: "#b91c1c", padding: 0, lineHeight: 1, fontSize: "0.9rem" }}>×</button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function VendorEditPageWrapper() {
   return <Suspense><VendorEditPage /></Suspense>;
 }
@@ -229,7 +310,7 @@ function VendorEditPage() {
       <div style={{ maxWidth: "680px", margin: "0 auto", padding: "2rem 1.25rem" }}>
         {[100, 60, 80, 60, 90, 70].map((w, i) => (
           <div key={i} style={{ height: i === 0 ? "2.5rem" : "2.75rem", width: `${w}%`, borderRadius: "10px", marginBottom: "1rem",
-            background: "linear-gradient(90deg, #f0ede8 25%, #e8e4de 50%, #f0ede8 75%)", backgroundSize: "200% 100%", animation: "skeleton-shimmer 1.5s infinite" }} />
+            background: "linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)", backgroundSize: "200% 100%", animation: "skeleton-shimmer 1.5s infinite" }} />
         ))}
       </div>
     );
@@ -256,6 +337,23 @@ function VendorEditPage() {
       </div>
 
       <div style={{ maxWidth: "760px", margin: "1.5rem auto", padding: "0 1.25rem 3rem" }}>
+        {/* Premium status banner — shown at top */}
+        {isUserPremium && (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "0.75rem 1rem", marginBottom: "1rem", fontSize: "0.875rem", color: "#92400e", fontWeight: 600 }}>
+            <Star className="w-4 h-4" style={{ color: "#d97706", flexShrink: 0 }} />
+            Premium actief — je profiel staat bovenaan de zoekresultaten.
+          </div>
+        )}
+        {upgradeStatus === "success" && (
+          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534", marginBottom: "1rem" }}>
+            Premium actief — welkom bij DreamDay Partners Pro!
+          </div>
+        )}
+        {upgradeStatus === "cancelled" && (
+          <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#92400e", marginBottom: "1rem" }}>
+            Betaling geannuleerd. Je kunt het altijd opnieuw proberen.
+          </div>
+        )}
         {error && (
           <div style={{ background: "#fee", border: "1px solid #fcc", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#c00", marginBottom: "1rem" }}>
             {error}
@@ -460,48 +558,10 @@ function VendorEditPage() {
         <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
           <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Beschikbaarheid</h2>
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
-            Markeer datums waarop jullie niet beschikbaar zijn. Wordt zichtbaar voor bruidsparen op jullie profiel.
+            Klik op een datum om hem te blokkeren. Rood = niet beschikbaar.
           </p>
-          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem", alignItems: "center" }}>
-            <input
-              type="date"
-              value={newBusyDate}
-              onChange={e => setNewBusyDate(e.target.value)}
-              style={{ padding: "0.5rem 0.75rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }}
-            />
-            <button
-              onClick={() => { if (newBusyDate) { toggleBusyDate(newBusyDate); setNewBusyDate(""); } }}
-              disabled={!newBusyDate}
-              style={{ padding: "0.5rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}
-            >
-              Toevoegen
-            </button>
-          </div>
-          {busyDates.length === 0 ? (
-            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", fontStyle: "italic" }}>Geen geblokkeerde datums.</p>
-          ) : (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-              {busyDates.map(d => (
-                <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", background: "#fee2e2", color: "#b91c1c", borderRadius: "9999px", padding: "0.25rem 0.75rem", fontSize: "0.8125rem", fontWeight: 500 }}>
-                  {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", year: "numeric" }).format(new Date(d))}
-                  <button onClick={() => toggleBusyDate(d)} style={{ background: "none", border: "none", cursor: "pointer", color: "#b91c1c", padding: 0, lineHeight: 1, fontSize: "1rem" }}>×</button>
-                </span>
-              ))}
-            </div>
-          )}
+          <BusyCalendar busyDates={busyDates} onToggle={toggleBusyDate} newBusyDate={newBusyDate} setNewBusyDate={setNewBusyDate} />
         </section>
-
-        {/* Premium */}
-        {upgradeStatus === "success" && (
-          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534", marginBottom: "1rem" }}>
-            Premium actief — welkom bij DreamDay Partners Pro!
-          </div>
-        )}
-        {upgradeStatus === "cancelled" && (
-          <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#92400e", marginBottom: "1rem" }}>
-            Betaling geannuleerd. Je kunt het altijd opnieuw proberen.
-          </div>
-        )}
 
         <section style={{ background: isUserPremium ? "#fffbeb" : "var(--foreground)", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: `1px solid ${isUserPremium ? "#fde68a" : "transparent"}` }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>

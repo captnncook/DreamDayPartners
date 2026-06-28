@@ -49,7 +49,9 @@ export type ModuleKey =
   | "documentUpload"
   | "setlistPlanner"
   | "menuBuilder"
-  | "couvertCalculator";
+  | "couvertCalculator"
+  | "shotlistBuilder"
+  | "galleryDelivery";
 
 export interface VendorTypeConfig {
   type: string;
@@ -156,13 +158,13 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "fotograaf",
     label: "Fotograaf",
     emoji: "📷",
-    modules: ["deliverablesTracker", "timelinePlanner"],
+    modules: ["deliverablesTracker", "timelinePlanner", "shotlistBuilder", "galleryDelivery"],
     intakeFields: [
       {
         key: "stijl",
         label: "Fotografiestijl",
         type: "select",
-        options: ["reportage", "klassiek", "editorial", "documentair"],
+        options: ["Documentair", "Klassiek", "Editorial", "Romantisch", "Reportage"],
       },
       { key: "firstLook", label: "First look gewenst?", type: "boolean" },
       { key: "familiefotolijst", label: "Familiefotolijst", type: "longtext", placeholder: "Combinaties die vastgelegd moeten worden" },

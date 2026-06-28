@@ -105,7 +105,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
               className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium mb-2 transition-colors"
               style={{ background: "var(--primary)", color: "white" }}
             >
-              + Nieuw gesprek
+              Nieuw bericht
             </button>
             {showNewThread && (
               <form onSubmit={createThread} className="mb-3 space-y-2">

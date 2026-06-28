@@ -20,7 +20,7 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
 
   const inputStyle = {
     width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem",
-    border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--charcoal)",
+    border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)",
   };
 
   function save() {
@@ -29,9 +29,12 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
   }
 
   return (
-    <div className="card" style={{ padding: "1.5rem" }}>
+    <div className="ddp-card" style={{ padding: "1.5rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-        <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Logistiek</h3>
+        <div>
+          <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Logistiek</h3>
+          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Wordt ingevuld door het bruidspaar of de planner.</p>
+        </div>
         {canEdit && (
           <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             {editing ? "Annuleren" : "Bewerken"}
@@ -78,7 +81,7 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
           return (
             <div key={field.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
               <span style={{ fontSize: "0.875rem", color: "var(--muted)", flexShrink: 0 }}>{field.label}</span>
-              <span style={{ fontSize: "0.875rem", color: "var(--charcoal)", textAlign: "right" }}>{display}</span>
+              <span style={{ fontSize: "0.875rem", color: "var(--foreground)", textAlign: "right" }}>{display}</span>
             </div>
           );
         })}

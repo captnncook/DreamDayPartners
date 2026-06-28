@@ -48,7 +48,7 @@ export default function VendorAnalyticsPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
             {[0,1,2,3].map(i => (
               <div key={i} style={{ height: "100px", borderRadius: "16px",
-                background: "linear-gradient(90deg, #f0ede8 25%, #e8e4de 50%, #f0ede8 75%)",
+                background: "linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)",
                 backgroundSize: "200% 100%", animation: "skeleton-shimmer 1.5s infinite" }} />
             ))}
           </div>
@@ -64,13 +64,16 @@ export default function VendorAnalyticsPage() {
                 { label: "Totaal bruiloften", value: data.total, icon: <Star className="w-4 h-4" />, color: "var(--primary)" },
                 { label: "Dit jaar", value: data.thisYear, icon: <Calendar className="w-4 h-4" />, color: "#7c3aed" },
                 { label: "Aankomend", value: data.upcoming, icon: <TrendingUp className="w-4 h-4" />, color: "#16a34a" },
-                { label: "Totale omzet", value: new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(data.totalRevenue), icon: <Euro className="w-4 h-4" />, color: "#d97706", isString: true },
-              ].map(({ label, value, icon, color }) => (
+                { label: "Totale omzet", value: new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(data.totalRevenue), icon: <Euro className="w-4 h-4" />, color: "#d97706", tooltip: "Gebaseerd op bevestigde betalingen binnen dit platform" },
+              ].map(({ label, value, icon, color, tooltip }) => (
                 <div key={label} style={{ background: "white", borderRadius: "16px", padding: "1.25rem", border: "1px solid rgba(0,0,0,0.06)" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div>
                       <div style={{ fontSize: typeof value === "string" ? "1.375rem" : "2rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1 }}>{value}</div>
-                      <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "4px" }}>{label}</div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "4px", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                        {label}
+                        {tooltip && <span title={tooltip} style={{ cursor: "help", color: "var(--muted)", fontSize: "0.6875rem", border: "1px solid var(--border)", borderRadius: "50%", width: "14px", height: "14px", display: "inline-flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>?</span>}
+                      </div>
                     </div>
                     <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", color }}>{icon}</div>
                   </div>

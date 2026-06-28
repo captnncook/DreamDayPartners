@@ -14,6 +14,8 @@ import PhotoUploadPanel from "./PhotoUploadPanel";
 import SetlistPlanner from "./SetlistPlanner";
 import MenuBuilder from "./MenuBuilder";
 import CouvertCalculator from "./CouvertCalculator";
+import ShotlistBuilder from "./ShotlistBuilder";
+import GalleryDelivery from "./GalleryDelivery";
 
 interface Props {
   weddingId: string;
@@ -109,6 +111,14 @@ export default function DashboardEngine({
 
       {modules.includes("couvertCalculator") && (
         <CouvertCalculator guests={guests} intakeData={intakeData} />
+      )}
+
+      {modules.includes("shotlistBuilder") && (
+        <ShotlistBuilder intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("galleryDelivery") && (
+        <GalleryDelivery intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
       )}
 
       {modules.includes("photoUpload") && (

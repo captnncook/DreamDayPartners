@@ -183,16 +183,18 @@ export default function DmPage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoading(false), 5000);
     Promise.all([
       fetch("/api/dm/conversations").then(r => r.json()),
       fetch("/api/auth/me").then(r => r.json()),
     ]).then(([convData, meData]) => {
+      clearTimeout(timeout);
       const list = convData.conversations ?? [];
       setConvs(list);
       setCurrentUserId(meData.user?.id ?? "");
       if (list.length > 0) setActiveConvId(list[0].id);
       setLoading(false);
-    });
+    }).catch(() => { clearTimeout(timeout); setLoading(false); });
   }, []);
 
   useEffect(() => {
