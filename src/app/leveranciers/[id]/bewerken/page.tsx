@@ -114,6 +114,7 @@ function VendorEditPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const emblemInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const searchParams = useSearchParams();
@@ -152,6 +153,8 @@ function VendorEditPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingEmblem, setUploadingEmblem] = useState(false);
+  const [emblemUrl, setEmblemUrl] = useState<string | null>(null);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [error, setError] = useState("");
   const [busyDates, setBusyDates] = useState<string[]>([]);
@@ -196,6 +199,7 @@ function VendorEditPage() {
     const pData = await photosRes.json();
     setCoverUrl(pData.coverUrl ?? null);
     setCoverKey(v.coverPhoto ?? null);
+    setEmblemUrl(pData.emblemUrl ?? null);
     setPhotoUrls(pData.urls ?? []);
     setPhotoKeys(v.photos ?? []);
 
@@ -262,6 +266,32 @@ function VendorEditPage() {
     const res = await fetch(`/api/catalogus/${id}/cover-photo`, { method: "DELETE" });
     if (res.ok) { setCoverUrl(null); setCoverKey(null); }
     void coverKey;
+  }
+
+  async function handleEmblemUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingEmblem(true);
+    setError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/catalogus/${id}/emblem-photo`, { method: "POST", body: fd });
+      let data: Record<string, unknown> = {};
+      try { data = await res.json(); } catch { /* non-JSON */ }
+      if (!res.ok) setError((data.error as string) ?? `Upload mislukt (${res.status})`);
+      else setEmblemUrl(data.url as string);
+    } catch {
+      setError("Verbindingsfout tijdens upload");
+    } finally {
+      setUploadingEmblem(false);
+      if (emblemInputRef.current) emblemInputRef.current.value = "";
+    }
+  }
+
+  async function handleDeleteEmblem() {
+    const res = await fetch(`/api/catalogus/${id}/emblem-photo`, { method: "DELETE" });
+    if (res.ok) setEmblemUrl(null);
   }
 
   async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -420,6 +450,48 @@ function VendorEditPage() {
           )}
           <input ref={coverInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
           <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.75rem" }}>Max 10 MB · JPG, PNG, WebP</p>
+        </section>
+
+        {/* Embleem foto */}
+        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Embleem foto</h2>
+          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+            Portretfoto die verschijnt in het Dream Team overzicht van het bruidspaar en in de chat. Gebruik een foto waarbij je gezicht goed zichtbaar is.
+          </p>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "1.5rem", flexWrap: "wrap" }}>
+            {/* Shield preview */}
+            <div style={{ position: "relative", width: "120px", flexShrink: 0 }}>
+              <svg viewBox="0 0 120 140" width="120" height="140" style={{ display: "block" }}>
+                <defs>
+                  <clipPath id="shield-clip-edit">
+                    <path d="M60 4 L108 22 L108 72 C108 100 84 124 60 136 C36 124 12 100 12 72 L12 22 Z" />
+                  </clipPath>
+                </defs>
+                <path d="M60 4 L108 22 L108 72 C108 100 84 124 60 136 C36 124 12 100 12 72 L12 22 Z"
+                  fill={emblemUrl ? "#1a1a1a" : "var(--accent)"} stroke="var(--border)" strokeWidth="2" />
+                {emblemUrl ? (
+                  <image href={emblemUrl} x="12" y="4" width="96" height="132" clipPath="url(#shield-clip-edit)" preserveAspectRatio="xMidYMid slice" />
+                ) : (
+                  <text x="60" y="80" textAnchor="middle" fill="var(--muted)" fontSize="32" fontWeight="300">+</text>
+                )}
+              </svg>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingTop: "0.5rem" }}>
+              <button onClick={() => emblemInputRef.current?.click()} disabled={uploadingEmblem}
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontWeight: 600, fontSize: "0.8125rem" }}>
+                <Upload className="w-4 h-4" />
+                {uploadingEmblem ? "Uploaden…" : emblemUrl ? "Vervangen" : "Foto uploaden"}
+              </button>
+              {emblemUrl && (
+                <button onClick={handleDeleteEmblem}
+                  style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "none", color: "var(--danger)", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontSize: "0.8125rem" }}>
+                  <Trash2 className="w-4 h-4" /> Verwijderen
+                </button>
+              )}
+              <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Max 10 MB · JPG, PNG, WebP</p>
+            </div>
+          </div>
+          <input ref={emblemInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEmblemUpload} />
         </section>
 
         {/* Galerij */}

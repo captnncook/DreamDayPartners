@@ -129,6 +129,7 @@ model Vendor {
   description   String?
   isPremium     Boolean  @default(false)
   coverPhoto    String?
+  emblemPhoto   String?
   photos        String[]
   city          String?
   latitude      Float?

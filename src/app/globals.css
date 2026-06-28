@@ -535,3 +535,10 @@ h1, h2, h3, h4, h5, h6 {
 .delay-500 { animation-delay: 0.50s; }
 
 .opacity-0 { opacity: 0; }
+
+@media (min-width: 640px) {
+  .dream-team-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (min-width: 900px) {
+  .dream-team-grid { grid-template-columns: repeat(4, 1fr) !important; }
+}

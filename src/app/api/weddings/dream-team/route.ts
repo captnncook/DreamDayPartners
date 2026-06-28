@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { getDownloadUrl } from "@/lib/r2";
 
 export async function GET() {
   const user = await getSession();
@@ -11,7 +12,7 @@ export async function GET() {
     include: {
       vendors: {
         include: {
-          vendor: { select: { id: true, name: true, category: true, coverPhoto: true } },
+          vendor: { select: { id: true, name: true, category: true, emblemPhoto: true, coverPhoto: true } },
         },
       },
     },
@@ -20,7 +21,7 @@ export async function GET() {
   if (!wedding) return NextResponse.json({ weddingId: null, team: [] });
 
   // Group by category: keep only the first (primary) vendor per category
-  const byCategory: Record<string, { vendorId: string; name: string; category: string; photo: string | null }> = {};
+  const byCategory: Record<string, { vendorId: string; name: string; category: string; photoKey: string | null }> = {};
   for (const wv of wedding.vendors) {
     const cat = wv.vendor.category;
     if (!byCategory[cat]) {
@@ -28,10 +29,18 @@ export async function GET() {
         vendorId: wv.vendor.id,
         name: wv.vendor.name,
         category: cat,
-        photo: wv.vendor.coverPhoto ?? null,
+        photoKey: wv.vendor.emblemPhoto ?? wv.vendor.coverPhoto ?? null,
       };
     }
   }
 
-  return NextResponse.json({ weddingId: wedding.id, team: Object.values(byCategory) });
+  const entries = Object.values(byCategory);
+  const team = await Promise.all(entries.map(async (e) => ({
+    vendorId: e.vendorId,
+    name: e.name,
+    category: e.category,
+    photo: e.photoKey ? await getDownloadUrl(e.photoKey, 3600).catch(() => null) : null,
+  })));
+
+  return NextResponse.json({ weddingId: wedding.id, team });
 }
