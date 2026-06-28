@@ -33,12 +33,12 @@ const HOW_IT_WORKS = [
 ];
 
 const FAQS = [
-  { q: "Is DreamDay Partners gratis voor bruidsparen?", a: "Ja, volledig. Bruidsparen betalen nooit iets — geen proefperiode, geen verborgen kosten. Het platform is voor altijd gratis voor jullie." },
+  { q: "Is DreamDay Platform gratis voor bruidsparen?", a: "Ja, volledig. Bruidsparen betalen nooit iets — geen proefperiode, geen verborgen kosten. Het platform is voor altijd gratis voor jullie." },
   { q: "Hoe vind ik leveranciers?", a: "Via de leveranciersdatabase zoek je op categorie — van fotograaf tot caterer. Je voegt ze toe aan jullie bruiloft en communiceert direct via de app." },
   { q: "Wat zit er in premium voor leveranciers?", a: "Met het premium abonnement beheer je onbeperkt bruiloften, bewerk je het draaiboek, upload je documenten, heb je toegang tot een analytisch dashboard en profiteer je van prioriteit support." },
   { q: "Hoe werkt het contact met leveranciers?", a: "Alles loopt via de ingebouwde chat. Geen losse apps, geen mailtjes kwijt — alle gesprekken staan in je account." },
   { q: "Wat is een draaiboek?", a: "Het draaiboek is een minuut-voor-minuut tijdlijn van jullie trouwdag. Je vult het samen met je planner in en deelt het met alle leveranciers." },
-  { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Absoluut. DreamDay Partners is ontworpen zodat bruidsparen zelf de regie kunnen houden — met of zonder professionele planner." },
+  { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Absoluut. DreamDay Platform is ontworpen zodat bruidsparen zelf de regie kunnen houden — met of zonder professionele planner." },
 ];
 
 /* ─── Sub-components ────────────────────────────────────── */
@@ -326,7 +326,7 @@ export default function LandingPage() {
                   Losse mailtjes, WhatsApp-groepen vol offertes en een Excel die steeds minder overzicht geeft. Je wil trouwen, geen projectmanager worden.
                 </p>
                 <p style={{ fontSize: "1.0625rem", color: "var(--foreground)", lineHeight: 1.75, fontWeight: 500 }}>
-                  DreamDay Partners brengt rust: alles op één plek, samen geregeld.
+                  DreamDay Platform brengt rust: alles op één plek, samen geregeld.
                 </p>
               </ScrollReveal>
             </div>
@@ -427,7 +427,7 @@ export default function LandingPage() {
                   Beheer al je bruiloften{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>op één plek.</span>
                 </h2>
                 <p style={{ fontSize: "1rem", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
-                  Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk. DreamDay Partners geeft je één helder overzicht.
+                  Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk. DreamDay Platform geeft je één helder overzicht.
                 </p>
               </ScrollReveal>
 
@@ -479,7 +479,7 @@ export default function LandingPage() {
               Wees één van de eersten.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>En help mee bouwen.</span>
             </h2>
             <p style={{ fontSize: "1rem", color: "var(--muted)", lineHeight: 1.7, maxWidth: "520px", marginBottom: "3rem" }}>
-              DreamDay Partners is momenteel in bèta. Vroege gebruikers krijgen directe toegang, persoonlijke support en de kans om het platform mee te vormen.
+              DreamDay Platform is momenteel in bèta. Vroege gebruikers krijgen directe toegang, persoonlijke support en de kans om het platform mee te vormen.
             </p>
           </ScrollReveal>
 
@@ -487,7 +487,7 @@ export default function LandingPage() {
             {[
               { icon: "✦", title: "Vroege toegang", desc: "Registreer nu en gebruik het platform terwijl het groeit. Jouw feedback vormt de volgende versie." },
               { icon: "✦", title: "Directe support", desc: "Tijdens de bèta heb je direct contact met het team. Geen wachtrij, geen bot." },
-              { icon: "✦", title: "Gratis voor bruidsparen", desc: "Nu, later, altijd. Bruidsparen betalen nooit voor DreamDay Partners." },
+              { icon: "✦", title: "Gratis voor bruidsparen", desc: "Nu, later, altijd. Bruidsparen betalen nooit voor DreamDay Platform." },
             ].map((item, i) => (
               <ScrollReveal key={item.title} delay={i * 100}>
                 <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
@@ -633,7 +633,7 @@ export default function LandingPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "1040px", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
             <Image src="/images/logo-wit.svg" alt="DreamDay Partners" width={26} height={26} />
-            <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>DreamDay Partners</span>
+            <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>DreamDay Platform</span>
           </div>
           <div className="flex flex-wrap justify-center gap-5">
             {[
@@ -646,7 +646,7 @@ export default function LandingPage() {
               <a key={l.href} href={l.href} style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.40)", textDecoration: "none" }}>{l.label}</a>
             ))}
           </div>
-          <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)" }}>© 2026 DreamDay Partners</p>
+          <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)" }}>© 2026 DreamDay Platform</p>
         </div>
       </footer>
     </div>

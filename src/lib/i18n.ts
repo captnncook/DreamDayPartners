@@ -29,7 +29,7 @@ export const translations = {
       heroBadge: "Het slimme bruiloftsplatform",
       heroTitle: "Plan de perfecte bruiloft, samen",
       heroSub:
-        "DreamDay Partners verbindt bruidsparen, weddingplanners en leveranciers in één platform. Van inspiratie tot draaiboek — alles op één plek.",
+        "DreamDay Platform verbindt bruidsparen, weddingplanners en leveranciers in één platform. Van inspiratie tot draaiboek — alles op één plek.",
       heroCtaCouple: "Maak Dream Day account aan",
       heroCtaLogin: "Inloggen als planner",
       coupleTitle: "Voor bruidsparen",
@@ -141,7 +141,7 @@ export const translations = {
       heroBadge: "The smart wedding platform",
       heroTitle: "Plan the perfect wedding, together",
       heroSub:
-        "DreamDay Partners connects couples, wedding planners and vendors in one platform. From inspiration to run sheet — everything in one place.",
+        "DreamDay Platform connects couples, wedding planners and vendors in one platform. From inspiration to run sheet — everything in one place.",
       heroCtaCouple: "Create Dream Day account",
       heroCtaLogin: "Log in as planner",
       coupleTitle: "For couples",

@@ -358,7 +358,7 @@ function VendorEditPage() {
         )}
         {upgradeStatus === "success" && (
           <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534", marginBottom: "1rem" }}>
-            Premium actief — welkom bij DreamDay Partners Pro!
+            Premium actief — welkom bij DreamDay Platform Pro!
           </div>
         )}
         {upgradeStatus === "cancelled" && (

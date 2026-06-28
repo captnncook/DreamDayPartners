@@ -111,7 +111,7 @@ export default function VendorsPage() {
             </div>
           </div>
           <button
-            onClick={() => alert("Premium upgrade: neem contact op met DreamDay Partners.")}
+            onClick={() => alert("Premium upgrade: neem contact op met DreamDay Platform.")}
             className="ddp-btn-primary ml-auto flex-shrink-0 text-sm"
           >
             Upgrade naar Premium

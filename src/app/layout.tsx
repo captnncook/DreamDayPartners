@@ -12,8 +12,8 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "DreamDay Partners — Plan jullie trouwdag zonder stress",
-    template: "%s | DreamDay Partners",
+    default: "DreamDay Platform — Plan jullie trouwdag zonder stress",
+    template: "%s | DreamDay Platform",
   },
   description: "Stel je dream team samen, regel offertes en facturen en maak je draaiboek — alles in één app. Gratis voor bruidsparen.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://dreamdaypartners-production.up.railway.app"),
@@ -21,14 +21,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "nl_NL",
     url: "/",
-    siteName: "DreamDay Partners",
-    title: "DreamDay Partners — Plan jullie trouwdag zonder stress",
+    siteName: "DreamDay Platform",
+    title: "DreamDay Platform — Plan jullie trouwdag zonder stress",
     description: "Stel je dream team samen, regel offertes en facturen en maak je draaiboek — alles in één app. Gratis voor bruidsparen.",
-    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "DreamDay Partners" }],
+    images: [{ url: "/images/og-image.png", width: 1200, height: 630, alt: "DreamDay Platform" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DreamDay Partners — Plan jullie trouwdag zonder stress",
+    title: "DreamDay Platform — Plan jullie trouwdag zonder stress",
     description: "Stel je dream team samen, regel offertes en facturen en maak je draaiboek — alles in één app.",
     images: ["/images/og-image.png"],
   },

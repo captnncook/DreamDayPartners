@@ -80,7 +80,7 @@ export default function Sidebar({ user, coupleWeddingId }: SidebarProps) {
           <Image src="/images/logo.svg" alt="DreamDay Partners" width={30} height={30} className="flex-shrink-0" />
           <div className="min-w-0">
             <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)", letterSpacing: "-0.02em" }}>DreamDay</div>
-            <div className="font-serif text-xs leading-none mt-0.5" style={{ color: "var(--primary)", fontSize: "0.7rem" }}>Partners</div>
+            <div className="font-serif text-xs leading-none mt-0.5" style={{ color: "var(--primary)", fontSize: "0.7rem" }}>Platform</div>
           </div>
         </Link>
       </div>
