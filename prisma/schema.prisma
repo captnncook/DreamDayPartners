@@ -135,6 +135,7 @@ model Vendor {
   longitude     Float?
   priceFrom       Int?
   priceTo         Int?
+  priceUnit       String?
   specializations String[]
   busyDates       String[]
   createdAt       DateTime @default(now())

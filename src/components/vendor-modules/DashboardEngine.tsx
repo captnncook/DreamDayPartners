@@ -12,6 +12,8 @@ import MoodboardUploader from "./MoodboardUploader";
 import ApprovalButton from "./ApprovalButton";
 import PhotoUploadPanel from "./PhotoUploadPanel";
 import SetlistPlanner from "./SetlistPlanner";
+import MenuBuilder from "./MenuBuilder";
+import CouvertCalculator from "./CouvertCalculator";
 
 interface Props {
   weddingId: string;
@@ -99,6 +101,14 @@ export default function DashboardEngine({
 
       {modules.includes("setlistPlanner") && (
         <SetlistPlanner intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("menuBuilder") && (
+        <MenuBuilder intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("couvertCalculator") && (
+        <CouvertCalculator guests={guests} intakeData={intakeData} />
       )}
 
       {modules.includes("photoUpload") && (

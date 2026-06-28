@@ -18,7 +18,7 @@ type Vendor = {
   id: string; name: string; category: string; contactPerson?: string;
   email?: string; phone?: string; website?: string; description?: string;
   isPremium: boolean; photos: string[]; city?: string; userId?: string;
-  priceFrom?: number; priceTo?: number; specializations?: string[]; busyDates?: string[];
+  priceFrom?: number; priceTo?: number; priceUnit?: string; specializations?: string[]; busyDates?: string[];
 };
 type Review = { id: string; rating: number; text?: string; createdAt: string; author: { name: string } };
 type Wedding = { id: string; title: string; date: string };
@@ -245,6 +245,7 @@ export default function VendorProfilePage() {
                       {vendor.priceFrom ? `€${vendor.priceFrom.toLocaleString("nl-NL")}` : ""}
                       {vendor.priceFrom && vendor.priceTo ? " – " : ""}
                       {vendor.priceTo ? `€${vendor.priceTo.toLocaleString("nl-NL")}` : ""}
+                      {vendor.priceUnit && <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "var(--muted)", marginLeft: "0.25rem" }}>{vendor.priceUnit}</span>}
                     </span>
                   </div>
                 )}

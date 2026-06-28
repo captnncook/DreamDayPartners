@@ -24,6 +24,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       userId: true,
       priceFrom: true,
       priceTo: true,
+      priceUnit: true,
       specializations: true,
       busyDates: true,
     },
@@ -47,7 +48,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const body = await req.json();
-  const { description, city, contactPerson, phone, website, priceFrom, priceTo, specializations } = body;
+  const { description, city, contactPerson, phone, website, priceFrom, priceTo, priceUnit, specializations } = body;
 
   let geoData: { latitude?: number; longitude?: number } = {};
   if (city !== undefined && city !== vendor.city && city.trim()) {
@@ -75,6 +76,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(website !== undefined ? { website } : {}),
       ...(priceFrom !== undefined ? { priceFrom: priceFrom ? Number(priceFrom) : null } : {}),
       ...(priceTo !== undefined ? { priceTo: priceTo ? Number(priceTo) : null } : {}),
+      ...(priceUnit !== undefined ? { priceUnit: priceUnit || null } : {}),
       ...(specializations !== undefined ? { specializations } : {}),
       ...geoData,
     },

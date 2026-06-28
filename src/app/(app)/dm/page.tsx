@@ -238,7 +238,7 @@ export default function DmPage() {
           <span style={{ fontWeight: 700, fontSize: "1rem" }}>Berichten</span>
           <button onClick={() => { setComposing(true); setQuery(""); setResults([]); }}
             style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.375rem 0.75rem", borderRadius: "9999px", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600 }}>
-            <Pencil className="w-3 h-3" /> Nieuw
+            <Pencil className="w-3 h-3" /> Nieuw bericht
           </button>
         </div>
 

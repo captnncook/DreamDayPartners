@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Download } from "lucide-react";
 import type { TimelineBlockTemplate } from "@/lib/vendorTypeConfigs";
 
 interface TimelineBlock {
@@ -95,16 +95,49 @@ function EntryForm({ form, setForm, saving, onSave, onCancel, saveLabel }: Entry
   );
 }
 
-export default function TimelinePlanner({ blocks: initial, weddingId, wvId, isPlanner, isVendor }: Props) {
+function exportTimelineCsv(blocks: TimelineBlock[], endOf: (b: TimelineBlock) => string) {
+  const header = "Starttijd,Eindtijd,Omschrijving";
+  const rows = blocks.map(b => `"${b.startTime}","${endOf(b)}","${b.description || b.title}"`);
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "tijdlijn.csv"; a.click();
+  URL.revokeObjectURL(url);
+}
+
+export default function TimelinePlanner({ blocks: initial, templates, weddingId, wvId, isPlanner, isVendor }: Props) {
   const [blocks, setBlocks] = useState(initial);
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
 
   const canEdit = isPlanner || isVendor;
 
   function endOf(b: TimelineBlock) { return addMinutes(b.startTime, b.duration); }
+
+  async function applyTemplate() {
+    if (!templates || templates.length === 0) return;
+    setLoadingTemplate(true);
+    let currentTime = "09:00";
+    const created: typeof blocks = [];
+    for (const tpl of templates) {
+      const dur = tpl.defaultDuration ?? 60;
+      const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/schedule`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ startTime: currentTime, duration: dur, title: tpl.label, notes: tpl.label }),
+      });
+      if (res.ok) {
+        const { item } = await res.json();
+        created.push({ id: item.id, startTime: item.startTime, duration: item.duration, title: item.title, description: item.notes ?? null, location: null, phase: tpl.phase ?? null });
+      }
+      currentTime = addMinutes(currentTime, dur);
+    }
+    setBlocks(created.sort((a, b) => a.startTime.localeCompare(b.startTime)));
+    setLoadingTemplate(false);
+  }
 
   async function saveNew() {
     const duration = diffMinutes(form.startTime, form.endTime);
@@ -160,14 +193,23 @@ export default function TimelinePlanner({ blocks: initial, weddingId, wvId, isPl
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
         <div>
           <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Tijdlijn</h3>
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Voeg hier je eigen opbouw- en bezorgtijden toe voor deze bruiloft.</p>
+          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Opbouw- en bezorgtijden voor deze bruiloft.</p>
         </div>
-        {canEdit && !adding && !editingId && (
-          <button onClick={() => { setAdding(true); setForm(emptyForm); }}
-            style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
-            + Toevoegen
-          </button>
-        )}
+        <div style={{ display: "flex", gap: "0.625rem", alignItems: "center" }}>
+          {blocks.length > 0 && (
+            <button onClick={() => exportTimelineCsv(blocks, endOf)}
+              title="Exporteer tijdlijn als CSV"
+              style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>
+              <Download className="w-3.5 h-3.5" /> Exporteren
+            </button>
+          )}
+          {canEdit && !adding && !editingId && (
+            <button onClick={() => { setAdding(true); setForm(emptyForm); }}
+              style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
+              + Toevoegen
+            </button>
+          )}
+        </div>
       </div>
 
       {adding && (
@@ -177,9 +219,20 @@ export default function TimelinePlanner({ blocks: initial, weddingId, wvId, isPl
       )}
 
       {blocks.length === 0 && !adding && (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
-          Nog geen tijden ingepland.{canEdit ? " Klik op '+ Toevoegen'." : ""}
-        </p>
+        <div style={{ textAlign: "center", padding: "1.5rem 0" }}>
+          <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic", marginBottom: "0.75rem" }}>
+            Nog geen tijden ingepland.
+          </p>
+          {canEdit && templates && templates.length > 0 && (
+            <button
+              onClick={applyTemplate}
+              disabled={loadingTemplate}
+              style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.4rem 0.875rem", cursor: "pointer", fontWeight: 600 }}
+            >
+              {loadingTemplate ? "Template laden…" : "✨ Template toepassen"}
+            </button>
+          )}
+        </div>
       )}
 
       <div style={{ display: "grid", gap: "0.5rem" }}>

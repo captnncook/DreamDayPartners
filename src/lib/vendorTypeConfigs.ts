@@ -8,7 +8,7 @@
 // Types
 // ────────────────────────────────────────────────────────────
 
-export type FieldType = "text" | "longtext" | "boolean" | "number" | "select" | "color-multi" | "time";
+export type FieldType = "text" | "longtext" | "boolean" | "number" | "select" | "color-multi" | "time" | "date";
 
 export interface Field {
   key: string;
@@ -47,7 +47,9 @@ export type ModuleKey =
   | "approvalButton"
   | "photoUpload"
   | "documentUpload"
-  | "setlistPlanner";
+  | "setlistPlanner"
+  | "menuBuilder"
+  | "couvertCalculator";
 
 export interface VendorTypeConfig {
   type: string;
@@ -498,11 +500,11 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "catering",
     label: "Catering",
     emoji: "🍽️",
-    modules: ["guestDataPanel", "deliverablesTracker", "timelinePlanner"],
+    modules: ["menuBuilder", "couvertCalculator", "guestDataPanel", "deliverablesTracker", "timelinePlanner"],
     readsGuestData: ["counts", "allergies"],
     intakeFields: [
       { key: "menu", label: "Menuvoorstel / -wensen", type: "longtext", placeholder: "Starters, hoofdgerecht, dessert, veganistisch..." },
-      { key: "proeverijDatum", label: "Datum proeverij", type: "text" },
+      { key: "proeverijDatum", label: "Datum proeverij", type: "date" },
       { key: "drankarrangement", label: "Drankarrangement", type: "text", placeholder: "Wijn, bier, frisdrank, open bar..." },
       { key: "kindermaaltijden", label: "Kindermaaltijden gewenst?", type: "boolean" },
     ],

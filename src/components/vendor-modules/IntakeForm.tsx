@@ -94,7 +94,7 @@ export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, is
                   />
                 ) : (
                   <input
-                    type={field.type === "number" ? "number" : field.type === "time" ? "time" : "text"}
+                    type={field.type === "number" ? "number" : field.type === "time" ? "time" : field.type === "date" ? "date" : "text"}
                     value={(value as string) ?? ""}
                     onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
                     style={inputStyle}

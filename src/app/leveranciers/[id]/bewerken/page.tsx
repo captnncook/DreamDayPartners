@@ -30,7 +30,7 @@ type Vendor = {
   id: string; name: string; category: string; contactPerson?: string;
   email?: string; phone?: string; website?: string; description?: string;
   isPremium: boolean; photos: string[]; city?: string; userId?: string;
-  priceFrom?: number; priceTo?: number; specializations?: string[]; busyDates?: string[];
+  priceFrom?: number; priceTo?: number; priceUnit?: string; specializations?: string[]; busyDates?: string[];
 };
 
 import { Suspense } from "react";
@@ -66,7 +66,7 @@ function VendorEditPage() {
 
   const [form, setForm] = useState({
     description: "", city: "", contactPerson: "", phone: "", website: "",
-    priceFrom: "", priceTo: "", specializations: "",
+    priceFrom: "", priceTo: "", priceUnit: "", specializations: "",
   });
 
   const load = useCallback(async () => {
@@ -94,6 +94,7 @@ function VendorEditPage() {
       website: v.website ?? "",
       priceFrom: v.priceFrom != null ? String(v.priceFrom) : "",
       priceTo: v.priceTo != null ? String(v.priceTo) : "",
+      priceUnit: v.priceUnit ?? "",
       specializations: (v.specializations ?? []).join(", "),
     });
     setBusyDates(v.busyDates ?? []);
@@ -412,8 +413,8 @@ function VendorEditPage() {
           </p>
           <div className="grid grid-cols-2 gap-4 mb-4">
             {[
-              { key: "priceFrom", label: "Startprijs (€)", placeholder: "bijv. 500" },
-              { key: "priceTo", label: "Tot (€)", placeholder: "bijv. 2000" },
+              { key: "priceFrom", label: "Startprijs (€)", placeholder: "bijv. 45" },
+              { key: "priceTo", label: "Tot (€)", placeholder: "bijv. 120" },
             ].map(({ key, label, placeholder }) => (
               <div key={key}>
                 <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{label}</label>
@@ -426,6 +427,22 @@ function VendorEditPage() {
                 />
               </div>
             ))}
+          </div>
+          <div className="mb-4">
+            <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Prijseenheid</label>
+            <select
+              value={form.priceUnit}
+              onChange={(e) => setForm({ ...form, priceUnit: e.target.value })}
+              style={{ width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none", background: "white" }}
+            >
+              <option value="">Geen eenheid</option>
+              <option value="per persoon">per persoon</option>
+              <option value="per couvert">per couvert</option>
+              <option value="per event">per event</option>
+              <option value="per uur">per uur</option>
+              <option value="per dag">per dag</option>
+              <option value="per tafel">per tafel</option>
+            </select>
           </div>
           <div>
             <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Specialisaties (komma-gescheiden)</label>
