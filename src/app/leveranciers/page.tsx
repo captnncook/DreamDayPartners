@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, MapPin, ArrowRight, SlidersHorizontal, X, LayoutGrid, Map, Plus } from "lucide-react";
@@ -40,11 +41,12 @@ type Vendor = {
   priceFrom?: number | null;
 };
 
-export default function LeveranciersPage() {
+function LeveranciersContent() {
+  const searchParams = useSearchParams();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(searchParams.get("category") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [view, setView] = useState<"grid" | "map">("grid");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -462,5 +464,13 @@ function AddVendorModal({ onClose, oncreated }: { onClose: () => void; oncreated
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LeveranciersPage() {
+  return (
+    <Suspense>
+      <LeveranciersContent />
+    </Suspense>
   );
 }
