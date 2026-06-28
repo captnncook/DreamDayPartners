@@ -135,6 +135,10 @@ function VendorEditPage() {
     verhuur: "bijv. meubilair, linnen, servies, podium",
     bar: "bijv. cocktails, wijnproeverij, champagnebar",
     koffiebar: "bijv. barista, specialty coffee, foodtruck",
+    liveband: "bijv. jazz, pop covers, akoestische sets, soul, eerste dans",
+    entertainment: "bijv. goochelaar, acrobaat, fotoboek, bruidsquiz",
+    tentverhuur: "bijv. partytent, tipi, glazen paviljoen, feesttent",
+    fotocabine: "bijv. photobooth, open booth, neon achtergrond",
   };
 
   const [vendor, setVendor] = useState<Vendor | null>(null);

@@ -17,6 +17,8 @@ const VENDOR_TYPE_LABELS: Record<string, string> = {
   haarstylist: "Haarstylist", visagist: "Visagist", trouwlocatie: "Trouwlocatie",
   vervoer: "Vervoer", verhuur: "Verhuur", tentverhuur: "Tentverhuur", trouwauto: "Trouwauto",
   bar: "Bar / Cocktails", koffiebar: "Koffiebar / Foodtruck",
+  liveband: "Liveband & Muziek", entertainment: "Entertainment / Acts",
+  fotocabine: "Fotocabine", dj_live: "DJ Live", band: "Band",
 };
 
 const NOTIF_DEFAULTS = {
