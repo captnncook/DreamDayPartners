@@ -147,8 +147,7 @@ export default function InstellingenPage() {
               <div className="relative mt-0.5 flex-shrink-0">
                 <input type="checkbox" checked={notifs[key]} onChange={e => setNotifs(p => ({ ...p, [key]: e.target.checked }))}
                   className="sr-only" />
-                <div onClick={() => setNotifs(p => ({ ...p, [key]: !p[key] }))}
-                  style={{ width: "36px", height: "20px", borderRadius: "10px", background: notifs[key] ? "var(--primary)" : "var(--border)", cursor: "pointer", transition: "background 0.2s", position: "relative" }}>
+                <div style={{ width: "36px", height: "20px", borderRadius: "10px", background: notifs[key] ? "var(--primary)" : "var(--border)", cursor: "pointer", transition: "background 0.2s", position: "relative" }}>
                   <div style={{ position: "absolute", top: "2px", left: notifs[key] ? "18px" : "2px", width: "16px", height: "16px", borderRadius: "50%", background: "white", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
                 </div>
               </div>
