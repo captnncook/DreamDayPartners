@@ -145,7 +145,7 @@ export default function LandingPage() {
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
           <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-            DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
+            DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
           </span>
         </Link>
 
