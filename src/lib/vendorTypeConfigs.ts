@@ -57,7 +57,9 @@ export type ModuleKey =
   | "materialChecklist"
   | "venueRooms"
   | "vendorAccessTimes"
-  | "dayOfContact";
+  | "dayOfContact"
+  | "rittenPlanner"
+  | "chauffeurInfo";
 
 export interface VendorTypeConfig {
   type: string;
@@ -718,25 +720,45 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "vervoer",
     label: "Vervoer",
     emoji: "🚗",
-    modules: ["timelinePlanner"],
+    modules: ["timelinePlanner", "rittenPlanner", "chauffeurInfo", "logisticsPanel"],
     intakeFields: [
       {
         key: "type",
         label: "Type voertuig",
         type: "select",
-        options: ["oldtimer", "limousine", "trouwauto", "bus"],
+        options: ["Oldtimer", "Limousine", "Vintage bus", "Cabriolet", "Paarden-koets", "Motor + sidecar", "Elektrisch", "Overig"],
       },
+      { key: "ingeboektVoertuig", label: "Ingeboekt voertuig (model / naam)", type: "text", placeholder: "bv. Rolls Royce Silver Shadow 1975" },
       { key: "passagiers", label: "Aantal passagiers", type: "number" },
       { key: "decoratie", label: "Decoratiewensen", type: "text", placeholder: "Linten, bloemen, blikjes..." },
+      { key: "ophaaladresBruid", label: "Ophaaladres bruid", type: "text", placeholder: "Straatnaam + huisnummer, Stad" },
+      { key: "ophaaladresBruidegom", label: "Ophaaladres bruidegom", type: "text", placeholder: "Straatnaam + huisnummer, Stad" },
+      { key: "ceremoniepunt", label: "Adres ceremonie", type: "text", placeholder: "Naam locatie, Straat, Stad" },
+      { key: "receptieLocatie", label: "Adres receptie / feest", type: "text", placeholder: "Naam locatie, Straat, Stad" },
+      { key: "eindpunt", label: "Eindbestemming (hotel / thuis)", type: "text", placeholder: "Straatnaam + huisnummer, Stad" },
     ],
     deliverables: [
-      { key: "rittenplan", label: "Rittenplan" },
+      { key: "rittenplan", label: "Rittenplan (definitief)", approvalRequired: true },
       { key: "adressen", label: "Bevestigde adressen & tijden" },
+      { key: "boekingsbevestiging", label: "Boekingsbevestiging / contract" },
     ],
     timelineTemplate: [
-      { key: "ophaal-rit-1", label: "Ophaaltijden + adressen per rit", phase: "perform", defaultDuration: 60 },
+      { key: "vertrek-naar-bruid", label: "Vertrek richting ophaaladres bruid", phase: "arrival", defaultDuration: 30 },
+      { key: "ophaal-bruid", label: "Ophalen bruid", phase: "arrival", defaultDuration: 15 },
+      { key: "ophaal-bruidegom", label: "Ophalen bruidegom (indien apart)", phase: "arrival", defaultDuration: 15 },
+      { key: "aankomst-ceremonie", label: "Aankomst ceremonie", phase: "perform", defaultDuration: 0 },
+      { key: "wachttijd-ceremonie", label: "Wachttijd tijdens ceremonie", phase: "perform", defaultDuration: 60 },
+      { key: "vertrek-naar-receptie", label: "Vertrek naar receptie / fotoshoot", phase: "perform", defaultDuration: 30 },
+      { key: "aankomst-receptie", label: "Aankomst receptie", phase: "perform", defaultDuration: 0 },
+      { key: "eindrit", label: "Eindrit naar hotel / thuis", phase: "teardown", defaultDuration: 45 },
+      { key: "einde-dienst", label: "Einde dienst", phase: "teardown", defaultDuration: 0 },
     ],
-    logisticsFields: [],
+    logisticsFields: [
+      { key: "parkeerplaats", label: "Parkeerplaats bij locatie geregeld?", type: "boolean" },
+      { key: "verzekering", label: "Verzekerd voor personenvervoer?", type: "boolean" },
+      { key: "bijzonderheden-route", label: "Bijzonderheden rijroute", type: "text", placeholder: "Wegwerkzaamheden, omleidingen, brug..." },
+      { key: "alternatief-bij-pech", label: "Alternatief voertuig bij pech?", type: "boolean" },
+    ],
   },
 
   {

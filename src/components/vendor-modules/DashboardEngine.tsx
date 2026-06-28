@@ -22,6 +22,8 @@ import MaterialChecklist from "./MaterialChecklist";
 import VenueRooms from "./VenueRooms";
 import VendorAccessTimes from "./VendorAccessTimes";
 import DayOfContact from "./DayOfContact";
+import RittenPlanner from "./RittenPlanner";
+import ChauffeurInfo from "./ChauffeurInfo";
 
 interface Props {
   weddingId: string;
@@ -149,6 +151,14 @@ export default function DashboardEngine({
 
       {modules.includes("dayOfContact") && (
         <DayOfContact intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("rittenPlanner") && (
+        <RittenPlanner intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("chauffeurInfo") && (
+        <ChauffeurInfo intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
       )}
 
       {modules.includes("photoUpload") && (
