@@ -28,6 +28,7 @@ model User {
   notifications        Notification[]
   dmParticipations     DirectConversationParticipant[]
   sentDirectMessages   DirectMessage[]
+  vendorReviews        VendorReview[]
 
   @@map("users")
 }
@@ -96,6 +97,7 @@ model Wedding {
   notifications   Notification[]
   seatTables      SeatingTable[]
   vendorInvites   VendorWeddingInvite[]
+  vendorReviews   VendorReview[]
 
   @@map("weddings")
 }
@@ -131,15 +133,52 @@ model Vendor {
   city          String?
   latitude      Float?
   longitude     Float?
-  priceFrom     Int?
-  createdAt     DateTime @default(now())
+  priceFrom       Int?
+  priceTo         Int?
+  specializations String[]
+  busyDates       String[]
+  createdAt       DateTime @default(now())
 
   weddingVendors   WeddingVendor[]
   draaiboekItems   DraaiboekItem[]
   budgetItems      BudgetItem[]
   weddingInvites   VendorWeddingInvite[]
+  contactRequests  VendorContactRequest[]
+  reviews          VendorReview[]
 
   @@map("vendors")
+}
+
+model VendorContactRequest {
+  id          String    @id @default(uuid())
+  vendorId    String
+  name        String
+  email       String
+  phone       String?
+  message     String
+  weddingDate DateTime?
+  createdAt   DateTime  @default(now())
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_contact_requests")
+}
+
+model VendorReview {
+  id        String   @id @default(uuid())
+  vendorId  String
+  weddingId String
+  authorId  String
+  rating    Int
+  text      String?
+  createdAt DateTime @default(now())
+
+  vendor  Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, weddingId, authorId])
+  @@map("vendor_reviews")
 }
 
 model VendorWeddingInvite {

@@ -107,10 +107,13 @@ export default function PhotoUploadPanel({ intakeData, onUpdate, isVendor, isPla
   return (
     <div className="card" style={{ padding: "1.5rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-        <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-          <Camera className="inline w-4 h-4 mr-1" style={{ verticalAlign: "middle" }} />
-          Foto&apos;s
-        </h3>
+        <div>
+          <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            <Camera className="inline w-4 h-4 mr-1" style={{ verticalAlign: "middle" }} />
+            Foto&apos;s
+          </h3>
+          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Upload per categorie je werkfoto&apos;s of referentiefoto&apos;s voor dit onderdeel.</p>
+        </div>
       </div>
 
       {canEdit && (

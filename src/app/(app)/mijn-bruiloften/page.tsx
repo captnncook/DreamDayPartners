@@ -152,7 +152,8 @@ export default function MijnBruiloftenPage() {
           {invites.map(invite => {
             const linked = !!invite.weddingId;
             return (
-              <div key={invite.id} className="ddp-card" style={{ padding: "1rem 1.25rem" }}>
+              <div key={invite.id} className="ddp-card" style={{ padding: "1rem 1.25rem", cursor: linked ? "pointer" : "default", transition: "box-shadow 0.15s" }}
+                onClick={() => { if (linked && invite.weddingId) window.location.href = `/weddings/${invite.weddingId}`; }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
                   <div style={{ marginTop: "2px" }}>
                     {linked

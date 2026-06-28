@@ -30,6 +30,7 @@ type Vendor = {
   id: string; name: string; category: string; contactPerson?: string;
   email?: string; phone?: string; website?: string; description?: string;
   isPremium: boolean; photos: string[]; city?: string; userId?: string;
+  priceFrom?: number; priceTo?: number; specializations?: string[]; busyDates?: string[];
 };
 
 import { Suspense } from "react";
@@ -60,9 +61,12 @@ function VendorEditPage() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [error, setError] = useState("");
+  const [busyDates, setBusyDates] = useState<string[]>([]);
+  const [newBusyDate, setNewBusyDate] = useState("");
 
   const [form, setForm] = useState({
     description: "", city: "", contactPerson: "", phone: "", website: "",
+    priceFrom: "", priceTo: "", specializations: "",
   });
 
   const load = useCallback(async () => {
@@ -88,7 +92,11 @@ function VendorEditPage() {
       contactPerson: v.contactPerson ?? "",
       phone: v.phone ?? "",
       website: v.website ?? "",
+      priceFrom: v.priceFrom != null ? String(v.priceFrom) : "",
+      priceTo: v.priceTo != null ? String(v.priceTo) : "",
+      specializations: (v.specializations ?? []).join(", "),
     });
+    setBusyDates(v.busyDates ?? []);
 
     const photosRes = await fetch(`/api/catalogus/${id}/signed-photos`);
     const pData = await photosRes.json();
@@ -105,10 +113,11 @@ function VendorEditPage() {
   async function handleSave() {
     setSaving(true);
     setError("");
+    const specializations = form.specializations.split(",").map(s => s.trim()).filter(Boolean);
     const res = await fetch(`/api/catalogus/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, specializations }),
     });
     if (!res.ok) {
       const d = await res.json();
@@ -118,6 +127,16 @@ function VendorEditPage() {
       setTimeout(() => setSaved(false), 3000);
     }
     setSaving(false);
+  }
+
+  async function toggleBusyDate(date: string) {
+    const updated = busyDates.includes(date) ? busyDates.filter(d => d !== date) : [...busyDates, date].sort();
+    setBusyDates(updated);
+    await fetch(`/api/catalogus/${id}/availability`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ busyDates: updated }),
+    });
   }
 
   async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -206,8 +225,11 @@ function VendorEditPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fff" }}>
-        <p style={{ color: "var(--muted)" }}>Laden…</p>
+      <div style={{ maxWidth: "680px", margin: "0 auto", padding: "2rem 1.25rem" }}>
+        {[100, 60, 80, 60, 90, 70].map((w, i) => (
+          <div key={i} style={{ height: i === 0 ? "2.5rem" : "2.75rem", width: `${w}%`, borderRadius: "10px", marginBottom: "1rem",
+            background: "linear-gradient(90deg, #f0ede8 25%, #e8e4de 50%, #f0ede8 75%)", backgroundSize: "200% 100%", animation: "skeleton-shimmer 1.5s infinite" }} />
+        ))}
       </div>
     );
   }
@@ -380,6 +402,76 @@ function VendorEditPage() {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Prijzen & specialisaties */}
+        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Prijsindicatie & specialisaties</h2>
+          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+            Geef bruidsparen een richtprijs en vertel in welke specialisaties jullie uitblinken.
+          </p>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {[
+              { key: "priceFrom", label: "Startprijs (€)", placeholder: "bijv. 500" },
+              { key: "priceTo", label: "Tot (€)", placeholder: "bijv. 2000" },
+            ].map(({ key, label, placeholder }) => (
+              <div key={key}>
+                <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{label}</label>
+                <input
+                  type="number"
+                  value={form[key as keyof typeof form]}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  placeholder={placeholder}
+                  style={{ width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }}
+                />
+              </div>
+            ))}
+          </div>
+          <div>
+            <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Specialisaties (komma-gescheiden)</label>
+            <input
+              type="text"
+              value={form.specializations}
+              onChange={(e) => setForm({ ...form, specializations: e.target.value })}
+              placeholder="bijv. bruidsboeket, corsages, tafeldecoratie"
+              style={{ width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }}
+            />
+          </div>
+        </section>
+
+        {/* Beschikbaarheid */}
+        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
+          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Beschikbaarheid</h2>
+          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+            Markeer datums waarop jullie niet beschikbaar zijn. Wordt zichtbaar voor bruidsparen op jullie profiel.
+          </p>
+          <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem", alignItems: "center" }}>
+            <input
+              type="date"
+              value={newBusyDate}
+              onChange={e => setNewBusyDate(e.target.value)}
+              style={{ padding: "0.5rem 0.75rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }}
+            />
+            <button
+              onClick={() => { if (newBusyDate) { toggleBusyDate(newBusyDate); setNewBusyDate(""); } }}
+              disabled={!newBusyDate}
+              style={{ padding: "0.5rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}
+            >
+              Toevoegen
+            </button>
+          </div>
+          {busyDates.length === 0 ? (
+            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", fontStyle: "italic" }}>Geen geblokkeerde datums.</p>
+          ) : (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+              {busyDates.map(d => (
+                <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", background: "#fee2e2", color: "#b91c1c", borderRadius: "9999px", padding: "0.25rem 0.75rem", fontSize: "0.8125rem", fontWeight: 500 }}>
+                  {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", year: "numeric" }).format(new Date(d))}
+                  <button onClick={() => toggleBusyDate(d)} style={{ background: "none", border: "none", cursor: "pointer", color: "#b91c1c", padding: 0, lineHeight: 1, fontSize: "1rem" }}>×</button>
+                </span>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Premium */}

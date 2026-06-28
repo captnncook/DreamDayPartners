@@ -18,7 +18,9 @@ type Vendor = {
   id: string; name: string; category: string; contactPerson?: string;
   email?: string; phone?: string; website?: string; description?: string;
   isPremium: boolean; photos: string[]; city?: string; userId?: string;
+  priceFrom?: number; priceTo?: number; specializations?: string[]; busyDates?: string[];
 };
+type Review = { id: string; rating: number; text?: string; createdAt: string; author: { name: string } };
 type Wedding = { id: string; title: string; date: string };
 type CurrentUser = { id: string; role: string; name: string };
 
@@ -34,6 +36,10 @@ export default function VendorProfilePage() {
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
   const [addError, setAddError] = useState("");
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", message: "", weddingDate: "" });
+  const [contactSent, setContactSent] = useState(false);
+  const [contactSending, setContactSending] = useState(false);
 
   const load = useCallback(async () => {
     const [vRes, meRes] = await Promise.all([
@@ -66,10 +72,24 @@ export default function VendorProfilePage() {
       setPhotoUrls(pData.urls ?? []);
       setCoverUrl(pData.coverUrl ?? null);
     }
+    const rRes = await fetch(`/api/catalogus/${id}/reviews`);
+    if (rRes.ok) { const rData = await rRes.json(); setReviews(rData.reviews ?? []); }
     setLoading(false);
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  async function handleContact(e: React.FormEvent) {
+    e.preventDefault();
+    setContactSending(true);
+    const res = await fetch(`/api/catalogus/${id}/contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(contactForm),
+    });
+    if (res.ok) setContactSent(true);
+    setContactSending(false);
+  }
 
   async function handleAddToDreamTeam() {
     if (!selectedWedding) return;
@@ -214,10 +234,34 @@ export default function VendorProfilePage() {
               </div>
             )}
 
+            {/* Price + specializations */}
+            {(vendor.priceFrom || (vendor.specializations && vendor.specializations.length > 0)) && (
+              <div className="ddp-card mb-5">
+                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.875rem" }}>Diensten & prijzen</h2>
+                {(vendor.priceFrom || vendor.priceTo) && (
+                  <div style={{ marginBottom: "0.75rem" }}>
+                    <span style={{ fontSize: "0.8125rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Prijsindicatie</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--foreground)" }}>
+                      {vendor.priceFrom ? `€${vendor.priceFrom.toLocaleString("nl-NL")}` : ""}
+                      {vendor.priceFrom && vendor.priceTo ? " – " : ""}
+                      {vendor.priceTo ? `€${vendor.priceTo.toLocaleString("nl-NL")}` : ""}
+                    </span>
+                  </div>
+                )}
+                {vendor.specializations && vendor.specializations.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+                    {vendor.specializations.map(s => (
+                      <span key={s} style={{ background: "var(--color-blush-soft)", color: "var(--muted)", border: "1px solid var(--color-blush)", borderRadius: "9999px", padding: "0.25rem 0.75rem", fontSize: "0.8125rem" }}>{s}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Contact */}
-            <div className="ddp-card">
+            <div className="ddp-card mb-5">
               <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "1rem" }}>
-                Contactgegevens
+                Contact
               </h2>
               <div className="flex flex-col gap-3">
                 {vendor.contactPerson && (
@@ -243,6 +287,77 @@ export default function VendorProfilePage() {
                 )}
               </div>
             </div>
+
+            {/* Reviews */}
+            {reviews.length > 0 && (
+              <div className="ddp-card mb-5">
+                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.875rem" }}>
+                  Beoordelingen
+                </h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                  {reviews.map(r => (
+                    <div key={r.id} style={{ borderBottom: "1px solid var(--border)", paddingBottom: "0.875rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                        <span style={{ color: "#f59e0b", fontSize: "0.9375rem", letterSpacing: "2px" }}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
+                        <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{r.author.name}</span>
+                      </div>
+                      {r.text && <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6 }}>{r.text}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Contact form */}
+            {!isVendorOwner && (
+              <div className="ddp-card">
+                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Stuur een aanvraag</h2>
+                <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.6 }}>
+                  Stel een vraag of doe een vrijblijvende aanvraag bij {vendor.name}.
+                </p>
+                {contactSent ? (
+                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534" }}>
+                    Aanvraag verstuurd! {vendor.name} neemt zo snel mogelijk contact op.
+                  </div>
+                ) : (
+                  <form onSubmit={handleContact} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    {[
+                      { key: "name", label: "Naam", placeholder: "Jouw naam", type: "text" },
+                      { key: "email", label: "E-mailadres", placeholder: "jouw@email.nl", type: "email" },
+                      { key: "phone", label: "Telefoonnummer (optioneel)", placeholder: "+31 6 12345678", type: "tel" },
+                      { key: "weddingDate", label: "Trouwdatum (optioneel)", placeholder: "", type: "date" },
+                    ].map(f => (
+                      <div key={f.key}>
+                        <label style={{ fontSize: "0.8125rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>{f.label}</label>
+                        <input
+                          type={f.type}
+                          required={f.key === "name" || f.key === "email"}
+                          value={contactForm[f.key as keyof typeof contactForm]}
+                          onChange={e => setContactForm(c => ({ ...c, [f.key]: e.target.value }))}
+                          placeholder={f.placeholder}
+                          style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "0.875rem", boxSizing: "border-box" }}
+                        />
+                      </div>
+                    ))}
+                    <div>
+                      <label style={{ fontSize: "0.8125rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Bericht</label>
+                      <textarea
+                        required
+                        value={contactForm.message}
+                        onChange={e => setContactForm(c => ({ ...c, message: e.target.value }))}
+                        placeholder="Vertel meer over jullie bruiloft en wat je nodig hebt…"
+                        rows={4}
+                        style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "0.875rem", resize: "vertical", boxSizing: "border-box" }}
+                      />
+                    </div>
+                    <button type="submit" disabled={contactSending} style={{ padding: "0.625rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+                      {contactSending ? "Verzenden…" : "Aanvraag versturen"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
           </div>
 
           {/* Sidebar — Dream Team */}

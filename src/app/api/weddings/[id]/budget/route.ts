@@ -50,6 +50,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       actual: body.actual ?? 0,
       vendorId: body.vendorId ?? null,
       payStatus: body.payStatus ?? "pending",
+      invoiceUrl: body.invoiceUrl ?? null,
     },
     include: { vendor: true },
   });

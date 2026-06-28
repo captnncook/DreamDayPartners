@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { X, Euro } from "lucide-react";
+import { X, Euro, Paperclip } from "lucide-react";
 import { SkeletonCard, SkeletonBlock } from "@/components/Skeleton";
 
 type BudgetItem = {
@@ -14,6 +14,7 @@ type BudgetItem = {
   actual: number;
   payStatus: string;
   vendor?: { name: string } | null;
+  invoiceUrl?: string | null;
 };
 
 type Budget = {
@@ -41,7 +42,7 @@ export default function BudgetPage() {
   const [showForm, setShowForm] = useState(false);
   const [editTotal, setEditTotal] = useState(false);
   const [newTotal, setNewTotal] = useState("");
-  const [form, setForm] = useState({ category: "Catering", description: "", estimated: "", actual: "", payStatus: "pending" });
+  const [form, setForm] = useState({ category: "Catering", description: "", estimated: "", actual: "", payStatus: "pending", invoiceUrl: "" });
   const [saving, setSaving] = useState(false);
 
   async function deleteItem(itemId: string) {
@@ -96,9 +97,10 @@ export default function BudgetPage() {
         ...form,
         estimated: parseFloat(form.estimated) || 0,
         actual: parseFloat(form.actual) || 0,
+        invoiceUrl: form.invoiceUrl || null,
       }),
     });
-    setForm({ category: "Catering", description: "", estimated: "", actual: "", payStatus: "pending" });
+    setForm({ category: "Catering", description: "", estimated: "", actual: "", payStatus: "pending", invoiceUrl: "" });
     setShowForm(false);
     setSaving(false);
     load();
@@ -233,6 +235,11 @@ export default function BudgetPage() {
                 {Object.entries(PAY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-medium mb-1">Offerte / factuurlink (optioneel)</label>
+              <input type="url" value={form.invoiceUrl} onChange={(e) => setForm((p) => ({ ...p, invoiceUrl: e.target.value }))}
+                placeholder="https://..." className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+            </div>
           </div>
           <button type="submit" disabled={saving} className="ddp-btn-primary w-full">
             {saving ? "Opslaan..." : "Budgetpost toevoegen"}
@@ -266,6 +273,13 @@ export default function BudgetPage() {
                         >
                           {PAY_LABELS[item.payStatus]}
                         </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        {item.invoiceUrl ? (
+                          <a href={item.invoiceUrl} target="_blank" rel="noopener noreferrer" title="Offerte / factuur bekijken" style={{ color: "var(--primary)", display: "flex" }}>
+                            <Paperclip className="w-3.5 h-3.5" />
+                          </a>
+                        ) : null}
                       </td>
                       <td className="px-4 py-3">
                         <button onClick={() => deleteItem(item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-3.5 h-3.5" /></button>

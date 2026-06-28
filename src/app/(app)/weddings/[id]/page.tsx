@@ -10,6 +10,7 @@ import {
 import VendorDashboardInline from "@/components/VendorDashboardInline";
 import VendorContactSheet from "@/components/VendorContactSheet";
 import EditableNotes from "@/components/EditableNotes";
+import TabNav from "./TabNav";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
@@ -167,28 +168,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-        {[
-          { href: `/weddings/${id}`, label: "Overzicht" },
-          !isVendor && { href: `/weddings/${id}/tasks`, label: "Taken" },
-          !isVendor && { href: `/weddings/${id}/guests`, label: "Gasten" },
-          !isVendor && { href: `/weddings/${id}/budget`, label: "Budget" },
-          { href: `/weddings/${id}/draaiboek`, label: "Draaiboek" },
-          { href: `/weddings/${id}/messages`, label: "Berichten" },
-          !isVendor && { href: `/weddings/${id}/vendors`, label: "Leveranciers" },
-          { href: `/weddings/${id}/team`, label: "Team" },
-        ].filter(Boolean).map((tab) => {
-          if (!tab) return null;
-          return (
-            <Link key={tab.href} href={tab.href}
-              className="flex-shrink-0 px-4 py-2 rounded-full font-medium whitespace-nowrap"
-              style={{ fontSize: "0.8125rem", background: "rgba(0,0,0,0.05)", color: "var(--muted)", letterSpacing: "-0.01em" }}
-            >
-              {tab.label}
-            </Link>
-          );
-        })}
-      </div>
+      <TabNav id={id} isVendor={isVendor} />
 
       {/* Content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
