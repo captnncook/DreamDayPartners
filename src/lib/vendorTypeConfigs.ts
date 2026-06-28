@@ -54,7 +54,10 @@ export type ModuleKey =
   | "galleryDelivery"
   | "videoDelivery"
   | "bruidsteamBuilder"
-  | "materialChecklist";
+  | "materialChecklist"
+  | "venueRooms"
+  | "vendorAccessTimes"
+  | "dayOfContact";
 
 export interface VendorTypeConfig {
   type: string;
@@ -625,12 +628,12 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     type: "trouwlocatie",
     label: "Trouwlocatie",
     emoji: "🏛️",
-    modules: ["logisticsPanel"],
+    modules: ["timelinePlanner", "venueRooms", "vendorAccessTimes", "dayOfContact", "fileVault"],
     intakeFields: [
-      { key: "capaciteit", label: "Capaciteit (personen)", type: "number" },
-      { key: "ruimtes", label: "Beschikbare ruimtes", type: "longtext", placeholder: "Ceremonie, diner, feest, bruidskamer..." },
-      { key: "huisregels", label: "Huisregels & restricties", type: "longtext", placeholder: "Geluidsgrens, eindtijd, cateringbeleid..." },
+      { key: "capaciteit", label: "Capaciteit (max. personen)", type: "number" },
       { key: "eindtijd", label: "Eindtijd evenement", type: "time" },
+      { key: "huisregels", label: "Huisregels & restricties", type: "longtext", placeholder: "Geluidsgrens, confetti-beleid, rookbeleid..." },
+      { key: "annuleringsbeleid", label: "Annuleringsbeleid", type: "longtext", placeholder: "Voorwaarden bij annulering..." },
     ],
     deliverables: [
       { key: "leveranciersrooster", label: "Leverancierstoegang rooster" },
@@ -639,13 +642,23 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     ],
     timelineTemplate: [
       { key: "leverancierstoegang", label: "Leverancierstoegang start", phase: "arrival", defaultDuration: 0 },
+      { key: "opbouw-decoratie", label: "Opbouw decoratie / styling", phase: "setup", defaultDuration: 120 },
+      { key: "opbouw-catering", label: "Opbouw catering", phase: "setup", defaultDuration: 90 },
+      { key: "ontvangst-gasten", label: "Ontvangst gasten", phase: "perform", defaultDuration: 30 },
+      { key: "ceremonie", label: "Ceremonie", phase: "perform", defaultDuration: 45 },
+      { key: "diner", label: "Diner", phase: "perform", defaultDuration: 120 },
+      { key: "feest", label: "Feest / dansvloer open", phase: "perform", defaultDuration: 180 },
       { key: "oplevering-locatie", label: "Oplevering locatie aan bruidspaar", phase: "custom", defaultDuration: 15 },
       { key: "eindtijd-locatie", label: "Eindtijd evenement", phase: "teardown", defaultDuration: 0 },
+      { key: "afbouw", label: "Afbouw & schoonmaak", phase: "teardown", defaultDuration: 120 },
     ],
     logisticsFields: [
       { key: "parkeergelegenheid", label: "Parkeergelegenheid aanwezig?", type: "boolean" },
-      { key: "toegankelijkheid", label: "Rolstoeltoegankelijkheid", type: "boolean" },
-      { key: "catering-beleid", label: "Cateringbeleid (eigen/extern)", type: "text" },
+      { key: "toegankelijkheid-rolstoel", label: "Rolstoeltoegankelijk (gehele locatie)?", type: "boolean" },
+      { key: "toegankelijkheid-lift", label: "Lift aanwezig?", type: "boolean" },
+      { key: "toegankelijkheid-mindervalide-toilet", label: "Mindervalidentoilet aanwezig?", type: "boolean" },
+      { key: "catering-beleid", label: "Cateringbeleid", type: "select", options: ["Eigen catering verplicht", "Externe catering toegestaan", "Externe catering mits gecertificeerd", "Vrije keuze"] },
+      { key: "geluidsgrens", label: "Geluidsgrens (dB)", type: "text" },
     ],
   },
 

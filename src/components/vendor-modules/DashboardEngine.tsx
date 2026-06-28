@@ -19,6 +19,9 @@ import GalleryDelivery from "./GalleryDelivery";
 import VideoDelivery from "./VideoDelivery";
 import BruidsteamBuilder from "./BruidsteamBuilder";
 import MaterialChecklist from "./MaterialChecklist";
+import VenueRooms from "./VenueRooms";
+import VendorAccessTimes from "./VendorAccessTimes";
+import DayOfContact from "./DayOfContact";
 
 interface Props {
   weddingId: string;
@@ -134,6 +137,18 @@ export default function DashboardEngine({
 
       {modules.includes("materialChecklist") && (
         <MaterialChecklist intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("venueRooms") && (
+        <VenueRooms intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("vendorAccessTimes") && (
+        <VendorAccessTimes intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+      )}
+
+      {modules.includes("dayOfContact") && (
+        <DayOfContact intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
       )}
 
       {modules.includes("photoUpload") && (
