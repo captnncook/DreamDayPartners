@@ -21,7 +21,7 @@ export default function MobileNav({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { t, toggle } = useLang();
+  const { lang, t, toggle } = useLang();
   const n = t.nav;
 
   const NAV_ITEMS = [
@@ -30,12 +30,10 @@ export default function MobileNav({ user }: { user: User }) {
     { href: "/tasks",                      label: n.myTasks,           roles: ["planner", "team_member", "couple"] },
     { href: "/guests",                     label: n.guests,            roles: ["planner", "team_member", "couple"] },
     { href: "/budget",                     label: n.budget,            roles: ["planner", "team_member"] },
-    { href: "/dm",                         label: "Berichten",         roles: ["planner", "team_member", "couple", "vendor"] },
-    { href: "/dream-team",                 label: "Dream Team",        roles: ["couple"] },
+    { href: "/messages",                   label: n.messages,          roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/vendors",                    label: n.vendors,           roles: ["planner", "team_member"] },
-    { href: "/leveranciers",               label: "Leveranciers",      roles: ["admin", "planner", "couple"] },
-    { href: "/leveranciers/mijn-profiel",  label: "Mijn profiel",      roles: ["vendor"] },
-    { href: "/mijn-bruiloften",            label: "Mijn bruiloften",   roles: ["vendor"] },
+    { href: "/leveranciers",               label: n.vendors,           roles: ["admin", "planner", "couple"] },
+    { href: "/leveranciers/mijn-profiel",  label: lang === "en" ? "My profile" : "Mijn profiel", roles: ["vendor"] },
     { href: "/admin",                      label: n.admin,             roles: ["admin"] },
   ];
 
@@ -75,7 +73,7 @@ export default function MobileNav({ user }: { user: User }) {
           href="/dashboard"
           style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
         >
-          <Image src="/images/logo.svg" alt="DreamDay Partners" width={30} height={30} style={{ flexShrink: 0 }} />
+          <Image src="/logo.png" alt="DreamDay Partners" width={30} height={30} style={{ flexShrink: 0 }} />
           <span
             style={{
               fontWeight: 700,
@@ -208,7 +206,7 @@ export default function MobileNav({ user }: { user: User }) {
           </div>
 
           {/* Nav items */}
-          <nav style={{ flex: 1, padding: "8px 16px" }}>
+          <nav style={{ flex: 1, padding: "8px 16px", overflowY: "auto" }}>
             <div
               style={{
                 background: "#f5f5f7",
@@ -254,11 +252,9 @@ export default function MobileNav({ user }: { user: User }) {
           </nav>
 
           {/* Bottom actions */}
-          <div style={{ padding: "8px 16px 32px" }}>
+          <div style={{ padding: "8px 16px 32px", flexShrink: 0, borderTop: "1px solid rgba(0,0,0,0.08)" }}>
             <Link
               href="/"
-              target="_blank"
-              rel="noopener noreferrer"
               onClick={() => setOpen(false)}
               style={{
                 display: "flex",
@@ -274,7 +270,7 @@ export default function MobileNav({ user }: { user: User }) {
                 letterSpacing: "-0.01em",
               }}
             >
-              Naar website
+              {t.nav.toWebsite}
             </Link>
             <div
               style={{

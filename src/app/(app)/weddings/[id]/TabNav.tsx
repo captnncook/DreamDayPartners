@@ -4,22 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLang } from "@/components/LangProvider";
 
-export default function TabNav({ id, isVendor }: { id: string; isVendor?: boolean }) {
+export default function TabNav({ id, isVendor = false }: { id: string; isVendor?: boolean }) {
   const pathname = usePathname();
   const { t } = useLang();
   const tb = t.tabs;
 
   const tabs = [
-    { href: `/weddings/${id}`,           label: tb.overview },
-    !isVendor && { href: `/weddings/${id}/tasks`,     label: tb.tasks },
-    !isVendor && { href: `/weddings/${id}/guests`,    label: tb.guests },
-    !isVendor && { href: `/weddings/${id}/budget`,    label: tb.budget },
-    !isVendor && { href: `/weddings/${id}/files`,     label: tb.files },
-    { href: `/weddings/${id}/draaiboek`, label: tb.draaiboek },
-    { href: `/weddings/${id}/messages`,  label: tb.messages },
-    !isVendor && { href: `/weddings/${id}/vendors`,   label: tb.vendors },
-    { href: `/weddings/${id}/team`,      label: tb.team },
-  ].filter(Boolean) as { href: string; label: string }[];
+    { href: `/weddings/${id}`,           label: tb.overview,   always: true },
+    { href: `/weddings/${id}/tasks`,     label: tb.tasks,      always: false },
+    { href: `/weddings/${id}/guests`,    label: tb.guests,     always: false },
+    { href: `/weddings/${id}/budget`,    label: tb.budget,     always: false },
+    { href: `/weddings/${id}/draaiboek`, label: tb.draaiboek,  always: true },
+    { href: `/weddings/${id}/messages`,  label: tb.messages,   always: true },
+    { href: `/weddings/${id}/vendors`,   label: tb.vendors,    always: false },
+    { href: `/weddings/${id}/team`,      label: tb.team,       always: true },
+  ].filter((tab) => tab.always || !isVendor);
 
   return (
     <div

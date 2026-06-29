@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Check, ArrowRight, ChevronDown } from "lucide-react";
 
@@ -33,12 +33,12 @@ const HOW_IT_WORKS = [
 ];
 
 const FAQS = [
-  { q: "Is DreamDay Platform gratis voor bruidsparen?", a: "Ja, volledig. Bruidsparen betalen nooit iets — geen proefperiode, geen verborgen kosten. Het platform is voor altijd gratis voor jullie." },
+  { q: "Is DreamDay Partners gratis voor bruidsparen?", a: "Ja, volledig. Bruidsparen betalen nooit iets — geen proefperiode, geen verborgen kosten. Het platform is voor altijd gratis voor jullie." },
   { q: "Hoe vind ik leveranciers?", a: "Via de leveranciersdatabase zoek je op categorie — van fotograaf tot caterer. Je voegt ze toe aan jullie bruiloft en communiceert direct via de app." },
   { q: "Wat zit er in premium voor leveranciers?", a: "Met het premium abonnement beheer je onbeperkt bruiloften, bewerk je het draaiboek, upload je documenten, heb je toegang tot een analytisch dashboard en profiteer je van prioriteit support." },
   { q: "Hoe werkt het contact met leveranciers?", a: "Alles loopt via de ingebouwde chat. Geen losse apps, geen mailtjes kwijt — alle gesprekken staan in je account." },
   { q: "Wat is een draaiboek?", a: "Het draaiboek is een minuut-voor-minuut tijdlijn van jullie trouwdag. Je vult het samen met je planner in en deelt het met alle leveranciers." },
-  { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Absoluut. DreamDay Platform is ontworpen zodat bruidsparen zelf de regie kunnen houden — met of zonder professionele planner." },
+  { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Absoluut. DreamDay Partners is ontworpen zodat bruidsparen zelf de regie kunnen houden — met of zonder professionele planner." },
 ];
 
 /* ─── Sub-components ────────────────────────────────────── */
@@ -99,24 +99,11 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [heroPassed, setHeroPassed] = useState(false);
-  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setHeroPassed(!entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(hero);
-    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -143,18 +130,18 @@ export default function LandingPage() {
         }}
       >
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
+          <Image src="/logo.png" alt="DreamDay Partners" width={28} height={28} />
           <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-            DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
+            DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
           </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-0 flex-1 justify-center">
           {[
             { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-            { href: "/leveranciers",  label: "Vind leveranciers" },
             { href: "#prijzen",       label: "Prijzen" },
             { href: "#faq",           label: "FAQ" },
+            { href: "/leveranciers",  label: "Vind leveranciers" },
           ].map((l) => (
             <a key={l.href} href={l.href} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.7rem" }}>
               {l.label}
@@ -164,18 +151,9 @@ export default function LandingPage() {
 
         <div className="flex items-center gap-2 ml-auto flex-shrink-0">
           {loggedIn ? (
-            <>
-              <button
-                onClick={() => fetch("/api/auth/logout", { method: "POST" }).then(() => { window.location.href = "/login"; })}
-                className="ddp-btn-ghost hidden sm:inline-flex"
-                style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}
-              >
-                Uitloggen
-              </button>
-              <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
-                Dashboard
-              </Link>
-            </>
+            <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+              Profiel
+            </Link>
           ) : (
             <>
               <Link href="/login" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
@@ -189,44 +167,8 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ── Sticky mobile CTA ────────────────────────────── */}
-      {heroPassed && !loggedIn && (
-        <div
-          className="md:hidden"
-          style={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 40,
-            background: "rgba(255,255,255,0.96)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderTop: "1px solid rgba(0,0,0,0.08)",
-            padding: "0.875rem 1.25rem",
-            display: "flex",
-            gap: "0.625rem",
-          }}
-        >
-          <Link
-            href="/aanmelden"
-            className="ddp-btn-primary"
-            style={{ flex: 1, justifyContent: "center", padding: "0.75rem", fontSize: "0.9375rem" }}
-          >
-            Begin gratis
-          </Link>
-          <Link
-            href="/leveranciers"
-            className="ddp-btn-secondary"
-            style={{ flex: 1, justifyContent: "center", padding: "0.75rem", fontSize: "0.9375rem" }}
-          >
-            Vind leveranciers
-          </Link>
-        </div>
-      )}
-
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section ref={heroRef} className="relative overflow-hidden" style={{ background: "#ffffff", minHeight: "90vh", display: "flex", alignItems: "center" }}>
+      <section className="relative overflow-hidden" style={{ background: "#ffffff", minHeight: "90vh", display: "flex", alignItems: "center" }}>
         <div className="w-full px-5 md:px-10 py-20 md:py-28" style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
             {/* Text */}
@@ -242,7 +184,7 @@ export default function LandingPage() {
                 }}
               >
                 Samen naar jullie dream day,{" "}
-                <span style={{ color: "var(--primary)", background: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                <span style={{ background: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                   zonder de stress.
                 </span>
               </h1>
@@ -253,8 +195,8 @@ export default function LandingPage() {
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Begin gratis
                 </Link>
-                <Link href="/leveranciers" style={{ fontSize: "0.9375rem", color: "var(--muted)", textDecoration: "underline", textUnderlineOffset: "3px", padding: "0.75rem 0.25rem" }}>
-                  Vind jouw Dream Partner
+                <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
+                  Vind jouw Dream Partner!
                 </Link>
               </div>
             </div>
@@ -326,7 +268,7 @@ export default function LandingPage() {
                   Losse mailtjes, WhatsApp-groepen vol offertes en een Excel die steeds minder overzicht geeft. Je wil trouwen, geen projectmanager worden.
                 </p>
                 <p style={{ fontSize: "1.0625rem", color: "var(--foreground)", lineHeight: 1.75, fontWeight: 500 }}>
-                  DreamDay Platform brengt rust: alles op één plek, samen geregeld.
+                  DreamDay Partners brengt rust: alles op één plek, samen geregeld.
                 </p>
               </ScrollReveal>
             </div>
@@ -427,7 +369,7 @@ export default function LandingPage() {
                   Beheer al je bruiloften{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>op één plek.</span>
                 </h2>
                 <p style={{ fontSize: "1rem", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
-                  Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk. DreamDay Platform geeft je één helder overzicht.
+                  Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk. DreamDay Partners geeft je één helder overzicht.
                 </p>
               </ScrollReveal>
 
@@ -465,39 +407,52 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Early access / beta ───────────────────────────── */}
+      {/* ── Social proof ─────────────────────────────────── */}
       <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
         <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
           <ScrollReveal>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.625rem", marginBottom: "1.25rem" }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", background: "var(--gradient-primary)", borderRadius: "999px", padding: "0.25rem 0.875rem", fontSize: "0.6875rem", fontWeight: 700, color: "white", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                Beta
-              </span>
-              <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Beperkte toegang · Wees er vroeg bij</span>
-            </div>
-            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "1rem" }}>
-              Wees één van de eersten.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>En help mee bouwen.</span>
+            <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Ervaringen</p>
+            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3.5rem" }}>
+              Bruidsparen gingen{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>je voor.</span>
             </h2>
-            <p style={{ fontSize: "1rem", color: "var(--muted)", lineHeight: 1.7, maxWidth: "520px", marginBottom: "3rem" }}>
-              DreamDay Platform is momenteel in bèta. Vroege gebruikers krijgen directe toegang, persoonlijke support en de kans om het platform mee te vormen.
-            </p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { icon: "✦", title: "Vroege toegang", desc: "Registreer nu en gebruik het platform terwijl het groeit. Jouw feedback vormt de volgende versie." },
-              { icon: "✦", title: "Directe support", desc: "Tijdens de bèta heb je direct contact met het team. Geen wachtrij, geen bot." },
-              { icon: "✦", title: "Gratis voor bruidsparen", desc: "Nu, later, altijd. Bruidsparen betalen nooit voor DreamDay Platform." },
-            ].map((item, i) => (
-              <ScrollReveal key={item.title} delay={i * 100}>
-                <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
-                  <div style={{ fontSize: "1.25rem", color: "var(--primary)", marginBottom: "0.75rem" }}>{item.icon}</div>
-                  <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.02em", marginBottom: "0.5rem" }}>{item.title}</h3>
-                  <p style={{ fontSize: "0.9rem", color: "var(--muted)", lineHeight: 1.65 }}>{item.desc}</p>
+            {/* Featured photo quote */}
+            <ScrollReveal delay={0} className="md:col-span-1">
+              <div style={{ borderRadius: "20px", overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.08)", height: "100%", display: "flex", flexDirection: "column" }}>
+                <div style={{ position: "relative", height: "220px" }}>
+                  <Image src="/images/bride-sofa.png" alt="Tevreden bruid" fill style={{ objectFit: "cover", objectPosition: "center top" }} />
                 </div>
-              </ScrollReveal>
-            ))}
+                <div style={{ padding: "1.5rem", background: "white", flex: 1 }}>
+                  <p style={{ fontSize: "0.9375rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1rem", fontStyle: "italic" }}>
+                    &ldquo;Eindelijk één plek voor alles. We hadden nooit gedacht dat plannen zo overzichtelijk kon zijn.&rdquo;
+                  </p>
+                  <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--primary)" }}>Emma & Thomas</p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <div className="md:col-span-2 grid grid-cols-1 gap-4">
+              {[
+                { quote: "De combinatie van leveranciers, chat en draaiboek op één plek is echt een game changer.", name: "Sophie & Lars" },
+                { quote: "Op onze trouwdag hoefden we nergens aan te denken. Alles was geregeld dankzij DreamDay.", name: "Nora & Daan" },
+              ].map((r, i) => (
+                <ScrollReveal key={i} delay={(i + 1) * 100}>
+                  <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
+                    <p style={{ fontSize: "0.9375rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1.25rem", fontStyle: "italic" }}>
+                      &ldquo;{r.quote}&rdquo;
+                    </p>
+                    <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--primary)" }}>{r.name}</p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
+
+          <p style={{ marginTop: "1.5rem", fontSize: "0.75rem", color: "var(--muted)", fontStyle: "italic" }}>
+            * Reviews worden aangevuld zodra we echte ervaringen hebben ontvangen.
+          </p>
         </div>
       </section>
 
@@ -538,7 +493,7 @@ export default function LandingPage() {
               <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
                 <div className="ddp-badge badge-neutral mb-5">Leverancier · Free</div>
                 <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>€0</div>
-                <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Per maand · Gratis proberen, 1 bruiloft inbegrepen</div>
+                <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Per maand</div>
                 <ul className="space-y-3 mb-7">
                   {["Portaaltoegang (1 bruiloft)", "Draaiboek inzien", "Bestanden ontvangen", "Chatten met planner", "Basisprofiel"].map((item) => (
                     <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "0.875rem" }}>
@@ -632,21 +587,21 @@ export default function LandingPage() {
       <footer className="px-5 py-10" style={{ background: "var(--foreground)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "1040px", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
-            <Image src="/images/logo-wit.svg" alt="DreamDay Partners" width={26} height={26} />
-            <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>DreamDay Platform</span>
+            <Image src="/logo.png" alt="DreamDay Partners" width={26} height={26} className="brightness-0 invert" />
+            <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>DreamDay Partners</span>
           </div>
           <div className="flex flex-wrap justify-center gap-5">
             {[
               { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-              { href: "/leveranciers",  label: "Vind leveranciers" },
               { href: "#prijzen",       label: "Prijzen" },
               { href: "#faq",           label: "FAQ" },
+              { href: "/leveranciers",  label: "Vind leveranciers" },
               { href: "/login",         label: "Inloggen" },
             ].map((l) => (
               <a key={l.href} href={l.href} style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.40)", textDecoration: "none" }}>{l.label}</a>
             ))}
           </div>
-          <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)" }}>© 2026 DreamDay Platform</p>
+          <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)" }}>© 2026 DreamDay Partners</p>
         </div>
       </footer>
     </div>

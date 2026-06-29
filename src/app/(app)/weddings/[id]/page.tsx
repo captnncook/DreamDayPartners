@@ -8,12 +8,11 @@ import {
   Clock, FileText, Handshake,
 } from "lucide-react";
 import VendorDashboardInline from "@/components/VendorDashboardInline";
-import VendorContactSheet from "@/components/VendorContactSheet";
-import EditableNotes from "@/components/EditableNotes";
 import TabNav from "./TabNav";
+import { getServerLang } from "@/lib/server-lang";
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
+function formatDate(date: Date, lang: string) {
+  return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
 }
 
 function formatTime(time: string) {
@@ -29,6 +28,8 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
   if (!user) redirect("/login");
 
   const { id } = await params;
+  const { lang, t } = await getServerLang();
+  const tw = t.wedding;
 
   // Role-based access filter
   const accessWhere =
@@ -55,7 +56,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 contactPerson: true,
                 email: true,
                 phone: true,
-                website: true,
                 userId: true,
               },
             },
@@ -72,7 +72,8 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
           include: {
             items: {
               orderBy: { sortOrder: "asc" },
-              include: { vendor: { select: { id: true, name: true, category: true } } },
+              take: 8,
+              include: { vendor: { select: { name: true } } },
             },
           },
           take: 1,
@@ -87,10 +88,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
   if (!wedding) notFound();
 
-  const tasksDoneCount = user.role !== "vendor" ? await prisma.task.count({
-    where: { weddingId: id, status: "done" },
-  }) : 0;
-
   // For vendor users: find their own Vendor.id so we can filter the dashboard list
   let ownVendorId: string | null = null;
   if (user.role === "vendor") {
@@ -102,20 +99,16 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
   const totalBudget = wedding.budget?.totalAmount ?? 0;
   const spent = wedding.budget?.items.reduce((s, i) => s + (i.actual ?? 0), 0) ?? 0;
   const budgetPct = totalBudget > 0 ? Math.min(100, Math.round((spent / totalBudget) * 100)) : 0;
-  const tasksOpen = wedding._count.tasks - tasksDoneCount;
+  const tasksDone = wedding.tasks.filter((t) => t.status === "done").length;
+  const tasksOpen = wedding.tasks.filter((t) => t.status !== "done").length;
   const guestConfirmed = wedding.guests.filter((g) => g.rsvpStatus === "confirmed").length;
   const draaiboek = wedding.draaiboeken[0] ?? null;
 
   const statusColors: Record<string, string> = {
     planning: "badge-info", intake: "badge-neutral", execution: "badge-warning", completed: "badge-success",
   };
-  const statusLabels: Record<string, string> = {
-    planning: "Planning", intake: "Intake", execution: "Uitvoering", completed: "Afgerond",
-  };
-  const vendorStatusLabels: Record<string, string> = {
-    lead: "Lead", invited: "Uitgenodigd", contacted: "Gecontacteerd", quote_received: "Offerte", booked: "Geboekt",
-    confirmed: "Bevestigd", in_progress: "Bezig", ready: "Klaar", completed: "Afgerond", declined: "Afgewezen",
-  };
+  const statusLabels = tw.statusLabels;
+  const vendorStatusLabels = tw.vendorStatusLabels;
   const vendorStatusColors: Record<string, string> = {
     lead: "badge-neutral", invited: "badge-warning", contacted: "badge-neutral", quote_received: "badge-warning",
     booked: "badge-info", confirmed: "badge-success", in_progress: "badge-info",
@@ -129,7 +122,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
       {/* Breadcrumb */}
       <Link href="/dashboard" className="inline-flex items-center gap-1 mb-5 text-sm" style={{ color: "var(--primary)" }}>
-        ← Dashboard
+        {tw.backToDashboard}
       </Link>
 
       {/* Header */}
@@ -140,13 +133,13 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               {wedding.title}
             </h1>
             <span className={`ddp-badge ${statusColors[wedding.status] ?? "badge-neutral"}`}>
-              {statusLabels[wedding.status] ?? wedding.status}
+              {(statusLabels as Record<string, string>)[wedding.status] ?? wedding.status}
             </span>
             {wedding.isPremium && <span className="ddp-badge badge-premium">Premium</span>}
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm" style={{ color: "var(--muted)" }}>
             <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5" /> {formatDate(wedding.date)}
+              <Calendar className="w-3.5 h-3.5" /> {formatDate(wedding.date, lang)}
             </span>
             {wedding.venue && (
               <span className="flex items-center gap-1">
@@ -162,7 +155,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             {Math.max(0, days)}
           </div>
           <div style={{ fontSize: "0.6875rem", color: "var(--muted)", marginTop: "2px" }}>
-            {days > 0 ? "dagen" : "geweest"}
+            {days > 0 ? tw.days : tw.passed}
           </div>
         </div>
       </div>
@@ -178,97 +171,69 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
           {/* Stats — alleen voor niet-vendors */}
           {!isVendor && (
-            <>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { value: guestConfirmed, sub: `van ${wedding._count.guests} gasten`, label: "Bevestigd" },
-                  { value: tasksOpen, sub: `${tasksDoneCount} afgerond`, label: "Taken open" },
-                  { value: wedding.vendors.length, sub: "gekoppeld", label: "Leveranciers" },
-                ].map((stat) => (
-                  <div key={stat.label} className="ddp-card text-center" style={{ padding: "1.25rem 0.75rem" }}>
-                    <div style={{ fontSize: "clamp(1.75rem, 6vw, 2.5rem)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: "var(--primary)", marginBottom: "4px" }}>
-                      {stat.value}
-                    </div>
-                    <div style={{ fontSize: "0.6875rem", color: "var(--muted)", lineHeight: 1.3 }}>
-                      <div className="font-semibold" style={{ color: "var(--foreground)", fontSize: "0.75rem" }}>{stat.label}</div>
-                      <div>{stat.sub}</div>
-                    </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { value: guestConfirmed, sub: `${tw.of} ${wedding._count.guests} ${tw.guests}`, label: tw.confirmed },
+                { value: tasksOpen, sub: `${tasksDone} ${tw.completed}`, label: tw.tasksOpen },
+                { value: wedding.vendors.length, sub: tw.linked, label: tw.vendors },
+              ].map((stat) => (
+                <div key={stat.label} className="ddp-card text-center" style={{ padding: "1.25rem 0.75rem" }}>
+                  <div style={{ fontSize: "clamp(1.75rem, 6vw, 2.5rem)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: "var(--primary)", marginBottom: "4px" }}>
+                    {stat.value}
                   </div>
-                ))}
-              </div>
-              {wedding._count.tasks > 0 && (
-                <div className="ddp-card" style={{ padding: "1rem 1.125rem" }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>Planningsvoortgang</span>
-                    <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>{tasksDoneCount} van {wedding._count.tasks} taken afgerond</span>
-                  </div>
-                  <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.06)" }}>
-                    <div className="h-full rounded-full" style={{
-                      width: `${Math.round((tasksDoneCount / wedding._count.tasks) * 100)}%`,
-                      background: "var(--gradient-primary)",
-                      transition: "width 0.5s ease",
-                    }} />
-                  </div>
-                  <div className="text-right mt-1" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-                    {Math.round((tasksDoneCount / wedding._count.tasks) * 100)}% klaar
+                  <div style={{ fontSize: "0.6875rem", color: "var(--muted)", lineHeight: 1.3 }}>
+                    <div className="font-semibold" style={{ color: "var(--foreground)", fontSize: "0.75rem" }}>{stat.label}</div>
+                    <div>{stat.sub}</div>
                   </div>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
 
           {/* Draaiboek preview */}
-          {draaiboek && (() => {
-            const previewItems = isVendor
-              ? draaiboek.items.filter(item =>
-                  (item.vendor && item.vendor.id === ownVendorId) || (item as { isPublic?: boolean }).isPublic
-                ).slice(0, 8)
-              : draaiboek.items.slice(0, 8);
-            if (previewItems.length === 0 && isVendor) return null;
-            return (
-              <div className="ddp-card">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
-                    <ClipboardList className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
-                    Draaiboek
-                  </h3>
-                  <Link href={`/weddings/${id}/draaiboek`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
-                    Volledig →
-                  </Link>
-                </div>
-                <div className="space-y-1">
-                  {previewItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl" style={{ background: "rgba(0,0,0,0.02)" }}>
-                      <div className="flex items-center gap-1 flex-shrink-0" style={{ color: "var(--muted)", minWidth: "52px" }}>
-                        <Clock className="w-3 h-3" />
-                        <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{formatTime(item.startTime)}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{item.title}</div>
-                        {item.location && <div className="text-xs truncate" style={{ color: "var(--muted)" }}>{item.location}</div>}
-                      </div>
-                      {item.vendor && (
-                        <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>{item.vendor.name}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
+          {draaiboek && (
+            <div className="ddp-card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
+                  <ClipboardList className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
+                  {tw.runSheet}
+                </h3>
+                <Link href={`/weddings/${id}/draaiboek`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
+                  {tw.full}
+                </Link>
               </div>
-            );
-          })()}
+              <div className="space-y-1">
+                {draaiboek.items.map((item) => (
+                  <div key={item.id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl" style={{ background: "rgba(0,0,0,0.02)" }}>
+                    <div className="flex items-center gap-1 flex-shrink-0" style={{ color: "var(--muted)", minWidth: "52px" }}>
+                      <Clock className="w-3 h-3" />
+                      <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{formatTime(item.startTime)}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{item.title}</div>
+                      {item.location && <div className="text-xs truncate" style={{ color: "var(--muted)" }}>{item.location}</div>}
+                    </div>
+                    {item.vendor && (
+                      <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>{item.vendor.name}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Taken — niet voor vendors */}
           {!isVendor && (
             <div className="ddp-card">
               <div className="flex items-center justify-between mb-4">
-                <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>Recente taken</h3>
+                <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>{tw.recentTasks}</h3>
                 <Link href={`/weddings/${id}/tasks`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
-                  Alle taken →
+                  {tw.allTasks}
                 </Link>
               </div>
               <div className="space-y-1">
                 {wedding.tasks.length === 0 && (
-                  <p className="text-sm text-center py-6" style={{ color: "var(--muted)" }}>Nog geen taken</p>
+                  <p className="text-sm text-center py-6" style={{ color: "var(--muted)" }}>{tw.noTasks}</p>
                 )}
                 {wedding.tasks.slice(0, 4).map((task) => (
                   <div key={task.id} className="flex items-center gap-3 py-2.5 px-3 rounded-xl" style={{ background: "rgba(0,0,0,0.02)" }}>
@@ -297,23 +262,55 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               <div className="flex items-center justify-between mb-4">
                 <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
                   <Euro className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
-                  Budget
+                  {tw.budget}
                 </h3>
                 <Link href={`/weddings/${id}/budget`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
-                  Details →
+                  {tw.details}
                 </Link>
               </div>
               <div className="flex justify-between mb-2" style={{ fontSize: "0.875rem" }}>
-                <span style={{ fontWeight: 600 }}>€{spent.toLocaleString("nl-NL")}</span>
-                <span style={{ color: "var(--muted)" }}>van €{totalBudget.toLocaleString("nl-NL")}</span>
+                <span style={{ fontWeight: 600 }}>€{spent.toLocaleString(lang === "en" ? "en-GB" : "nl-NL")}</span>
+                <span style={{ color: "var(--muted)" }}>{tw.of} €{totalBudget.toLocaleString(lang === "en" ? "en-GB" : "nl-NL")}</span>
               </div>
               <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.06)" }}>
                 <div className="h-full rounded-full" style={{ width: `${budgetPct}%`, background: budgetPct > 90 ? "var(--danger)" : budgetPct > 70 ? "var(--warning)" : "var(--gradient-primary)" }} />
               </div>
-              <div className="text-right mt-1.5" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{budgetPct}% gebruikt</div>
+              <div className="text-right mt-1.5" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{budgetPct}{tw.used}</div>
             </div>
           )}
 
+          {/* Leveranciers */}
+          <div className="ddp-card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>{tw.dreamTeam}</h3>
+              {!isVendor && (
+                <Link href={`/weddings/${id}/vendors`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
+                  {tw.manage}
+                </Link>
+              )}
+            </div>
+            {wedding.vendors.length === 0 ? (
+              <p className="text-sm text-center py-6" style={{ color: "var(--muted)" }}>{tw.noVendors}</p>
+            ) : (
+              <div className="space-y-2">
+                {wedding.vendors.map((wv) => (
+                  <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="flex items-center gap-3 py-2 px-2 rounded-xl -mx-2 hover:bg-accent" style={{ textDecoration: "none", color: "inherit" }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold" style={{ background: "var(--accent)", color: "var(--primary)" }}>
+                      {wv.vendor.name.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{wv.vendor.name}</div>
+                      <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
+                    </div>
+                    <span className={`ddp-badge ${vendorStatusColors[wv.status] ?? "badge-neutral"}`} style={{ fontSize: "0.6rem" }}>
+                      {(vendorStatusLabels as Record<string, string>)[wv.status] ?? wv.status}
+                    </span>
+                    <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)" }} />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Vendor-specifieke dashboards */}
           {(() => {
@@ -325,7 +322,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               <div className="space-y-4">
                 {!isVendor && (
                   <h2 style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
-                    Leverancier Dashboards
+                    {tw.vendorDashboards}
                   </h2>
                 )}
                 {visibleVendors.map((wv) => (
@@ -348,19 +345,12 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
         {/* Sidebar */}
         <div className="space-y-5">
 
-          {/* Team — alle betrokkenen */}
+          {/* Team */}
           <div className="ddp-card">
-            <div className="flex items-center justify-between mb-4">
-              <h3 style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
-                <Handshake className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
-                Team
-              </h3>
-              {!isVendor && (
-                <Link href={`/weddings/${id}/vendors`} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.25rem 0.625rem" }}>
-                  Beheren →
-                </Link>
-              )}
-            </div>
+            <h3 className="mb-4" style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>
+              <Handshake className="w-4 h-4 inline mr-2" style={{ color: "var(--primary)" }} />
+              {tw.team}
+            </h3>
             <div className="space-y-3">
               {wedding.teamMembers.map((m) => (
                 <div key={m.id} className="flex items-center gap-3">
@@ -370,40 +360,32 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{m.user.name}</div>
                     <div className="text-xs" style={{ color: "var(--muted)" }}>
-                      {m.role === "couple" ? "Bruidspaar" : m.role === "planner" ? "Planner" : "Teamlid"}
+                      {tw.roles[m.role as keyof typeof tw.roles] ?? m.role}
                     </div>
                   </div>
                 </div>
               ))}
-              {wedding.vendors.filter(wv => wv.status !== "declined").map((wv) => (
-                <VendorContactSheet
-                  key={wv.id}
-                  vendor={wv.vendor}
-                  weddingId={id}
-                  wvId={wv.id}
-                  status={wv.status}
-                  statusLabel={vendorStatusLabels[wv.status] ?? wv.status}
-                  statusColor={vendorStatusColors[wv.status] ?? "badge-neutral"}
-                />
-              ))}
             </div>
           </div>
 
-          {!isVendor && (
-            <EditableNotes weddingId={id} initialNotes={wedding.notes ?? ""} />
+          {wedding.notes && (
+            <div className="ddp-card">
+              <h3 className="mb-2" style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{tw.notes}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{wedding.notes}</p>
+            </div>
           )}
 
-          {/* Snelle toegang */}
+          {/* Quick access */}
           <div className="ddp-card">
-            <h3 className="mb-3" style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>Snelle toegang</h3>
+            <h3 className="mb-3" style={{ fontWeight: 600, fontSize: "0.9375rem", letterSpacing: "-0.02em" }}>{tw.quickAccess}</h3>
             <div className="space-y-0.5">
               {[
-                { href: `/weddings/${id}/draaiboek`, label: "Draaiboek", icon: ClipboardList },
-                { href: `/weddings/${id}/messages`, label: "Berichten", icon: MessageCircle },
-                !isVendor && { href: `/weddings/${id}/guests`, label: "Gastenlijst", icon: Users },
-                !isVendor && { href: `/weddings/${id}/budget`, label: "Budget", icon: Euro },
-                !isVendor && { href: `/weddings/${id}/files`, label: "Bestanden", icon: FileText },
-                { href: `/weddings/${id}/team`, label: "Team", icon: Handshake },
+                { href: `/weddings/${id}/draaiboek`, label: tw.runSheet, icon: ClipboardList },
+                { href: `/weddings/${id}/messages`, label: t.tabs.messages, icon: MessageCircle },
+                !isVendor && { href: `/weddings/${id}/guests`, label: tw.guestList, icon: Users },
+                !isVendor && { href: `/weddings/${id}/budget`, label: tw.budget, icon: Euro },
+                !isVendor && { href: `/weddings/${id}/files`, label: tw.files, icon: FileText },
+                { href: `/weddings/${id}/team`, label: t.tabs.team, icon: Handshake },
               ].filter(Boolean).map((link) => {
                 if (!link) return null;
                 const Icon = link.icon;
