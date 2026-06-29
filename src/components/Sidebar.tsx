@@ -23,10 +23,13 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/tasks",      label: n.myTasks,   roles: ["planner", "team_member", "couple"] },
     { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
     { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
-    { href: "/messages",                  label: n.messages,      roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/dm",                        label: "Berichten",     roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/dream-team",               label: "Dream Team",    roles: ["couple"] },
     { href: "/vendors",                   label: n.vendors,       roles: ["planner", "team_member"] },
-    { href: "/leveranciers",              label: n.vendors,       roles: ["admin", "planner", "couple"] },
-    { href: "/leveranciers/mijn-profiel", label: lang === "en" ? "My profile" : "Mijn profiel", roles: ["vendor"] },
+    { href: "/leveranciers",              label: "Leveranciers",  roles: ["admin", "planner", "couple"] },
+    { href: "/leveranciers/mijn-profiel", label: "Mijn profiel",  roles: ["vendor"] },
+    { href: "/mijn-bruiloften",           label: "Mijn bruiloften", roles: ["vendor"] },
+    { href: "/instellingen",              label: "Instellingen",  roles: ["admin", "planner", "team_member", "couple", "vendor"] },
     { href: "/admin",                     label: n.admin,         roles: ["admin"] },
   ];
 
@@ -61,10 +64,10 @@ export default function Sidebar({ user }: SidebarProps) {
       {/* Logo */}
       <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <Image src="/logo.png" alt="DreamDay Partners" width={30} height={30} className="flex-shrink-0" />
+          <Image src="/images/logo.svg" alt="DreamDay Partners" width={30} height={30} className="flex-shrink-0" />
           <div className="min-w-0">
             <div className="font-bold text-sm leading-none" style={{ color: "var(--foreground)", letterSpacing: "-0.02em" }}>DreamDay</div>
-            <div className="font-serif text-xs leading-none mt-0.5" style={{ color: "var(--primary)", fontSize: "0.7rem" }}>Partners</div>
+            <div className="font-serif text-xs leading-none mt-0.5" style={{ color: "var(--primary)", fontSize: "0.7rem" }}>Platform</div>
           </div>
         </Link>
       </div>

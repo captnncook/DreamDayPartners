@@ -30,10 +30,13 @@ export default function MobileNav({ user }: { user: User }) {
     { href: "/tasks",                      label: n.myTasks,           roles: ["planner", "team_member", "couple"] },
     { href: "/guests",                     label: n.guests,            roles: ["planner", "team_member", "couple"] },
     { href: "/budget",                     label: n.budget,            roles: ["planner", "team_member"] },
-    { href: "/messages",                   label: n.messages,          roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/dm",                         label: "Berichten",         roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/dream-team",                 label: "Dream Team",        roles: ["couple"] },
     { href: "/vendors",                    label: n.vendors,           roles: ["planner", "team_member"] },
-    { href: "/leveranciers",               label: n.vendors,           roles: ["admin", "planner", "couple"] },
-    { href: "/leveranciers/mijn-profiel",  label: lang === "en" ? "My profile" : "Mijn profiel", roles: ["vendor"] },
+    { href: "/leveranciers",               label: "Leveranciers",      roles: ["admin", "planner", "couple"] },
+    { href: "/leveranciers/mijn-profiel",  label: "Mijn profiel",      roles: ["vendor"] },
+    { href: "/mijn-bruiloften",            label: "Mijn bruiloften",   roles: ["vendor"] },
+    { href: "/instellingen",               label: "Instellingen",      roles: ["admin", "planner", "team_member", "couple", "vendor"] },
     { href: "/admin",                      label: n.admin,             roles: ["admin"] },
   ];
 
@@ -73,7 +76,7 @@ export default function MobileNav({ user }: { user: User }) {
           href="/dashboard"
           style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
         >
-          <Image src="/logo.png" alt="DreamDay Partners" width={30} height={30} style={{ flexShrink: 0 }} />
+          <Image src="/images/logo.svg" alt="DreamDay Partners" width={30} height={30} style={{ flexShrink: 0 }} />
           <span
             style={{
               fontWeight: 700,
