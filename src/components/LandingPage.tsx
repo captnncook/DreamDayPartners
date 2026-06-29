@@ -587,7 +587,7 @@ export default function LandingPage() {
       <footer className="px-5 py-10" style={{ background: "var(--foreground)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "1040px", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
-            <Image src="/images/logo.svg" alt="DreamDay Partners" width={26} height={26} className="brightness-0 invert" />
+            <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={26} height={26} />
             <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>DreamDay Platform</span>
           </div>
           <div className="flex flex-wrap justify-center gap-5">
