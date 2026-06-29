@@ -465,7 +465,10 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
   flex-direction: column;
   width: 248px;
-  min-height: 100vh;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
   flex-shrink: 0;
 }
 
