@@ -40,6 +40,10 @@ export default function VendorProfilePage() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", message: "", weddingDate: "" });
   const [contactSent, setContactSent] = useState(false);
   const [contactSending, setContactSending] = useState(false);
+  const [claimEmail, setClaimEmail] = useState("");
+  const [claimSending, setClaimSending] = useState(false);
+  const [claimSent, setClaimSent] = useState(false);
+  const [claimError, setClaimError] = useState("");
 
   const load = useCallback(async () => {
     const [vRes, meRes] = await Promise.all([
@@ -89,6 +93,21 @@ export default function VendorProfilePage() {
     });
     if (res.ok) setContactSent(true);
     setContactSending(false);
+  }
+
+  async function handleClaim(e: React.FormEvent) {
+    e.preventDefault();
+    setClaimSending(true);
+    setClaimError("");
+    const res = await fetch(`/api/catalogus/${id}/claim`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: claimEmail }),
+    });
+    const data = await res.json();
+    if (!res.ok) setClaimError(data.error ?? "Er ging iets mis");
+    else setClaimSent(true);
+    setClaimSending(false);
   }
 
   async function handleAddToDreamTeam() {
@@ -306,6 +325,36 @@ export default function VendorProfilePage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Claim profile */}
+            {!vendor.userId && (
+              <div className="ddp-card" style={{ background: "var(--color-blush-soft)", borderColor: "var(--color-blush)" }}>
+                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Is dit jouw bedrijf?</h2>
+                <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.6 }}>
+                  Claim dit profiel om het te beheren, foto&apos;s toe te voegen en aanvragen van bruidsparen te ontvangen.
+                </p>
+                {claimSent ? (
+                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534" }}>
+                    Aanvraag verstuurd! We nemen je verzoek in behandeling en sturen je een e-mail zodra het is goedgekeurd.
+                  </div>
+                ) : (
+                  <form onSubmit={handleClaim} style={{ display: "flex", gap: "0.5rem" }}>
+                    <input
+                      type="email"
+                      required
+                      value={claimEmail}
+                      onChange={(e) => setClaimEmail(e.target.value)}
+                      placeholder="jouw@email.nl"
+                      style={{ flex: 1, padding: "0.5rem 0.75rem", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "0.875rem", boxSizing: "border-box" }}
+                    />
+                    <button type="submit" disabled={claimSending} style={{ padding: "0.5rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, whiteSpace: "nowrap" }}>
+                      {claimSending ? "Bezig…" : "Profiel claimen"}
+                    </button>
+                  </form>
+                )}
+                {claimError && <p style={{ fontSize: "0.8125rem", color: "var(--danger)", marginTop: "0.5rem" }}>{claimError}</p>}
               </div>
             )}
 

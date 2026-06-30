@@ -18,6 +18,23 @@ const STATEMENTS = [
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "contactPerson" TEXT`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
 
+  `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "passwordHash" TEXT`,
+
+  `CREATE TABLE IF NOT EXISTS "vendor_claim_requests" (
+    "id" TEXT NOT NULL,
+    "vendorId" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "token" TEXT,
+    "tokenExpiresAt" TIMESTAMP(3),
+    "attempts" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "decidedAt" TIMESTAMP(3),
+    CONSTRAINT "vendor_claim_requests_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "vcr_token_key" UNIQUE ("token"),
+    CONSTRAINT "vcr_vendor_fk" FOREIGN KEY ("vendorId") REFERENCES "vendors"("id") ON DELETE CASCADE
+  )`,
+
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "intakeData" JSONB`,
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositAmount" DOUBLE PRECISION`,
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositDue" TIMESTAMP(3)`,

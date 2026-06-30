@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
+import { completeClaimViaOAuth } from "@/lib/complete-claim";
 import { createPrivateKey, createSign } from "crypto";
 
 const appUrl = () => process.env.NEXT_PUBLIC_APP_URL ?? "";
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
     const idToken = form.get("id_token") as string | null;
     // Apple sends name only on the very first login, encoded as JSON in `user`
     const userField = form.get("user") as string | null;
+    const state = form.get("state") as string | null;
+    const claimToken = state?.startsWith("claim:") ? state.slice(6) : null;
 
     if (!code && !idToken) {
       return NextResponse.redirect(`${base}/login?error=apple_no_code`);
@@ -96,6 +99,13 @@ export async function POST(req: NextRequest) {
     }
 
     email = email.toLowerCase();
+
+    if (claimToken) {
+      const result = await completeClaimViaOAuth(claimToken, email);
+      if (!result.ok) return NextResponse.redirect(`${base}/claim/${claimToken}?error=${encodeURIComponent(result.error)}`);
+      return NextResponse.redirect(`${base}/leveranciers/mijn-profiel`);
+    }
+
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {

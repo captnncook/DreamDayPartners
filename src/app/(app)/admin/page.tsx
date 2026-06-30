@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Users, Heart, Handshake } from "lucide-react";
 import BulkVendorImport from "./BulkVendorImport";
+import ClaimRequests from "./ClaimRequests";
 
 export default async function AdminPage() {
   const user = await getSession();
@@ -38,6 +39,8 @@ export default async function AdminPage() {
           </div>
         ))}
       </div>
+      <ClaimRequests />
+
       <div className="mb-8">
         <BulkVendorImport />
       </div>

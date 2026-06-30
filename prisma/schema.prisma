@@ -14,6 +14,7 @@ model User {
   role       String   // admin | planner | team_member | couple | vendor
   vendorType String?  // bloemist | dj | catering | fotograaf | etc.
   avatar     String?
+  passwordHash         String?
   isPremium            Boolean  @default(false)
   stripeCustomerId     String?
   stripeSubscriptionId String?
@@ -147,8 +148,25 @@ model Vendor {
   weddingInvites   VendorWeddingInvite[]
   contactRequests  VendorContactRequest[]
   reviews          VendorReview[]
+  claimRequests    VendorClaimRequest[]
 
   @@map("vendors")
+}
+
+model VendorClaimRequest {
+  id          String    @id @default(uuid())
+  vendorId    String
+  email       String
+  status      String    @default("pending") // pending | approved | rejected | completed
+  token       String?   @unique
+  tokenExpiresAt DateTime?
+  attempts    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  decidedAt   DateTime?
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_claim_requests")
 }
 
 model VendorContactRequest {

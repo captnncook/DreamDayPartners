@@ -1,10 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
     return NextResponse.json({ error: "Google OAuth niet geconfigureerd" }, { status: 503 });
   }
+
+  const claimToken = req.nextUrl.searchParams.get("claim");
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -13,6 +15,7 @@ export async function GET() {
     scope: "openid email profile",
     access_type: "offline",
     prompt: "select_account",
+    ...(claimToken ? { state: `claim:${claimToken}` } : {}),
   });
 
   return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
