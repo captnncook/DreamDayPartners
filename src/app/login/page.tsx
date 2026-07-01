@@ -242,6 +242,9 @@ export default function LoginPage() {
             <button type="submit" disabled={realLoading} className="ddp-btn-primary w-full py-2.5 text-sm">
               {realLoading ? "Bezig…" : "Inloggen"}
             </button>
+            <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
+              <Link href="/wachtwoord-vergeten" style={{ color: "var(--primary)" }}>Wachtwoord vergeten?</Link>
+            </p>
           </form>
         </div>
 

@@ -39,6 +39,18 @@ const STATEMENTS = [
     CONSTRAINT "vcr_vendor_fk" FOREIGN KEY ("vendorId") REFERENCES "vendors"("id") ON DELETE CASCADE
   )`,
 
+  `CREATE TABLE IF NOT EXISTS "password_reset_tokens" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "password_reset_tokens_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "prt_user_key" UNIQUE ("userId"),
+    CONSTRAINT "prt_token_key" UNIQUE ("token"),
+    CONSTRAINT "prt_user_fk" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE
+  )`,
+
   `CREATE TABLE IF NOT EXISTS "vendor_delete_tokens" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
