@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendMail, claimRequestAdminEmail } from "@/lib/mail";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_NOTIFY_EMAIL ?? "info@dreamdaypartners.nl";
+const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_NOTIFY_EMAIL ?? "info@dreamdayplatform.com";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
