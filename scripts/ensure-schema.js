@@ -39,6 +39,18 @@ const STATEMENTS = [
     CONSTRAINT "vcr_vendor_fk" FOREIGN KEY ("vendorId") REFERENCES "vendors"("id") ON DELETE CASCADE
   )`,
 
+  `CREATE TABLE IF NOT EXISTS "vendor_delete_tokens" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "vendor_delete_tokens_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "vdt_user_key" UNIQUE ("userId"),
+    CONSTRAINT "vdt_token_key" UNIQUE ("token"),
+    CONSTRAINT "vdt_user_fk" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE
+  )`,
+
   `CREATE TABLE IF NOT EXISTS "pending_registrations" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,

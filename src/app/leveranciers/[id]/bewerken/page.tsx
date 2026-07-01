@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Upload, Trash2, Save, Check, Star } from "lucide-react";
+import { ArrowLeft, Upload, Trash2, Save, Check, Star, AlertTriangle } from "lucide-react";
 
 const CATEGORIES = [
   { value: "weddingplanner", label: "Weddingplanner" },
@@ -157,6 +157,8 @@ function VendorEditPage() {
   const [emblemUrl, setEmblemUrl] = useState<string | null>(null);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [error, setError] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteSent, setDeleteSent] = useState(false);
   const [busyDates, setBusyDates] = useState<string[]>([]);
   const [newBusyDate, setNewBusyDate] = useState("");
 
@@ -345,6 +347,20 @@ function VendorEditPage() {
     const data = await res.json();
     if (data.url) window.location.href = data.url;
     else { setError(data.error ?? "Kan niet verbinden met betaalservice"); setBillingLoading(false); }
+  }
+
+  async function handleRequestDelete() {
+    if (!confirm("Weet je zeker dat je een verwijderverzoek wilt indienen? Je ontvangt een bevestigingsmail.")) return;
+    setDeleteLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/vendor/delete-request`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? "Er ging iets mis"); return; }
+      setDeleteSent(true);
+    } finally {
+      setDeleteLoading(false);
+    }
   }
 
   if (loading) {
@@ -692,6 +708,33 @@ function VendorEditPage() {
             {saved ? <><Check className="w-4 h-4" /> Opgeslagen!</> : <><Save className="w-4 h-4" /> {saving ? "Opslaan…" : "Opslaan"}</>}
           </button>
         </div>
+
+        {/* Profiel verwijderen */}
+        <section className="ddp-card mt-4" style={{ borderColor: "var(--danger)", background: "var(--danger-bg)" }}>
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--danger)" }} />
+            <div className="flex-1">
+              <h3 className="font-semibold text-sm" style={{ color: "var(--danger)" }}>Profiel verwijderen</h3>
+              <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>
+                Je account en alle bijbehorende gegevens worden permanent verwijderd. Je ontvangt eerst een bevestigingse-mail.
+              </p>
+              {deleteSent ? (
+                <p className="text-xs mt-3 font-medium" style={{ color: "var(--danger)" }}>
+                  ✓ Bevestigingsmail verstuurd. Controleer je inbox en klik op de link om de verwijdering te voltooien.
+                </p>
+              ) : (
+                <button
+                  onClick={handleRequestDelete}
+                  disabled={deleteLoading}
+                  className="mt-3 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors"
+                  style={{ borderColor: "var(--danger)", color: "var(--danger)", background: "transparent", cursor: "pointer" }}
+                >
+                  {deleteLoading ? "Versturen…" : "Profiel verwijderen"}
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
