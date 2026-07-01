@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
   const verifyUrl = `${appUrl}/claim/${token}`;
   const tpl = claimApprovedEmail(request.vendor.name, verifyUrl);
-  await sendMail({ to: request.email, subject: tpl.subject, html: tpl.html });
+  await sendMail({ to: request.email, subject: tpl.subject, html: tpl.html, role: "vendor", name: request.vendor.name });
 
   return NextResponse.json({ ok: true });
 }

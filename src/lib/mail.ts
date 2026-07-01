@@ -3,9 +3,16 @@ import { Resend } from "resend";
 const FROM = process.env.MAIL_FROM ?? "DreamDay Platform <onboarding@resend.dev>";
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID ?? "";
+const AUDIENCE_COUPLE = process.env.RESEND_AUDIENCE_COUPLE ?? "";
+const AUDIENCE_VENDOR = process.env.RESEND_AUDIENCE_VENDOR ?? "";
 
-export async function sendMail(opts: { to: string; subject: string; html: string; name?: string }): Promise<void> {
+export async function sendMail(opts: {
+  to: string;
+  subject: string;
+  html: string;
+  name?: string;
+  role?: "couple" | "vendor" | "planner" | "team_member" | "admin";
+}): Promise<void> {
   if (!resend) {
     console.log(`[mail:skipped — no RESEND_API_KEY] to=${opts.to} subject="${opts.subject}"`);
     return;
@@ -15,11 +22,16 @@ export async function sendMail(opts: { to: string; subject: string; html: string
   } catch (err) {
     console.error("Mail send failed:", err);
   }
-  // Save to Resend audience/contacts list if configured
-  if (AUDIENCE_ID) {
+  // Save to the correct Resend audience based on role
+  const audienceId =
+    opts.role === "vendor" ? AUDIENCE_VENDOR :
+    opts.role === "couple" ? AUDIENCE_COUPLE :
+    AUDIENCE_COUPLE; // default to couple audience for unknown roles
+
+  if (audienceId) {
     try {
       await resend.contacts.create({
-        audienceId: AUDIENCE_ID,
+        audienceId,
         email: opts.to,
         ...(opts.name ? { firstName: opts.name } : {}),
         unsubscribed: false,
