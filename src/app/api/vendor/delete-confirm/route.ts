@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { clearSession } from "@/lib/session";
-import { sendMail } from "@/lib/mail";
+import { sendMail, deleteAdminNotificationEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
   const { token } = await req.json();
@@ -39,17 +39,8 @@ export async function POST(req: NextRequest) {
 
   // Notify admin
   const adminEmail = process.env.ADMIN_NOTIFY_EMAIL ?? "info@dreamdayplatform.com";
-  await sendMail({
-    to: adminEmail,
-    subject: `Leveranciersprofiel verwijderd: ${vendorName}`,
-    html: `
-      <p>Het leveranciersprofiel van <strong>${vendorName}</strong> is definitief verwijderd.</p>
-      <ul>
-        <li>E-mailadres: ${userEmail}</li>
-        <li>Tijdstip: ${new Date().toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam" })}</li>
-      </ul>
-    `,
-  });
+  const tpl = deleteAdminNotificationEmail(vendorName, userEmail);
+  await sendMail({ to: adminEmail, subject: tpl.subject, html: tpl.html });
 
   return NextResponse.json({ ok: true });
 }

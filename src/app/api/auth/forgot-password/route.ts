@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendMail } from "@/lib/mail";
+import { sendMail, passwordResetEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -28,21 +28,8 @@ export async function POST(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
   const resetUrl = `${appUrl}/wachtwoord-reset/${token}`;
 
-  await sendMail({
-    to: user.email,
-    subject: "Wachtwoord opnieuw instellen",
-    html: `
-      <p>Je hebt gevraagd om je wachtwoord opnieuw in te stellen voor DreamDay Partners.</p>
-      <p>Klik op onderstaande knop om een nieuw wachtwoord te kiezen. Deze link is <strong>1 uur</strong> geldig.</p>
-      <p>
-        <a href="${resetUrl}" style="display:inline-block;padding:12px 24px;background:#c49a6c;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">
-          Nieuw wachtwoord instellen
-        </a>
-      </p>
-      <p style="color:#888;font-size:0.9em;">Werkt de knop niet? Kopieer deze link: ${resetUrl}</p>
-      <p style="color:#888;font-size:0.9em;">Als je dit niet hebt aangevraagd, kun je deze e-mail negeren.</p>
-    `,
-  });
+  const tpl = passwordResetEmail(resetUrl);
+  await sendMail({ to: user.email, subject: tpl.subject, html: tpl.html });
 
   return NextResponse.json({ ok: true });
 }

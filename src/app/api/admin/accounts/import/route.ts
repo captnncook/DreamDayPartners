@@ -3,7 +3,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { geocodeCity } from "@/lib/geocode";
 import { randomBytes } from "crypto";
-import { sendMail } from "@/lib/mail";
+import { sendMail, accountActivationEmail } from "@/lib/mail";
 
 // Expected CSV columns (case-insensitive): name, email, role, vendorType, city, phone, website
 // role defaults to "vendor", vendorType defaults to "overig"
@@ -83,18 +83,8 @@ export async function POST(req: NextRequest) {
           randomBytes(8).toString("hex"), user.id, token, expiresAt
         );
         const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
-        await sendMail({
-          to: email,
-          subject: "Je account op DreamDay Partners is aangemaakt",
-          html: `
-            <p>Welkom op DreamDay Partners!</p>
-            <p>Er is een account voor je aangemaakt. Klik op de knop om je wachtwoord in te stellen en in te loggen.</p>
-            <p><a href="${appUrl}/wachtwoord-reset/${token}" style="display:inline-block;padding:12px 24px;background:#c49a6c;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">Account activeren</a></p>
-            <p style="color:#888;font-size:0.9em;">De link is 7 dagen geldig.</p>
-          `,
-          role: role === "vendor" ? "vendor" : "couple",
-          name,
-        });
+        const tpl = accountActivationEmail(name, `${appUrl}/wachtwoord-reset/${token}`);
+        await sendMail({ to: email, subject: tpl.subject, html: tpl.html, role: role === "vendor" ? "vendor" : "couple", name });
       }
 
       created++;
