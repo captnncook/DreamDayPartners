@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
+import { compare } from "bcryptjs";
 
 const DEMO_DEFAULTS: Record<string, { name: string; role: string; vendorType?: string }> = {
   "admin@dreamday.nl":   { name: "Platform Admin",         role: "admin" },
@@ -13,7 +14,8 @@ const DEMO_DEFAULTS: Record<string, { name: string; role: string; vendorType?: s
 };
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
+  const body = await req.json();
+  const { email, password } = body as { email: string; password?: string };
 
   if (!email) {
     return NextResponse.json({ error: "Email verplicht" }, { status: 400 });
@@ -21,6 +23,20 @@ export async function POST(req: NextRequest) {
 
   let user = await prisma.user.findUnique({ where: { email } });
 
+  // Real account with password
+  if (user && user.passwordHash) {
+    if (!password) {
+      return NextResponse.json({ error: "Wachtwoord verplicht" }, { status: 400 });
+    }
+    const valid = await compare(password, user.passwordHash);
+    if (!valid) {
+      return NextResponse.json({ error: "Onjuist wachtwoord" }, { status: 401 });
+    }
+    await setSession(user.id);
+    return NextResponse.json({ user });
+  }
+
+  // Demo login (no password required)
   if (!user) {
     const defaults = DEMO_DEFAULTS[email];
     if (!defaults) {

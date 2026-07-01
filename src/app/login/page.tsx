@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
-import { Heart, Settings, Users, Leaf, Music, Utensils, Camera, Video, Scissors, Mic2, Cake, MapPin, Car, CalendarCheck } from "lucide-react";
+import { Heart, Settings, Users, Leaf, Music, Utensils, Camera, Video, Scissors, Mic2, Cake, MapPin, Car, CalendarCheck, Eye, EyeOff } from "lucide-react";
 
 const ROLE_OPTIONS: { value: DemoRole; label: string; Icon: React.ElementType; description: string }[] = [
   { value: "admin",               label: "Admin",              Icon: Settings,      description: "Platform beheerder" },
@@ -28,6 +28,11 @@ export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<DemoRole>("planner");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [emailLogin, setEmailLogin] = useState("");
+  const [passwordLogin, setPasswordLogin] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [realLoading, setRealLoading] = useState(false);
+  const [realError, setRealError] = useState("");
   const router = useRouter();
 
   async function handleLogin(e: React.FormEvent) {
@@ -56,6 +61,27 @@ export default function LoginPage() {
       setError("Verbindingsfout, probeer opnieuw");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleRealLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setRealLoading(true);
+    setRealError("");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailLogin, password: passwordLogin }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setRealError(data.error ?? "Inloggen mislukt"); return; }
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setRealError("Verbindingsfout, probeer opnieuw");
+    } finally {
+      setRealLoading(false);
     }
   }
 
@@ -174,6 +200,47 @@ export default function LoginPage() {
               className="ddp-btn-primary w-full py-3 text-base mt-2"
             >
               {loading ? "Bezig…" : `Inloggen als ${selected.label}`}
+            </button>
+          </form>
+        </div>
+
+        {/* Email + wachtwoord inloggen */}
+        <div className="ddp-card mt-4" style={{ boxShadow: "var(--shadow-md)" }}>
+          <h2 className="font-semibold text-sm mb-3">Inloggen met e-mail &amp; wachtwoord</h2>
+          <form onSubmit={handleRealLogin} className="space-y-3">
+            <input
+              type="email"
+              required
+              value={emailLogin}
+              onChange={e => setEmailLogin(e.target.value)}
+              placeholder="jouw@emailadres.nl"
+              className="ddp-input w-full"
+            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={passwordLogin}
+                onChange={e => setPasswordLogin(e.target.value)}
+                placeholder="Wachtwoord"
+                className="ddp-input w-full pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(s => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+                style={{ color: "var(--muted)" }}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {realError && (
+              <div className="text-sm p-2.5 rounded-lg" style={{ background: "var(--danger-bg)", color: "var(--danger)" }}>
+                {realError}
+              </div>
+            )}
+            <button type="submit" disabled={realLoading} className="ddp-btn-primary w-full py-2.5 text-sm">
+              {realLoading ? "Bezig…" : "Inloggen"}
             </button>
           </form>
         </div>
