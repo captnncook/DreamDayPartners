@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
 import { completeClaimViaOAuth } from "@/lib/complete-claim";
+import { completePendingRegistrationViaOAuth } from "@/lib/complete-pending-registration";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -9,6 +10,7 @@ export async function GET(req: NextRequest) {
   const error = searchParams.get("error");
   const state = searchParams.get("state");
   const claimToken = state?.startsWith("claim:") ? state.slice(6) : null;
+  const pendingToken = state?.startsWith("pending:") ? state.slice(8) : null;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
 
   if (error || !code) {
@@ -51,6 +53,12 @@ export async function GET(req: NextRequest) {
     const result = await completeClaimViaOAuth(claimToken, email);
     if (!result.ok) return NextResponse.redirect(`${appUrl}/claim/${claimToken}?error=${encodeURIComponent(result.error)}`);
     return NextResponse.redirect(`${appUrl}/leveranciers/mijn-profiel`);
+  }
+
+  if (pendingToken) {
+    const result = await completePendingRegistrationViaOAuth(pendingToken, email, appUrl);
+    if (!result.ok) return NextResponse.redirect(`${appUrl}/aanmelden?error=${encodeURIComponent(result.error)}`);
+    return NextResponse.redirect(result.redirect);
   }
 
   // Find or create user

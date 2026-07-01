@@ -39,6 +39,20 @@ const STATEMENTS = [
     CONSTRAINT "vcr_vendor_fk" FOREIGN KEY ("vendorId") REFERENCES "vendors"("id") ON DELETE CASCADE
   )`,
 
+  `CREATE TABLE IF NOT EXISTS "pending_registrations" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "data" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "codeExpiresAt" TIMESTAMP(3) NOT NULL,
+    "verified" BOOLEAN NOT NULL DEFAULT false,
+    "verifiedToken" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "pending_registrations_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "pr_verified_token_key" UNIQUE ("verifiedToken")
+  )`,
+
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "intakeData" JSONB`,
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositAmount" DOUBLE PRECISION`,
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositDue" TIMESTAMP(3)`,

@@ -42,6 +42,17 @@ export async function sendMail(opts: {
   }
 }
 
+export function verificationCodeEmail(code: string): { subject: string; html: string } {
+  return {
+    subject: `Je verificatiecode: ${code}`,
+    html: `
+      <p>Gebruik onderstaande code om je e-mailadres te bevestigen voor DreamDay Partners.</p>
+      <div style="font-size:2.5rem;font-weight:bold;letter-spacing:0.4em;text-align:center;padding:1.5rem;background:#f8f5f0;border-radius:12px;margin:1.5rem 0;color:#333;">${code}</div>
+      <p style="color:#888;font-size:0.9em;">Deze code is <strong>10 minuten</strong> geldig. Als je dit niet hebt aangevraagd, kun je deze e-mail negeren.</p>
+    `,
+  };
+}
+
 export function claimRequestAdminEmail(vendorName: string, claimantEmail: string): { subject: string; html: string } {
   return {
     subject: `Nieuwe profiel-claim aanvraag: ${vendorName}`,

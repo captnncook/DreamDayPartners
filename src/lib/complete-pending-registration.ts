@@ -1,21 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
 import { generateWeddingCode } from "@/lib/wedding-id";
-import { hash } from "bcryptjs";
 import { sendMail, claimWelcomeEmail } from "@/lib/mail";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { verifiedToken, password } = body as { verifiedToken: string; password?: string };
-
-  if (!verifiedToken) {
-    return NextResponse.json({ error: "Verificatietoken ontbreekt" }, { status: 400 });
-  }
-  if (!password || password.length < 8) {
-    return NextResponse.json({ error: "Wachtwoord moet minimaal 8 tekens zijn" }, { status: 400 });
-  }
-
+export async function completePendingRegistrationViaOAuth(
+  verifiedToken: string,
+  oauthEmail: string,
+  appUrl: string
+): Promise<{ ok: true; redirect: string } | { ok: false; error: string }> {
   const rows = await prisma.$queryRawUnsafe<Array<{
     id: string; email: string; type: string; data: string; verified: boolean;
   }>>(
@@ -24,30 +16,28 @@ export async function POST(req: NextRequest) {
   );
 
   const pending = rows[0];
-  if (!pending || !pending.verified) {
-    return NextResponse.json({ error: "Ongeldig of verlopen token. Start opnieuw." }, { status: 401 });
+  if (!pending || !pending.verified) return { ok: false, error: "Verificatietoken verlopen. Start opnieuw." };
+  if (pending.email !== oauthEmail.toLowerCase()) {
+    return { ok: false, error: "Het e-mailadres van je Google/Apple account komt niet overeen met het verificatie-emailadres." };
   }
 
   const existing = await prisma.user.findUnique({ where: { email: pending.email } });
   if (existing) {
-    return NextResponse.json({ error: "Er bestaat al een account met dit e-mailadres." }, { status: 409 });
+    await setSession(existing.id);
+    await prisma.$executeRawUnsafe(`DELETE FROM "pending_registrations" WHERE "verifiedToken" = $1`, verifiedToken);
+    return { ok: true, redirect: `${appUrl}/dashboard` };
   }
 
   const data = JSON.parse(pending.data);
-  const passwordHash = await hash(password, 12);
 
-  // Clean up used token
-  await prisma.$executeRawUnsafe(
-    `DELETE FROM "pending_registrations" WHERE "verifiedToken" = $1`,
-    verifiedToken
-  );
+  await prisma.$executeRawUnsafe(`DELETE FROM "pending_registrations" WHERE "verifiedToken" = $1`, verifiedToken);
 
   if (pending.type === "couple") {
-    const { partner1, partner2, date, venue, budget, guestCount } = data;
+    const { partner1, partner2, date, venue, budget } = data;
     const coupleName = partner1 && partner2 ? `${partner1} & ${partner2}` : partner1 || "Bruidspaar";
 
     const user = await prisma.user.create({
-      data: { email: pending.email, name: coupleName, role: "couple", isPremium: false, passwordHash },
+      data: { email: pending.email, name: coupleName, role: "couple", isPremium: false },
     });
     await setSession(user.id);
 
@@ -67,36 +57,17 @@ export async function POST(req: NextRequest) {
         ownerId: user.id,
       },
     });
+    await prisma.weddingTeamMember.create({ data: { weddingId: wedding.id, userId: user.id, role: "couple" } });
+    await prisma.budget.create({ data: { weddingId: wedding.id, totalAmount: budget ? parseFloat(String(budget)) : 0 } });
 
-    await prisma.weddingTeamMember.create({
-      data: { weddingId: wedding.id, userId: user.id, role: "couple" },
-    });
-
-    await prisma.budget.create({
-      data: { weddingId: wedding.id, totalAmount: budget ? parseFloat(String(budget)) : 0 },
-    });
-
-    if (guestCount) { /* stored in wedding notes if needed */ }
-
-    return NextResponse.json({ redirect: `/weddings/${wedding.id}` }, { status: 201 });
+    return { ok: true, redirect: `${appUrl}/weddings/${wedding.id}` };
   }
 
   if (pending.type === "vendor") {
     const { businessName, category, contactPerson, phone, website, city } = data;
 
-    if (!businessName || !category) {
-      return NextResponse.json({ error: "Bedrijfsnaam en categorie zijn verplicht" }, { status: 400 });
-    }
-
     const user = await prisma.user.create({
-      data: {
-        email: pending.email,
-        name: contactPerson || businessName,
-        role: "vendor",
-        vendorType: category,
-        isPremium: false,
-        passwordHash,
-      },
+      data: { email: pending.email, name: contactPerson || businessName, role: "vendor", vendorType: category, isPremium: false },
     });
     await setSession(user.id);
 
@@ -116,8 +87,8 @@ export async function POST(req: NextRequest) {
     const tpl = claimWelcomeEmail(businessName);
     await sendMail({ to: pending.email, subject: tpl.subject, html: tpl.html, role: "vendor", name: businessName });
 
-    return NextResponse.json({ redirect: "/leveranciers/mijn-profiel" }, { status: 201 });
+    return { ok: true, redirect: `${appUrl}/leveranciers/mijn-profiel` };
   }
 
-  return NextResponse.json({ error: "Ongeldig type" }, { status: 400 });
+  return { ok: false, error: "Ongeldig registratietype" };
 }

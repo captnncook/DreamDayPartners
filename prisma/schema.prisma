@@ -157,6 +157,20 @@ model Vendor {
   @@map("vendors")
 }
 
+model PendingRegistration {
+  id             String    @id @default(uuid())
+  email          String
+  type           String    // "couple" | "vendor"
+  data           String    // JSON blob with all form fields
+  code           String
+  codeExpiresAt  DateTime
+  verified       Boolean   @default(false)
+  verifiedToken  String?   @unique
+  createdAt      DateTime  @default(now())
+
+  @@map("pending_registrations")
+}
+
 model VendorClaimRequest {
   id          String    @id @default(uuid())
   vendorId    String

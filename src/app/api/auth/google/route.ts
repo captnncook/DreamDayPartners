@@ -7,6 +7,9 @@ export async function GET(req: NextRequest) {
   }
 
   const claimToken = req.nextUrl.searchParams.get("claim");
+  const pendingToken = req.nextUrl.searchParams.get("pending");
+
+  const state = claimToken ? `claim:${claimToken}` : pendingToken ? `pending:${pendingToken}` : undefined;
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -15,7 +18,7 @@ export async function GET(req: NextRequest) {
     scope: "openid email profile",
     access_type: "offline",
     prompt: "select_account",
-    ...(claimToken ? { state: `claim:${claimToken}` } : {}),
+    ...(state ? { state } : {}),
   });
 
   return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
