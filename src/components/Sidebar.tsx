@@ -31,6 +31,7 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/mijn-bruiloften",           label: "Mijn bruiloften", roles: ["vendor"] },
     { href: "/instellingen",              label: "Instellingen",  roles: ["admin", "planner", "team_member", "couple", "vendor"] },
     { href: "/admin",                     label: n.admin,         roles: ["admin"] },
+    { href: "/admin/accounts",            label: "Accounts",      roles: ["admin"] },
   ];
 
   async function handleLogout() {
