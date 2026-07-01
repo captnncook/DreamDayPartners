@@ -87,6 +87,39 @@ export function newDirectMessageEmail(senderName: string, preview: string, appUr
   };
 }
 
+const PREMIUM_BENEFITS: Record<string, string[]> = {
+  fotograaf:       ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkte fotogalerij", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  videograaf:      ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkte fotogalerij", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  bloemist:        ["Uitgelicht profiel bovenaan zoekresultaten", "Uitgebreide specialisaties tonen", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  catering:        ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  dj:              ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  liveband:        ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  trouwlocatie:    ["Uitgelicht profiel bovenaan zoekresultaten", "Kaartweergave met prominente pin", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  weddingplanner:  ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkt bruiloften beheren", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  default:         ["Uitgelicht profiel bovenaan zoekresultaten", "Directe aanvraagknop voor bruidsparen", "Beschikbaarheidskalender zichtbaar", "Statistieken & profielbezoeken"],
+};
+
+export function premiumGrantedEmail(name: string, vendorType: string | null): { subject: string; html: string } {
+  const benefits = PREMIUM_BENEFITS[vendorType ?? ""] ?? PREMIUM_BENEFITS.default;
+  const benefitList = benefits.map(b => `<li style="margin:0.4rem 0;">✓ ${b}</li>`).join("");
+  return {
+    subject: "Gefeliciteerd — je hebt nu Premium toegang op DreamDay Partners!",
+    html: `
+      <p>Hallo ${name},</p>
+      <p>Goed nieuws! Je profiel op DreamDay Partners is zojuist opgewaardeerd naar <strong>Premium</strong>.</p>
+      <p style="font-weight:600;margin-top:1.5rem;">Wat premium voor jou betekent:</p>
+      <ul style="padding-left:1rem;color:#333;">${benefitList}</ul>
+      <p style="margin-top:1.5rem;">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL ?? ""}/leveranciers/mijn-profiel"
+           style="display:inline-block;padding:12px 24px;background:#c49a6c;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">
+          Bekijk je premium profiel
+        </a>
+      </p>
+      <p style="color:#888;font-size:0.9em;margin-top:1rem;">Vragen? Stuur een e-mail naar info@dreamdayplatform.com</p>
+    `,
+  };
+}
+
 export function newTaskEmail(taskTitle: string, weddingTitle: string, appUrl: string): { subject: string; html: string } {
   return {
     subject: `Nieuwe taak: ${taskTitle}`,
