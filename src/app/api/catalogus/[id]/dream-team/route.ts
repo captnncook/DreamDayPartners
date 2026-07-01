@@ -55,3 +55,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({ weddingVendor });
 }
+
+// DELETE /api/catalogus/[id]/dream-team  body: { weddingId }
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getSession();
+  if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+
+  const { id: vendorId } = await params;
+  const { weddingId } = await req.json();
+
+  if (!weddingId) return NextResponse.json({ error: "weddingId ontbreekt" }, { status: 400 });
+
+  const wedding = await prisma.wedding.findFirst({
+    where: {
+      id: weddingId,
+      OR: [{ ownerId: user.id }, { teamMembers: { some: { userId: user.id } } }],
+    },
+  });
+  if (!wedding) return NextResponse.json({ error: "Geen toegang tot deze bruiloft" }, { status: 403 });
+
+  await prisma.weddingVendor.deleteMany({ where: { weddingId, vendorId } });
+
+  return NextResponse.json({ ok: true });
+}
