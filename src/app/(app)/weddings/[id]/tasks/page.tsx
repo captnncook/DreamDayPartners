@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, RefreshCw, Circle, Calendar, User, X, CheckSquare } from "lucide-react";
+import { CheckCircle2, RefreshCw, Circle, Calendar, X, CheckSquare } from "lucide-react";
 import { SkeletonCard } from "@/components/Skeleton";
 
 type Task = {
@@ -16,6 +16,8 @@ type Task = {
   priority: string;
   assignedUser?: { id: string; name: string } | null;
 };
+
+type Member = { id: string; name: string; label: string };
 
 const STATUS_ICON_MAP: Record<string, React.ElementType> = { open: Circle, in_progress: RefreshCw, done: CheckCircle2 };
 const STATUS_ICON_COLOR: Record<string, string> = { open: "var(--muted-light)", in_progress: "var(--warning)", done: "var(--success)" };
@@ -36,8 +38,9 @@ export default function TasksPage() {
   const [filter, setFilter] = useState<"all" | "open" | "done">("all");
   const [sort, setSort] = useState<"deadline" | "priority" | "status">("deadline");
   const [view, setView] = useState<"list" | "timeline">("list");
-  const [form, setForm] = useState({ title: "", description: "", dueDate: "", category: "general", priority: "medium" });
+  const [form, setForm] = useState({ title: "", description: "", dueDate: "", category: "general", priority: "medium", assignedTo: "" });
   const [saving, setSaving] = useState(false);
+  const [members, setMembers] = useState<Member[]>([]);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/weddings/${id}/tasks`);
@@ -47,6 +50,10 @@ export default function TasksPage() {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    fetch(`/api/weddings/${id}/members`).then(r => r.json()).then(d => setMembers(d.members ?? []));
+  }, [id]);
 
   async function seedTasks() {
     if (!confirm("20 standaardtaken toevoegen?")) return;
@@ -62,7 +69,7 @@ export default function TasksPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    setForm({ title: "", description: "", dueDate: "", category: "general", priority: "medium" });
+    setForm({ title: "", description: "", dueDate: "", category: "general", priority: "medium", assignedTo: "" });
     setShowForm(false);
     setSaving(false);
     load();
@@ -129,11 +136,12 @@ export default function TasksPage() {
                 className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Categorie</label>
-              <select value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+              <label className="block text-xs font-medium mb-1">Toewijzen aan</label>
+              <select value={form.assignedTo} onChange={(e) => setForm((p) => ({ ...p, assignedTo: e.target.value }))}
                 className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
-                {["general","venue","catering","decoration","legal","clothing","music","photo"].map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                <option value="">— Niemand —</option>
+                {members.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name} ({m.label})</option>
                 ))}
               </select>
             </div>
@@ -201,14 +209,13 @@ export default function TasksPage() {
                   {task.title}
                 </span>
                 <span className={`ddp-badge ${PRIORITY_COLORS[task.priority]}`}>{PRIORITY_LABELS[task.priority]}</span>
-                <span className="ddp-badge badge-neutral">{task.category}</span>
+                {task.assignedUser && <span className="ddp-badge badge-info">{task.assignedUser.name}</span>}
               </div>
               {task.description && (
                 <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>{task.description}</p>
               )}
               <div className="flex items-center gap-3 mt-1.5">
                 {task.dueDate && <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><Calendar className="w-3 h-3" />{formatDate(task.dueDate)}</span>}
-                {task.assignedUser && <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><User className="w-3 h-3" />{task.assignedUser.name}</span>}
                 <span className="text-xs" style={{ color: "var(--muted)" }}>{STATUS_LABELS[task.status]}</span>
               </div>
             </div>
