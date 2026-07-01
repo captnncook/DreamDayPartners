@@ -51,7 +51,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { description, city, contactPerson, phone, website, priceFrom, priceTo, priceUnit, specializations } = body;
 
   let geoData: { latitude?: number; longitude?: number } = {};
-  if (city !== undefined && city !== vendor.city && city.trim()) {
+  const needsGeo = city !== undefined && city.trim() && (city !== vendor.city || !vendor.latitude);
+  if (needsGeo) {
     try {
       const geoRes = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ", Nederland")}&format=json&limit=1`,

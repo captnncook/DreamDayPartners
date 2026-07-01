@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
 import { generateWeddingCode } from "@/lib/wedding-id";
 import { sendMail, claimWelcomeEmail } from "@/lib/mail";
+import { geocodeCity } from "@/lib/geocode";
 
 export async function completePendingRegistrationViaOAuth(
   verifiedToken: string,
@@ -71,6 +72,8 @@ export async function completePendingRegistrationViaOAuth(
     });
     await setSession(user.id);
 
+    const geo = await geocodeCity(city);
+
     await prisma.vendor.create({
       data: {
         name: businessName,
@@ -80,6 +83,8 @@ export async function completePendingRegistrationViaOAuth(
         phone: phone || null,
         website: website || null,
         city: city || null,
+        latitude: geo.latitude ?? null,
+        longitude: geo.longitude ?? null,
         userId: user.id,
       },
     });

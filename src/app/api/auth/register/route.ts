@@ -4,6 +4,7 @@ import { setSession } from "@/lib/session";
 import { generateWeddingCode } from "@/lib/wedding-id";
 import { hash } from "bcryptjs";
 import { sendMail, claimWelcomeEmail } from "@/lib/mail";
+import { geocodeCity } from "@/lib/geocode";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -100,6 +101,8 @@ export async function POST(req: NextRequest) {
     });
     await setSession(user.id);
 
+    const geo = await geocodeCity(city);
+
     await prisma.vendor.create({
       data: {
         name: businessName,
@@ -109,6 +112,8 @@ export async function POST(req: NextRequest) {
         phone: phone || null,
         website: website || null,
         city: city || null,
+        latitude: geo.latitude ?? null,
+        longitude: geo.longitude ?? null,
         userId: user.id,
       },
     });

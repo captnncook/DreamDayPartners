@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Users, Heart, Handshake } from "lucide-react";
 import BulkVendorImport from "./BulkVendorImport";
 import ClaimRequests from "./ClaimRequests";
+import GeocodeVendors from "./GeocodeVendors";
 
 export default async function AdminPage() {
   const user = await getSession();
@@ -44,6 +45,7 @@ export default async function AdminPage() {
       <div className="mb-8">
         <BulkVendorImport />
       </div>
+      <GeocodeVendors />
       <div className="grid grid-cols-2 gap-6">
         <div>
           <h2 className="font-semibold mb-4">Gebruikers</h2>
