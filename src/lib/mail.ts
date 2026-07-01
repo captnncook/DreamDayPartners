@@ -3,7 +3,9 @@ import { Resend } from "resend";
 const FROM = process.env.MAIL_FROM ?? "DreamDay Platform <onboarding@resend.dev>";
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-export async function sendMail(opts: { to: string; subject: string; html: string }): Promise<void> {
+const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID ?? "";
+
+export async function sendMail(opts: { to: string; subject: string; html: string; name?: string }): Promise<void> {
   if (!resend) {
     console.log(`[mail:skipped — no RESEND_API_KEY] to=${opts.to} subject="${opts.subject}"`);
     return;
@@ -12,6 +14,19 @@ export async function sendMail(opts: { to: string; subject: string; html: string
     await resend.emails.send({ from: FROM, to: opts.to, subject: opts.subject, html: opts.html });
   } catch (err) {
     console.error("Mail send failed:", err);
+  }
+  // Save to Resend audience/contacts list if configured
+  if (AUDIENCE_ID) {
+    try {
+      await resend.contacts.create({
+        audienceId: AUDIENCE_ID,
+        email: opts.to,
+        ...(opts.name ? { firstName: opts.name } : {}),
+        unsubscribed: false,
+      });
+    } catch {
+      // Contact may already exist — ignore
+    }
   }
 }
 
