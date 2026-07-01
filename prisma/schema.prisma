@@ -15,6 +15,10 @@ model User {
   vendorType String?  // bloemist | dj | catering | fotograaf | etc.
   avatar     String?
   passwordHash         String?
+  emailNewMessage      Boolean  @default(true)
+  emailNewTask         Boolean  @default(true)
+  emailWeddingUpdate   Boolean  @default(false)
+  emailWeeklyDigest    Boolean  @default(true)
   isPremium            Boolean  @default(false)
   stripeCustomerId     String?
   stripeSubscriptionId String?

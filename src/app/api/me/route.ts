@@ -11,8 +11,18 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
-  const { name } = await req.json();
-  if (!name?.trim()) return NextResponse.json({ error: "Naam verplicht" }, { status: 400 });
-  const updated = await prisma.user.update({ where: { id: user.id }, data: { name: name.trim() } });
+  const body = await req.json();
+
+  const data: Record<string, unknown> = {};
+  if (body.name !== undefined) {
+    if (!body.name?.trim()) return NextResponse.json({ error: "Naam verplicht" }, { status: 400 });
+    data.name = body.name.trim();
+  }
+  if (body.emailNewMessage !== undefined) data.emailNewMessage = !!body.emailNewMessage;
+  if (body.emailNewTask !== undefined) data.emailNewTask = !!body.emailNewTask;
+  if (body.emailWeddingUpdate !== undefined) data.emailWeddingUpdate = !!body.emailWeddingUpdate;
+  if (body.emailWeeklyDigest !== undefined) data.emailWeeklyDigest = !!body.emailWeeklyDigest;
+
+  const updated = await prisma.user.update({ where: { id: user.id }, data });
   return NextResponse.json({ user: updated });
 }

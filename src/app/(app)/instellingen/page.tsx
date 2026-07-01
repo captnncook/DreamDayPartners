@@ -53,6 +53,14 @@ export default function InstellingenPage() {
     fetch("/api/me").then(r => r.json()).then(d => {
       setUser(d.user);
       setNameDraft(d.user?.name ?? "");
+      if (d.user) {
+        setNotifs({
+          emailNewMessage: d.user.emailNewMessage ?? true,
+          emailNewTask: d.user.emailNewTask ?? true,
+          emailWeddingUpdate: d.user.emailWeddingUpdate ?? false,
+          emailWeeklyDigest: d.user.emailWeeklyDigest ?? true,
+        });
+      }
       setLoading(false);
     });
   }, []);
@@ -159,7 +167,14 @@ export default function InstellingenPage() {
           ))}
         </div>
         <button
-          onClick={() => setToast("Meldingsinstellingen opgeslagen")}
+          onClick={async () => {
+            await fetch("/api/me", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(notifs),
+            });
+            setToast("Meldingsinstellingen opgeslagen");
+          }}
           className="ddp-btn-primary mt-4">
           Voorkeuren opslaan
         </button>

@@ -38,6 +38,28 @@ export function claimApprovedEmail(vendorName: string, verifyUrl: string): { sub
   };
 }
 
+export function newDirectMessageEmail(senderName: string, preview: string, appUrl: string): { subject: string; html: string } {
+  return {
+    subject: `Nieuw bericht van ${senderName}`,
+    html: `
+      <p><strong>${senderName}</strong> heeft je een bericht gestuurd op DreamDay Platform:</p>
+      <blockquote style="border-left:3px solid #c49a6c;margin:0;padding:0.5rem 1rem;color:#555;">${preview}</blockquote>
+      <p><a href="${appUrl}/dm" style="display:inline-block;margin-top:12px;padding:10px 20px;background:#c49a6c;color:#fff;border-radius:8px;text-decoration:none;">Bericht bekijken</a></p>
+    `,
+  };
+}
+
+export function newTaskEmail(taskTitle: string, weddingTitle: string, appUrl: string): { subject: string; html: string } {
+  return {
+    subject: `Nieuwe taak: ${taskTitle}`,
+    html: `
+      <p>Er is een nieuwe taak aan jou toegewezen voor <strong>${weddingTitle}</strong>:</p>
+      <p style="font-size:1.1em;font-weight:bold;">${taskTitle}</p>
+      <p><a href="${appUrl}/tasks" style="display:inline-block;margin-top:12px;padding:10px 20px;background:#c49a6c;color:#fff;border-radius:8px;text-decoration:none;">Taak bekijken</a></p>
+    `,
+  };
+}
+
 export function claimWelcomeEmail(vendorName: string): { subject: string; html: string } {
   return {
     subject: `Welkom op DreamDay Platform, ${vendorName}!`,
