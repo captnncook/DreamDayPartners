@@ -31,7 +31,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       description: body.description,
       dueDate: body.dueDate ? new Date(body.dueDate) : null,
       category: body.category ?? "general",
-      assignedTo: body.assignedTo ?? null,
+      assignedTo: body.assignedTo || null,
       status: body.status ?? "open",
       priority: body.priority ?? "medium",
     },
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   });
 
   // Email the assigned user if they have emailNewTask enabled
-  if (task.assignedUser?.emailNewTask && task.assignedUser.email && task.assignedUser.id !== user.id) {
+  if (task.assignedUser?.emailNewTask && task.assignedUser.email) {
     const wedding = await prisma.wedding.findUnique({ where: { id }, select: { title: true } });
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const tpl = newTaskEmail(task.title, wedding?.title ?? "je bruiloft", appUrl);
