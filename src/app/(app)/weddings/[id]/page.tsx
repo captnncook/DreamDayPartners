@@ -96,8 +96,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
   const guestConfirmed = wedding.guests.filter((g) => g.rsvpStatus === "confirmed").length;
   const draaiboek = wedding.draaiboeken[0] ?? null;
 
-  const statusLabels = tw.statusLabels;
-
   const isVendor = user.role === "vendor";
   const urgent = days >= 0 && days <= 14;
   const d = new Date(wedding.date);
@@ -113,9 +111,9 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
       </Link>
 
       {/* Header — dark hero met gouden datumring */}
-      <div className="dash-hero mb-6" style={{ padding: "1.5rem 1.75rem", display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+      <div className="dash-hero mb-6" style={{ padding: "1.5rem 1.75rem", display: "flex", alignItems: "center", gap: "1.375rem", flexWrap: "wrap" }}>
         <div className="dash-ring" style={{ width: "64px", height: "64px" }}>
-          <span style={{ fontSize: "0.5rem", fontWeight: 700, letterSpacing: "0.08em" }}>{monthShort}</span>
+          <span className="dash-ring-month" style={{ fontSize: "0.5rem", fontWeight: 700, letterSpacing: "0.08em" }}>{monthShort}</span>
           <span className="font-serif" style={{ fontSize: "1.5rem", fontWeight: 700, lineHeight: 1 }}>{dayNum}</span>
         </div>
 
@@ -124,9 +122,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             <h1 className="font-serif" style={{ fontSize: "clamp(1.25rem, 4.5vw, 1.625rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
               {wedding.title}
             </h1>
-            <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--gold)" }}>
-              {(statusLabels as Record<string, string>)[wedding.status] ?? wedding.status}
-            </span>
             {wedding.isPremium && (
               <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--gold)" }}>Premium</span>
             )}

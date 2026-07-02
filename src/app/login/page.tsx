@@ -89,22 +89,22 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 py-12"
-      style={{ background: "var(--gradient-hero)" }}
+      className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden"
+      style={{ background: "linear-gradient(150deg, var(--ink) 0%, var(--ink-mid) 100%)" }}
     >
       {/* Logo linksboven — terug naar home */}
       <Link href="/" className="fixed top-4 left-5 md:left-10 inline-flex items-center gap-2 z-20" style={{ textDecoration: "none" }}>
-        <Image src="/images/logo.svg" alt="DreamDay Platform" width={28} height={28} />
-        <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-          DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
+        <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={26} height={26} />
+        <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.02em", color: "var(--ink-text)" }}>
+          DreamDay<span className="font-serif" style={{ color: "var(--gold)" }}> Platform</span>
         </span>
       </Link>
 
-      {/* Decorative blob */}
+      {/* Zachte gouden gloed — geen decoratieve roze blob meer */}
       <div
-        className="fixed top-0 right-0 w-[400px] h-[400px] rounded-full pointer-events-none"
+        className="fixed top-0 right-0 w-[460px] h-[460px] rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(circle, rgba(232,180,188,0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(201,167,93,0.16) 0%, transparent 70%)",
           transform: "translate(30%, -30%)",
         }}
       />
@@ -114,19 +114,19 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-3">
-            <Image src="/images/logo.svg" alt="DreamDay Platform" width={48} height={48} />
+            <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={44} height={44} />
             <div className="text-left">
-              <div className="font-serif text-xl font-bold" style={{ color: "var(--foreground)" }}>DreamDay</div>
-              <div className="text-sm font-medium" style={{ color: "var(--primary)" }}>Platform</div>
+              <div className="font-serif text-xl font-bold" style={{ color: "var(--ink-text)" }}>DreamDay</div>
+              <div className="text-sm font-medium" style={{ color: "var(--gold)" }}>Platform</div>
             </div>
           </Link>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
+          <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
             Jouw dream day, zonder de stress — Demo
           </p>
         </div>
 
         {/* Login card */}
-        <div className="ddp-card" style={{ boxShadow: "var(--shadow-lg)", padding: "1.75rem" }}>
+        <div style={{ background: "var(--surface)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-lg)", padding: "1.75rem" }}>
           <h1 className="font-serif text-xl font-bold mb-1">Inloggen</h1>
           <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
             Kies een rol om de demo te verkennen
@@ -158,22 +158,19 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Role preview */}
-            <div
-              className="rounded-xl p-4 flex items-center gap-3"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-            >
+            {/* Role preview — geen kaart-in-kaart, dunne scheidingslijn */}
+            <div className="flex items-center gap-3 py-3" style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "var(--accent)" }}
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "var(--gold)" }}
               >
-                <selected.Icon className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <selected.Icon className="w-5 h-5" style={{ color: "var(--ink)" }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm">{selected.label}</div>
                 <div className="text-xs" style={{ color: "var(--muted)" }}>{selected.description}</div>
               </div>
-              <span className="ddp-badge badge-neutral text-xs flex-shrink-0">
+              <span className="text-xs flex-shrink-0" style={{ color: "var(--muted-light)" }}>
                 {DEMO_USERS[selectedRole].email}
               </span>
             </div>
@@ -184,7 +181,7 @@ export default function LoginPage() {
               {selectedRole === "planner" && <p>Volledig bruiloftsbeheer: taken, gasten, budget, draaiboek, communicatie</p>}
               {selectedRole === "couple"  && <p>Overzicht van de eigen bruiloft, taken en communicatie met het team</p>}
               {!["admin","planner","couple"].includes(selectedRole) && (
-                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek <span className="ddp-badge badge-premium" style={{ fontSize: "0.6rem" }}>Premium</span></p>
+                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek — <span style={{ color: "var(--gold-deep)", fontWeight: 700, textTransform: "uppercase", fontSize: "0.6875rem", letterSpacing: "0.05em" }}>Premium</span></p>
               )}
             </div>
 
@@ -205,7 +202,7 @@ export default function LoginPage() {
         </div>
 
         {/* Email + wachtwoord inloggen */}
-        <div className="ddp-card mt-4" style={{ boxShadow: "var(--shadow-md)" }}>
+        <div style={{ background: "var(--surface)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-md)", padding: "1.75rem" }} className="mt-4">
           <h2 className="font-semibold text-sm mb-3">Inloggen met e-mail &amp; wachtwoord</h2>
           <form onSubmit={handleRealLogin} className="space-y-3">
             <input
@@ -243,24 +240,24 @@ export default function LoginPage() {
               {realLoading ? "Bezig…" : "Inloggen"}
             </button>
             <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
-              <Link href="/wachtwoord-vergeten" style={{ color: "var(--primary)" }}>Wachtwoord vergeten?</Link>
+              <Link href="/wachtwoord-vergeten" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>Wachtwoord vergeten?</Link>
             </p>
           </form>
         </div>
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 ddp-divider" />
-          <span className="text-xs" style={{ color: "var(--muted)" }}>of inloggen met</span>
-          <div className="flex-1 ddp-divider" />
+          <div className="flex-1" style={{ height: "1px", background: "var(--ink-line)" }} />
+          <span className="text-xs" style={{ color: "var(--ink-muted)" }}>of inloggen met</span>
+          <div className="flex-1" style={{ height: "1px", background: "var(--ink-line)" }} />
         </div>
 
         {/* OAuth buttons */}
         <div className="flex flex-col gap-2 mb-4">
           <a
             href="/api/auth/google"
-            className="ddp-btn-secondary w-full py-2.5 text-sm flex items-center justify-center gap-2.5 no-underline"
-            style={{ textDecoration: "none" }}
+            className="w-full py-2.5 text-sm flex items-center justify-center gap-2.5 no-underline"
+            style={{ textDecoration: "none", background: "var(--surface)", borderRadius: "var(--radius-full)", fontWeight: 600, color: "var(--foreground)" }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -272,8 +269,8 @@ export default function LoginPage() {
           </a>
           <a
             href="/api/auth/apple"
-            className="ddp-btn-secondary w-full py-2.5 text-sm flex items-center justify-center gap-2.5 no-underline"
-            style={{ textDecoration: "none" }}
+            className="w-full py-2.5 text-sm flex items-center justify-center gap-2.5 no-underline"
+            style={{ textDecoration: "none", background: "var(--surface)", borderRadius: "var(--radius-full)", fontWeight: 600, color: "var(--foreground)" }}
           >
             <svg width="16" height="18" viewBox="0 0 814 1000" fill="currentColor">
               <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.7C199.4 718 128 583 128 462.9c0-0-96.5-197.9 0-288.2C174.5 128.4 221.2 128 224 128c6.8 0 25.5 2.5 31 4.1 25.3 7.3 51.9 27.7 72.9 44.6 24.9 20.1 49.2 54.3 57.7 87.5 7.7 30.9 9.6 62.9 5.8 95.5 48.8 9.4 115.7 7.5 162.1-45.5 19.3-22.1 35.6-55.1 41.5-86.2z"/>
@@ -282,19 +279,23 @@ export default function LoginPage() {
           </a>
         </div>
 
-        {/* Register CTA */}
-        <div className="ddp-card text-center" style={{ boxShadow: "var(--shadow-md)" }}>
-          <Image src="/images/logo.svg" alt="DreamDay" width={40} height={40} className="mx-auto mb-3" />
-          <h2 className="font-semibold text-sm mb-1">Jullie dream day plannen?</h2>
-          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>
+        {/* Register CTA — donker paneel met gouden knop, consistent met dash-hero */}
+        <div className="dash-hero text-center" style={{ padding: "1.5rem" }}>
+          <Image src="/images/logo-wit.svg" alt="DreamDay" width={36} height={36} className="mx-auto mb-3" />
+          <h2 className="font-serif font-bold mb-1" style={{ fontSize: "1.0625rem", color: "var(--ink-text)" }}>Jullie dream day plannen?</h2>
+          <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
             Stel jullie dream team samen en regel alles op één plek — gratis voor bruidsparen.
           </p>
-          <Link href="/aanmelden" className="ddp-btn-primary w-full py-2.5 text-sm">
+          <Link
+            href="/aanmelden"
+            className="w-full inline-flex items-center justify-center py-2.5 text-sm font-bold"
+            style={{ background: "var(--gold)", color: "var(--ink)", borderRadius: "var(--radius-full)" }}
+          >
             Begin gratis
           </Link>
         </div>
 
-        <p className="text-center text-xs mt-5" style={{ color: "var(--muted-light)" }}>
+        <p className="text-center text-xs mt-5" style={{ color: "var(--ink-muted)" }}>
           Dit is een demo-omgeving. Geen echte inloggegevens nodig.
         </p>
       </div>

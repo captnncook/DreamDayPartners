@@ -147,17 +147,20 @@ function LeveranciersContent() {
         </div>
       </div>
 
-      {/* ── Category chips ───────────────────────────── */}
-      <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "0.875rem 1.25rem" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-          <button onClick={() => setCategory("")} className={`ddp-chip${!category ? " active" : ""}`}>
+      {/* ── Category tabs ───────────────────────────── */}
+      <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "0 1.25rem" }}>
+        <div
+          className="flex overflow-x-auto"
+          style={{ maxWidth: "1040px", margin: "0 auto", scrollbarWidth: "none" }}
+        >
+          <button onClick={() => setCategory("")} className={`ddp-cat-tab${!category ? " active" : ""}`}>
             Alles
           </button>
           {CATEGORIES.map((c) => (
             <button
               key={c.value}
               onClick={() => setCategory(category === c.value ? "" : c.value)}
-              className={`ddp-chip${category === c.value ? " active" : ""}`}
+              className={`ddp-cat-tab${category === c.value ? " active" : ""}`}
             >
               {c.label}
             </button>

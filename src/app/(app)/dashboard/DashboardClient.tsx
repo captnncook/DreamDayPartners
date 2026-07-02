@@ -378,7 +378,7 @@ function NextWeddingHero({ wedding }: { wedding: Wedding }) {
       <div className="ddp-section-label mb-2">Eerstvolgende bruiloft</div>
       <div className="dash-hero" style={{ padding: "1.75rem", display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
         <div className="dash-ring" style={{ width: "76px", height: "76px" }}>
-          <span style={{ fontSize: "0.5625rem", fontWeight: 700, letterSpacing: "0.08em" }}>{month}</span>
+          <span className="dash-ring-month" style={{ fontSize: "0.5625rem", fontWeight: 700, letterSpacing: "0.08em" }}>{month}</span>
           <span className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, lineHeight: 1 }}>{day}</span>
         </div>
 

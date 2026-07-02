@@ -3,8 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ScrollReveal from "@/components/ScrollReveal";
-import { Check, ArrowRight, ChevronDown } from "lucide-react";
+import { Check, ArrowRight, ChevronDown, LogOut } from "lucide-react";
 
 /* ─── Data ─────────────────────────────────────────────── */
 
@@ -97,6 +98,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 /* ─── Page ──────────────────────────────────────────────── */
 
 export default function LandingPage() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -112,6 +114,13 @@ export default function LandingPage() {
       .then((d) => setLoggedIn(Boolean(d?.user)))
       .catch(() => {});
   }, []);
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setLoggedIn(false);
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#ffffff", color: "var(--foreground)" }}>
@@ -151,9 +160,20 @@ export default function LandingPage() {
 
         <div className="flex items-center gap-2 ml-auto flex-shrink-0">
           {loggedIn ? (
-            <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
-              Profiel
-            </Link>
+            <>
+              <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+                Profiel
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="ddp-btn-ghost"
+                style={{ fontSize: "0.8125rem", color: "var(--muted)", padding: "0.45rem 0.625rem" }}
+                title="Uitloggen"
+                aria-label="Uitloggen"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </>
           ) : (
             <>
               <Link href="/login" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
