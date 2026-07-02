@@ -151,8 +151,8 @@ function LeveranciersContent() {
       {/* ── Category tabs ───────────────────────────── */}
       <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "0 1.25rem" }}>
         <div
-          className="flex overflow-x-auto"
-          style={{ maxWidth: "1040px", margin: "0 auto", scrollbarWidth: "none" }}
+          className="flex overflow-x-auto ddp-cat-tabs-scroll"
+          style={{ maxWidth: "1040px", margin: "0 auto", scrollbarWidth: "none", paddingRight: "2rem" }}
         >
           <button onClick={() => setCategory("")} className={`ddp-cat-tab${!category ? " active" : ""}`}>
             Alles

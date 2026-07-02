@@ -369,6 +369,24 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom-color: var(--gold);
 }
 
+/* Wrapper voor de scrollbare categorierij: fade-out aan de rechterrand zodat
+   duidelijk is dat er nog meer categorieën volgen (i.p.v. een woord dat
+   halverwege lijkt af te breken, bijv. "Liveba" i.p.v. "Liveband"). */
+.ddp-cat-tabs-scroll {
+  position: relative;
+}
+
+.ddp-cat-tabs-scroll::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 2.5rem;
+  background: linear-gradient(to right, transparent, var(--surface));
+  pointer-events: none;
+}
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    INPUTS & SELECTS
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
