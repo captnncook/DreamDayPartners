@@ -236,7 +236,7 @@ function LeveranciersContent() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--ink-text)", cursor: page <= 1 ? "default" : "pointer" }}
+                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--foreground)", cursor: page <= 1 ? "default" : "pointer" }}
                 >
                   ← Vorige
                 </button>
@@ -244,7 +244,7 @@ function LeveranciersContent() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--ink-text)", cursor: page >= totalPages ? "default" : "pointer" }}
+                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--foreground)", cursor: page >= totalPages ? "default" : "pointer" }}
                 >
                   Volgende →
                 </button>
