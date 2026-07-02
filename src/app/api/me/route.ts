@@ -18,6 +18,13 @@ export async function PATCH(req: NextRequest) {
     if (!body.name?.trim()) return NextResponse.json({ error: "Naam verplicht" }, { status: 400 });
     data.name = body.name.trim();
   }
+  if (body.email !== undefined && user.role === "admin") {
+    const email = body.email.toLowerCase().trim();
+    if (!email) return NextResponse.json({ error: "E-mailadres verplicht" }, { status: 400 });
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing && existing.id !== user.id) return NextResponse.json({ error: "E-mailadres al in gebruik" }, { status: 409 });
+    data.email = email;
+  }
   if (body.emailNewMessage !== undefined) data.emailNewMessage = !!body.emailNewMessage;
   if (body.emailNewTask !== undefined) data.emailNewTask = !!body.emailNewTask;
   if (body.emailWeddingUpdate !== undefined) data.emailWeddingUpdate = !!body.emailWeddingUpdate;

@@ -45,6 +45,7 @@ export default function InstellingenPage() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [nameDraft, setNameDraft] = useState("");
+  const [emailDraft, setEmailDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
   const [notifs, setNotifs] = useState(NOTIF_DEFAULTS);
@@ -53,6 +54,7 @@ export default function InstellingenPage() {
     fetch("/api/me").then(r => r.json()).then(d => {
       setUser(d.user);
       setNameDraft(d.user?.name ?? "");
+      setEmailDraft(d.user?.email ?? "");
       if (d.user) {
         setNotifs({
           emailNewMessage: d.user.emailNewMessage ?? true,
@@ -68,15 +70,20 @@ export default function InstellingenPage() {
   async function saveName(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    const body: Record<string, string> = { name: nameDraft };
+    if (user?.role === "admin" && emailDraft && emailDraft !== user.email) {
+      body.email = emailDraft;
+    }
     const res = await fetch("/api/me", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: nameDraft }),
+      body: JSON.stringify(body),
     });
     setSaving(false);
     if (res.ok) {
       const d = await res.json();
       setUser(d.user);
+      setEmailDraft(d.user?.email ?? "");
       setToast("Profielinstellingen opgeslagen");
     }
   }
@@ -117,10 +124,19 @@ export default function InstellingenPage() {
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">E-mailadres</label>
-            <div className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)", background: "var(--accent)", color: "var(--muted)" }}>
-              {user?.email}
-            </div>
-            <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>Aanmelden gaat via magic link — geen wachtwoord nodig.</p>
+            {user?.role === "admin" ? (
+              <input
+                type="email"
+                value={emailDraft}
+                onChange={e => setEmailDraft(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                style={{ borderColor: "var(--border)" }}
+              />
+            ) : (
+              <div className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)", background: "var(--accent)", color: "var(--muted)" }}>
+                {user?.email}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">Rol</label>
