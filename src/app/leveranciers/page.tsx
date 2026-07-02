@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, ArrowRight, SlidersHorizontal, X, LayoutGrid, Map, Plus } from "lucide-react";
+import { Search, MapPin, ArrowRight, X, LayoutGrid, Map, Plus } from "lucide-react";
 
 const VendorMap = lazy(() => import("@/components/VendorMap"));
 
@@ -188,10 +188,7 @@ function LeveranciersContent() {
               {category && ` · ${CATEGORY_MAP[category] ?? category}`}
             </p>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="hidden sm:flex items-center gap-1.5" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span>Premium eerst</span>
-              </div>
+
               <div style={{ display: "flex", flexDirection: "row", border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
                 <button
                   onClick={() => setView("grid")}
