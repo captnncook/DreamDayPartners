@@ -310,7 +310,7 @@ export default function DashboardClient({ user, greeting, statsCards, weddings, 
       {user.role === "vendor" && <VendorTasksSection weddings={weddings} />}
 
       {/* Taken */}
-      {user.role !== "vendor" && (
+      {user.role !== "vendor" && user.role !== "admin" && (
         <section>
           <div className="flex items-center justify-between mb-3">
             <div>

@@ -81,7 +81,7 @@ export default async function DashboardPage() {
 
   const statsCards = user.role !== "couple" && user.role !== "vendor" ? [
     { label: "Bruiloften", value: weddings.length, icon: "Heart" },
-    { label: "Open taken", value: myTasks.length, icon: "CheckSquare" },
+    ...(user.role !== "admin" ? [{ label: "Open taken", value: myTasks.length, icon: "CheckSquare" }] : []),
     { label: "Komende 30 dagen", value: weddings.filter((w) => daysUntil(w.date) <= 30 && daysUntil(w.date) > 0).length, icon: "Calendar" },
     { label: "Dit jaar", value: weddings.filter((w) => new Date(w.date).getFullYear() === new Date().getFullYear()).length, icon: "Sparkles" },
   ] : [];

@@ -136,8 +136,8 @@ export default function InstellingenPage() {
         </form>
       </div>
 
-      {/* Notifications */}
-      <div className="ddp-card mb-6">
+      {/* Notifications — hidden for admins */}
+      {user?.role !== "admin" && <div className="ddp-card mb-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "var(--primary)" }}>
             <Bell className="w-4 h-4 text-white" />
@@ -178,7 +178,7 @@ export default function InstellingenPage() {
           className="ddp-btn-primary mt-4">
           Voorkeuren opslaan
         </button>
-      </div>
+      </div>}
 
       {/* Logout */}
       <div className="ddp-card">
