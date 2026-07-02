@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { sendMail, premiumGrantedEmail } from "@/lib/mail";
+import { logAdminEvent } from "@/lib/adminEvent";
 
 // DELETE — verwijder account
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -41,6 +42,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     data.isPremium = Boolean(body.isPremium);
   }
 
+  if (body.vendorType !== undefined && target.role === "vendor") {
+    data.vendorType = body.vendorType || null;
+  }
+
   const updated = await prisma.user.update({
     where: { id },
     data,
@@ -51,6 +56,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.isPremium === true && !target.isPremium) {
     const tpl = premiumGrantedEmail(updated.name, updated.vendorType);
     await sendMail({ to: updated.email, subject: tpl.subject, html: tpl.html, role: "vendor", name: updated.name });
+  }
+
+  if (body.email !== undefined && target.email !== updated.email) {
+    await logAdminEvent("email_change", `E-mailadres van ${updated.name} gewijzigd: ${target.email} → ${updated.email}`, updated.email);
+  }
+
+  if (body.vendorType !== undefined && target.vendorType !== updated.vendorType) {
+    await logAdminEvent("vendor_type_change", `Leverancierstype van ${updated.name} gewijzigd: ${target.vendorType ?? "—"} → ${updated.vendorType ?? "—"}`, updated.email);
   }
 
   return NextResponse.json({ user: updated });

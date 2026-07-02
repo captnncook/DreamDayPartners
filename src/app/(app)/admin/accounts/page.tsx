@@ -24,6 +24,16 @@ const ROLE_COLOR: Record<string, string> = {
   vendor: "var(--muted)", team_member: "var(--muted)",
 };
 
+const VENDOR_TYPE_LABELS: Record<string, string> = {
+  weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
+  bloemist: "Bloemist", dj: "DJ / Muziek", catering: "Catering", bakker: "Bruidstaart & Bakker",
+  haarstylist: "Haarstylist", visagist: "Visagist", trouwlocatie: "Trouwlocatie",
+  vervoer: "Vervoer", verhuur: "Verhuur", tentverhuur: "Tentverhuur", trouwauto: "Trouwauto",
+  bar: "Bar / Cocktails", koffiebar: "Koffiebar / Foodtruck",
+  liveband: "Liveband & Muziek", entertainment: "Entertainment / Acts",
+  fotocabine: "Fotocabine", overig: "Overig",
+};
+
 export default function AccountsPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +41,7 @@ export default function AccountsPage() {
   const [role, setRole] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editEmail, setEditEmail] = useState("");
+  const [editVendorTypeId, setEditVendorTypeId] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, string>>({});
   // Track pending premium changes: userId -> new value
@@ -102,6 +113,24 @@ export default function AccountsPage() {
       setMsg(u.id, d.error ?? "Fout bij opslaan");
     }
     setEditId(null);
+    setSaving(null);
+  }
+
+  async function handleSaveVendorType(u: User, vendorType: string) {
+    setSaving(u.id);
+    const res = await fetch(`/api/admin/accounts/${u.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vendorType }),
+    });
+    if (res.ok) {
+      setUsers(us => us.map(x => x.id === u.id ? { ...x, vendorType } : x));
+      setMsg(u.id, "✓ Leverancierstype bijgewerkt");
+    } else {
+      const d = await res.json();
+      setMsg(u.id, d.error ?? "Fout bij opslaan");
+    }
+    setEditVendorTypeId(null);
     setSaving(null);
   }
 
@@ -269,8 +298,29 @@ export default function AccountsPage() {
                   <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: ROLE_COLOR[u.role] ?? "var(--muted)" }}>
                     {ROLE_LABELS[u.role] ?? u.role}
                   </span>
-                  {u.role === "vendor" && u.vendorType && (
-                    <span className="capitalize" style={{ fontSize: "0.6875rem", color: "var(--muted-light)", marginLeft: "0.5rem" }}>{u.vendorType}</span>
+                  {u.role === "vendor" && (
+                    editVendorTypeId === u.id ? (
+                      <select
+                        autoFocus
+                        defaultValue={u.vendorType ?? ""}
+                        onChange={e => handleSaveVendorType(u, e.target.value)}
+                        onBlur={() => setEditVendorTypeId(null)}
+                        className="ddp-input py-0.5 text-xs"
+                        style={{ display: "inline-block", width: "auto", marginLeft: "0.5rem" }}
+                      >
+                        <option value="">— Kies —</option>
+                        {Object.entries(VENDOR_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                      </select>
+                    ) : (
+                      <button
+                        onClick={() => setEditVendorTypeId(u.id)}
+                        className="capitalize"
+                        style={{ fontSize: "0.6875rem", color: "var(--muted-light)", marginLeft: "0.5rem", background: "none", border: "none", cursor: "pointer", textDecoration: "underline dotted" }}
+                        title="Leverancierstype wijzigen"
+                      >
+                        {u.vendorType ? (VENDOR_TYPE_LABELS[u.vendorType] ?? u.vendorType) : "Type instellen"}
+                      </button>
+                    )
                   )}
                 </td>
                 <td className="px-4 py-3">

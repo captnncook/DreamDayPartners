@@ -31,6 +31,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   });
 
   if (!vendor) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
+
+  // Tel een profielweergave, maar niet wanneer de eigenaar zijn eigen profiel bekijkt/bewerkt.
+  const viewer = await getSession();
+  if (!viewer || viewer.id !== vendor.userId) {
+    prisma.vendor.update({ where: { id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
+  }
+
   return NextResponse.json({ vendor });
 }
 

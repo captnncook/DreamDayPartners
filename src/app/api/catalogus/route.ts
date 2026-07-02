@@ -52,6 +52,8 @@ export async function GET(req: NextRequest) {
       city: true,
       latitude: true,
       longitude: true,
+      priceFrom: true,
+      specializations: true,
     },
     orderBy: [{ isPremium: "desc" }, { name: "asc" }],
   });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendMail, passwordResetEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
+import { logAdminEvent } from "@/lib/adminEvent";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
 
   const tpl = passwordResetEmail(resetUrl);
   await sendMail({ to: user.email, subject: tpl.subject, html: tpl.html });
+  await logAdminEvent("password_reset", `Wachtwoordreset aangevraagd door ${user.name}`, user.email);
 
   return NextResponse.json({ ok: true });
 }

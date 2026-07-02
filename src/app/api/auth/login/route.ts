@@ -3,6 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
 import { compare } from "bcryptjs";
 
+async function bumpLogin(userId: string) {
+  try {
+    await prisma.user.update({ where: { id: userId }, data: { loginCount: { increment: 1 }, lastLoginAt: new Date() } });
+  } catch (err) {
+    console.error("[login] failed to record login stats:", err);
+  }
+}
+
 const DEMO_DEFAULTS: Record<string, { name: string; role: string; vendorType?: string }> = {
   "admin@dreamday.nl":   { name: "Platform Admin",         role: "admin" },
   "planner@dreamday.nl": { name: "Sophie van der Berg",    role: "planner" },
@@ -33,6 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Onjuist wachtwoord" }, { status: 401 });
     }
     await setSession(user.id);
+    await bumpLogin(user.id);
     return NextResponse.json({ user });
   }
 
@@ -48,5 +57,6 @@ export async function POST(req: NextRequest) {
   }
 
   await setSession(user.id);
+  await bumpLogin(user.id);
   return NextResponse.json({ user });
 }

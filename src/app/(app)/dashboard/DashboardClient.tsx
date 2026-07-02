@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Trash2, ChevronRight, Check, X } from "lucide-react";
+import ClaimRequests from "@/components/admin/ClaimRequests";
 
 const PRIORITY_META: Record<string, { label: string; color: string; weight: number }> = {
   high:   { label: "Urgent", color: "var(--gold-deep)",   weight: 700 },
@@ -90,7 +91,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
     if (!aUp && bUp) return 1;
     return a.days - b.days;
   });
-  const heroWedding = (user.role === "planner" || user.role === "admin" || user.role === "team_member")
+  const heroWedding = (user.role === "planner" || user.role === "team_member")
     ? sortedWeddings.find((w) => w.days >= 0) ?? null
     : null;
   const restWeddings = heroWedding ? sortedWeddings.filter((w) => w.id !== heroWedding.id) : sortedWeddings;
@@ -107,13 +108,16 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             {new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date())}
           </p>
         </div>
-        {(user.role === "planner" || user.role === "admin") && (
+        {user.role === "planner" && (
           <div style={{ display: "flex", gap: "1.5rem" }}>
             <StatInline value={stats.total} label="bruiloften" />
             <StatInline value={stats.upcoming30} label="komende 30 dagen" />
           </div>
         )}
       </div>
+
+      {/* Admin: accountverzoeken & platformactiviteit */}
+      {user.role === "admin" && <AdminOverview />}
 
       {/* Dream Team-uitnodigingen (leverancier) */}
       {user.role === "vendor" && requests.length > 0 && (
@@ -192,14 +196,14 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
         </section>
       )}
 
-      {/* Bruiloften — leverancier heeft de agenda hierboven al */}
-      {user.role !== "vendor" && (
+      {/* Bruiloften — leverancier heeft de agenda hierboven al, admin beheert dit via de sidebar */}
+      {user.role !== "vendor" && user.role !== "admin" && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <h2 className="dash-section-title">
               {user.role === "couple" ? "Onze bruiloft" : "Bruiloften"}
             </h2>
-            {(user.role === "planner" || user.role === "admin") && (
+            {user.role === "planner" && (
               <Link href="/weddings/new" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
                 <Plus className="w-3.5 h-3.5" /> Nieuw
               </Link>
@@ -209,7 +213,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
           {weddings.length === 0 ? (
             <div style={{ padding: "2.5rem 0", textAlign: "center" }}>
               <p className="text-sm font-medium" style={{ color: "var(--muted)" }}>Nog geen bruiloften</p>
-              {(user.role === "planner" || user.role === "admin") && (
+              {user.role === "planner" && (
                 <Link href="/weddings/new" className="ddp-btn-primary inline-flex mt-4 text-sm">Eerste bruiloft aanmaken</Link>
               )}
             </div>
@@ -355,6 +359,96 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
         </section>
       )}
     </div>
+  );
+}
+
+const EVENT_META: Record<string, { color: string }> = {
+  password_reset:     { color: "var(--muted)" },
+  email_change:       { color: "var(--foreground)" },
+  vendor_type_change: { color: "var(--foreground)" },
+  claim_approved:     { color: "var(--gold-deep)" },
+  claim_rejected:     { color: "var(--muted-light)" },
+  claim_reminder:     { color: "var(--gold-deep)" },
+  account_created:    { color: "var(--gold-deep)" },
+  error:               { color: "var(--gold-deep)" },
+};
+
+type AdminEvent = { id: string; type: string; label: string; message: string; targetEmail?: string | null; createdAt: string };
+type TopVendor = { id: string; name: string; category: string; viewCount: number };
+
+function AdminOverview() {
+  const [events, setEvents] = useState<AdminEvent[]>([]);
+  const [topVendors, setTopVendors] = useState<TopVendor[]>([]);
+  const [loginsToday, setLoginsToday] = useState(0);
+  const [loginsWeek, setLoginsWeek] = useState(0);
+  const [errorCount7d, setErrorCount7d] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/overview").then(r => r.ok ? r.json() : null).then(d => {
+      if (d) {
+        setEvents(d.recentEvents ?? []);
+        setTopVendors(d.topVendors ?? []);
+        setLoginsToday(d.loginsToday ?? 0);
+        setLoginsWeek(d.loginsWeek ?? 0);
+        setErrorCount7d(d.errorCount7d ?? 0);
+      }
+      setLoaded(true);
+    });
+  }, []);
+
+  if (!loaded) return null;
+
+  return (
+    <>
+      {/* Platformactiviteit — inline cijfers, geen kaartgrid */}
+      <div className="flex flex-wrap gap-x-8 gap-y-3 mb-8 pb-5" style={{ borderBottom: "1px solid var(--border)" }}>
+        <StatInline value={loginsToday} label="logins vandaag" />
+        <StatInline value={loginsWeek} label="logins deze week" />
+        <div>
+          <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, letterSpacing: "-0.01em", color: errorCount7d > 0 ? "var(--gold-deep)" : "var(--foreground)" }}>{errorCount7d}</span>
+          <span style={{ display: "block", fontSize: "0.625rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>fouten deze week</span>
+        </div>
+      </div>
+
+      <ClaimRequests />
+
+      {topVendors.length > 0 && (
+        <section className="mb-8">
+          <h2 className="dash-section-title mb-1">Meest bekeken profielen</h2>
+          <div style={{ borderTop: "1px solid var(--border)" }}>
+            {topVendors.map((v) => (
+              <Link key={v.id} href={`/leveranciers/${v.id}`} className="dash-row">
+                <div className="flex-1 min-w-0">
+                  <div className="font-serif text-sm truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>{v.name}</div>
+                  <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{v.category}</div>
+                </div>
+                <div className="text-sm flex-shrink-0" style={{ fontWeight: 700, color: "var(--gold-deep)" }}>{v.viewCount}</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {events.length > 0 && (
+        <section>
+          <h2 className="dash-section-title mb-1">Recente activiteit</h2>
+          <div style={{ borderTop: "1px solid var(--border)" }}>
+            {events.map((e) => (
+              <div key={e.id} className="dash-row">
+                <div className="flex-1 min-w-0">
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: EVENT_META[e.type]?.color ?? "var(--muted)" }}>
+                    {e.label}
+                  </span>
+                  <div className="text-sm mt-0.5" style={{ color: "var(--foreground)" }}>{e.message}</div>
+                </div>
+                <span className="text-xs flex-shrink-0" style={{ color: "var(--muted-light)" }}>{formatDateShort(e.createdAt)}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
   );
 }
 

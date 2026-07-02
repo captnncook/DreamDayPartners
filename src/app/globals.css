@@ -676,6 +676,15 @@ h1, h2, h3, h4, h5, h6 {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
   }
+
+  /* Aanbevolen (premium) leveranciers krijgen ~20% meer ruimte voor hun
+     omschrijving/specialisaties, ten koste van de naamkolom. */
+  .vcat-row.premium {
+    grid-template-columns: 84px minmax(0, 4fr) minmax(0, 8.4fr) auto;
+  }
+  .vcat-row.premium .vcat-desc {
+    -webkit-line-clamp: 3;
+  }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

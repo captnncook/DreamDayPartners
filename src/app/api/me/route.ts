@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { logAdminEvent } from "@/lib/adminEvent";
 
 export async function GET() {
   const user = await getSession();
@@ -31,5 +32,10 @@ export async function PATCH(req: NextRequest) {
   if (body.emailWeeklyDigest !== undefined) data.emailWeeklyDigest = !!body.emailWeeklyDigest;
 
   const updated = await prisma.user.update({ where: { id: user.id }, data });
+
+  if (body.email !== undefined && user.email !== updated.email) {
+    await logAdminEvent("email_change", `Beheerder wijzigde eigen e-mailadres: ${user.email} → ${updated.email}`, updated.email);
+  }
+
   return NextResponse.json({ user: updated });
 }

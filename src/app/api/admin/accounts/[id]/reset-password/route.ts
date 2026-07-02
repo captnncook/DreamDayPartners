@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { sendMail, adminPasswordResetEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
+import { logAdminEvent } from "@/lib/adminEvent";
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await getSession();
@@ -30,6 +31,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   const tpl = adminPasswordResetEmail(resetUrl);
   await sendMail({ to: target.email, subject: tpl.subject, html: tpl.html });
+  await logAdminEvent("password_reset", `Beheerder stuurde wachtwoordreset naar ${target.name}`, target.email);
 
   return NextResponse.json({ ok: true });
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
 import { sendMail, claimWelcomeEmail } from "@/lib/mail";
+import { logAdminEvent } from "@/lib/adminEvent";
 import bcrypt from "bcryptjs";
 
 const MAX_ATTEMPTS = 10;
@@ -65,13 +66,14 @@ export async function POST(req: NextRequest) {
 
   await prisma.$transaction([
     prisma.vendor.update({ where: { id: request.vendorId }, data: { userId: user.id, email: request.email } }),
-    prisma.vendorClaimRequest.update({ where: { id: request.id }, data: { status: "completed", token: null } }),
+    prisma.vendorClaimRequest.update({ where: { id: request.id }, data: { status: "completed", token: null, completedAt: new Date() } }),
   ]);
 
   await setSession(user.id);
 
   const welcome = claimWelcomeEmail(request.vendor.name);
   await sendMail({ to: request.email, subject: welcome.subject, html: welcome.html });
+  await logAdminEvent("account_created", `${request.vendor.name} heeft het profiel geactiveerd`, request.email);
 
   return NextResponse.json({ ok: true, redirect: "/leveranciers/mijn-profiel" });
 }

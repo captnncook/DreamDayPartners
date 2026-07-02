@@ -39,6 +39,7 @@ type Vendor = {
   latitude?: number | null;
   longitude?: number | null;
   priceFrom?: number | null;
+  specializations?: string[];
 };
 
 function LeveranciersContent() {
@@ -267,7 +268,14 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
         {meta && <div className="vcat-meta">{meta}</div>}
       </div>
 
-      <div className="vcat-desc">{vendor.description ?? ""}</div>
+      <div className="vcat-desc">
+        {vendor.description ?? ""}
+        {vendor.isPremium && vendor.specializations && vendor.specializations.length > 0 && (
+          <div style={{ marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--gold-deep)" }}>
+            {vendor.specializations.join(" · ")}
+          </div>
+        )}
+      </div>
 
       <div className="vcat-price">
         {vendor.priceFrom != null ? (

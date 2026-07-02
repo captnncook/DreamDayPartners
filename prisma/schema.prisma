@@ -22,6 +22,8 @@ model User {
   isPremium            Boolean  @default(false)
   stripeCustomerId     String?
   stripeSubscriptionId String?
+  loginCount           Int      @default(0)
+  lastLoginAt          DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -144,6 +146,7 @@ model Vendor {
   priceUnit       String?
   specializations String[]
   busyDates       String[]
+  viewCount       Int      @default(0)
   createdAt       DateTime @default(now())
 
   weddingVendors   WeddingVendor[]
@@ -181,6 +184,7 @@ model VendorClaimRequest {
   attempts    Int       @default(0)
   createdAt   DateTime  @default(now())
   decidedAt   DateTime?
+  completedAt DateTime?
 
   vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
@@ -495,4 +499,14 @@ model Notification {
   wedding Wedding? @relation(fields: [weddingId], references: [id], onDelete: SetNull)
 
   @@map("notifications")
+}
+
+model AdminEvent {
+  id          String   @id @default(uuid())
+  type        String   // password_reset | email_change | vendor_type_change | claim_approved | claim_rejected | claim_reminder | account_created | error
+  message     String
+  targetEmail String?
+  createdAt   DateTime @default(now())
+
+  @@map("admin_events")
 }

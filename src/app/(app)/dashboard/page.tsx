@@ -16,11 +16,9 @@ export default async function DashboardPage() {
   let weddings: Awaited<ReturnType<typeof prisma.wedding.findMany>>;
 
   if (user.role === "admin") {
-    weddings = await prisma.wedding.findMany({
-      include: { owner: true, teamMembers: { include: { user: true } } },
-      orderBy: { date: "asc" },
-      take: 10,
-    });
+    // Admin-dashboard draait om accountverzoeken en platformactiviteit, niet om bruiloften
+    // (die staan in de sidebar onder "Bruiloften").
+    weddings = [];
   } else if (user.role === "vendor") {
     weddings = await prisma.wedding.findMany({
       where: { vendors: { some: { vendor: { userId: user.id }, portalAccess: true } } },
