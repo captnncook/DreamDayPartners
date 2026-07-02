@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import BulkVendorImport from "./BulkVendorImport";
 import GeocodeVendors from "./GeocodeVendors";
+import DangerReset from "./DangerReset";
 
 export default async function AdminPage() {
   const user = await getSession();
@@ -39,6 +40,7 @@ export default async function AdminPage() {
         <BulkVendorImport />
       </div>
       <GeocodeVendors />
+      <DangerReset />
 
       <div>
         <h2 className="dash-section-title mb-1">Bruiloften</h2>
