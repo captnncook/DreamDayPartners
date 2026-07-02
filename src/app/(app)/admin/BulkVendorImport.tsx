@@ -14,6 +14,7 @@ const CATEGORIES = [
 type ParsedVendor = {
   name: string; category: string; contactPerson: string; email: string;
   phone: string; website: string; city: string; description: string; isPremium: string;
+  imageUrl: string;
 };
 
 // Header-aliassen → veldnaam
@@ -27,6 +28,7 @@ const HEADER_MAP: Record<string, keyof ParsedVendor> = {
   city: "city", stad: "city", plaats: "city", regio: "city",
   description: "description", beschrijving: "description", omschrijving: "description",
   ispremium: "isPremium", premium: "isPremium",
+  foto: "imageUrl", afbeelding: "imageUrl", image: "imageUrl", photo: "imageUrl", imageurl: "imageUrl",
 };
 
 // Eenvoudige CSV-parser met ondersteuning voor quotes, komma's en puntkomma's
@@ -58,7 +60,7 @@ function rowsToVendors(rows: string[][]): { vendors: ParsedVendor[]; unmapped: s
   const header = rows[0].map((h) => h.trim().toLowerCase());
   const fields = header.map((h) => HEADER_MAP[h]);
   const unmapped = header.filter((h, i) => !fields[i]);
-  const empty: ParsedVendor = { name: "", category: "", contactPerson: "", email: "", phone: "", website: "", city: "", description: "", isPremium: "" };
+  const empty: ParsedVendor = { name: "", category: "", contactPerson: "", email: "", phone: "", website: "", city: "", description: "", isPremium: "", imageUrl: "" };
   const vendors = rows.slice(1).map((cells) => {
     const v: ParsedVendor = { ...empty };
     fields.forEach((f, i) => { if (f) v[f] = (cells[i] ?? "").trim(); });
@@ -137,7 +139,7 @@ export default function BulkVendorImport() {
 
       <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
         Upload een CSV-bestand. Excel? Sla op als <strong>CSV (UTF-8)</strong>. Kolommen: <code>naam</code>, <code>categorie</code> (verplicht),
-        en optioneel <code>contactpersoon, email, telefoon, website, stad, beschrijving, premium</code>.
+        en optioneel <code>contactpersoon, email, telefoon, website, stad, beschrijving, premium, foto</code> (link naar profielfoto). Maximaal 2000 rijen per upload.
       </p>
 
       <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: "none" }} onChange={handleFile} />

@@ -12,6 +12,7 @@ type IncomingVendor = {
   city?: string;
   description?: string;
   isPremium?: boolean | string;
+  imageUrl?: string;
 };
 
 const geoCache = new Map<string, { latitude?: number; longitude?: number }>();
@@ -57,8 +58,8 @@ export async function POST(req: NextRequest) {
   if (rows.length === 0) {
     return NextResponse.json({ error: "Geen leveranciers ontvangen" }, { status: 400 });
   }
-  if (rows.length > 1000) {
-    return NextResponse.json({ error: "Maximaal 1000 leveranciers per import" }, { status: 400 });
+  if (rows.length > 2000) {
+    return NextResponse.json({ error: "Maximaal 2000 leveranciers per import" }, { status: 400 });
   }
 
   // Bestaande namen ophalen om dubbele te kunnen overslaan (case-insensitief)
@@ -91,6 +92,8 @@ export async function POST(req: NextRequest) {
   let created = 0;
   for (const { row, data } of toCreate) {
     const geo = await geocodeCity(data.city);
+    const imageUrl = data.imageUrl?.trim();
+    const isValidImage = imageUrl && /^https?:\/\//i.test(imageUrl);
     try {
       await prisma.vendor.create({
         data: {
@@ -104,6 +107,7 @@ export async function POST(req: NextRequest) {
           description: data.description?.trim() || null,
           isPremium: toBool(data.isPremium),
           ...(geo.latitude != null ? { latitude: geo.latitude, longitude: geo.longitude } : {}),
+          ...(isValidImage ? { coverPhoto: imageUrl, photos: [imageUrl] } : {}),
         },
       });
       created++;
