@@ -211,9 +211,9 @@ export default function VendorProfilePage() {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
               {vendor.isPremium && (
-                <span className="ddp-badge badge-champagne mb-2" style={{ display: "inline-flex" }}>Aanbevolen leverancier</span>
+                <span className="mb-2" style={{ display: "inline-block", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold-deep)" }}>Aanbevolen leverancier</span>
               )}
-              <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2.25rem)", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1.1, marginBottom: "0.375rem" }}>
+              <h1 className="font-serif" style={{ fontSize: "clamp(1.5rem, 4vw, 2.25rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)", lineHeight: 1.1, marginBottom: "0.375rem" }}>
                 {vendor.name}
               </h1>
               <div className="flex items-center gap-3 flex-wrap" style={{ fontSize: "0.9rem", color: "var(--muted)" }}>

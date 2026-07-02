@@ -259,7 +259,7 @@ export default function DmPage() {
             return (
               <button key={conv.id} onClick={() => setActiveConvId(conv.id)}
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.875rem 1rem", border: "none", textAlign: "left", cursor: "pointer", background: isActive ? "var(--color-blush-soft)" : "transparent", borderLeft: isActive ? "3px solid var(--primary)" : "3px solid transparent", transition: "background 0.1s" }}>
-                <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, color: "var(--primary)", flexShrink: 0 }}>
+                <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, color: "var(--ink)", flexShrink: 0 }}>
                   {other?.name?.charAt(0) ?? "?"}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>

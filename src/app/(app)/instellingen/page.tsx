@@ -106,7 +106,7 @@ export default function InstellingenPage() {
     <div className="p-8 max-w-xl mx-auto">
       {toast && <Toast msg={toast} onDone={() => setToast("")} />}
 
-      <h1 className="text-2xl font-bold mb-6">Profielinstellingen</h1>
+      <h1 className="font-serif mb-6" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Profielinstellingen</h1>
 
       {/* Account */}
       <div className="ddp-card mb-6">

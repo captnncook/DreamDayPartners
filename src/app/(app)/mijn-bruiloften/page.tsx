@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Trash2, CheckCircle, Clock, ExternalLink } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 type Invite = {
   id: string;
@@ -24,9 +24,9 @@ const VENDOR_STATUS_LABELS: Record<string, string> = {
   invited: "Uitgenodigd", contacted: "Gecontacteerd", interest: "Interesse", completed: "Afgerond", pending: "In behandeling",
 };
 const VENDOR_STATUS_COLORS: Record<string, string> = {
-  lead: "#f59e0b", confirmed: "#16a34a", booked: "#2563eb", quote_received: "#d97706", declined: "#dc2626",
-  interest: "#9ca3af", ready: "#059669", in_progress: "#7c3aed", invited: "#64748b",
-  contacted: "#0891b2", completed: "#2563eb", pending: "#6b7280",
+  lead: "var(--gold-deep)", confirmed: "var(--gold-deep)", booked: "var(--gold-deep)", quote_received: "var(--foreground)",
+  declined: "var(--muted-light)", interest: "var(--muted)", ready: "var(--gold-deep)", in_progress: "var(--foreground)",
+  invited: "var(--muted)", contacted: "var(--muted)", completed: "var(--muted-light)", pending: "var(--muted)",
 };
 
 const INP: React.CSSProperties = {
@@ -100,7 +100,7 @@ export default function MijnBruiloftenPage() {
     <div style={{ maxWidth: "760px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
         <div>
-          <h1 style={{ fontSize: "1.625rem", fontWeight: 700, letterSpacing: "-0.04em" }}>Mijn bruiloften</h1>
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Mijn bruiloften</h1>
           <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>
             Registreer een bruiloft zodat je automatisch wordt gekoppeld zodra het bruidspaar aanmeldt.
           </p>
@@ -116,7 +116,7 @@ export default function MijnBruiloftenPage() {
       </div>
 
       {success && (
-        <div style={{ padding: "0.875rem 1rem", borderRadius: "10px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#15803d", fontSize: "0.875rem", marginBottom: "1rem" }}>
+        <div style={{ padding: "0.875rem 1rem", borderRadius: "0 10px 10px 0", background: "var(--sand)", borderLeft: "3px solid var(--gold)", color: "var(--foreground)", fontSize: "0.875rem", marginBottom: "1rem" }}>
           {success}
         </div>
       )}
@@ -163,20 +163,13 @@ export default function MijnBruiloftenPage() {
 
       {/* Status flow legend */}
       {!loading && invites.length > 0 && (
-        <div style={{ background: "white", border: "1px solid var(--border)", borderRadius: "12px", padding: "0.875rem 1rem", marginBottom: "1rem" }}>
+        <div style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", padding: "0.75rem 0.25rem", marginBottom: "1rem" }}>
           <p style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Statusflow</p>
           <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexWrap: "wrap" }}>
-            {[
-              { label: "Aanvraag", color: "#9ca3af" },
-              { label: "Interesse", color: "#6b7280" },
-              { label: "Lead", color: "#f59e0b" },
-              { label: "Geboekt", color: "#16a34a" },
-              { label: "Afgerond", color: "#2563eb" },
-            ].map(({ label, color }, i, arr) => (
-              <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem" }}>
-                <span style={{ display: "inline-block", width: "8px", height: "8px", borderRadius: "50%", background: color }} />
-                <span style={{ color: "var(--foreground)", fontWeight: 500 }}>{label}</span>
-                {i < arr.length - 1 && <span style={{ color: "var(--muted)", marginLeft: "0.125rem" }}>→</span>}
+            {["Aanvraag", "Interesse", "Lead", "Geboekt", "Afgerond"].map((label, i, arr) => (
+              <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "0.75rem" }}>
+                <span style={{ color: i >= 2 && i <= 3 ? "var(--gold-deep)" : "var(--muted)", fontWeight: 600 }}>{label}</span>
+                {i < arr.length - 1 && <span style={{ color: "var(--muted-light)" }}>·</span>}
               </span>
             ))}
           </div>
@@ -187,27 +180,20 @@ export default function MijnBruiloftenPage() {
       {loading ? (
         <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>Laden…</p>
       ) : invites.length === 0 ? (
-        <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-          <Clock className="w-8 h-8 mx-auto mb-3" style={{ color: "var(--color-rose)" }} />
+        <div className="text-center py-16" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
           <p style={{ fontWeight: 600, marginBottom: "0.5rem" }}>Nog geen bruiloften geregistreerd</p>
           <p style={{ fontSize: "0.875rem" }}>Voeg een bruiloft toe om automatisch gekoppeld te worden zodra het bruidspaar zich aanmeldt.</p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <div style={{ borderTop: "1px solid var(--border)" }}>
           {invites.map(invite => {
             const linked = !!invite.weddingId;
             return (
-              <div key={invite.id} className="ddp-card" style={{ padding: "1rem 1.25rem", cursor: linked ? "pointer" : "default", transition: "box-shadow 0.15s" }}
+              <div key={invite.id} className="dash-row" style={{ cursor: linked ? "pointer" : "default", alignItems: "flex-start" }}
                 onClick={() => { if (linked && invite.weddingId) window.location.href = `/weddings/${invite.weddingId}`; }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-                  <div style={{ marginTop: "2px" }}>
-                    {linked
-                      ? <CheckCircle className="w-5 h-5" style={{ color: "#22c55e" }} />
-                      : <CheckCircle className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                    }
-                  </div>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem", width: "100%" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: "0.9375rem" }}>
+                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "1rem" }}>
                       {invite.weddingTitle ?? formatDate(invite.weddingDate)}
                     </div>
                     <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "2px" }}>
@@ -218,16 +204,16 @@ export default function MijnBruiloftenPage() {
                     )}
                     <div style={{ marginTop: "6px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {linked ? (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.75rem", fontWeight: 600, color: "#16a34a", background: "#f0fdf4", padding: "0.2rem 0.5rem", borderRadius: "6px" }}>
-                          <CheckCircle className="w-3 h-3" /> Bruidspaar gekoppeld
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
+                          Bruidspaar gekoppeld
                         </span>
                       ) : (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", background: "var(--border)", padding: "0.2rem 0.5rem", borderRadius: "6px" }}>
-                          <Clock className="w-3 h-3" /> Bruidspaar nog niet aangemeld
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
+                          Bruidspaar nog niet aangemeld
                         </span>
                       )}
                       {invite.vendorStatus && (
-                        <span style={{ display: "inline-flex", alignItems: "center", fontSize: "0.75rem", fontWeight: 600, padding: "0.2rem 0.5rem", borderRadius: "6px", color: VENDOR_STATUS_COLORS[invite.vendorStatus] ?? "var(--muted)", background: `${VENDOR_STATUS_COLORS[invite.vendorStatus] ?? "#6b7280"}18` }}>
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: VENDOR_STATUS_COLORS[invite.vendorStatus] ?? "var(--muted)" }}>
                           {VENDOR_STATUS_LABELS[invite.vendorStatus] ?? invite.vendorStatus}
                         </span>
                       )}
@@ -237,9 +223,9 @@ export default function MijnBruiloftenPage() {
                     {invite.weddingId && (
                       <Link
                         href={`/weddings/${invite.weddingId}`}
-                        style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.8125rem", color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}
+                        style={{ fontSize: "0.8125rem", color: "var(--gold-deep)", fontWeight: 600, textDecoration: "none" }}
                       >
-                        <ExternalLink className="w-3.5 h-3.5" /> Dashboard
+                        Dashboard
                       </Link>
                     )}
                     <button onClick={() => handleDelete(invite.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: "4px", display: "flex" }}>

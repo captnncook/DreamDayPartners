@@ -38,7 +38,7 @@ export default function VendorAnalyticsPage() {
             style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.875rem", marginBottom: "1.5rem", display: "inline-flex" }}>
             <ArrowLeft className="w-4 h-4" /> Dashboard
           </Link>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white" }}>Analytisch overzicht</h1>
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "white" }}>Analytisch overzicht</h1>
           <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", marginTop: "0.25rem" }}>Jouw prestaties als leverancier</p>
         </div>
       </div>

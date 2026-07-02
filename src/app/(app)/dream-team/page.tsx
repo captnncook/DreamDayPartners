@@ -163,7 +163,7 @@ export default function DreamTeamPage() {
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       <div className="mb-8">
-        <h1 style={{ fontSize: "1.625rem", fontWeight: 700, letterSpacing: "-0.04em" }}>Dream Team</h1>
+        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Dream Team</h1>
         <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "4px" }}>
           Jullie leveranciers per categorie
         </p>
