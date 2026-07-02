@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, ArrowRight, X, LayoutGrid, Map, Plus } from "lucide-react";
+import { Search, MapPin, ArrowRight, X, LayoutGrid, Map } from "lucide-react";
 
 const VendorMap = lazy(() => import("@/components/VendorMap"));
 
@@ -140,15 +140,6 @@ function LeveranciersContent() {
                 style={{ padding: "0.75rem 1.25rem", fontSize: "0.875rem" }}
               >
                 <X className="w-3.5 h-3.5" /> Alles wissen
-              </button>
-            )}
-            {isAdmin && (
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="ddp-btn-primary flex items-center gap-1.5"
-                style={{ padding: "0.75rem 1.25rem", fontSize: "0.875rem" }}
-              >
-                <Plus className="w-4 h-4" /> Leverancier toevoegen
               </button>
             )}
           </div>

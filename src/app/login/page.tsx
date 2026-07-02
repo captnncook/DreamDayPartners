@@ -94,9 +94,9 @@ export default function LoginPage() {
     >
       {/* Logo linksboven — terug naar home */}
       <Link href="/" className="fixed top-4 left-5 md:left-10 inline-flex items-center gap-2 z-20" style={{ textDecoration: "none" }}>
-        <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
+        <Image src="/images/logo.svg" alt="DreamDay Platform" width={28} height={28} />
         <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-          DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
+          DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
         </span>
       </Link>
 
@@ -114,10 +114,10 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3 mb-3">
-            <Image src="/images/logo.svg" alt="DreamDay Partners" width={48} height={48} />
+            <Image src="/images/logo.svg" alt="DreamDay Platform" width={48} height={48} />
             <div className="text-left">
               <div className="font-serif text-xl font-bold" style={{ color: "var(--foreground)" }}>DreamDay</div>
-              <div className="text-sm font-medium" style={{ color: "var(--primary)" }}>Partners</div>
+              <div className="text-sm font-medium" style={{ color: "var(--primary)" }}>Platform</div>
             </div>
           </Link>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
