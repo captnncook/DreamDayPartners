@@ -200,13 +200,12 @@ export default function AccountsPage() {
 
       {/* Filters */}
       <div className="flex gap-3 mb-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--muted)" }} />
+        <div className="ddp-search flex-1">
+          <Search />
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
             placeholder="Zoeken op naam of e-mail…"
-            className="ddp-input w-full pl-9"
           />
         </div>
         <select

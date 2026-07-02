@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, ArrowRight, X, LayoutGrid, Map } from "lucide-react";
+import { Search, X, LayoutGrid, Map } from "lucide-react";
 
 const VendorMap = lazy(() => import("@/components/VendorMap"));
 
@@ -48,10 +48,8 @@ function LeveranciersContent() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(searchParams.get("category") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [view, setView] = useState<"grid" | "map">("grid");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [view, setView] = useState<"list" | "map">("list");
   const [loggedIn, setLoggedIn] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350);
@@ -61,7 +59,7 @@ function LeveranciersContent() {
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { setIsAdmin(d?.user?.role === "admin"); setLoggedIn(Boolean(d?.user)); })
+      .then((d) => setLoggedIn(Boolean(d?.user)))
       .catch(() => {});
   }, []);
 
@@ -80,9 +78,12 @@ function LeveranciersContent() {
 
   const hasFilter = !!category || !!search;
 
+  // Premium eerst binnen elke categorie
+  const sorted = [...vendors].sort((a, b) => Number(b.isPremium) - Number(a.isPremium));
+
   const grouped = category
-    ? { [category]: vendors }
-    : vendors.reduce<Record<string, Vendor[]>>((acc, v) => {
+    ? { [category]: sorted }
+    : sorted.reduce<Record<string, Vendor[]>>((acc, v) => {
         (acc[v.category] = acc[v.category] ?? []).push(v);
         return acc;
       }, {});
@@ -91,53 +92,53 @@ function LeveranciersContent() {
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
 
       {/* ── Hero ─────────────────────────────────────── */}
-      <div style={{ background: "var(--color-cream)", borderBottom: "1px solid var(--border)", padding: "3rem 1.25rem 2.5rem" }}>
+      <div style={{ background: "var(--ink)", padding: "1.5rem 1.25rem 2.5rem" }}>
         <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
 
-          {/* Top bar: logo linksboven + Profiel/Inloggen rechtsboven */}
-          <div className="flex items-center justify-between mb-6">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
-              <Image src="/images/logo.svg" alt="" width={22} height={22} />
-              <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-                DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
+          {/* Top bar */}
+          <div className="flex items-center justify-between mb-8" style={{ gap: "0.75rem" }}>
+            <Link href="/" className="inline-flex items-center gap-2" style={{ minWidth: 0 }}>
+              <Image src="/images/logo-wit.svg" alt="" width={24} height={24} style={{ flexShrink: 0 }} />
+              <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.02em", color: "var(--ink-text)", whiteSpace: "nowrap" }}>
+                DreamDay<span style={{ color: "var(--gold)" }}> Platform</span>
               </span>
             </Link>
             {loggedIn ? (
-              <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+              <Link href="/dashboard" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.45rem 1.125rem", borderRadius: "var(--radius-full)", whiteSpace: "nowrap", flexShrink: 0 }}>
                 Profiel
               </Link>
             ) : (
-              <Link href="/login" className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
+              <Link href="/login" style={{ color: "var(--ink-text)", fontSize: "0.8125rem", fontWeight: 600, padding: "0.45rem 0.875rem", whiteSpace: "nowrap", flexShrink: 0 }}>
                 Inloggen
               </Link>
             )}
           </div>
 
-          <p className="ddp-section-label mb-2">Leveranciersoverzicht</p>
-          <h1 className="font-serif" style={{ fontSize: "clamp(1.75rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.1, color: "var(--foreground)", marginBottom: "0.75rem" }}>
-            Vind leveranciers die passen<br className="hidden md:block" /> bij jullie dag
+          <p className="ddp-section-label mb-2" style={{ color: "var(--gold)" }}>Leveranciersoverzicht</p>
+          <h1 className="font-serif" style={{ fontSize: "clamp(1.625rem, 5vw, 2.75rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.12, color: "var(--ink-text)", marginBottom: "0.625rem" }}>
+            Vind leveranciers die passen bij jullie dag
           </h1>
-          <p style={{ fontSize: "1rem", color: "var(--muted)", maxWidth: "460px", lineHeight: 1.65 }}>
-            Vergelijk fotografen, bloemisten, locaties en cateraars in één handig overzicht.
+          <p style={{ fontSize: "0.9375rem", color: "var(--ink-muted)", maxWidth: "440px", lineHeight: 1.6 }}>
+            Vergelijk fotografen, bloemisten, locaties en cateraars in één overzicht.
           </p>
 
           {/* Search bar */}
-          <div className="flex gap-3 mt-6 flex-wrap">
-            <div style={{ position: "relative", flex: "1 1 260px", maxWidth: "420px" }}>
-              <Search className="w-4 h-4" style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", color: "var(--muted-light)", pointerEvents: "none" }} />
+          <div className="flex gap-3 mt-6 flex-wrap items-center">
+            <div className="ddp-search" style={{ flex: "1 1 240px", maxWidth: "420px" }}>
+              <Search />
               <input
                 type="text"
                 placeholder="Zoek op naam of stad…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ width: "100%", paddingLeft: "2.75rem", paddingRight: "1rem", paddingTop: "0.75rem", paddingBottom: "0.75rem", border: "1px solid var(--border)", borderRadius: "var(--radius-full)", fontSize: "0.9375rem", outline: "none", background: "white", color: "var(--foreground)", boxShadow: "var(--shadow-sm)" }}
+                style={{ padding: "0.7rem 1rem 0.7rem 2.5rem", fontSize: "0.9375rem", border: "none" }}
               />
             </div>
             {hasFilter && (
               <button
                 onClick={() => { setSearch(""); setCategory(""); }}
-                className="ddp-btn-secondary flex items-center gap-1.5"
-                style={{ padding: "0.75rem 1.25rem", fontSize: "0.875rem" }}
+                className="flex items-center gap-1.5"
+                style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", borderRadius: "var(--radius-full)", padding: "0.6rem 1.125rem", fontSize: "0.8125rem", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}
               >
                 <X className="w-3.5 h-3.5" /> Alles wissen
               </button>
@@ -147,12 +148,9 @@ function LeveranciersContent() {
       </div>
 
       {/* ── Category chips ───────────────────────────── */}
-      <div style={{ background: "white", borderBottom: "1px solid var(--border)", padding: "1rem 1.25rem" }}>
+      <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "0.875rem 1.25rem" }}>
         <div style={{ maxWidth: "1040px", margin: "0 auto", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-          <button
-            onClick={() => setCategory("")}
-            className={`ddp-chip${!category ? " active" : ""}`}
-          >
+          <button onClick={() => setCategory("")} className={`ddp-chip${!category ? " active" : ""}`}>
             Alles
           </button>
           {CATEGORIES.map((c) => (
@@ -168,32 +166,31 @@ function LeveranciersContent() {
       </div>
 
       {/* ── Results ──────────────────────────────────── */}
-      <div style={{ maxWidth: "1040px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
+      <div style={{ maxWidth: "1040px", margin: "0 auto", padding: "1.75rem 1.25rem 4rem" }}>
 
         {/* Results header */}
         {!loading && vendors.length > 0 && (
-          <div className="flex items-center justify-between mb-5" style={{ gap: "0.75rem" }}>
+          <div className="flex items-center justify-between mb-4" style={{ gap: "0.75rem" }}>
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", minWidth: 0 }}>
               <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{vendors.length}</span>{" "}
-              leverancier{vendors.length !== 1 ? "s" : ""} gevonden
+              leverancier{vendors.length !== 1 ? "s" : ""}
               {category && ` · ${CATEGORY_MAP[category] ?? category}`}
             </p>
-            <div className="flex items-center gap-2 flex-shrink-0">
-
-              <div style={{ display: "flex", flexDirection: "row", border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
-                <button
-                  onClick={() => setView("grid")}
-                  style={{ padding: "0.375rem 0.625rem", background: view === "grid" ? "var(--color-charcoal)" : "transparent", color: view === "grid" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setView("map")}
-                  style={{ padding: "0.375rem 0.625rem", background: view === "map" ? "var(--color-charcoal)" : "transparent", color: view === "map" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
-                >
-                  <Map className="w-3.5 h-3.5" />
-                </button>
-              </div>
+            <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", overflow: "hidden", flexShrink: 0 }}>
+              <button
+                onClick={() => setView("list")}
+                aria-label="Lijstweergave"
+                style={{ padding: "0.4rem 0.7rem", background: view === "list" ? "var(--ink)" : "transparent", color: view === "list" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setView("map")}
+                aria-label="Kaartweergave"
+                style={{ padding: "0.4rem 0.7rem", background: view === "map" ? "var(--ink)" : "transparent", color: view === "map" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
+              >
+                <Map className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         )}
@@ -204,8 +201,7 @@ function LeveranciersContent() {
           </div>
         ) : vendors.length === 0 ? (
           <div style={{ textAlign: "center", padding: "5rem 0" }}>
-            <Search className="w-8 h-8 mx-auto mb-3" style={{ color: "var(--muted)", opacity: 0.4 }} />
-            <h3 style={{ fontWeight: 700, fontSize: "1.125rem", marginBottom: "0.5rem" }}>Geen leveranciers gevonden</h3>
+            <h3 className="font-serif" style={{ fontWeight: 700, fontSize: "1.25rem", marginBottom: "0.5rem", color: "var(--foreground)" }}>Geen leveranciers gevonden</h3>
             <p style={{ fontSize: "0.9375rem", color: "var(--muted)", marginBottom: "1.5rem" }}>
               Pas je filters aan of zoek op een andere naam.
             </p>
@@ -215,7 +211,7 @@ function LeveranciersContent() {
           </div>
         ) : view === "map" ? (
           <Suspense fallback={
-            <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-blush-soft)", borderRadius: "var(--radius-lg)" }}>
+            <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--sand)", borderRadius: "var(--radius-lg)" }}>
               <p style={{ color: "var(--muted)" }}>Kaart laden…</p>
             </div>
           }>
@@ -223,235 +219,64 @@ function LeveranciersContent() {
           </Suspense>
         ) : (
           Object.entries(grouped).map(([cat, items]) => (
-            <div key={cat} style={{ marginBottom: "3rem" }}>
+            <section key={cat} style={{ marginBottom: "2.5rem" }}>
               {!category && (
-                <div className="flex items-center gap-3 mb-4">
-                  <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)" }}>
+                <div className="flex items-baseline gap-2.5 mb-1" style={{ padding: "0 0.75rem" }}>
+                  <h2 className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>
                     {CATEGORY_MAP[cat] ?? cat}
                   </h2>
-                  <span style={{ fontSize: "0.8125rem", color: "var(--muted)", background: "rgba(31,36,40,0.05)", borderRadius: "var(--radius-full)", padding: "0.15rem 0.625rem" }}>
-                    {items.length}
-                  </span>
+                  <span style={{ fontSize: "0.8125rem", color: "var(--muted-light)" }}>{items.length}</span>
                 </div>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {items.map((v) => <SupplierCard key={v.id} vendor={v} />)}
+              <div style={{ borderTop: "1px solid var(--border)" }}>
+                {items.map((v) => <VendorRow key={v.id} vendor={v} showCategory={!!category} />)}
               </div>
-            </div>
+            </section>
           ))
         )}
       </div>
-
-      {isAdmin && showAddForm && (
-        <AddVendorModal onClose={() => setShowAddForm(false)} oncreated={() => { setShowAddForm(false); load(); }} />
-      )}
     </div>
   );
 }
 
-function SupplierCard({ vendor }: { vendor: Vendor }) {
+function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boolean }) {
   const catLabel = CATEGORY_MAP[vendor.category] ?? vendor.category;
+  const meta = [vendor.city, showCategory ? catLabel : null].filter(Boolean).join(" · ");
+  const initials = vendor.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
   return (
-    <Link href={`/leveranciers/${vendor.id}`} style={{ textDecoration: "none", display: "flex", flexDirection: "column", height: "100%" }}>
-      <div
-        style={{
-          background: "white",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          overflow: "hidden",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
-          cursor: "pointer",
-        }}
-        onMouseEnter={(e) => {
-          const el = e.currentTarget as HTMLDivElement;
-          el.style.transform = "translateY(-2px)";
-          el.style.boxShadow = "0 14px 36px rgba(31,36,40,0.08)";
-          el.style.borderColor = "#DDD1C4";
-        }}
-        onMouseLeave={(e) => {
-          const el = e.currentTarget as HTMLDivElement;
-          el.style.transform = "translateY(0)";
-          el.style.boxShadow = "none";
-          el.style.borderColor = "var(--border)";
-        }}
-      >
-        {/* Image area — 4:3 */}
-        <div style={{ aspectRatio: "4/3", background: "var(--color-blush-soft)", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-          {vendor.coverPhotoUrl ? (
-            <Image src={vendor.coverPhotoUrl} alt={vendor.name} fill style={{ objectFit: "cover" }} />
-          ) : (
-            <span style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{catLabel}</span>
-          )}
-          {vendor.isPremium ? (
-            <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", background: "var(--color-champagne)", color: "#7a5c1a", borderRadius: "var(--radius-full)", padding: "0.2rem 0.75rem", fontSize: "0.625rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              Aanbevolen
-            </div>
-          ) : null}
-        </div>
+    <Link href={`/leveranciers/${vendor.id}`} className={`vcat-row${vendor.isPremium ? " premium" : ""}`}>
+      <div className="vcat-photo">
+        {vendor.coverPhotoUrl ? (
+          <Image src={vendor.coverPhotoUrl} alt={vendor.name} fill sizes="84px" style={{ objectFit: "cover" }} />
+        ) : (
+          <span className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--muted-light)" }}>{initials}</span>
+        )}
+      </div>
 
-        {/* Body */}
-        <div style={{ padding: "1.125rem 1.25rem 1.375rem", flex: 1, display: "flex", flexDirection: "column" }}>
-          {/* Category */}
-          <p style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted-light)", marginBottom: "0.3rem" }}>
-            {catLabel}
-          </p>
-
-          {/* Name */}
-          <h3 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "0.375rem", lineHeight: 1.25 }}>
-            {vendor.name}
-          </h3>
-
-          {/* Location */}
-          {vendor.city && (
-            <div className="flex items-center gap-1 mb-2" style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
-              <MapPin className="w-3 h-3 flex-shrink-0" />
-              <span>{vendor.city}</span>
-            </div>
-          )}
-
-          {/* Description */}
-          {vendor.description && (
-            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", lineHeight: 1.6, flex: 1, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", marginBottom: "0.875rem" }}>
-              {vendor.description}
-            </p>
-          )}
-
-          <div style={{ flex: 1 }} />
-
-          {/* Footer: prijs links, pijltje rechts */}
-          <div className="flex items-end justify-between mt-3 pt-3" style={{ borderTop: "1px solid var(--border)" }}>
-            <div style={{ minWidth: 0 }}>
-              {vendor.priceFrom != null ? (
-                <>
-                  <div style={{ fontSize: "0.625rem", color: "var(--muted-light)", textTransform: "uppercase", letterSpacing: "0.06em" }}>vanaf</div>
-                  <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
-                    €{vendor.priceFrom.toLocaleString("nl-NL")}
-                  </div>
-                </>
-              ) : (
-                <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Op aanvraag</span>
-              )}
-            </div>
-            <span
-              style={{
-                width: "32px", height: "32px", borderRadius: "var(--radius-full)", flexShrink: 0,
-                background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center",
-              }}
-            >
-              <ArrowRight className="w-4 h-4" style={{ color: "var(--color-charcoal)" }} />
-            </span>
+      <div style={{ minWidth: 0 }}>
+        {vendor.isPremium && (
+          <div style={{ fontSize: "0.625rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold-deep)", marginBottom: "1px" }}>
+            Aanbevolen
           </div>
-        </div>
+        )}
+        <div className="vcat-name">{vendor.name}</div>
+        {meta && <div className="vcat-meta">{meta}</div>}
+      </div>
+
+      <div className="vcat-desc">{vendor.description ?? ""}</div>
+
+      <div className="vcat-price">
+        {vendor.priceFrom != null ? (
+          <>
+            <div className="label">vanaf</div>
+            <div className="amount">€{vendor.priceFrom.toLocaleString("nl-NL")}</div>
+          </>
+        ) : (
+          <div className="label" style={{ fontSize: "0.6875rem" }}>Op aanvraag</div>
+        )}
       </div>
     </Link>
-  );
-}
-
-function AddVendorModal({ onClose, oncreated }: { onClose: () => void; oncreated: () => void }) {
-  const [form, setForm] = useState({
-    name: "", category: "", contactPerson: "", email: "", phone: "",
-    website: "", city: "", description: "", priceFrom: "", isPremium: false,
-  });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-
-  function upd(key: keyof typeof form, value: string | boolean) {
-    setForm((p) => ({ ...p, [key]: value }));
-  }
-
-  async function submit() {
-    if (!form.name || !form.category) { setError("Naam en categorie zijn verplicht"); return; }
-    setSaving(true);
-    setError("");
-    const res = await fetch("/api/catalogus", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    if (!res.ok) {
-      const d = await res.json().catch(() => ({}));
-      setError(d.error ?? "Er ging iets mis");
-      setSaving(false);
-      return;
-    }
-    oncreated();
-  }
-
-  return (
-    <div
-      onClick={onClose}
-      style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "5vh 1rem", overflowY: "auto" }}
-    >
-      <div onClick={(e) => e.stopPropagation()} style={{ background: "white", borderRadius: "var(--radius-lg)", maxWidth: "520px", width: "100%", padding: "1.75rem" }}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em" }}>Leverancier toevoegen</h2>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)" }}>
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Naam *</label>
-              <input className="ddp-input" value={form.name} onChange={(e) => upd("name", e.target.value)} placeholder="Bedrijfsnaam" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Categorie *</label>
-              <select className="ddp-input" value={form.category} onChange={(e) => upd("category", e.target.value)}>
-                <option value="">Kies…</option>
-                {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Plaats</label>
-              <input className="ddp-input" value={form.city} onChange={(e) => upd("city", e.target.value)} placeholder="bijv. Utrecht" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Prijs vanaf (€)</label>
-              <input className="ddp-input" type="number" value={form.priceFrom} onChange={(e) => upd("priceFrom", e.target.value)} placeholder="bijv. 1500" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Contactpersoon</label>
-              <input className="ddp-input" value={form.contactPerson} onChange={(e) => upd("contactPerson", e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Telefoon</label>
-              <input className="ddp-input" value={form.phone} onChange={(e) => upd("phone", e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">E-mail</label>
-              <input className="ddp-input" type="email" value={form.email} onChange={(e) => upd("email", e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Website</label>
-              <input className="ddp-input" value={form.website} onChange={(e) => upd("website", e.target.value)} placeholder="https://…" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1.5">Omschrijving</label>
-            <textarea className="ddp-input resize-none" rows={3} value={form.description} onChange={(e) => upd("description", e.target.value)} />
-          </div>
-          <label className="flex items-center gap-2 text-sm" style={{ cursor: "pointer" }}>
-            <input type="checkbox" checked={form.isPremium} onChange={(e) => upd("isPremium", e.target.checked)} />
-            Premium leverancier
-          </label>
-
-          {error && <p style={{ fontSize: "0.8125rem", color: "var(--danger)" }}>{error}</p>}
-
-          <div className="flex gap-3 pt-2">
-            <button onClick={onClose} className="ddp-btn-secondary flex-1">Annuleren</button>
-            <button onClick={submit} disabled={saving} className="ddp-btn-primary flex-1">
-              {saving ? "Opslaan…" : "Toevoegen"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
