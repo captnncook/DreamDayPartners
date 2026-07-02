@@ -19,9 +19,9 @@ const ROLE_LABELS: Record<string, string> = {
   vendor: "Leverancier", team_member: "Teamlid",
 };
 
-const ROLE_BADGE: Record<string, string> = {
-  admin: "badge-danger", planner: "badge-info", couple: "badge-warning",
-  vendor: "badge-neutral", team_member: "badge-neutral",
+const ROLE_COLOR: Record<string, string> = {
+  admin: "var(--gold-deep)", planner: "var(--foreground)", couple: "var(--muted)",
+  vendor: "var(--muted)", team_member: "var(--muted)",
 };
 
 export default function AccountsPage() {
@@ -142,7 +142,7 @@ export default function AccountsPage() {
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Accountbeheer</h1>
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Accountbeheer</h1>
           <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>{users.length} accounts gevonden</p>
         </div>
         <button
@@ -222,8 +222,8 @@ export default function AccountsPage() {
       </div>
 
       {/* Table */}
-      <div className="ddp-card p-0 overflow-hidden">
-        <table className="w-full text-sm">
+      <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflowX: "auto" }}>
+        <table className="w-full text-sm" style={{ minWidth: "720px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
               {["Naam", "E-mail", "Rol", "Premium", "Aangemaakt", "Acties"].map(h => (
@@ -266,11 +266,11 @@ export default function AccountsPage() {
                   {feedback[u.id] && <span className="text-xs block mt-0.5" style={{ color: feedback[u.id].startsWith("✓") ? "var(--success)" : "var(--danger)" }}>{feedback[u.id]}</span>}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`ddp-badge ${ROLE_BADGE[u.role] ?? "badge-neutral"}`}>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: ROLE_COLOR[u.role] ?? "var(--muted)" }}>
                     {ROLE_LABELS[u.role] ?? u.role}
                   </span>
                   {u.role === "vendor" && u.vendorType && (
-                    <span className="ddp-badge badge-neutral ml-1 text-xs">{u.vendorType}</span>
+                    <span className="capitalize" style={{ fontSize: "0.6875rem", color: "var(--muted-light)", marginLeft: "0.5rem" }}>{u.vendorType}</span>
                   )}
                 </td>
                 <td className="px-4 py-3">

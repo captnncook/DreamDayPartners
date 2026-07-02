@@ -1,7 +1,6 @@
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Users, Heart, Handshake } from "lucide-react";
 import BulkVendorImport from "./BulkVendorImport";
 import ClaimRequests from "./ClaimRequests";
 import GeocodeVendors from "./GeocodeVendors";
@@ -20,25 +19,24 @@ export default async function AdminPage() {
     orderBy: { date: "asc" },
   });
 
-  const roleColors: Record<string, string> = { admin: "badge-danger", planner: "badge-info", couple: "badge-success", vendor: "badge-warning", team_member: "badge-neutral" };
   const roleLabels: Record<string, string> = { admin: "Admin", planner: "Planner", couple: "Bruidspaar", vendor: "Leverancier", team_member: "Teamlid" };
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-8">Platform Beheer</h1>
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        {([
-          { Icon: Users, val: userCount, label: "Gebruikers" },
-          { Icon: Heart, val: weddingCount, label: "Bruiloften" },
-          { Icon: Handshake, val: vendorCount, label: "Leveranciers" },
-        ] as const).map(({ Icon, val, label }) => (
-          <div key={label} className="ddp-card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
-              <Icon className="w-6 h-6" style={{ color: "var(--primary)" }} />
+      <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Platform Beheer</h1>
+        <div className="flex gap-6">
+          {[
+            { val: userCount, label: "Gebruikers" },
+            { val: weddingCount, label: "Bruiloften" },
+            { val: vendorCount, label: "Leveranciers" },
+          ].map(({ val, label }) => (
+            <div key={label} style={{ textAlign: "right" }}>
+              <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{val}</span>
+              <span style={{ display: "block", fontSize: "0.625rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{label}</span>
             </div>
-            <div><div className="text-3xl font-bold">{val}</div><div className="text-xs" style={{ color: "var(--muted)" }}>{label}</div></div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       <ClaimRequests />
 
@@ -46,20 +44,28 @@ export default async function AdminPage() {
         <BulkVendorImport />
       </div>
       <GeocodeVendors />
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h2 className="font-semibold mb-4">Gebruikers</h2>
-          <div className="ddp-card p-0 overflow-hidden">
-            <table className="w-full">
-              <thead><tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
-                {["Naam","Rol","Premium"].map((h) => <th key={h} className="text-xs font-semibold text-left px-4 py-3" style={{ color: "var(--muted)" }}>{h}</th>)}
-              </tr></thead>
+          <h2 className="dash-section-title mb-1">Gebruikers</h2>
+          <div style={{ borderTop: "1px solid var(--border)", overflowX: "auto" }}>
+            <table className="w-full" style={{ minWidth: "360px" }}>
               <tbody>
-                {users.map((u, i) => (
-                  <tr key={u.id} style={{ borderBottom: i < users.length - 1 ? "1px solid var(--border)" : undefined }}>
-                    <td className="px-4 py-3"><div className="text-sm font-medium">{u.name}</div><div className="text-xs" style={{ color: "var(--muted)" }}>{u.email}</div></td>
-                    <td className="px-4 py-3"><span className={`ddp-badge ${roleColors[u.role] ?? "badge-neutral"}`}>{roleLabels[u.role] ?? u.role}</span></td>
-                    <td className="px-4 py-3">{u.isPremium ? <span className="ddp-badge badge-premium">Premium</span> : <span className="text-xs" style={{ color: "var(--muted)" }}>Gratis</span>}</td>
+                {users.map((u) => (
+                  <tr key={u.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                    <td className="px-1 py-3">
+                      <div className="text-sm font-medium">{u.name}</div>
+                      <div className="text-xs" style={{ color: "var(--muted)" }}>{u.email}</div>
+                    </td>
+                    <td className="px-1 py-3">
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: u.role === "admin" ? "var(--gold-deep)" : "var(--muted)" }}>
+                        {roleLabels[u.role] ?? u.role}
+                      </span>
+                    </td>
+                    <td className="px-1 py-3 text-right">
+                      {u.isPremium
+                        ? <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Premium</span>
+                        : <span className="text-xs" style={{ color: "var(--muted-light)" }}>Gratis</span>}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -67,18 +73,23 @@ export default async function AdminPage() {
           </div>
         </div>
         <div>
-          <h2 className="font-semibold mb-4">Bruiloften</h2>
-          <div className="space-y-2">
+          <h2 className="dash-section-title mb-1">Bruiloften</h2>
+          <div style={{ borderTop: "1px solid var(--border)" }}>
             {weddings.map((w) => (
-              <div key={w.id} className="ddp-card p-3 flex items-center gap-3">
+              <div key={w.id} className="dash-row">
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">{w.title}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{w.weddingCode} · {w.owner.name}</div>
+                  <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{w.title}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
+                    {w.weddingCode} · {w.owner.name}
+                    {w.isPremium && (
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)", marginLeft: "0.5rem" }}>Premium</span>
+                    )}
+                  </div>
                 </div>
-                <div className="text-xs text-right" style={{ color: "var(--muted)" }}>
-                  <div>{w._count.guests} gasten</div><div>{w._count.vendors} leveranciers</div>
+                <div className="text-xs text-right flex-shrink-0" style={{ color: "var(--muted)" }}>
+                  <div>{w._count.guests} gasten</div>
+                  <div>{w._count.vendors} leveranciers</div>
                 </div>
-                {w.isPremium && <span className="ddp-badge badge-premium">Premium</span>}
               </div>
             ))}
           </div>

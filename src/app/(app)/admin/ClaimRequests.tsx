@@ -36,8 +36,8 @@ export default function ClaimRequests() {
   const pending = requests.filter((r) => r.status === "pending");
   const others = requests.filter((r) => r.status !== "pending");
 
-  const statusBadge: Record<string, string> = {
-    pending: "badge-warning", approved: "badge-info", completed: "badge-success", rejected: "badge-danger",
+  const statusColor: Record<string, string> = {
+    pending: "var(--gold-deep)", approved: "var(--foreground)", completed: "var(--muted)", rejected: "var(--muted-light)",
   };
   const statusLabel: Record<string, string> = {
     pending: "In afwachting", approved: "Goedgekeurd (wacht op activatie)", completed: "Geactiveerd", rejected: "Afgewezen",
@@ -56,7 +56,7 @@ export default function ClaimRequests() {
       {pending.length > 0 && (
         <div className="space-y-2 mb-4">
           {pending.map((r) => (
-            <div key={r.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)" }}>
+            <div key={r.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0" }}>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium truncate">{r.vendor.name}</div>
                 <div className="text-xs" style={{ color: "var(--muted)" }}>{r.email} · {r.vendor.category}{r.vendor.city ? ` · ${r.vendor.city}` : ""}</div>
@@ -97,7 +97,7 @@ export default function ClaimRequests() {
                 <td className="px-2 py-2 text-sm">{r.vendor.name}</td>
                 <td className="px-2 py-2 text-xs" style={{ color: "var(--muted)" }}>{r.email}</td>
                 <td className="px-2 py-2">
-                  <span className={`ddp-badge ${statusBadge[r.status] ?? "badge-neutral"}`}>{statusLabel[r.status] ?? r.status}</span>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor[r.status] ?? "var(--muted)" }}>{statusLabel[r.status] ?? r.status}</span>
                 </td>
               </tr>
             ))}
