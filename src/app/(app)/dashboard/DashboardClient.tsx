@@ -175,17 +175,6 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
         </section>
       ))}
 
-      {/* Leverancier: analytics link */}
-      {user.role === "vendor" && (
-        <Link href="/leveranciers/analytics" className="dash-row mb-4" style={{ display: "flex", borderTop: "1px solid var(--border)" }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground)" }}>Analytisch overzicht</div>
-            <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Jouw bruiloften per maand, omzet en meer</div>
-          </div>
-          <ChevronRight className="w-4 h-4" style={{ color: "var(--muted)", flexShrink: 0 }} />
-        </Link>
-      )}
-
       {/* Signature-element: eerstvolgende bruiloft */}
       {heroWedding && <NextWeddingHero wedding={heroWedding} />}
 

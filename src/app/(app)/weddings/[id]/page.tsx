@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import VendorDashboardInline from "@/components/VendorDashboardInline";
+import VendorNotesEditor from "@/components/VendorNotesEditor";
 import TabNav from "./TabNav";
 import { getServerLang } from "@/lib/server-lang";
 
@@ -96,12 +97,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
   const draaiboek = wedding.draaiboeken[0] ?? null;
 
   const statusLabels = tw.statusLabels;
-  const vendorStatusLabels = tw.vendorStatusLabels;
-  // Typografisch statussysteem: goud voor actief/positief, muted voor de rest
-  const vendorStatusColor = (status: string) =>
-    ["confirmed", "booked", "ready", "completed"].includes(status) ? "var(--gold-deep)"
-    : status === "declined" ? "var(--muted-light)"
-    : "var(--muted)";
 
   const isVendor = user.role === "vendor";
   const urgent = days >= 0 && days <= 14;
@@ -279,15 +274,12 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             ) : (
               <div style={{ borderTop: "1px solid var(--border)" }}>
                 {wedding.vendors.map((wv) => (
-                  <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="dash-row">
+                  <div key={wv.id} className="dash-row">
                     <div className="flex-1 min-w-0">
                       <div className="font-serif text-sm truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>{wv.vendor.name}</div>
                       <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
                     </div>
-                    <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: vendorStatusColor(wv.status), flexShrink: 0 }}>
-                      {(vendorStatusLabels as Record<string, string>)[wv.status] ?? wv.status}
-                    </span>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
@@ -344,34 +336,24 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </div>
           </section>
 
-          {wedding.notes && (
+          {!isVendor && wedding.notes && (
             <section className="mb-8">
               <h3 className="dash-section-title mb-1">{tw.notes}</h3>
               <p className="text-sm leading-relaxed pt-3" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>{wedding.notes}</p>
             </section>
           )}
 
-          {/* Quick access */}
-          <section>
-            <h3 className="dash-section-title mb-1">{tw.quickAccess}</h3>
-            <div style={{ borderTop: "1px solid var(--border)" }}>
-              {[
-                { href: `/weddings/${id}/draaiboek`, label: tw.runSheet },
-                { href: `/weddings/${id}/messages`, label: t.tabs.messages },
-                !isVendor && { href: `/weddings/${id}/guests`, label: tw.guestList },
-                !isVendor && { href: `/weddings/${id}/budget`, label: tw.budget },
-                !isVendor && { href: `/weddings/${id}/files`, label: tw.files },
-                { href: `/weddings/${id}/team`, label: t.tabs.team },
-              ].filter(Boolean).map((link) => {
-                if (!link) return null;
-                return (
-                  <Link key={link.href} href={link.href} className="dash-row text-sm" style={{ padding: "0.6rem 0.25rem", fontWeight: 500, color: "var(--foreground)" }}>
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
+          {/* Eigen notities — alleen zichtbaar en bewerkbaar voor de leverancier zelf */}
+          {isVendor && (() => {
+            const ownWv = wedding.vendors.find((wv) => wv.vendor.id === ownVendorId);
+            if (!ownWv) return null;
+            return (
+              <section>
+                <h3 className="dash-section-title mb-1">Mijn notities</h3>
+                <VendorNotesEditor weddingId={id} wvId={ownWv.id} initialNotes={ownWv.notes ?? ""} />
+              </section>
+            );
+          })()}
         </div>
       </div>
     </div>

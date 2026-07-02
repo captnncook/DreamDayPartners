@@ -36,6 +36,7 @@ export default function MobileNav({ user }: { user: User }) {
     { href: "/leveranciers",               label: "Catalogus",         roles: ["admin", "planner", "couple"] },
     { href: "/leveranciers/mijn-profiel",  label: "Mijn profiel",      roles: ["vendor"] },
     { href: "/mijn-bruiloften",            label: "Mijn bruiloften",   roles: ["vendor"] },
+    { href: "/leveranciers/analytics",     label: "Analytisch overzicht", roles: ["vendor"] },
     { href: "/instellingen",               label: "Instellingen",      roles: ["admin", "planner", "team_member", "couple", "vendor"] },
     { href: "/admin",                      label: n.admin,             roles: ["admin"] },
   ];

@@ -15,7 +15,6 @@ export default function TabNav({ id, isVendor = false }: { id: string; isVendor?
     { href: `/weddings/${id}/guests`,    label: tb.guests,     always: false },
     { href: `/weddings/${id}/budget`,    label: tb.budget,     always: false },
     { href: `/weddings/${id}/draaiboek`, label: tb.draaiboek,  always: true },
-    { href: `/weddings/${id}/messages`,  label: tb.messages,   always: true },
     { href: `/weddings/${id}/vendors`,   label: tb.vendors,    always: false },
     { href: `/weddings/${id}/team`,      label: tb.team,       always: true },
   ].filter((tab) => tab.always || !isVendor);
