@@ -1,8 +1,6 @@
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Heart, CheckSquare, Calendar, Sparkles } from "lucide-react";
 import DashboardClient from "./DashboardClient";
 
 function daysUntil(date: Date) {
@@ -79,12 +77,11 @@ export default async function DashboardPage() {
     vendor: `Welkom in het dream team`,
   };
 
-  const statsCards = user.role !== "couple" && user.role !== "vendor" ? [
-    { label: "Bruiloften", value: weddings.length, icon: "Heart" },
-    ...(user.role !== "admin" ? [{ label: "Open taken", value: myTasks.length, icon: "CheckSquare" }] : []),
-    { label: "Komende 30 dagen", value: weddings.filter((w) => daysUntil(w.date) <= 30 && daysUntil(w.date) > 0).length, icon: "Calendar" },
-    { label: "Dit jaar", value: weddings.filter((w) => new Date(w.date).getFullYear() === new Date().getFullYear()).length, icon: "Sparkles" },
-  ] : [];
+  const stats = {
+    total: weddings.length,
+    upcoming30: weddings.filter((w) => daysUntil(w.date) <= 30 && daysUntil(w.date) >= 0).length,
+    thisYear: weddings.filter((w) => new Date(w.date).getFullYear() === new Date().getFullYear()).length,
+  };
 
   const weddingsData = weddings.map((w) => ({
     id: w.id,
@@ -112,7 +109,7 @@ export default async function DashboardPage() {
     <DashboardClient
       user={{ id: user.id, name: user.name, role: user.role }}
       greeting={greetings[user.role] ?? "Welkom"}
-      statsCards={statsCards}
+      stats={stats}
       weddings={weddingsData}
       tasks={tasksData}
       taskProgress={user.role === "couple" ? { total: totalTasks, done: doneTasks } : undefined}

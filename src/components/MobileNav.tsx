@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import {
-  LogOut, Menu, X, Globe, ChevronRight,
+  LogOut, Menu, X, Globe,
 } from "lucide-react";
 import { useLang } from "./LangProvider";
 
@@ -32,8 +32,8 @@ export default function MobileNav({ user }: { user: User }) {
     { href: "/budget",                     label: n.budget,            roles: ["planner", "team_member"] },
     { href: "/dm",                         label: "Berichten",         roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/dream-team",                 label: "Dream Team",        roles: ["couple"] },
-    { href: "/vendors",                    label: n.vendors,           roles: ["planner", "team_member"] },
-    { href: "/leveranciers",               label: "Leveranciers",      roles: ["admin", "planner", "couple"] },
+    { href: "/vendors",                    label: "Onze leveranciers", roles: ["planner", "team_member"] },
+    { href: "/leveranciers",               label: "Catalogus",         roles: ["admin", "planner", "couple"] },
     { href: "/leveranciers/mijn-profiel",  label: "Mijn profiel",      roles: ["vendor"] },
     { href: "/mijn-bruiloften",            label: "Mijn bruiloften",   roles: ["vendor"] },
     { href: "/instellingen",               label: "Instellingen",      roles: ["admin", "planner", "team_member", "couple", "vendor"] },
@@ -115,7 +115,7 @@ export default function MobileNav({ user }: { user: User }) {
             position: "fixed",
             inset: 0,
             zIndex: 100,
-            background: "white",
+            background: "var(--ink)",
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
@@ -129,7 +129,7 @@ export default function MobileNav({ user }: { user: User }) {
               justifyContent: "space-between",
               padding: "0 1rem",
               height: "56px",
-              borderBottom: "1px solid rgba(0,0,0,0.08)",
+              borderBottom: "1px solid var(--ink-line)",
               flexShrink: 0,
             }}
           >
@@ -138,7 +138,7 @@ export default function MobileNav({ user }: { user: User }) {
                 fontWeight: 700,
                 fontSize: "17px",
                 letterSpacing: "-0.03em",
-                color: "var(--foreground)",
+                color: "var(--ink-text)",
               }}
             >
               Menu
@@ -149,7 +149,7 @@ export default function MobileNav({ user }: { user: User }) {
                 width: "32px",
                 height: "32px",
                 borderRadius: "50%",
-                background: "rgba(0,0,0,0.06)",
+                background: "rgba(255,255,255,0.08)",
                 border: "none",
                 cursor: "pointer",
                 display: "flex",
@@ -157,7 +157,7 @@ export default function MobileNav({ user }: { user: User }) {
                 justifyContent: "center",
               }}
             >
-              <X style={{ width: "16px", height: "16px", color: "var(--foreground)" }} />
+              <X style={{ width: "16px", height: "16px", color: "var(--ink-text)" }} />
             </button>
           </div>
 
@@ -169,8 +169,6 @@ export default function MobileNav({ user }: { user: User }) {
                 alignItems: "center",
                 gap: "12px",
                 padding: "14px 16px",
-                background: "#f5f5f7",
-                borderRadius: "14px",
               }}
             >
               <div
@@ -178,11 +176,11 @@ export default function MobileNav({ user }: { user: User }) {
                   width: "44px",
                   height: "44px",
                   borderRadius: "50%",
-                  background: "var(--gradient-primary)",
+                  background: "var(--gold)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "white",
+                  color: "var(--ink)",
                   fontSize: "15px",
                   fontWeight: 700,
                   flexShrink: 0,
@@ -195,13 +193,13 @@ export default function MobileNav({ user }: { user: User }) {
                   style={{
                     fontWeight: 600,
                     fontSize: "15px",
-                    color: "var(--foreground)",
+                    color: "var(--ink-text)",
                     letterSpacing: "-0.01em",
                   }}
                 >
                   {user.name}
                 </div>
-                <div style={{ fontSize: "13px", color: "var(--muted)", marginTop: "1px" }}>
+                <div style={{ fontSize: "13px", color: "var(--ink-muted)", marginTop: "1px" }}>
                   {roleLabel}
                 </div>
               </div>
@@ -210,44 +208,18 @@ export default function MobileNav({ user }: { user: User }) {
 
           {/* Nav items */}
           <nav style={{ flex: 1, padding: "8px 16px", overflowY: "auto" }}>
-            <div
-              style={{
-                background: "#f5f5f7",
-                borderRadius: "14px",
-                overflow: "hidden",
-              }}
-            >
-              {visibleItems.map((item, idx) => {
+            <div style={{ overflow: "hidden" }}>
+              {visibleItems.map((item) => {
                 const active = pathname === item.href || pathname.startsWith(item.href + "/");
-                const isLast = idx === visibleItems.length - 1;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "14px 16px",
-                      textDecoration: "none",
-                      background: active ? "rgba(196,154,108,0.08)" : "transparent",
-                      borderBottom: isLast ? "none" : "1px solid rgba(0,0,0,0.06)",
-                    }}
+                    className={`ddp-nav-item-dark${active ? " active" : ""}`}
+                    style={{ padding: "12px 14px", marginBottom: "2px" }}
                   >
-                    <span
-                      style={{
-                        flex: 1,
-                        fontSize: "15px",
-                        fontWeight: active ? 600 : 400,
-                        color: active ? "var(--primary-dark)" : "var(--foreground)",
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {item.label}
-                    </span>
-                    <ChevronRight
-                      style={{ width: "16px", height: "16px", color: "rgba(0,0,0,0.2)", flexShrink: 0 }}
-                    />
+                    <span style={{ flex: 1, fontSize: "15px" }}>{item.label}</span>
                   </Link>
                 );
               })}
@@ -255,96 +227,32 @@ export default function MobileNav({ user }: { user: User }) {
           </nav>
 
           {/* Bottom actions */}
-          <div style={{ padding: "8px 16px 32px", flexShrink: 0, borderTop: "1px solid rgba(0,0,0,0.08)" }}>
+          <div style={{ padding: "8px 16px 32px", flexShrink: 0, borderTop: "1px solid var(--ink-line)" }}>
             <Link
               href="/"
               onClick={() => setOpen(false)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "12px 16px",
-                marginBottom: "8px",
-                borderRadius: "14px",
-                background: "#f5f5f7",
-                textDecoration: "none",
-                fontSize: "14px",
-                color: "var(--muted)",
-                letterSpacing: "-0.01em",
-              }}
+              className="ddp-nav-item-dark"
+              style={{ justifyContent: "center", padding: "12px 16px", marginTop: "10px" }}
             >
               {t.nav.toWebsite}
             </Link>
-            <div
-              style={{
-                background: "#f5f5f7",
-                borderRadius: "14px",
-                overflow: "hidden",
-              }}
+            <button
+              onClick={() => { toggle(); }}
+              className="ddp-nav-item-dark w-full text-left mt-0.5"
+              style={{ padding: "12px 14px" }}
             >
-              <button
-                onClick={() => { toggle(); }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "14px 16px",
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  borderBottom: "1px solid rgba(0,0,0,0.06)",
-                }}
-              >
-                <div
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "8px",
-                    background: "rgba(0,0,0,0.06)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Globe style={{ width: "16px", height: "16px", color: "var(--muted)" }} />
-                </div>
-                <span style={{ fontSize: "15px", color: "var(--foreground)", letterSpacing: "-0.01em" }}>
-                  {t.common.switchLang}
-                </span>
-              </button>
+              <Globe style={{ width: "16px", height: "16px" }} />
+              <span style={{ fontSize: "15px" }}>{t.common.switchLang}</span>
+            </button>
 
-              <button
-                onClick={handleLogout}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "14px 16px",
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                <div
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "8px",
-                    background: "rgba(255,59,48,0.10)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <LogOut style={{ width: "16px", height: "16px", color: "var(--danger)" }} />
-                </div>
-                <span style={{ fontSize: "15px", color: "var(--danger)", letterSpacing: "-0.01em" }}>
-                  {n.logout}
-                </span>
-              </button>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="ddp-nav-item-dark w-full text-left mt-0.5"
+              style={{ padding: "12px 14px" }}
+            >
+              <LogOut style={{ width: "16px", height: "16px" }} />
+              <span style={{ fontSize: "15px" }}>{n.logout}</span>
+            </button>
           </div>
         </div>
       )}

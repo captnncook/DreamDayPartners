@@ -40,6 +40,18 @@
   --info:       #3a6fa8;
   --info-bg:    #eef4fb;
 
+  /* ── Ink palette — sidebar & dashboard signature ── */
+  --ink:          #1C2B24;
+  --ink-mid:      #2E4438;
+  --ink-light:    #3D5A4A;
+  --ink-line:     rgba(255,255,255,0.10);
+  --ink-text:     #FFFFFF;
+  --ink-muted:    #8BA898;
+  --sand:         #F5F0E8;
+  --gold:         var(--primary);
+  --gold-deep:    var(--primary-dark);
+  --gold-light:   #F0E4C4;
+
   /* ── Shadows ── */
   --shadow-sm:        0 1px 3px rgba(31,36,40,0.06);
   --shadow-md:        0 4px 16px rgba(31,36,40,0.08);
@@ -392,6 +404,91 @@ h1, h2, h3, h4, h5, h6 {
   width: 3px;
   background: var(--color-charcoal);
   border-radius: 0 3px 3px 0;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SIDEBAR — dark variant
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.ddp-nav-item-dark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.575rem 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  text-decoration: none;
+  position: relative;
+}
+
+.ddp-nav-item-dark:hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--ink-text);
+}
+
+.ddp-nav-item-dark.active {
+  background: var(--ink-mid);
+  color: var(--ink-text);
+  font-weight: 600;
+}
+
+.ddp-nav-item-dark.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  background: var(--gold);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DASHBOARD — signature elements
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.dash-hero {
+  background: linear-gradient(150deg, var(--ink) 0%, var(--ink-mid) 100%);
+  border-radius: var(--radius-xl);
+  color: var(--ink-text);
+  overflow: hidden;
+  position: relative;
+}
+
+.dash-ring {
+  background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 100%);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  flex-shrink: 0;
+}
+
+.dash-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.dash-row:hover { background: rgba(28,43,36,0.035); }
+.dash-row:last-child { border-bottom: none; }
+
+.dash-section-title {
+  font-family: var(--font-playfair), "Georgia", serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
