@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
           description: data.description?.trim() || null,
           isPremium: toBool(data.isPremium),
           ...(geo.latitude != null ? { latitude: geo.latitude, longitude: geo.longitude } : {}),
-          ...(isValidImage ? { coverPhoto: imageUrl, photos: [imageUrl] } : {}),
+          ...(isValidImage ? { coverPhoto: imageUrl } : {}),
         },
       });
       created++;
