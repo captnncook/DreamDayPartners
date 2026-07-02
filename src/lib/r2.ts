@@ -12,7 +12,10 @@ export const r2 = new S3Client({
 
 export const R2_BUCKET = process.env.R2_BUCKET_NAME ?? "dreamday-files";
 
+// Sommige velden (bijv. door bulk-import) bevatten al een volledige externe
+// URL in plaats van een R2-object-key — die hoeft niet gesigned te worden.
 export async function getDownloadUrl(fileKey: string, expiresInSeconds = 3600): Promise<string> {
+  if (/^https?:\/\//i.test(fileKey)) return fileKey;
   return getSignedUrl(r2, new GetObjectCommand({ Bucket: R2_BUCKET, Key: fileKey }), {
     expiresIn: expiresInSeconds,
   });
