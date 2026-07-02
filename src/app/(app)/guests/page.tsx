@@ -3,8 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-const RSVP_COLORS: Record<string, string> = { confirmed: "badge-success", declined: "badge-danger", invited: "badge-info", no_response: "badge-neutral" };
-const RSVP_LABELS: Record<string, string> = { confirmed: "Bevestigd", declined: "Afgemeld", invited: "Uitgenodigd", no_response: "Geen reactie" };
+const RSVP_META: Record<string, { label: string; color: string }> = {
+  confirmed:   { label: "Bevestigd",    color: "var(--foreground)" },
+  invited:     { label: "Uitgenodigd",  color: "var(--muted)" },
+  no_response: { label: "Geen reactie", color: "var(--muted-light)" },
+  declined:    { label: "Afgemeld",     color: "var(--muted-light)" },
+};
 
 export default async function AllGuestsPage() {
   const user = await getSession();
@@ -23,30 +27,40 @@ export default async function AllGuestsPage() {
   const totalConfirmed = weddings.reduce((s, w) => s + w.guests.filter((g) => g.rsvpStatus === "confirmed").length, 0);
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-2">Gasten</h1>
-      <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>{totalGuests} gasten totaal · {totalConfirmed} bevestigd</p>
-      <div className="space-y-6">
-        {weddings.map((w) => (
-          <div key={w.id} className="ddp-card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">{w.title}</h2>
-              <Link href={`/weddings/${w.id}/guests`} className="text-sm" style={{ color: "var(--primary)" }}>Beheren →</Link>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {["confirmed","invited","no_response","declined"].map((status) => {
-                const count = w.guests.filter((g) => g.rsvpStatus === status).length;
-                return (
-                  <div key={status} className="text-center p-2 rounded-lg" style={{ background: "var(--background)" }}>
-                    <div className="font-bold">{count}</div>
-                    <span className={`ddp-badge ${RSVP_COLORS[status]}`} style={{ fontSize: "0.6rem" }}>{RSVP_LABELS[status]}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+    <div className="p-8 max-w-3xl mx-auto">
+      <div className="mb-8">
+        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Gasten</h1>
+        <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{totalGuests} gasten totaal · {totalConfirmed} bevestigd</p>
       </div>
+
+      {weddings.length === 0 ? (
+        <p className="text-sm py-16 text-center" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
+          Nog geen bruiloften met gastenlijsten.
+        </p>
+      ) : (
+        <div style={{ borderTop: "1px solid var(--border)" }}>
+          {weddings.map((w) => (
+            <Link key={w.id} href={`/weddings/${w.id}/guests`} className="dash-row" style={{ padding: "1.125rem 0.25rem" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</div>
+                <div className="flex items-center gap-4 mt-1.5 flex-wrap">
+                  {(["confirmed", "invited", "no_response", "declined"] as const).map((status) => {
+                    const count = w.guests.filter((g) => g.rsvpStatus === status).length;
+                    const meta = RSVP_META[status];
+                    return (
+                      <span key={status} className="text-xs" style={{ color: meta.color }}>
+                        <span style={{ fontWeight: 700 }}>{count}</span>{" "}
+                        <span style={{ fontSize: "0.6875rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{meta.label}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+              <span className="text-sm flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>Beheren</span>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

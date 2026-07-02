@@ -20,36 +20,47 @@ export default async function AllBudgetPage() {
     orderBy: { date: "asc" },
   });
 
+  const withBudget = weddings.filter((w) => w.budget);
+
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-8">Budget overzicht</h1>
-      <div className="space-y-4">
-        {weddings.map((w) => {
-          if (!w.budget) return null;
-          const spent = w.budget.items.reduce((s, i) => s + i.actual, 0);
-          const total = w.budget.totalAmount;
-          const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0;
-          return (
-            <div key={w.id} className="ddp-card">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-semibold">{w.title}</h2>
-                <Link href={`/weddings/${w.id}/budget`} className="text-sm" style={{ color: "var(--primary)" }}>Details →</Link>
-              </div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-medium">{euro(spent)} uitgegeven</span>
-                <span style={{ color: "var(--muted)" }}>van {euro(total)}</span>
-              </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--accent)" }}>
-                <div className="h-full rounded-full" style={{ width: `${pct}%`, background: pct > 90 ? "#e05252" : pct > 70 ? "var(--warning)" : "var(--success)" }} />
-              </div>
-              <div className="text-xs mt-1 flex justify-between" style={{ color: "var(--muted)" }}>
-                <span>{pct}% gebruikt</span>
-                <span>Resterend: {euro(total - spent)}</span>
-              </div>
-            </div>
-          );
-        })}
+    <div className="p-8 max-w-3xl mx-auto">
+      <div className="mb-8">
+        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Budget</h1>
+        <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{withBudget.length} bruiloft{withBudget.length !== 1 ? "en" : ""} met budget</p>
       </div>
+
+      {withBudget.length === 0 ? (
+        <p className="text-sm py-16 text-center" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
+          Nog geen budgetten aangemaakt.
+        </p>
+      ) : (
+        <div style={{ borderTop: "1px solid var(--border)" }}>
+          {withBudget.map((w) => {
+            const spent = w.budget!.items.reduce((s, i) => s + i.actual, 0);
+            const total = w.budget!.totalAmount;
+            const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0;
+            const over = pct > 90;
+            return (
+              <Link key={w.id} href={`/weddings/${w.id}/budget`} className="dash-row" style={{ padding: "1.125rem 0.25rem", display: "block" }}>
+                <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                  <span className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</span>
+                  <span className="text-sm">
+                    <span style={{ fontWeight: 700, color: over ? "var(--gold-deep)" : "var(--foreground)" }}>{euro(spent)}</span>
+                    <span style={{ color: "var(--muted)" }}> van {euro(total)}</span>
+                  </span>
+                </div>
+                <div style={{ height: "3px", borderRadius: "999px", background: "var(--border)", overflow: "hidden", margin: "0.625rem 0 0.375rem" }}>
+                  <div style={{ height: "100%", width: `${pct}%`, background: over ? "var(--gold-deep)" : "var(--ink)" }} />
+                </div>
+                <div className="text-xs flex justify-between" style={{ color: "var(--muted)" }}>
+                  <span style={{ fontWeight: over ? 700 : 400, color: over ? "var(--gold-deep)" : "var(--muted)" }}>{pct}% gebruikt</span>
+                  <span>Resterend: {euro(total - spent)}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
