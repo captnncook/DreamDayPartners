@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Users, X, Upload } from "lucide-react";
+import { X, Upload } from "lucide-react";
 import { SkeletonCard } from "@/components/Skeleton";
 
 type Guest = {
@@ -17,9 +17,6 @@ type Guest = {
   plusOne: boolean;
 };
 
-const RSVP_COLORS: Record<string, string> = {
-  confirmed: "badge-success", declined: "badge-danger", invited: "badge-info", no_response: "badge-neutral",
-};
 const RSVP_LABELS: Record<string, string> = {
   confirmed: "Bevestigd", declined: "Afgemeld", invited: "Uitgenodigd", no_response: "Geen reactie",
 };
@@ -136,9 +133,9 @@ export default function GuestsPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
-        <div className="flex items-center justify-between mt-4">
-          <h1 className="text-2xl font-bold">Gastenlijst</h1>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
+        <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Gastenlijst</h1>
           <div className="flex gap-2">
             <input ref={csvRef} type="file" accept=".csv" onChange={handleCsvImport} className="hidden" id="csv-import" />
             <label htmlFor="csv-import" className="ddp-btn-secondary cursor-pointer flex items-center gap-1">
@@ -163,15 +160,18 @@ export default function GuestsPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        {Object.entries(stats).map(([key, count]) => (
-          <div key={key} className="ddp-card text-center p-3 cursor-pointer"
-            onClick={() => setFilterRsvp(filterRsvp === key ? "all" : key)}
-            style={{ border: filterRsvp === key ? "2px solid var(--primary)" : undefined }}>
-            <div className="text-xl font-bold">{count}</div>
-            <span className={`ddp-badge ${RSVP_COLORS[key]} mt-1`}>{RSVP_LABELS[key]}</span>
-          </div>
-        ))}
+      <div className="flex flex-wrap gap-x-7 gap-y-3 mb-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
+        {Object.entries(stats).map(([key, count]) => {
+          const active = filterRsvp === key;
+          return (
+            <button key={key}
+              onClick={() => setFilterRsvp(active ? "all" : key)}
+              style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left", opacity: filterRsvp !== "all" && !active ? 0.45 : 1 }}>
+              <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: active ? "var(--gold-deep)" : "var(--foreground)", letterSpacing: "-0.01em" }}>{count}</span>
+              <span style={{ display: "block", fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: "1px" }}>{RSVP_LABELS[key]}</span>
+            </button>
+          );
+        })}
       </div>
 
       {showForm && (
@@ -229,8 +229,8 @@ export default function GuestsPage() {
         </select>
       </div>
 
-      <div className="ddp-card p-0 overflow-hidden">
-        <table className="w-full">
+      <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflowX: "auto" }}>
+        <table className="w-full" style={{ minWidth: "640px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
               {["Naam", "Contact", "Kant", "RSVP", "Dieet", ""].map((h) => (
@@ -243,8 +243,8 @@ export default function GuestsPage() {
               <tr key={guest.id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : undefined }}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                      style={{ background: "var(--primary)" }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                      style={{ background: "var(--gold)", color: "var(--ink)" }}>
                       {guest.name.charAt(0)}
                     </div>
                     <div>
@@ -274,7 +274,6 @@ export default function GuestsPage() {
         </table>
         {filtered.length === 0 && (
           <div className="text-center py-10" style={{ color: "var(--muted)" }}>
-            <div className="flex justify-center mb-2"><Users className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
             <p>Geen gasten gevonden</p>
           </div>
         )}

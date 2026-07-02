@@ -139,7 +139,7 @@ export default function DraaiboekClient({
         </Link>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.04em" }}>Draaiboek</h1>
+            <h1 className="font-serif" style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.01em" }}>Draaiboek</h1>
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
           <div className="flex gap-2">
@@ -186,15 +186,15 @@ export default function DraaiboekClient({
                   style={{
                     textAlign: "left", padding: "0.75rem 0.875rem", borderRadius: "12px",
                     border: "1px solid",
-                    borderColor: activeDraaiboekId === d.id ? "var(--color-blush)" : "var(--border)",
-                    background: activeDraaiboekId === d.id ? "var(--color-blush-soft)" : "white",
+                    borderColor: activeDraaiboekId === d.id ? "var(--gold)" : "var(--border)",
+                    background: activeDraaiboekId === d.id ? "var(--sand)" : "white",
                     cursor: "pointer", transition: "all 150ms",
                   }}
                 >
                   <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground)" }} className="truncate">{d.title}</div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <span style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>v{d.version}</span>
-                    <span className={`ddp-badge ${d.status === "final" ? "badge-success" : "badge-neutral"}`} style={{ fontSize: "0.6rem" }}>
+                    <span style={{ fontSize: "0.625rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: d.status === "final" ? "var(--gold-deep)" : "var(--muted-light)" }}>
                       {d.status === "final" ? "Definitief" : "Concept"}
                     </span>
                   </div>

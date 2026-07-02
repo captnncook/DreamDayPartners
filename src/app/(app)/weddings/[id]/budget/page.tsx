@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { X, Euro, Paperclip } from "lucide-react";
+import { X, Paperclip } from "lucide-react";
 import { SkeletonCard, SkeletonBlock } from "@/components/Skeleton";
 
 type BudgetItem = {
@@ -23,8 +23,10 @@ type Budget = {
   items: BudgetItem[];
 };
 
-const PAY_COLORS: Record<string, string> = {
-  pending: "badge-neutral", deposit_paid: "badge-warning", paid: "badge-success",
+const PAY_META: Record<string, { label: string; color: string; weight: number }> = {
+  pending:      { label: "Openstaand", color: "var(--gold-deep)",   weight: 700 },
+  deposit_paid: { label: "Aanbetaald", color: "var(--muted)",       weight: 600 },
+  paid:         { label: "Betaald",    color: "var(--muted-light)", weight: 400 },
 };
 const PAY_LABELS: Record<string, string> = {
   pending: "Openstaand", deposit_paid: "Aanbetaald", paid: "Betaald",
@@ -130,78 +132,71 @@ export default function BudgetPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
-        <div className="flex items-center justify-between mt-4">
-          <h1 className="text-2xl font-bold">Budget</h1>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
+        <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Budget</h1>
           <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary">
             {showForm ? "Annuleren" : "+ Post toevoegen"}
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="ddp-card col-span-2">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-medium">Totaalbudget</span>
-            <button onClick={() => { setNewTotal(String(budget.totalAmount)); setEditTotal(true); }}
-              className="text-xs" style={{ color: "var(--primary)" }}>Wijzigen</button>
-          </div>
-          {editTotal ? (
-            <form onSubmit={handleUpdateTotal} className="flex gap-2 mt-2">
-              <input type="number" value={newTotal} onChange={(e) => setNewTotal(e.target.value)}
-                className="flex-1 border rounded-lg px-3 py-1.5 text-sm" style={{ borderColor: "var(--border)" }} />
-              <button type="submit" className="ddp-btn-primary px-3 py-1.5 text-xs">Opslaan</button>
-              <button type="button" onClick={() => setEditTotal(false)} className="ddp-btn-secondary px-3 py-1.5 text-xs"><X className="w-3.5 h-3.5" /></button>
-            </form>
-          ) : (
-            <>
-              <div className="text-3xl font-bold" style={{ color: "var(--primary)" }}>{euro(budget.totalAmount)}</div>
-              <div className="h-1.5 rounded-full mt-3 overflow-hidden" style={{ background: "var(--accent)" }}>
-                <div className="h-full rounded-full" style={{
-                  width: `${pct}%`,
-                  background: pct > 90 ? "#e05252" : pct > 70 ? "var(--warning)" : "var(--success)",
-                }} />
+      {/* Budgetoverzicht — donker paneel met inline cijfers */}
+      <div className="dash-hero mb-6" style={{ padding: "1.5rem 1.75rem" }}>
+        <div className="flex items-baseline justify-between flex-wrap gap-2">
+          <div>
+            <div style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold)" }}>Totaalbudget</div>
+            {editTotal ? (
+              <form onSubmit={handleUpdateTotal} className="flex gap-2 mt-2">
+                <input type="number" value={newTotal} onChange={(e) => setNewTotal(e.target.value)} autoFocus
+                  className="flex-1 rounded-lg px-3 py-1.5 text-sm" style={{ border: "none", minWidth: "120px" }} />
+                <button type="submit" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.75rem", padding: "0.35rem 0.875rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer" }}>Opslaan</button>
+                <button type="button" onClick={() => setEditTotal(false)} style={{ background: "none", border: "none", color: "var(--ink-muted)", cursor: "pointer", display: "flex", alignItems: "center" }}><X className="w-4 h-4" /></button>
+              </form>
+            ) : (
+              <div className="flex items-baseline gap-3">
+                <span className="font-serif" style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>{euro(budget.totalAmount)}</span>
+                <button onClick={() => { setNewTotal(String(budget.totalAmount)); setEditTotal(true); }}
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.75rem", color: "var(--gold)", fontWeight: 600, padding: 0 }}>Wijzigen</button>
               </div>
-              <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>{pct}% gebruikt</div>
-            </>
-          )}
-        </div>
-        <div className="ddp-card">
-          <div className="text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Uitgegeven</div>
-          <div className="text-xl font-bold">{euro(totalActual)}</div>
-          <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>Geschat: {euro(totalEstimated)}</div>
-        </div>
-        <div className="ddp-card">
-          <div className="text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Resterend</div>
-          <div className="text-xl font-bold" style={{ color: remaining < 0 ? "#e05252" : "var(--success)" }}>
-            {euro(Math.abs(remaining))}
+            )}
           </div>
-          <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>{remaining < 0 ? "over budget!" : "beschikbaar"}</div>
-        </div>
-        <div className="ddp-card">
-          <div className="text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Kosten per gast</div>
-          <div className="text-xl font-bold">{costPerGuest !== null ? euro(costPerGuest) : "—"}</div>
-          <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>{confirmedGuests} bevestigde gasten</div>
-        </div>
-      </div>
-
-      {categoryTotals.length > 0 && (
-        <div className="ddp-card mb-6">
-          <h3 className="font-semibold text-sm mb-4">Kosten per categorie</h3>
-          <div className="space-y-2.5">
-            {categoryTotals.map(({ cat, actual }) => (
-              <div key={cat}>
-                <div className="flex justify-between text-xs mb-1">
-                  <span style={{ color: "var(--foreground)" }}>{cat}</span>
-                  <span style={{ color: "var(--muted)" }}>{euro(actual)}</span>
-                </div>
-                <div style={{ height: "6px", borderRadius: "9999px", background: "var(--accent)", overflow: "hidden" }}>
-                  <div style={{ height: "100%", borderRadius: "9999px", background: "var(--primary)", width: `${Math.round((actual / maxCategoryActual) * 100)}%`, transition: "width 0.5s ease" }} />
-                </div>
+          <div className="flex gap-7 flex-wrap">
+            {[
+              { value: euro(totalActual), label: "Uitgegeven" },
+              { value: euro(Math.abs(remaining)), label: remaining < 0 ? "Over budget" : "Resterend", warn: remaining < 0 },
+              { value: costPerGuest !== null ? euro(costPerGuest) : "—", label: `Per gast (${confirmedGuests})` },
+            ].map((s) => (
+              <div key={s.label} style={{ textAlign: "right" }}>
+                <div className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: s.warn ? "var(--gold)" : "var(--ink-text)" }}>{s.value}</div>
+                <div style={{ fontSize: "0.625rem", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{s.label}</div>
               </div>
             ))}
           </div>
         </div>
+        <div style={{ height: "3px", borderRadius: "999px", background: "var(--ink-line)", overflow: "hidden", marginTop: "1.125rem" }}>
+          <div style={{ height: "100%", width: `${pct}%`, background: "var(--gold)" }} />
+        </div>
+        <div className="text-xs mt-1.5" style={{ color: "var(--ink-muted)" }}>{pct}% gebruikt · geschat {euro(totalEstimated)}</div>
+      </div>
+
+      {categoryTotals.length > 0 && (
+        <section className="mb-8">
+          <h3 className="dash-section-title mb-2">Kosten per categorie</h3>
+          <div className="pt-3 space-y-2.5" style={{ borderTop: "1px solid var(--border)" }}>
+            {categoryTotals.map(({ cat, actual }) => (
+              <div key={cat}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span style={{ color: "var(--foreground)", fontWeight: 500 }}>{cat}</span>
+                  <span style={{ color: "var(--muted)" }}>{euro(actual)}</span>
+                </div>
+                <div style={{ height: "3px", borderRadius: "999px", background: "var(--border)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", background: "var(--ink)", width: `${Math.round((actual / maxCategoryActual) * 100)}%`, transition: "width 0.5s ease" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {showForm && (
@@ -251,38 +246,43 @@ export default function BudgetPage() {
         const catEstimated = items.reduce((s, i) => s + i.estimated, 0);
         const catActual = items.reduce((s, i) => s + i.actual, 0);
         return (
-          <div key={category} className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-sm">{category}</h3>
+          <div key={category} className="mb-6">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="dash-section-title">{category}</h3>
               <span className="text-xs" style={{ color: "var(--muted)" }}>{euro(catActual)} / {euro(catEstimated)}</span>
             </div>
-            <div className="ddp-card p-0 overflow-hidden">
-              <table className="w-full">
+            <div style={{ borderTop: "1px solid var(--border)", overflowX: "auto" }}>
+              <table className="w-full" style={{ minWidth: "560px" }}>
                 <tbody>
-                  {items.map((item, i) => (
-                    <tr key={item.id} style={{ borderBottom: i < items.length - 1 ? "1px solid var(--border)" : undefined }}>
-                      <td className="px-4 py-3 text-sm">{item.description}</td>
-                      <td className="px-4 py-3 text-xs" style={{ color: "var(--muted)" }}>{item.vendor?.name}</td>
-                      <td className="px-4 py-3 text-sm text-right" style={{ color: "var(--muted)" }}>{euro(item.estimated)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-medium">{euro(item.actual)}</td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => cyclePayStatus(item)}
-                          className={`ddp-badge ${PAY_COLORS[item.payStatus]} cursor-pointer hover:opacity-80`}
-                          title="Klik om status te wijzigen"
-                        >
-                          {PAY_LABELS[item.payStatus]}
-                        </button>
+                  {items.map((item) => (
+                    <tr key={item.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                      <td className="px-2 py-3 text-sm">{item.description}</td>
+                      <td className="px-2 py-3 text-xs font-serif" style={{ color: "var(--muted)", fontWeight: 700 }}>{item.vendor?.name}</td>
+                      <td className="px-2 py-3 text-sm text-right" style={{ color: "var(--muted)" }}>{euro(item.estimated)}</td>
+                      <td className="px-2 py-3 text-sm text-right font-medium">{euro(item.actual)}</td>
+                      <td className="px-2 py-3 text-right">
+                        {(() => {
+                          const meta = PAY_META[item.payStatus] ?? PAY_META.pending;
+                          return (
+                            <button
+                              onClick={() => cyclePayStatus(item)}
+                              title="Klik om status te wijzigen"
+                              style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "0.6875rem", fontWeight: meta.weight, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color, whiteSpace: "nowrap" }}
+                            >
+                              {PAY_LABELS[item.payStatus]}
+                            </button>
+                          );
+                        })()}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-2 py-3">
                         {item.invoiceUrl ? (
-                          <a href={item.invoiceUrl} target="_blank" rel="noopener noreferrer" title="Offerte / factuur bekijken" style={{ color: "var(--primary)", display: "flex" }}>
+                          <a href={item.invoiceUrl} target="_blank" rel="noopener noreferrer" title="Offerte / factuur bekijken" style={{ color: "var(--gold-deep)", display: "flex" }}>
                             <Paperclip className="w-3.5 h-3.5" />
                           </a>
                         ) : null}
                       </td>
-                      <td className="px-4 py-3">
-                        <button onClick={() => deleteItem(item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-3.5 h-3.5" /></button>
+                      <td className="px-2 py-3">
+                        <button onClick={() => deleteItem(item.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)", background: "none", border: "none", cursor: "pointer", display: "flex" }}><X className="w-3.5 h-3.5" /></button>
                       </td>
                     </tr>
                   ))}
@@ -294,10 +294,9 @@ export default function BudgetPage() {
       })}
 
       {budget.items.length === 0 && (
-        <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-          <div className="flex justify-center mb-2"><Euro className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
-          <p>Nog geen budgetposten. Voeg de eerste post toe.</p>
-        </div>
+        <p className="text-sm text-center py-12" style={{ color: "var(--muted)" }}>
+          Nog geen budgetposten. Voeg de eerste post toe.
+        </p>
       )}
     </div>
   );

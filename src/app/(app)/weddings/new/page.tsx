@@ -41,7 +41,7 @@ export default function NewWeddingPage() {
     <div className="p-8 max-w-2xl mx-auto">
       <div className="mb-8">
         <Link href="/weddings" className="text-sm" style={{ color: "var(--muted)" }}>← Terug naar bruiloften</Link>
-        <h1 className="text-2xl font-bold mt-4">Nieuwe bruiloft aanmaken</h1>
+        <h1 className="font-serif mt-4" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Nieuwe bruiloft aanmaken</h1>
         <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Op basis van de e-mailadressen en trouwdatum wordt automatisch een unieke WeddingID aangemaakt.</p>
       </div>
       <form onSubmit={handleSubmit} className="ddp-card space-y-5">

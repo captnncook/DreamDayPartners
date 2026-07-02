@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, RefreshCw, Circle, Calendar, X, CheckSquare } from "lucide-react";
+import { CheckCircle2, RefreshCw, Circle, X } from "lucide-react";
 import { SkeletonCard } from "@/components/Skeleton";
 
 type Task = {
@@ -19,10 +19,14 @@ type Task = {
 
 type Member = { id: string; name: string; label: string };
 
+// Statusicoon is functioneel: klikbaar als status-toggle
 const STATUS_ICON_MAP: Record<string, React.ElementType> = { open: Circle, in_progress: RefreshCw, done: CheckCircle2 };
-const STATUS_ICON_COLOR: Record<string, string> = { open: "var(--muted-light)", in_progress: "var(--warning)", done: "var(--success)" };
-const PRIORITY_COLORS: Record<string, string> = { high: "badge-danger", medium: "badge-warning", low: "badge-neutral" };
-const PRIORITY_LABELS: Record<string, string> = { high: "Hoog", medium: "Middel", low: "Laag" };
+const STATUS_ICON_COLOR: Record<string, string> = { open: "var(--muted-light)", in_progress: "var(--gold-deep)", done: "var(--ink)" };
+const PRIORITY_META: Record<string, { label: string; color: string }> = {
+  high:   { label: "Urgent", color: "var(--gold-deep)" },
+  medium: { label: "Middel", color: "var(--muted)" },
+  low:    { label: "Laag",   color: "var(--muted-light)" },
+};
 const STATUS_LABELS: Record<string, string> = { open: "Open", in_progress: "Bezig", done: "Klaar" };
 
 function formatDate(d?: string) {
@@ -112,9 +116,9 @@ export default function TasksPage() {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
-        <div className="flex items-center justify-between mt-4">
-          <h1 className="text-2xl font-bold">Taken</h1>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
+        <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Taken</h1>
           <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary">
             {showForm ? "Annuleren" : "+ Taak toevoegen"}
           </button>
@@ -122,23 +126,20 @@ export default function TasksPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleAdd} className="ddp-card mb-6 space-y-4">
-          <h3 className="font-semibold">Nieuwe taak</h3>
+        <form onSubmit={handleAdd} className="mb-6 space-y-4 p-5" style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)" }}>
+          <h3 className="dash-section-title">Nieuwe taak</h3>
           <input required value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
-            placeholder="Taaknaam" className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+            placeholder="Taaknaam" className="ddp-input" />
           <textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
-            placeholder="Omschrijving (optioneel)" rows={2}
-            className="w-full border rounded-lg px-3 py-2 text-sm resize-none" style={{ borderColor: "var(--border)" }} />
-          <div className="grid grid-cols-3 gap-3">
+            placeholder="Omschrijving (optioneel)" rows={2} className="ddp-input resize-none" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium mb-1">Deadline</label>
-              <input type="date" value={form.dueDate} onChange={(e) => setForm((p) => ({ ...p, dueDate: e.target.value }))}
-                className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+              <input type="date" value={form.dueDate} onChange={(e) => setForm((p) => ({ ...p, dueDate: e.target.value }))} className="ddp-input" />
             </div>
             <div>
               <label className="block text-xs font-medium mb-1">Toewijzen aan</label>
-              <select value={form.assignedTo} onChange={(e) => setForm((p) => ({ ...p, assignedTo: e.target.value }))}
-                className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
+              <select value={form.assignedTo} onChange={(e) => setForm((p) => ({ ...p, assignedTo: e.target.value }))} className="ddp-select">
                 <option value="">— Niemand —</option>
                 {members.map((m) => (
                   <option key={m.id} value={m.id}>{m.name} ({m.label})</option>
@@ -147,8 +148,7 @@ export default function TasksPage() {
             </div>
             <div>
               <label className="block text-xs font-medium mb-1">Prioriteit</label>
-              <select value={form.priority} onChange={(e) => setForm((p) => ({ ...p, priority: e.target.value }))}
-                className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
+              <select value={form.priority} onChange={(e) => setForm((p) => ({ ...p, priority: e.target.value }))} className="ddp-select">
                 <option value="high">Hoog</option>
                 <option value="medium">Middel</option>
                 <option value="low">Laag</option>
@@ -163,17 +163,11 @@ export default function TasksPage() {
 
       <div className="flex flex-wrap gap-2 mb-4 items-center">
         {(["all", "open", "done"] as const).map((f) => (
-          <button key={f} onClick={() => setFilter(f)}
-            className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-            style={{
-              background: filter === f ? "var(--primary)" : "var(--accent)",
-              color: filter === f ? "white" : "var(--foreground)",
-            }}>
+          <button key={f} onClick={() => setFilter(f)} className={`ddp-chip${filter === f ? " active" : ""}`} style={{ padding: "0.35rem 0.875rem", fontSize: "0.75rem" }}>
             {f === "all" ? "Alles" : f === "open" ? "Open" : "Klaar"}
           </button>
         ))}
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span className="text-xs" style={{ color: "var(--muted)" }}>Sorteren:</span>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
           <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
             className="text-xs rounded-lg px-2 py-1.5 border"
             style={{ borderColor: "var(--border)", background: "white", cursor: "pointer" }}>
@@ -183,7 +177,7 @@ export default function TasksPage() {
           </select>
           <button onClick={() => setView(v => v === "list" ? "timeline" : "list")}
             className="text-xs rounded-lg px-2 py-1.5 border"
-            style={{ borderColor: "var(--border)", background: view === "timeline" ? "var(--primary)" : "white", color: view === "timeline" ? "white" : "var(--foreground)", cursor: "pointer" }}>
+            style={{ borderColor: "var(--border)", background: view === "timeline" ? "var(--ink)" : "white", color: view === "timeline" ? "white" : "var(--foreground)", cursor: "pointer" }}>
             {view === "list" ? "Tijdlijn" : "Lijst"}
           </button>
           <span className="text-xs" style={{ color: "var(--muted)" }}>{filtered.length} taken</span>
@@ -193,39 +187,45 @@ export default function TasksPage() {
       {view === "timeline" ? (
         <TimelineView tasks={filtered} onToggle={toggleStatus} />
       ) : (
-      <div className="space-y-2">
+      <div style={{ borderTop: "1px solid var(--border)" }}>
         {filtered.map((task) => {
           const daysLeft = task.dueDate ? Math.ceil((new Date(task.dueDate).getTime() - Date.now()) / 86400000) : null;
           const isUrgent = daysLeft !== null && daysLeft <= 7 && task.status !== "done";
+          const meta = PRIORITY_META[task.priority] ?? PRIORITY_META.medium;
+          const isDone = task.status === "done";
           return (
-          <div key={task.id} className="ddp-card flex items-start gap-4" style={isUrgent ? { borderColor: "var(--danger)", background: "var(--danger-bg)" } : {}}>
-            <button onClick={() => toggleStatus(task)} className="mt-0.5 flex-shrink-0" title="Status wijzigen">
+          <div key={task.id} className="dash-row" style={{ alignItems: "flex-start" }}>
+            <button onClick={() => toggleStatus(task)} className="mt-0.5 flex-shrink-0" title="Status wijzigen" style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
               {(() => { const Icon = STATUS_ICON_MAP[task.status] ?? Circle; return <Icon className="w-5 h-5" style={{ color: STATUS_ICON_COLOR[task.status] ?? "var(--muted-light)" }} />; })()}
             </button>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`font-medium text-sm ${task.status === "done" ? "line-through" : ""}`}
-                  style={{ color: task.status === "done" ? "var(--muted)" : undefined }}>
-                  {task.title}
-                </span>
-                <span className={`ddp-badge ${PRIORITY_COLORS[task.priority]}`}>{PRIORITY_LABELS[task.priority]}</span>
-                {task.assignedUser && <span className="ddp-badge badge-info">{task.assignedUser.name}</span>}
-              </div>
+              <span className={`text-sm ${isDone ? "line-through" : ""}`}
+                style={{ fontWeight: isUrgent ? 700 : isDone ? 400 : 500, color: isDone ? "var(--muted-light)" : "var(--foreground)" }}>
+                {task.title}
+              </span>
               {task.description && (
-                <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>{task.description}</p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{task.description}</p>
               )}
-              <div className="flex items-center gap-3 mt-1.5">
-                {task.dueDate && <span className="text-xs flex items-center gap-1" style={{ color: "var(--muted)" }}><Calendar className="w-3 h-3" />{formatDate(task.dueDate)}</span>}
-                <span className="text-xs" style={{ color: "var(--muted)" }}>{STATUS_LABELS[task.status]}</span>
+              <div className="flex items-center gap-2.5 mt-1 flex-wrap text-xs" style={{ color: "var(--muted)" }}>
+                {!isDone && (
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>{meta.label}</span>
+                )}
+                {isUrgent && (
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
+                    {daysLeft !== null && daysLeft <= 0 ? "Vandaag" : `Nog ${daysLeft}d`}
+                  </span>
+                )}
+                {task.dueDate && <span>{formatDate(task.dueDate)}</span>}
+                <span style={{ color: "var(--muted-light)" }}>{STATUS_LABELS[task.status]}</span>
+                {task.assignedUser && <span style={{ fontWeight: 600 }}>{task.assignedUser.name}</span>}
               </div>
             </div>
-            <button onClick={() => deleteTask(task.id)} className="flex-shrink-0 hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-4 h-4" /></button>
+            <button onClick={() => deleteTask(task.id)} className="flex-shrink-0 hover:opacity-70" style={{ color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: "2px", display: "flex" }}><X className="w-4 h-4" /></button>
           </div>
           );
         })}
         {filtered.length === 0 && (
           <div className="text-center py-12" style={{ color: "var(--muted)" }}>
-            <div className="flex justify-center mb-2"><CheckSquare className="w-8 h-8" style={{ color: "var(--accent-dark)" }} /></div>
             <p className="mb-3">Geen taken gevonden</p>
             {tasks.length === 0 && (
               <button onClick={seedTasks} className="ddp-btn-secondary text-sm">
@@ -255,24 +255,25 @@ function TimelineView({ tasks, onToggle }: { tasks: Task[]; onToggle: (t: Task) 
       {Object.entries(byMonth).map(([month, monthTasks]) => (
         <div key={month} className="mb-6 flex gap-4">
           <div style={{ width: "100px", flexShrink: 0, paddingTop: "0.25rem" }}>
-            <span className="text-xs font-semibold" style={{ color: "var(--primary)", textTransform: "capitalize" }}>{month}</span>
+            <span className="text-xs font-semibold" style={{ color: "var(--gold-deep)", textTransform: "capitalize" }}>{month}</span>
           </div>
           <div style={{ flex: 1, borderLeft: "2px solid var(--border)", paddingLeft: "1.25rem" }}>
-            <div className="space-y-2">
+            <div>
               {monthTasks.map(t => {
                 const Icon = STATUS_ICON_MAP[t.status] ?? Circle;
+                const meta = PRIORITY_META[t.priority] ?? PRIORITY_META.medium;
                 return (
-                  <div key={t.id} className="flex items-start gap-3" style={{ position: "relative" }}>
-                    <div style={{ position: "absolute", left: "-1.625rem", top: "0.125rem", background: "white", padding: "1px" }}>
-                      <button onClick={() => onToggle(t)}>
+                  <div key={t.id} className="flex items-start gap-3 py-2" style={{ position: "relative", borderBottom: "1px solid var(--border)", opacity: t.status === "done" ? 0.55 : 1 }}>
+                    <div style={{ position: "absolute", left: "-1.71rem", top: "0.55rem", background: "var(--background)", padding: "1px" }}>
+                      <button onClick={() => onToggle(t)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
                         <Icon className="w-4 h-4" style={{ color: STATUS_ICON_COLOR[t.status] }} />
                       </button>
                     </div>
-                    <div className="ddp-card py-2 px-3 flex-1" style={{ opacity: t.status === "done" ? 0.6 : 1 }}>
+                    <div className="flex-1 min-w-0">
                       <span className={`text-sm font-medium ${t.status === "done" ? "line-through" : ""}`}>{t.title}</span>
-                      <div className="flex gap-2 mt-1">
-                        <span className={`ddp-badge ${PRIORITY_COLORS[t.priority]}`} style={{ fontSize: "0.65rem" }}>{PRIORITY_LABELS[t.priority]}</span>
-                        {t.dueDate && <span className="text-xs" style={{ color: "var(--muted)" }}>{formatDate(t.dueDate)}</span>}
+                      <div className="flex gap-2.5 mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>{meta.label}</span>
+                        {t.dueDate && <span>{formatDate(t.dueDate)}</span>}
                       </div>
                     </div>
                   </div>
@@ -288,9 +289,9 @@ function TimelineView({ tasks, onToggle }: { tasks: Task[]; onToggle: (t: Task) 
             <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>Geen datum</span>
           </div>
           <div style={{ flex: 1, borderLeft: "2px solid var(--border)", paddingLeft: "1.25rem" }}>
-            <div className="space-y-2">
+            <div>
               {noDate.map(t => (
-                <div key={t.id} className="ddp-card py-2 px-3">
+                <div key={t.id} className="py-2" style={{ borderBottom: "1px solid var(--border)" }}>
                   <span className="text-sm font-medium">{t.title}</span>
                 </div>
               ))}

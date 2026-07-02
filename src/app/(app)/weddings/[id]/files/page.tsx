@@ -141,10 +141,10 @@ export default function FilesPage() {
     <div className="p-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
           <div>
-            <h1 className="text-2xl font-bold">Bestanden</h1>
+            <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Bestanden</h1>
             <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
               Inspiratie, offertes, facturen en contracten
             </p>
@@ -314,7 +314,7 @@ export default function FilesPage() {
                     <div className="min-w-0">
                       <div className="text-sm font-medium truncate" title={doc.name}>{doc.name}</div>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="ddp-badge badge-neutral" style={{ fontSize: "0.65rem" }}>
+                        <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted)" }}>
                           {catInfo?.label ?? doc.category}
                         </span>
                         <span className="text-xs" style={{ color: "var(--muted)" }}>{formatSize(doc.fileSize)}</span>

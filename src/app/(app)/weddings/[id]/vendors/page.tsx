@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Briefcase, User, Mail, Phone, Star, X, CheckCircle2 } from "lucide-react";
+import { User, Mail, Phone, Star, X, CheckCircle2 } from "lucide-react";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = {
@@ -92,9 +92,9 @@ export default function VendorsPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
-          <h1 className="text-2xl font-bold">Leveranciers</h1>
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Leveranciers</h1>
           <button onClick={() => setShowAdd(!showAdd)} className="ddp-btn-primary">
             {showAdd ? "Annuleren" : "+ Leverancier koppelen"}
           </button>
@@ -161,23 +161,22 @@ export default function VendorsPage() {
 
       {weddingVendors.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-          <div className="flex justify-center mb-3"><Briefcase className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
           <h2 className="font-semibold text-lg mb-2">Nog geen leveranciers</h2>
           <p className="text-sm mb-4">Koppel leveranciers aan deze bruiloft</p>
           <button onClick={() => setShowAdd(true)} className="ddp-btn-primary">+ Leverancier koppelen</button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {weddingVendors.map((wv) => (
             <div key={wv.id} className="ddp-card">
               <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
-                  <Briefcase className="w-5 h-5" style={{ color: "var(--primary)" }} />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 font-serif" style={{ background: "var(--sand)", color: "var(--ink)", fontWeight: 700, fontSize: "1.125rem" }}>
+                  {wv.vendor.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-sm">{wv.vendor.name}</h3>
-                    {wv.portalAccess && <span className="ddp-badge badge-premium">Portal</span>}
+                    {wv.portalAccess && <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Portal</span>}
                   </div>
                   <div className="text-xs capitalize mt-0.5" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
                 </div>
