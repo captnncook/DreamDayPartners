@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Globe, Phone, Mail, ArrowLeft, Check, ChevronDown, Heart, Pencil, User } from "lucide-react";
+import { MapPin, Globe, Phone, Mail, ArrowLeft, Check, ChevronDown, Pencil, User } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
   weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
@@ -151,7 +151,7 @@ export default function VendorProfilePage() {
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
 
       {/* ── Photo header ─────────────────────────────── */}
-      <div style={{ position: "relative", background: "var(--color-blush-soft)", borderBottom: "1px solid var(--border)" }}>
+      <div style={{ position: "relative" }}>
         {/* Logo linksboven + back link */}
         <div className="flex items-center justify-between" style={{ maxWidth: "1040px", margin: "0 auto", padding: "1.25rem 1.25rem 0" }}>
           <Link href="/leveranciers" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)" }}>
@@ -159,13 +159,13 @@ export default function VendorProfilePage() {
           </Link>
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--muted)", textDecoration: "none" }}>
             <Image src="/images/logo.svg" alt="" width={22} height={22} />
-            <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-              DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
+            <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
+              DreamDay<span className="font-serif" style={{ color: "var(--gold-deep)" }}> Platform</span>
             </span>
           </Link>
         </div>
 
-        {/* Photos: cover left + gallery right (like screenshot) */}
+        {/* Photos: cover left + gallery right */}
         {(coverUrl || photoUrls.length > 0) ? (
           <div style={{ maxWidth: "1040px", margin: "1.25rem auto 0", padding: "0 1.25rem" }}>
             <div style={{ display: "grid", gridTemplateColumns: photoUrls.length > 0 ? "1fr 1fr" : "1fr", gap: "4px", borderRadius: "var(--radius-lg)", overflow: "hidden", height: "380px" }}>
@@ -176,8 +176,8 @@ export default function VendorProfilePage() {
                 ) : photoUrls[0] ? (
                   <Image src={photoUrls[0]} alt={`${vendor.name}`} fill style={{ objectFit: "cover" }} />
                 ) : (
-                  <div style={{ height: "100%", background: "var(--color-blush)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.4 }}>{vendor.category}</span>
+                  <div style={{ height: "100%", background: "var(--sand)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{vendor.category}</span>
                   </div>
                 )}
                 {photoUrls.length > 0 && (
@@ -200,8 +200,8 @@ export default function VendorProfilePage() {
           </div>
         ) : (
           <div style={{ maxWidth: "1040px", margin: "1.25rem auto 0", padding: "0 1.25rem" }}>
-            <div style={{ height: "220px", borderRadius: "var(--radius-lg)", background: "var(--color-blush)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.4 }}>{vendor.category}</span>
+            <div style={{ height: "220px", borderRadius: "var(--radius-lg)", background: "var(--sand)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{vendor.category}</span>
             </div>
           </div>
         )}
@@ -235,140 +235,131 @@ export default function VendorProfilePage() {
       </div>
 
       {/* ── Content ──────────────────────────────────── */}
-      <div style={{ maxWidth: "1040px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
-        <div className="flex flex-col lg:flex-row gap-6">
+      <div style={{ maxWidth: "1040px", margin: "0 auto", padding: "0 1.25rem 4rem" }}>
+        <div className="flex flex-col lg:flex-row gap-10">
 
           {/* Main */}
           <div style={{ flex: 1, minWidth: 0 }}>
 
             {/* About */}
             {vendor.description && (
-              <div className="ddp-card mb-5">
-                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.875rem" }}>
-                  Over {vendor.name}
-                </h2>
+              <section className="mb-8">
+                <h2 className="dash-section-title mb-2">Over {vendor.name}</h2>
                 <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.75, whiteSpace: "pre-wrap" }}>
                   {vendor.description}
                 </p>
-              </div>
+              </section>
             )}
 
             {/* Price + specializations */}
             {(vendor.priceFrom || (vendor.specializations && vendor.specializations.length > 0)) && (
-              <div className="ddp-card mb-5">
-                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.875rem" }}>Diensten & prijzen</h2>
+              <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                <h2 className="dash-section-title mb-3">Diensten & prijzen</h2>
                 {(vendor.priceFrom || vendor.priceTo) && (
                   <div style={{ marginBottom: "0.75rem" }}>
-                    <span style={{ fontSize: "0.8125rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Prijsindicatie</span>
-                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--foreground)" }}>
+                    <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "0.25rem" }}>Prijsindicatie</span>
+                    <span className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--foreground)" }}>
                       {vendor.priceFrom ? `€${vendor.priceFrom.toLocaleString("nl-NL")}` : ""}
                       {vendor.priceFrom && vendor.priceTo ? " – " : ""}
                       {vendor.priceTo ? `€${vendor.priceTo.toLocaleString("nl-NL")}` : ""}
-                      {vendor.priceUnit && <span style={{ fontSize: "0.875rem", fontWeight: 400, color: "var(--muted)", marginLeft: "0.25rem" }}>{vendor.priceUnit}</span>}
+                      {vendor.priceUnit && <span className="font-sans" style={{ fontSize: "0.875rem", fontWeight: 400, color: "var(--muted)", marginLeft: "0.375rem" }}>{vendor.priceUnit}</span>}
                     </span>
                   </div>
                 )}
                 {vendor.specializations && vendor.specializations.length > 0 && (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
-                    {vendor.specializations.map(s => (
-                      <span key={s} style={{ background: "var(--color-blush-soft)", color: "var(--muted)", border: "1px solid var(--color-blush)", borderRadius: "9999px", padding: "0.25rem 0.75rem", fontSize: "0.8125rem" }}>{s}</span>
-                    ))}
-                  </div>
+                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600 }}>
+                    {vendor.specializations.join(" · ")}
+                  </p>
                 )}
-              </div>
+              </section>
             )}
 
             {/* Contact */}
-            <div className="ddp-card mb-5">
-              <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "1rem" }}>
-                Contact
-              </h2>
-              <div className="flex flex-col gap-3">
-                {vendor.contactPerson && (
-                  <ContactRow icon={<User className="w-3.5 h-3.5" />} label={vendor.contactPerson} />
-                )}
+            <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+              <h2 className="dash-section-title mb-3">Contact</h2>
+              <div className="flex flex-col gap-2.5">
+                {vendor.contactPerson && <ContactRow icon={<User className="w-4 h-4" />} label={vendor.contactPerson} />}
                 {vendor.email && (
                   <a href={`mailto:${vendor.email}`} style={{ textDecoration: "none" }}>
-                    <ContactRow icon={<Mail className="w-3.5 h-3.5" />} label={vendor.email} />
+                    <ContactRow icon={<Mail className="w-4 h-4" />} label={vendor.email} />
                   </a>
                 )}
                 {vendor.phone && (
                   <a href={`tel:${vendor.phone}`} style={{ textDecoration: "none" }}>
-                    <ContactRow icon={<Phone className="w-3.5 h-3.5" />} label={vendor.phone} />
+                    <ContactRow icon={<Phone className="w-4 h-4" />} label={vendor.phone} />
                   </a>
                 )}
                 {vendor.website && (
                   <a href={vendor.website} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-                    <ContactRow icon={<Globe className="w-3.5 h-3.5" />} label={vendor.website.replace(/^https?:\/\//, "")} />
+                    <ContactRow icon={<Globe className="w-4 h-4" />} label={vendor.website.replace(/^https?:\/\//, "")} />
                   </a>
                 )}
                 {!vendor.contactPerson && !vendor.email && !vendor.phone && !vendor.website && (
                   <p style={{ fontSize: "0.875rem", color: "var(--muted-light)" }}>Nog geen contactgegevens ingevuld.</p>
                 )}
               </div>
-            </div>
+            </section>
 
             {/* Reviews */}
             {reviews.length > 0 && (
-              <div className="ddp-card mb-5">
-                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.875rem" }}>
-                  Beoordelingen
-                </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+              <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                <h2 className="dash-section-title mb-3">Beoordelingen</h2>
+                <div>
                   {reviews.map(r => (
-                    <div key={r.id} style={{ borderBottom: "1px solid var(--border)", paddingBottom: "0.875rem" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                        <span style={{ color: "#f59e0b", fontSize: "0.9375rem", letterSpacing: "2px" }}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
+                    <div key={r.id} className="dash-row" style={{ flexDirection: "column", alignItems: "flex-start", gap: "0.25rem" }}>
+                      <div className="flex items-center gap-2">
+                        <span style={{ color: "var(--gold)", fontSize: "0.9375rem", letterSpacing: "2px" }}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
                         <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{r.author.name}</span>
                       </div>
                       {r.text && <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6 }}>{r.text}</p>}
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Claim profile */}
             {!vendor.userId && (
-              <div className="ddp-card" style={{ background: "var(--color-blush-soft)", borderColor: "var(--color-blush)" }}>
-                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Is dit jouw bedrijf?</h2>
+              <section className="mb-8" style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem" }}>
+                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "0.25rem", color: "var(--foreground)" }}>Is dit jouw bedrijf?</h2>
                 <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.6 }}>
                   Claim dit profiel om het te beheren, foto&apos;s toe te voegen en aanvragen van bruidsparen te ontvangen.
                 </p>
                 {claimSent ? (
-                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534" }}>
+                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600 }}>
                     Aanvraag verstuurd! We nemen je verzoek in behandeling en sturen je een e-mail zodra het is goedgekeurd.
-                  </div>
+                  </p>
                 ) : (
-                  <form onSubmit={handleClaim} style={{ display: "flex", gap: "0.5rem" }}>
+                  <form onSubmit={handleClaim} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                     <input
                       type="email"
                       required
                       value={claimEmail}
                       onChange={(e) => setClaimEmail(e.target.value)}
                       placeholder="jouw@email.nl"
-                      style={{ flex: 1, padding: "0.5rem 0.75rem", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "0.875rem", boxSizing: "border-box" }}
+                      className="ddp-input"
+                      style={{ flex: "1 1 200px" }}
                     />
-                    <button type="submit" disabled={claimSending} style={{ padding: "0.5rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, whiteSpace: "nowrap" }}>
+                    <button type="submit" disabled={claimSending} className="ddp-btn-primary">
                       {claimSending ? "Bezig…" : "Profiel claimen"}
                     </button>
                   </form>
                 )}
                 {claimError && <p style={{ fontSize: "0.8125rem", color: "var(--danger)", marginTop: "0.5rem" }}>{claimError}</p>}
-              </div>
+              </section>
             )}
 
             {/* Contact form */}
             {!isVendorOwner && (
-              <div className="ddp-card">
-                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Stuur een aanvraag</h2>
+              <section className="pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                <h2 className="dash-section-title mb-1">Stuur een aanvraag</h2>
                 <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.6 }}>
                   Stel een vraag of doe een vrijblijvende aanvraag bij {vendor.name}.
                 </p>
                 {contactSent ? (
-                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534" }}>
+                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600 }}>
                     Aanvraag verstuurd! {vendor.name} neemt zo snel mogelijk contact op.
-                  </div>
+                  </p>
                 ) : (
                   <form onSubmit={handleContact} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                     {[
@@ -385,7 +376,7 @@ export default function VendorProfilePage() {
                           value={contactForm[f.key as keyof typeof contactForm]}
                           onChange={e => setContactForm(c => ({ ...c, [f.key]: e.target.value }))}
                           placeholder={f.placeholder}
-                          style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "0.875rem", boxSizing: "border-box" }}
+                          className="ddp-input"
                         />
                       </div>
                     ))}
@@ -397,43 +388,42 @@ export default function VendorProfilePage() {
                         onChange={e => setContactForm(c => ({ ...c, message: e.target.value }))}
                         placeholder="Vertel meer over jullie bruiloft en wat je nodig hebt…"
                         rows={4}
-                        style={{ width: "100%", padding: "0.5rem 0.75rem", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "0.875rem", resize: "vertical", boxSizing: "border-box" }}
+                        className="ddp-input resize-none"
                       />
                     </div>
-                    <button type="submit" disabled={contactSending} style={{ padding: "0.625rem 1rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+                    <button type="submit" disabled={contactSending} className="ddp-btn-primary" style={{ alignSelf: "flex-start" }}>
                       {contactSending ? "Verzenden…" : "Aanvraag versturen"}
                     </button>
                   </form>
                 )}
-              </div>
+              </section>
             )}
 
           </div>
 
           {/* Sidebar — Dream Team */}
           <div style={{ width: "100%", maxWidth: "300px", flexShrink: 0 }} className="lg:flex-shrink-0">
-            <div className="ddp-card" style={{ background: "var(--color-blush-soft)", borderColor: "var(--color-blush)" }}>
-              <Heart className="w-5 h-5 mb-3" style={{ color: "var(--color-rose)" }} />
-              <h3 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.375rem" }}>
+            <div className="dash-hero" style={{ padding: "1.5rem" }}>
+              <h3 className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "0.375rem", color: "var(--ink-text)" }}>
                 Toevoegen aan Dream Team
               </h3>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
+              <p style={{ fontSize: "0.8125rem", color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
                 Nodig {vendor.name} uit voor jullie bruiloft. De leverancier ontvangt een verzoek en kan dit accepteren.
               </p>
 
               {!currentUser ? (
                 <div className="flex flex-col gap-2">
-                  <Link href="/aanmelden" className="ddp-btn-primary" style={{ justifyContent: "center" }}>
+                  <Link href="/aanmelden" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
                     Account aanmaken
                   </Link>
-                  <Link href="/login" className="ddp-btn-secondary" style={{ justifyContent: "center" }}>
+                  <Link href="/login" style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", fontWeight: 600, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
                     Inloggen
                   </Link>
                 </div>
               ) : isVendorOwner ? (
-                <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>Dit is jouw eigen profiel.</p>
+                <p style={{ fontSize: "0.875rem", color: "var(--ink-muted)" }}>Dit is jouw eigen profiel.</p>
               ) : added ? (
-                <div className="flex items-center gap-2" style={{ color: "var(--success)", fontSize: "0.9rem", fontWeight: 600 }}>
+                <div className="flex items-center gap-2" style={{ color: "var(--gold)", fontSize: "0.9rem", fontWeight: 600 }}>
                   <Check className="w-4 h-4" /> Uitnodiging verstuurd!
                 </div>
               ) : isCouple ? (
@@ -458,14 +448,13 @@ export default function VendorProfilePage() {
                   <button
                     onClick={handleAddToDreamTeam}
                     disabled={adding || !selectedWedding}
-                    className="ddp-btn-primary"
-                    style={{ justifyContent: "center" }}
+                    style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer", fontSize: "0.875rem", opacity: (adding || !selectedWedding) ? 0.6 : 1 }}
                   >
                     {adding ? "Bezig…" : "Uitnodigen voor Dream Team"}
                   </button>
                 </div>
               ) : (
-                <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
+                <p style={{ fontSize: "0.875rem", color: "var(--ink-muted)" }}>
                   Alleen bruidsparen kunnen leveranciers toevoegen.
                 </p>
               )}
@@ -480,10 +469,8 @@ export default function VendorProfilePage() {
 
 function ContactRow({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="flex items-center gap-3" style={{ fontSize: "0.9rem", color: "var(--foreground)" }}>
-      <div style={{ width: "34px", height: "34px", borderRadius: "10px", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--muted)" }}>
-        {typeof icon === "string" ? icon : icon}
-      </div>
+    <div className="flex items-center gap-2.5" style={{ fontSize: "0.9rem", color: "var(--foreground)" }}>
+      <span style={{ color: "var(--gold-deep)", display: "flex", flexShrink: 0 }}>{icon}</span>
       <span style={{ color: "var(--muted)" }}>{label}</span>
     </div>
   );

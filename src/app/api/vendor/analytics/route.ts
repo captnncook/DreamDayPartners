@@ -6,12 +6,12 @@ export async function GET() {
   const user = await getSession();
   if (!user || user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
-  const vendor = await prisma.vendor.findFirst({ where: { userId: user.id }, select: { id: true } });
+  const vendor = await prisma.vendor.findFirst({ where: { userId: user.id }, select: { id: true, viewCount: true } });
   if (!vendor) return NextResponse.json({ error: "Geen leveranciersprofiel" }, { status: 404 });
 
   const weddingVendors = await prisma.weddingVendor.findMany({
     where: { vendorId: vendor.id, portalAccess: true },
-    include: { wedding: { select: { date: true, title: true } } },
+    include: { wedding: { select: { id: true, date: true, title: true } } },
   });
 
   const now = new Date();
@@ -39,6 +39,21 @@ export async function GET() {
   const upcoming = weddingVendors.filter(wv => new Date(wv.wedding.date) >= now).length;
   const past = weddingVendors.filter(wv => new Date(wv.wedding.date) < now).length;
 
+  // Met welke andere leveranciers is samengewerkt (zelfde bruiloften)?
+  const weddingIds = weddingVendors.map(wv => wv.wedding.id);
+  const collaborators = weddingIds.length > 0 ? await prisma.weddingVendor.findMany({
+    where: { weddingId: { in: weddingIds }, vendorId: { not: vendor.id } },
+    include: { vendor: { select: { id: true, name: true, category: true } } },
+  }) : [];
+
+  const collabCounts = new Map<string, { id: string; name: string; category: string; count: number }>();
+  for (const c of collaborators) {
+    const existing = collabCounts.get(c.vendor.id);
+    if (existing) existing.count += 1;
+    else collabCounts.set(c.vendor.id, { id: c.vendor.id, name: c.vendor.name, category: c.vendor.category, count: 1 });
+  }
+  const topCollaborators = Array.from(collabCounts.values()).sort((a, b) => b.count - a.count).slice(0, 8);
+
   return NextResponse.json({
     total: weddingVendors.length,
     thisYear: byYear[thisYear] ?? 0,
@@ -47,5 +62,7 @@ export async function GET() {
     totalRevenue,
     monthsData,
     byYear: Object.entries(byYear).map(([year, count]) => ({ year: Number(year), count })).sort((a, b) => a.year - b.year),
+    profileViews: vendor.viewCount,
+    topCollaborators,
   });
 }

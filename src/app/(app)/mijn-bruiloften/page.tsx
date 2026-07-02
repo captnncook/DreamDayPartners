@@ -161,21 +161,6 @@ export default function MijnBruiloftenPage() {
         </form>
       )}
 
-      {/* Status flow legend */}
-      {!loading && invites.length > 0 && (
-        <div style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)", padding: "0.75rem 0.25rem", marginBottom: "1rem" }}>
-          <p style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Statusflow</p>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexWrap: "wrap" }}>
-            {["Aanvraag", "Interesse", "Lead", "Geboekt", "Afgerond"].map((label, i, arr) => (
-              <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "0.75rem" }}>
-                <span style={{ color: i >= 2 && i <= 3 ? "var(--gold-deep)" : "var(--muted)", fontWeight: 600 }}>{label}</span>
-                {i < arr.length - 1 && <span style={{ color: "var(--muted-light)" }}>·</span>}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* List */}
       {loading ? (
         <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>Laden…</p>

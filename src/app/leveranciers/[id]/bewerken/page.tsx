@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Upload, Trash2, Save, Check, Star, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Upload, Trash2, Save, Check, Star } from "lucide-react";
 
 const CATEGORIES = [
   { value: "weddingplanner", label: "Weddingplanner" },
@@ -81,8 +81,8 @@ function BusyCalendar({ busyDates, onToggle }: {
           return (
             <button key={ds} onClick={() => !isPast && onToggle(ds)} style={{
               padding: "0.375rem 0.25rem", borderRadius: "6px", border: "none", cursor: isPast ? "default" : "pointer",
-              background: isBusy ? "#fee2e2" : "var(--accent)",
-              color: isBusy ? "#b91c1c" : isPast ? "var(--muted)" : "var(--foreground)",
+              background: isBusy ? "var(--ink)" : "var(--sand)",
+              color: isBusy ? "var(--ink-text)" : isPast ? "var(--muted)" : "var(--foreground)",
               fontWeight: isBusy ? 700 : 400, fontSize: "0.8125rem", transition: "background 0.1s",
               opacity: isPast ? 0.4 : 1,
             }}>
@@ -95,9 +95,9 @@ function BusyCalendar({ busyDates, onToggle }: {
       {busyDates.length > 0 && (
         <div style={{ marginTop: "0.75rem", display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
           {busyDates.sort().map(d => (
-            <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", background: "#fee2e2", color: "#b91c1c", borderRadius: "9999px", padding: "0.2rem 0.625rem", fontSize: "0.75rem", fontWeight: 500 }}>
+            <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", background: "var(--ink)", color: "var(--ink-text)", borderRadius: "9999px", padding: "0.2rem 0.625rem", fontSize: "0.75rem", fontWeight: 500 }}>
               {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(new Date(d))}
-              <button onClick={() => onToggle(d)} style={{ background: "none", border: "none", cursor: "pointer", color: "#b91c1c", padding: 0, lineHeight: 1, fontSize: "0.9rem" }}>×</button>
+              <button onClick={() => onToggle(d)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--gold)", padding: 0, lineHeight: 1, fontSize: "0.9rem" }}>×</button>
             </span>
           ))}
         </div>
@@ -377,50 +377,50 @@ function VendorEditPage() {
   if (!vendor) return null;
 
   return (
-    <div className="min-h-screen" style={{ background: "#f5f5f7", color: "var(--foreground)" }}>
-      <div style={{ background: "var(--foreground)", padding: "1.25rem 1.25rem 2rem" }}>
+    <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+      <div className="dash-hero" style={{ borderRadius: 0, padding: "1.25rem 1.25rem 2rem" }}>
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
           <Link
             href={`/leveranciers/${id}`}
             className="inline-flex items-center gap-2"
-            style={{ color: "rgba(255,255,255,0.6)", textDecoration: "none", fontSize: "0.875rem", marginBottom: "1.5rem", display: "inline-flex" }}
+            style={{ color: "var(--ink-muted)", textDecoration: "none", fontSize: "0.875rem", marginBottom: "1.5rem", display: "inline-flex" }}
           >
             <ArrowLeft className="w-4 h-4" /> Terug naar profiel
           </Link>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white" }}>
+          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
             Profiel bewerken
           </h1>
-          <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", marginTop: "0.25rem" }}>{vendor.name}</p>
+          <p style={{ fontSize: "0.9rem", color: "var(--ink-muted)", marginTop: "0.25rem" }}>{vendor.name}</p>
         </div>
       </div>
 
       <div style={{ maxWidth: "760px", margin: "1.5rem auto", padding: "0 1.25rem 3rem" }}>
         {/* Premium status banner — shown at top */}
         {isUserPremium && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "0.75rem 1rem", marginBottom: "1rem", fontSize: "0.875rem", color: "#92400e", fontWeight: 600 }}>
-            <Star className="w-4 h-4" style={{ color: "#d97706", flexShrink: 0 }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.75rem 1rem", marginBottom: "1rem", fontSize: "0.875rem", color: "var(--foreground)", fontWeight: 600 }}>
+            <Star className="w-4 h-4" style={{ color: "var(--gold-deep)", flexShrink: 0 }} />
             Premium actief — je profiel staat bovenaan de zoekresultaten.
           </div>
         )}
         {upgradeStatus === "success" && (
-          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#166534", marginBottom: "1rem" }}>
+          <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "var(--foreground)", marginBottom: "1rem" }}>
             Premium actief — welkom bij DreamDay Platform Pro!
           </div>
         )}
         {upgradeStatus === "cancelled" && (
-          <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#92400e", marginBottom: "1rem" }}>
+          <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "var(--foreground)", marginBottom: "1rem" }}>
             Betaling geannuleerd. Je kunt het altijd opnieuw proberen.
           </div>
         )}
         {error && (
-          <div style={{ background: "#fee", border: "1px solid #fcc", borderRadius: "12px", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "#c00", marginBottom: "1rem" }}>
+          <div style={{ background: "var(--danger-bg)", borderLeft: "3px solid var(--danger)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "var(--danger)", marginBottom: "1rem" }}>
             {error}
           </div>
         )}
 
         {/* Profielfoto (cover) */}
-        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Profielfoto</h2>
+        <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="dash-section-title mb-1">Profielfoto</h2>
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
             Wordt getoond op de leverancierskaart in het overzicht. Kies een opvallende foto die jullie werk goed vertegenwoordigt.
           </p>
@@ -469,8 +469,8 @@ function VendorEditPage() {
         </section>
 
         {/* Embleem foto */}
-        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Embleem foto</h2>
+        <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="dash-section-title mb-1">Embleem foto</h2>
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
             Portretfoto die verschijnt in het Dream Team overzicht van het bruidspaar en in de chat. Gebruik een foto waarbij je gezicht goed zichtbaar is.
           </p>
@@ -484,7 +484,7 @@ function VendorEditPage() {
                   </clipPath>
                 </defs>
                 <path d="M60 4 L108 22 L108 72 C108 100 84 124 60 136 C36 124 12 100 12 72 L12 22 Z"
-                  fill={emblemUrl ? "#1a1a1a" : "var(--accent)"} stroke="var(--border)" strokeWidth="2" />
+                  fill={emblemUrl ? "var(--ink)" : "var(--sand)"} stroke="var(--border)" strokeWidth="2" />
                 {emblemUrl ? (
                   <image href={emblemUrl} x="12" y="4" width="96" height="132" clipPath="url(#shield-clip-edit)" preserveAspectRatio="xMidYMid slice" />
                 ) : (
@@ -494,7 +494,7 @@ function VendorEditPage() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingTop: "0.5rem" }}>
               <button onClick={() => emblemInputRef.current?.click()} disabled={uploadingEmblem}
-                style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontWeight: 600, fontSize: "0.8125rem" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--ink)", color: "white", border: "none", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontWeight: 600, fontSize: "0.8125rem" }}>
                 <Upload className="w-4 h-4" />
                 {uploadingEmblem ? "Uploaden…" : emblemUrl ? "Vervangen" : "Foto uploaden"}
               </button>
@@ -511,8 +511,8 @@ function VendorEditPage() {
         </section>
 
         {/* Galerij */}
-        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Galerij</h2>
+        <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="dash-section-title mb-1">Galerij</h2>
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
             Tot 12 foto&apos;s die worden getoond op jullie profielpagina. Laat zien wat jullie kunnen!
           </p>
@@ -555,8 +555,8 @@ function VendorEditPage() {
         </section>
 
         {/* Tekst & info */}
-        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "1rem" }}>Informatie</h2>
+        <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="dash-section-title mb-4">Informatie</h2>
 
           <div className="flex flex-col gap-4">
             <div>
@@ -568,11 +568,7 @@ function VendorEditPage() {
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={5}
                 placeholder="Schrijf een beschrijving over jullie diensten, aanpak en wat jullie uniek maakt…"
-                style={{
-                  width: "100%", padding: "0.75rem", border: "1px solid rgba(0,0,0,0.12)",
-                  borderRadius: "10px", fontSize: "0.875rem", resize: "vertical", outline: "none",
-                  lineHeight: 1.6, fontFamily: "inherit",
-                }}
+                className="ddp-input resize-none"
               />
             </div>
 
@@ -592,10 +588,7 @@ function VendorEditPage() {
                     value={form[key as keyof typeof form]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                     placeholder={placeholder}
-                    style={{
-                      width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)",
-                      borderRadius: "10px", fontSize: "0.875rem", outline: "none",
-                    }}
+                    className="ddp-input"
                   />
                 </div>
               ))}
@@ -604,8 +597,8 @@ function VendorEditPage() {
         </section>
 
         {/* Prijzen & specialisaties */}
-        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "0.25rem" }}>Prijsindicatie & specialisaties</h2>
+        <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="dash-section-title mb-1">Prijsindicatie & specialisaties</h2>
           <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
             Geef bruidsparen een richtprijs en vertel in welke specialisaties jullie uitblinken.
           </p>
@@ -621,7 +614,7 @@ function VendorEditPage() {
                   value={form[key as keyof typeof form]}
                   onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                   placeholder={placeholder}
-                  style={{ width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }}
+                  className="ddp-input"
                 />
               </div>
             ))}
@@ -631,7 +624,7 @@ function VendorEditPage() {
             <select
               value={form.priceUnit}
               onChange={(e) => setForm({ ...form, priceUnit: e.target.value })}
-              style={{ width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none", background: "white" }}
+              className="ddp-select"
             >
               <option value="">Geen eenheid</option>
               <option value="per persoon">per persoon</option>
@@ -649,27 +642,27 @@ function VendorEditPage() {
               value={form.specializations}
               onChange={(e) => setForm({ ...form, specializations: e.target.value })}
               placeholder={SPECIALIZATIONS_PLACEHOLDER[vendor?.category ?? ""] ?? "bijv. bruidsboeket, corsages, fotografie..."}
-              style={{ width: "100%", padding: "0.625rem 0.875rem", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "10px", fontSize: "0.875rem", outline: "none" }}
+              className="ddp-input"
             />
           </div>
         </section>
 
         {/* Beschikbaarheid */}
-        <section style={{ background: "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: "1px solid rgba(0,0,0,0.06)" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "1rem" }}>Beschikbaarheid</h2>
+        <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="dash-section-title mb-4">Beschikbaarheid</h2>
           <BusyCalendar busyDates={busyDates} onToggle={toggleBusyDate} />
         </section>
 
-        <section style={{ background: isUserPremium ? "#fffbeb" : "white", borderRadius: "16px", padding: "1.5rem", marginBottom: "1rem", border: `1px solid ${isUserPremium ? "#fde68a" : "#C9A96E"}` }}>
+        <section className={isUserPremium ? "" : "dash-hero"} style={isUserPremium ? { background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem", marginBottom: "2rem" } : { padding: "1.5rem", marginBottom: "2rem" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
-                <Star className="w-4 h-4" style={{ color: isUserPremium ? "#d97706" : "#C9A96E" }} />
-                <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: isUserPremium ? "#92400e" : "var(--foreground)" }}>
+                <Star className="w-4 h-4" style={{ color: "var(--gold)", flexShrink: 0 }} />
+                <span className="font-serif" style={{ fontWeight: 700, fontSize: "1.0625rem", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
                   {isUserPremium ? "Premium actief" : "Upgrade naar Premium"}
                 </span>
               </div>
-              <p style={{ fontSize: "0.8125rem", color: isUserPremium ? "#b45309" : "var(--muted)", maxWidth: "360px" }}>
+              <p style={{ fontSize: "0.8125rem", color: isUserPremium ? "var(--muted)" : "var(--ink-muted)", maxWidth: "360px" }}>
                 {isUserPremium
                   ? "Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen."
                   : "Kom bovenaan zoekresultaten, toon het Aanbevolen-label en bereik meer bruidsparen. Slechts €29/maand."}
@@ -679,7 +672,7 @@ function VendorEditPage() {
               <button
                 onClick={handlePortal}
                 disabled={billingLoading}
-                style={{ padding: "0.625rem 1.25rem", borderRadius: "9999px", background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}
+                className="ddp-btn-secondary"
               >
                 {billingLoading ? "Laden…" : "Abonnement beheren"}
               </button>
@@ -687,7 +680,7 @@ function VendorEditPage() {
               <button
                 onClick={handleUpgrade}
                 disabled={billingLoading}
-                style={{ padding: "0.625rem 1.5rem", borderRadius: "9999px", background: "#C9A96E", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700 }}
+                style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
               >
                 {billingLoading ? "Laden…" : "Upgrade — €29/maand"}
               </button>
@@ -710,30 +703,25 @@ function VendorEditPage() {
         </div>
 
         {/* Profiel verwijderen */}
-        <section className="ddp-card mt-4" style={{ borderColor: "var(--danger)", background: "var(--danger-bg)" }}>
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--danger)" }} />
-            <div className="flex-1">
-              <h3 className="font-semibold text-sm" style={{ color: "var(--danger)" }}>Profiel verwijderen</h3>
-              <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>
-                Je account en alle bijbehorende gegevens worden permanent verwijderd. Je ontvangt eerst een bevestigingse-mail.
-              </p>
-              {deleteSent ? (
-                <p className="text-xs mt-3 font-medium" style={{ color: "var(--danger)" }}>
-                  ✓ Bevestigingsmail verstuurd. Controleer je inbox en klik op de link om de verwijdering te voltooien.
-                </p>
-              ) : (
-                <button
-                  onClick={handleRequestDelete}
-                  disabled={deleteLoading}
-                  className="mt-3 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors"
-                  style={{ borderColor: "var(--danger)", color: "var(--danger)", background: "transparent", cursor: "pointer" }}
-                >
-                  {deleteLoading ? "Versturen…" : "Profiel verwijderen"}
-                </button>
-              )}
-            </div>
-          </div>
+        <section className="mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+          <h3 className="dash-section-title mb-1" style={{ color: "var(--danger)" }}>Profiel verwijderen</h3>
+          <p className="text-xs" style={{ color: "var(--muted)" }}>
+            Je account en alle bijbehorende gegevens worden permanent verwijderd. Je ontvangt eerst een bevestigingse-mail.
+          </p>
+          {deleteSent ? (
+            <p className="text-xs mt-3 font-medium" style={{ color: "var(--danger)" }}>
+              Bevestigingsmail verstuurd. Controleer je inbox en klik op de link om de verwijdering te voltooien.
+            </p>
+          ) : (
+            <button
+              onClick={handleRequestDelete}
+              disabled={deleteLoading}
+              className="mt-3 text-xs font-semibold"
+              style={{ color: "var(--danger)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+            >
+              {deleteLoading ? "Versturen…" : "Profiel verwijderen"}
+            </button>
+          )}
         </section>
       </div>
     </div>

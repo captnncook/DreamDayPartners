@@ -462,20 +462,12 @@ function StatInline({ value, label }: { value: number; label: string }) {
 }
 
 function NextWeddingHero({ wedding }: { wedding: Wedding }) {
-  const d = new Date(wedding.date);
-  const day = d.getDate();
-  const month = new Intl.DateTimeFormat("nl-NL", { month: "short" }).format(d).toUpperCase();
   const urgent = wedding.days <= 14;
 
   return (
     <section className="mb-8">
       <div className="ddp-section-label mb-2">Eerstvolgende bruiloft</div>
       <div className="dash-hero" style={{ padding: "1.75rem", display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
-        <div className="dash-ring" style={{ width: "76px", height: "76px" }}>
-          <span className="dash-ring-month" style={{ fontSize: "0.5625rem", fontWeight: 700, letterSpacing: "0.08em" }}>{month}</span>
-          <span className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, lineHeight: 1 }}>{day}</span>
-        </div>
-
         <div style={{ flex: 1, minWidth: "180px" }}>
           <div className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
             {wedding.title}

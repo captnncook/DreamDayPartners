@@ -28,7 +28,8 @@ Het volledige palet en de componentklassen staan in `src/app/globals.css`. Ident
 - Namen van bruiloften en leveranciers: `.font-serif`.
 - Sectielabels: `.ddp-section-label` (kleine caps).
 - Lijstrijen: `.dash-row`.
-- Donkere panelen (hero's, sidebar): `--ink`/`--ink-mid` met `--gold` accent; het signature-element is de gouden datumring (`.dash-ring`).
+- Donkere panelen (hero's, sidebar): `--ink`/`--ink-mid` met `--gold` accent.
+- Bruiloft-hero's (`.dash-hero`): toon elk gegeven maar **één keer** — naam (serif), datum + locatie op één regel eronder, aftellen rechts. Geen aparte datumring/medaillon meer (verwijderd — was redundant met de datum in de regel eronder).
 - Zoekvelden: gebruik `.ddp-search` wrapper (icoon + input) — nooit los een icoon absoluut positioneren over een `.ddp-input`, en nooit Tailwind `pl-*` combineren met `.ddp-input` (die overschrijft de padding).
 
 ### Responsiviteit — geen uitzonderingen

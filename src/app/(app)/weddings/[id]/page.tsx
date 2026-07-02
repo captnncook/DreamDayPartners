@@ -98,9 +98,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
   const isVendor = user.role === "vendor";
   const urgent = days >= 0 && days <= 14;
-  const d = new Date(wedding.date);
-  const dayNum = d.getDate();
-  const monthShort = new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "nl-NL", { month: "short" }).format(d).toUpperCase();
 
   return (
     <div className="px-4 py-6 md:p-8 max-w-5xl mx-auto">
@@ -110,13 +107,8 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
         {tw.backToDashboard}
       </Link>
 
-      {/* Header — dark hero met gouden datumring */}
+      {/* Header — dark hero: naam, datum + locatie, aftellen */}
       <div className="dash-hero mb-6" style={{ padding: "1.5rem 1.75rem", display: "flex", alignItems: "center", gap: "1.375rem", flexWrap: "wrap" }}>
-        <div className="dash-ring" style={{ width: "64px", height: "64px" }}>
-          <span className="dash-ring-month" style={{ fontSize: "0.5rem", fontWeight: 700, letterSpacing: "0.08em" }}>{monthShort}</span>
-          <span className="font-serif" style={{ fontSize: "1.5rem", fontWeight: 700, lineHeight: 1 }}>{dayNum}</span>
-        </div>
-
         <div style={{ flex: 1, minWidth: "200px" }}>
           <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
             <h1 className="font-serif" style={{ fontSize: "clamp(1.25rem, 4.5vw, 1.625rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
