@@ -52,6 +52,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     select: { id: true, email: true, isPremium: true, name: true, vendorType: true },
   });
 
+  // Vendor.isPremium (catalogus-sortering/badge op /leveranciers) staat los
+  // van User.isPremium — zonder deze sync verandert een admin-toggle hier
+  // niets aan de zichtbare listing.
+  if (body.isPremium !== undefined) {
+    await prisma.vendor.updateMany({ where: { userId: id }, data: { isPremium: Boolean(body.isPremium) } });
+  }
+
   // Send premium granted email when toggling on
   if (body.isPremium === true && !target.isPremium) {
     const tpl = premiumGrantedEmail(updated.name, updated.vendorType);

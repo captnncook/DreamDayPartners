@@ -172,6 +172,13 @@ const STATEMENTS = [
 ];
 
 const CLEANUP = [
+  // Vendor.isPremium (catalogus) en User.isPremium (accountflag) konden uit
+  // sync raken doordat de admin-accounts-toggle voorheen alleen User zette —
+  // hier eenmalig/idempotent rechttrekken voor bestaande scheve gevallen.
+  `UPDATE "vendors" v SET "isPremium" = u."isPremium"
+   FROM "users" u
+   WHERE v."userId" = u.id AND v."isPremium" IS DISTINCT FROM u."isPremium"`,
+
   // Remove duplicate draaiboek items — keep earliest per (draaiboekId, vendorId, title, startTime)
   `DELETE FROM "draaiboek_items"
    WHERE id NOT IN (
