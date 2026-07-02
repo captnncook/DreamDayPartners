@@ -21,6 +21,11 @@ const STATEMENTS = [
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "viewCount" INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE "vendor_claim_requests" ADD COLUMN IF NOT EXISTS "completedAt" TIMESTAMP(3)`,
 
+  // Catalogus-overzicht (/leveranciers) filtert/sorteert op deze kolommen —
+  // zonder index kost dat een full table scan bij elke pageload/filter.
+  `CREATE INDEX IF NOT EXISTS "vendors_category_idx" ON "vendors" ("category")`,
+  `CREATE INDEX IF NOT EXISTS "vendors_isPremium_idx" ON "vendors" ("isPremium")`,
+
   `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "passwordHash" TEXT`,
   `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "emailNewMessage" BOOLEAN NOT NULL DEFAULT true`,
   `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "emailNewTask" BOOLEAN NOT NULL DEFAULT true`,

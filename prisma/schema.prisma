@@ -157,6 +157,8 @@ model Vendor {
   reviews          VendorReview[]
   claimRequests    VendorClaimRequest[]
 
+  @@index([category])
+  @@index([isPremium])
   @@map("vendors")
 }
 

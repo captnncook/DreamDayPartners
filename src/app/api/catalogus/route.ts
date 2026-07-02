@@ -20,43 +20,53 @@ async function geocodeCity(city?: string | null): Promise<{ latitude?: number; l
   return {};
 }
 
+const PAGE_SIZE = 60;
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const category = searchParams.get("category");
   const search = searchParams.get("search");
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
-  const vendors = await prisma.vendor.findMany({
-    where: {
-      ...(category ? { category } : {}),
-      ...(search
-        ? {
-            OR: [
-              { name: { contains: search, mode: "insensitive" } },
-              { description: { contains: search, mode: "insensitive" } },
-              { city: { contains: search, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-    },
-    select: {
-      id: true,
-      name: true,
-      category: true,
-      contactPerson: true,
-      email: true,
-      phone: true,
-      website: true,
-      description: true,
-      isPremium: true,
-      coverPhoto: true,
-      city: true,
-      latitude: true,
-      longitude: true,
-      priceFrom: true,
-      specializations: true,
-    },
-    orderBy: [{ isPremium: "desc" }, { name: "asc" }],
-  });
+  const where = {
+    ...(category ? { category } : {}),
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { description: { contains: search, mode: "insensitive" as const } },
+            { city: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
+
+  const [vendors, total] = await Promise.all([
+    prisma.vendor.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        category: true,
+        contactPerson: true,
+        email: true,
+        phone: true,
+        website: true,
+        description: true,
+        isPremium: true,
+        coverPhoto: true,
+        city: true,
+        latitude: true,
+        longitude: true,
+        priceFrom: true,
+        specializations: true,
+      },
+      orderBy: [{ isPremium: "desc" }, { name: "asc" }],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.vendor.count({ where }),
+  ]);
 
   // Generate signed URLs for cover photos
   const vendorsWithCover = await Promise.all(
@@ -66,7 +76,7 @@ export async function GET(req: NextRequest) {
     }))
   );
 
-  return NextResponse.json({ vendors: vendorsWithCover });
+  return NextResponse.json({ vendors: vendorsWithCover, total, page, pageSize: PAGE_SIZE });
 }
 
 // Admin-only: nieuwe leverancier toevoegen aan de catalogus

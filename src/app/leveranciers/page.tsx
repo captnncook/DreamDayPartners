@@ -45,6 +45,9 @@ type Vendor = {
 function LeveranciersContent() {
   const searchParams = useSearchParams();
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(60);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(searchParams.get("category") ?? "");
@@ -64,30 +67,30 @@ function LeveranciersContent() {
       .catch(() => {});
   }, []);
 
+  // Terug naar pagina 1 zodra filters wijzigen
+  useEffect(() => { setPage(1); }, [category, debouncedSearch]);
+
   const load = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (category) params.set("category", category);
     if (debouncedSearch) params.set("search", debouncedSearch);
+    params.set("page", String(page));
     const res = await fetch(`/api/catalogus?${params}`);
     const data = await res.json();
     setVendors(data.vendors ?? []);
+    setTotal(data.total ?? 0);
+    setPageSize(data.pageSize ?? 60);
     setLoading(false);
-  }, [category, debouncedSearch]);
+  }, [category, debouncedSearch, page]);
 
   useEffect(() => { load(); }, [load]);
 
   const hasFilter = !!category || !!search;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  // Premium eerst binnen elke categorie
+  // Premium eerst binnen deze pagina
   const sorted = [...vendors].sort((a, b) => Number(b.isPremium) - Number(a.isPremium));
-
-  const grouped = category
-    ? { [category]: sorted }
-    : sorted.reduce<Record<string, Vendor[]>>((acc, v) => {
-        (acc[v.category] = acc[v.category] ?? []).push(v);
-        return acc;
-      }, {});
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
@@ -176,9 +179,10 @@ function LeveranciersContent() {
         {!loading && vendors.length > 0 && (
           <div className="flex items-center justify-between mb-4" style={{ gap: "0.75rem" }}>
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", minWidth: 0 }}>
-              <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{vendors.length}</span>{" "}
-              leverancier{vendors.length !== 1 ? "s" : ""}
+              <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{total}</span>{" "}
+              leverancier{total !== 1 ? "s" : ""}
               {category && ` · ${CATEGORY_MAP[category] ?? category}`}
+              {totalPages > 1 && ` · pagina ${page}/${totalPages}`}
             </p>
             <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", overflow: "hidden", flexShrink: 0 }}>
               <button
@@ -222,21 +226,31 @@ function LeveranciersContent() {
             <VendorMap vendors={vendors} />
           </Suspense>
         ) : (
-          Object.entries(grouped).map(([cat, items]) => (
-            <section key={cat} style={{ marginBottom: "2.5rem" }}>
-              {!category && (
-                <div className="flex items-baseline gap-2.5 mb-1" style={{ padding: "0 0.75rem" }}>
-                  <h2 className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>
-                    {CATEGORY_MAP[cat] ?? cat}
-                  </h2>
-                  <span style={{ fontSize: "0.8125rem", color: "var(--muted-light)" }}>{items.length}</span>
-                </div>
-              )}
-              <div style={{ borderTop: "1px solid var(--border)" }}>
-                {items.map((v) => <VendorRow key={v.id} vendor={v} showCategory={!!category} />)}
+          <>
+            <div style={{ borderTop: "1px solid var(--border)" }}>
+              {sorted.map((v) => <VendorRow key={v.id} vendor={v} showCategory={!category} />)}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 pt-4" style={{ borderTop: "1px solid var(--border)" }}>
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--ink-text)", cursor: page <= 1 ? "default" : "pointer" }}
+                >
+                  ← Vorige
+                </button>
+                <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Pagina {page} van {totalPages}</span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--ink-text)", cursor: page >= totalPages ? "default" : "pointer" }}
+                >
+                  Volgende →
+                </button>
               </div>
-            </section>
-          ))
+            )}
+          </>
         )}
       </div>
     </div>
