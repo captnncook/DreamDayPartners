@@ -170,42 +170,62 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+function SidebarItem({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left"
+      style={{
+        fontSize: "0.9375rem", fontWeight: isActive ? 700 : 500, padding: "0.625rem 1rem",
+        borderRadius: "10px", border: "none", cursor: "pointer", transition: "all 0.15s",
+        background: isActive ? "var(--accent-soft)" : "transparent",
+        color: isActive ? "var(--foreground)" : "var(--muted)",
+        borderLeft: `3px solid ${isActive ? "var(--primary)" : "transparent"}`,
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 function VendorStoryPicker() {
-  const [active, setActive] = useState(VENDOR_STORIES[0].value);
-  const story = VENDOR_STORIES.find((s) => s.value === active)!;
+  const [active, setActive] = useState<string>("bruidspaar");
+  const story = VENDOR_STORIES.find((s) => s.value === active);
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-8">
-        {VENDOR_STORIES.map((s) => {
-          const isActive = s.value === active;
-          return (
-            <button
-              key={s.value}
-              onClick={() => setActive(s.value)}
-              style={{
-                fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500, padding: "0.5rem 1rem",
-                borderRadius: "var(--radius-full)", border: `1px solid ${isActive ? "var(--primary)" : "rgba(0,0,0,0.10)"}`,
-                background: isActive ? "var(--foreground)" : "transparent",
-                color: isActive ? "white" : "var(--muted)",
-                cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap",
-              }}
-            >
-              {s.label}
-            </button>
-          );
-        })}
+    <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+      {/* Sidebar */}
+      <div className="flex flex-col gap-1 lg:w-64 flex-shrink-0">
+        <SidebarItem label="Bruidspaar" isActive={active === "bruidspaar"} onClick={() => setActive("bruidspaar")} />
+        <div style={{ height: "1px", background: "rgba(0,0,0,0.10)", margin: "0.75rem 0.25rem" }} />
+        {VENDOR_STORIES.map((s) => (
+          <SidebarItem key={s.value} label={s.label} isActive={active === s.value} onClick={() => setActive(s.value)} />
+        ))}
       </div>
 
-      <div key={active} className="animate-fade-in" style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
-        <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label} — de vervelende realiteit</p>
-        <p style={{ fontSize: "1.0625rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1.25rem" }}>
-          {story.pain}
-        </p>
-        <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>Wat DreamDay oplost</p>
-        <p style={{ fontSize: "1.0625rem", color: "var(--muted)", lineHeight: 1.7 }}>
-          {story.solution}
-        </p>
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        {active === "bruidspaar" ? (
+          <div key="bruidspaar" className="animate-fade-in">
+            <p className="ddp-section-label mb-4" style={{ color: "var(--primary)" }}>Voor het bruidspaar</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {FEATURES_COUPLES.map((f) => (
+                <FeatureCard key={f.title} title={f.title} desc={f.desc} />
+              ))}
+            </div>
+          </div>
+        ) : story ? (
+          <div key={story.value} className="animate-fade-in" style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label} — de vervelende realiteit</p>
+            <p style={{ fontSize: "1.0625rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1.25rem" }}>
+              {story.pain}
+            </p>
+            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>Wat DreamDay oplost</p>
+            <p style={{ fontSize: "1.0625rem", color: "var(--muted)", lineHeight: 1.7 }}>
+              {story.solution}
+            </p>
+          </div>
+        ) : null}
       </div>
     </div>
   );
