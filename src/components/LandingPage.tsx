@@ -193,14 +193,31 @@ function VendorStoryPicker() {
   const story = VENDOR_STORIES.find((s) => s.value === active);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-      {/* Sidebar */}
-      <div className="flex flex-col gap-1 lg:w-64 flex-shrink-0">
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
+      {/* Sidebar — desktop only */}
+      <div className="hidden lg:flex flex-col gap-1 lg:w-64 flex-shrink-0">
         <SidebarItem label="Bruidspaar" isActive={active === "bruidspaar"} onClick={() => setActive("bruidspaar")} />
         <div style={{ height: "1px", background: "rgba(0,0,0,0.10)", margin: "0.75rem 0.25rem" }} />
         {VENDOR_STORIES.map((s) => (
           <SidebarItem key={s.value} label={s.label} isActive={active === s.value} onClick={() => setActive(s.value)} />
         ))}
+      </div>
+
+      {/* Dropdown — mobile/tablet only */}
+      <div className="lg:hidden">
+        <select
+          value={active}
+          onChange={(e) => setActive(e.target.value)}
+          className="ddp-select"
+          style={{ fontWeight: 700, fontSize: "1rem" }}
+        >
+          <option value="bruidspaar">Bruidspaar</option>
+          <optgroup label="Leveranciers">
+            {VENDOR_STORIES.map((s) => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </optgroup>
+        </select>
       </div>
 
       {/* Content */}
