@@ -10,12 +10,87 @@ import { Check, ArrowRight, ChevronDown, LogOut } from "lucide-react";
 /* ─── Data ─────────────────────────────────────────────── */
 
 const FEATURES_COUPLES = [
-  { title: "Alle leveranciers op één plek",  desc: "Zoek, vergelijk en voeg je bloemist, DJ en fotograaf toe — zonder eindeloos googelen." },
-  { title: "Contact via de app",             desc: "Geen losse gesprekken meer. Alles staat in je account, altijd terug te vinden." },
-  { title: "Offertes & facturen geregeld",   desc: "Nooit meer zoeken in je mail. Alles wat je ontvangt staat netjes in je dossier." },
-  { title: "Draaiboek voor jullie dag",      desc: "Een minuut-voor-minuut tijdlijn die je deelt met je dream team." },
-  { title: "Overzicht & planning",           desc: "Van verloving tot de grote dag — taken, deadlines en voortgang in één dashboard." },
-  { title: "Gastenlijst & RSVP",            desc: "Wie er komt, dieetwensen en bevestigingen — bijgehouden zonder gedoe." },
+  { title: "Nooit hetzelfde twee keer vertellen", desc: "Gastenaantal en dieetwensen vul je één keer in — cateraar, bakker en vervoerder lezen automatisch mee." },
+  { title: "Eén draaiboek voor iedereen",         desc: "Fotograaf, DJ, band en vervoerder werken met dezelfde actuele tijdlijn, niet acht losse kopieën." },
+  { title: "Altijd zicht op betaalstatus",        desc: "Aanbetaling, einddatum en eindbedrag van elke leverancier in één overzicht — geen losse facturen bijhouden." },
+  { title: "Contracten & offertes centraal",      desc: "Alles wat je ontvangt staat gecategoriseerd in je dossier, niet verspreid over mail en WhatsApp." },
+  { title: "Duidelijke goedkeuringen",            desc: "Weet precies welke versie van het moodboard of menu je hebt goedgekeurd — geen mailthread doorzoeken." },
+  { title: "Geen telefooncentrale meer",          desc: "Leveranciers stemmen praktische logistiek rechtstreeks met elkaar af, in plaats van via jou." },
+  { title: "Taken & deadlines op één plek",       desc: "Van verloving tot de grote dag — voortgang in één dashboard, niet drie losse apps." },
+  { title: "Altijd gratis",                       desc: "Geen abonnement, geen creditcard, geen addertjes — voor altijd gratis voor bruidsparen." },
+];
+
+const VENDOR_STORIES: { value: string; label: string; pain: string; solution: string }[] = [
+  {
+    value: "weddingplanner", label: "Weddingplanner",
+    pain: "Jij coördineert 12+ leveranciers, vaak via vijf losse tools naast elkaar — en volgens onderzoek gaat tot 70% van je tijd naar administratie in plaats van naar het vak zelf.",
+    solution: "DreamDay geeft je per bruiloft één overzicht: status van elke leverancier, openstaande deliverables, betalingen en het complete draaiboek — zonder zelf alles handmatig te synchroniseren.",
+  },
+  {
+    value: "fotograaf", label: "Fotograaf",
+    pain: "Voor elk uur achter de camera gaat er net zoveel tijd naar niet-gefactureerde administratie: offertes op maat, contracten, en steeds opnieuw het tijdschema doornemen.",
+    solution: "Je shotlist en leveringen (sneak peek, bestanden, album) staan met een duidelijke goedkeuringsstatus klaar, in hetzelfde draaiboek als de videograaf.",
+  },
+  {
+    value: "videograaf", label: "Videograaf",
+    pain: "Jij en de fotograaf vragen vaak los van elkaar dezelfde ceremonie-informatie op bij het bruidspaar — en als er iets verschuift, hoort niet iedereen het tegelijk.",
+    solution: "Eén gedeeld draaiboek per fase betekent dat jullie nooit meer los van elkaar dezelfde tijden hoeven te reconstrueren.",
+  },
+  {
+    value: "bloemist", label: "Bloemist",
+    pain: "Het lastige deel van bloemwerk is niet het boeket — het is de aanpassing twee weken van tevoren, de gewijzigde tafelindeling, of niet weten wie het aanspreekpunt is.",
+    solution: "Gastenaantallen, tafelindeling en het opbouwschema staan centraal bij — inclusief de toegangstijd van de locatie, zodat je dat niet zelf hoeft na te vragen.",
+  },
+  {
+    value: "catering", label: "Catering",
+    pain: "Het definitieve gastenaantal, allergieën en dieetwensen achterhaal je nu vaak tot op het laatste moment via losse mailtjes.",
+    solution: "DreamDay leest automatisch mee met de actuele gastenlijst van het bruidspaar — geen aparte spreadsheet meer opvragen en samenvoegen.",
+  },
+  {
+    value: "bakker", label: "Bruidstaart & Bakker",
+    pain: "Een taart bakken op het verkeerde gastenaantal kost een hele laag — of je bakt juist te weinig voor een uitgebreidere gastenlijst.",
+    solution: "Dezelfde automatische koppeling met de gastenlijst, plus een heldere goedkeuringsstatus voor smaakproef en ontwerp.",
+  },
+  {
+    value: "dj", label: "DJ",
+    pain: "Must-play-lijst, geluidsgrens van de locatie en het exacte moment van de eerste dans komen nu via drie verschillende kanalen binnen.",
+    solution: "De geluidsgrens van de locatie staat al vooraf ingevuld, en je fase-indeling hangt direct aan de rest van het draaiboek.",
+  },
+  {
+    value: "liveband", label: "Liveband",
+    pain: "Opbouw, stroomvoorziening en soundcheck regelen — en dan ook nog het repertoire afstemmen op het exacte moment van de speeches.",
+    solution: "Logistiek zoals vermogen, podiumafmeting en kleedkamer, plus je definitieve setlist, staan vooraf vast — gekoppeld aan het draaiboek.",
+  },
+  {
+    value: "ceremoniespreker", label: "Ceremoniespreker",
+    pain: "Een ceremonie schrijven begint met een uitgebreide vragenlijst over het bruidspaar, en eindigt met uitzoeken wie de repetitie regelt.",
+    solution: "Het liefdesverhaal en de voorkeuren staan gestructureerd vast, met een duidelijke goedkeuringsstatus voor je concept- en definitieve script.",
+  },
+  {
+    value: "trouwlocatie", label: "Trouwlocatie",
+    pain: "Bij tientallen tot honderden bruiloften per jaar leg je bij elke nieuwe leverancier weer dezelfde huisregels uit.",
+    solution: "Sluitingstijd, geluidsgrens en cateringbeleid staan één keer vast — automatisch zichtbaar voor elke leverancier die het bruidspaar boekt.",
+  },
+  {
+    value: "haarstylist", label: "Haar & Make-up",
+    pain: "Als hair & makeup uitloopt, verschuift de rest van de hele dag — en dat gebeurt vaak omdat niemand vooraf de tijd per persoon heeft berekend.",
+    solution: "Aantal personen en behandeltijd worden vooraf vastgelegd, met ingebouwde bufferruimte in het draaiboek.",
+  },
+  {
+    value: "vervoer", label: "Vervoer",
+    pain: "Meerdere ophaallocaties, tijden die achterwaarts vanaf de ceremonie berekend moeten worden — en één verkeerde inschatting verschuift de hele dag.",
+    solution: "Je rittenplanner hangt in hetzelfde draaiboek als de rest van de dag, dus een verschuiving is direct voor iedereen zichtbaar.",
+  },
+  {
+    value: "decoratie", label: "Decoratie & Styling",
+    pain: "De styling kan pas als de tent staat, de bloemen komen na de styling — en één leverancier die uitloopt, verschuift de hele opbouw.",
+    solution: "Het gedeelde opbouwschema en de moodboard-goedkeuring laten precies zien wanneer wie aan de beurt is.",
+  },
+  {
+    value: "fotocabine", label: "Fotocabine",
+    pain: "Wie een dag wacht met reageren op een aanvraag, is de boeking vaak al kwijt aan een concurrent.",
+    solution: "Aanvragen en bruiloftsdetails staan op één centrale plek, zodat je binnen minuten kan reageren in plaats van dagen.",
+  },
 ];
 
 const FEATURES_VENDORS = [
@@ -91,6 +166,47 @@ function FaqItem({ q, a }: { q: string; a: string }) {
       {open && (
         <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.7, paddingBottom: "1.375rem" }}>{a}</p>
       )}
+    </div>
+  );
+}
+
+function VendorStoryPicker() {
+  const [active, setActive] = useState(VENDOR_STORIES[0].value);
+  const story = VENDOR_STORIES.find((s) => s.value === active)!;
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2 mb-8">
+        {VENDOR_STORIES.map((s) => {
+          const isActive = s.value === active;
+          return (
+            <button
+              key={s.value}
+              onClick={() => setActive(s.value)}
+              style={{
+                fontSize: "0.8125rem", fontWeight: isActive ? 700 : 500, padding: "0.5rem 1rem",
+                borderRadius: "var(--radius-full)", border: `1px solid ${isActive ? "var(--primary)" : "rgba(0,0,0,0.10)"}`,
+                background: isActive ? "var(--foreground)" : "transparent",
+                color: isActive ? "white" : "var(--muted)",
+                cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap",
+              }}
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div key={active} className="animate-fade-in" style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
+        <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label} — de vervelende realiteit</p>
+        <p style={{ fontSize: "1.0625rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1.25rem" }}>
+          {story.pain}
+        </p>
+        <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>Wat DreamDay oplost</p>
+        <p style={{ fontSize: "1.0625rem", color: "var(--muted)", lineHeight: 1.7 }}>
+          {story.solution}
+        </p>
+      </div>
     </div>
   );
 }
@@ -440,6 +556,24 @@ export default function LandingPage() {
               </div>
             </ScrollReveal>
           </div>
+        </div>
+      </section>
+
+      {/* ── Per leveranciersoort ──────────────────────────── */}
+      <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
+          <ScrollReveal>
+            <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Voor elke leveranciersoort</p>
+            <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem", maxWidth: "640px" }}>
+              Wat kost jou nu tijd?{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Kies je vak.</span>
+            </h2>
+            <p style={{ fontSize: "1rem", color: "var(--muted)", marginBottom: "2.5rem", maxWidth: "520px" }}>
+              Elke leveranciersoort heeft zijn eigen administratieve rompslomp. Klik hieronder en zie precies wat DreamDay voor jou oplost.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={80}>
+            <VendorStoryPicker />
+          </ScrollReveal>
         </div>
       </section>
 
