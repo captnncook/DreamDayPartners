@@ -141,7 +141,7 @@ export default function LandingPage() {
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
           <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-            DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
+            DreamDay<span className="hidden sm:inline" style={{ color: "var(--primary)" }}> Platform</span>
           </span>
         </Link>
 
@@ -176,10 +176,12 @@ export default function LandingPage() {
             </>
           ) : (
             <>
-              <Link href="/login" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
-                Inloggen
-              </Link>
-              <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 1.125rem" }}>
+              <div className="hidden sm:block">
+                <Link href="/login" className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
+                  Inloggen
+                </Link>
+              </div>
+              <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 0.875rem" }}>
                 Begin gratis
               </Link>
             </>
@@ -189,7 +191,7 @@ export default function LandingPage() {
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden" style={{ background: "#ffffff", minHeight: "90vh", display: "flex", alignItems: "center" }}>
-        <div className="w-full px-5 md:px-10 py-20 md:py-28" style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <div className="w-full px-5 md:px-10 py-20 md:py-28" style={{ maxWidth: "clamp(1200px, 82vw, 1600px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
             {/* Text */}
             <div className="lg:w-1/2 animate-fade-in">
@@ -222,7 +224,20 @@ export default function LandingPage() {
             </div>
 
             {/* Hero image */}
-            <div className="lg:w-1/2 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <div className="lg:w-1/2 animate-fade-in" style={{ animationDelay: "0.2s", position: "relative" }}>
+              {/* Zachte gloed erachter — vult de ruimte rond het beeld op grote schermen, i.p.v. lege witruimte */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  inset: "-12%",
+                  background: "var(--gradient-primary)",
+                  opacity: 0.14,
+                  filter: "blur(80px)",
+                  borderRadius: "50%",
+                  zIndex: 0,
+                }}
+              />
               <div style={{ borderRadius: "24px", overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.15)", position: "relative" }}>
                 <Image
                   src="/images/hero-bride-phone.png"
@@ -263,7 +278,7 @@ export default function LandingPage() {
 
       {/* ── Herkenning ───────────────────────────────────── */}
       <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-20">
             <ScrollReveal className="lg:w-2/5 lg:flex-shrink-0">
               <div style={{ borderRadius: "20px", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.10)" }}>
@@ -298,7 +313,7 @@ export default function LandingPage() {
 
       {/* ── Hoe het werkt ────────────────────────────────── */}
       <section id="hoe-het-werkt" className="px-5 py-24 md:py-32" style={{ background: "#f5f5f7" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Hoe het werkt</p>
             <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "4rem", maxWidth: "520px" }}>
@@ -329,7 +344,7 @@ export default function LandingPage() {
 
       {/* ── Functies voor bruidsparen ─────────────────────── */}
       <section id="stellen" className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
             {/* Left: text + features grid */}
             <div className="flex-1">
@@ -379,7 +394,7 @@ export default function LandingPage() {
 
       {/* ── Voor leveranciers ────────────────────────────── */}
       <section id="leveranciers" className="px-5 py-24 md:py-32" style={{ background: "#f5f5f7" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row-reverse gap-12 lg:gap-16 items-start">
             {/* Right (visually): features */}
             <div className="flex-1">
@@ -429,7 +444,7 @@ export default function LandingPage() {
 
       {/* ── Social proof ─────────────────────────────────── */}
       <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Ervaringen</p>
             <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3.5rem" }}>
@@ -478,7 +493,7 @@ export default function LandingPage() {
 
       {/* ── Prijzen ──────────────────────────────────────── */}
       <section id="prijzen" className="px-5 py-24 md:py-32" style={{ background: "#f5f5f7" }}>
-        <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Transparante prijzen</p>
             <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem" }}>
@@ -605,7 +620,7 @@ export default function LandingPage() {
 
       {/* ── Footer ───────────────────────────────────────── */}
       <footer className="px-5 py-10" style={{ background: "var(--foreground)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "1040px", margin: "0 auto" }}>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
             <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={26} height={26} />
             <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>DreamDay Platform</span>
