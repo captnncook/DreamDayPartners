@@ -123,6 +123,7 @@ function FeatureCard({ title, desc, delay = 0 }: { title: string; desc: string; 
   return (
     <ScrollReveal delay={delay}>
       <div
+        className="ddp-feature-card"
         style={{
           background: "rgba(255,255,255,0.75)",
           backdropFilter: "blur(12px)",
@@ -130,16 +131,7 @@ function FeatureCard({ title, desc, delay = 0 }: { title: string; desc: string; 
           borderRadius: "20px",
           padding: "1.625rem",
           border: "1px solid rgba(0,0,0,0.05)",
-          transition: "box-shadow 0.3s, transform 0.3s",
           height: "100%",
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLDivElement).style.boxShadow = "0 12px 40px rgba(0,0,0,0.10)";
-          (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)";
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-          (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
         }}
       >
         <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.02em", marginBottom: "0.5rem" }}>
@@ -177,11 +169,15 @@ function SidebarItem({ label, isActive, onClick }: { label: string; isActive: bo
       className="w-full text-left"
       style={{
         fontSize: "0.9375rem", fontWeight: isActive ? 700 : 500, padding: "0.625rem 1rem",
-        borderRadius: "10px", border: "none", cursor: "pointer", transition: "all 0.15s",
+        borderRadius: "10px", border: "none", cursor: "pointer",
+        transition: "background 140ms var(--ease-out), color 140ms var(--ease-out), border-color 140ms var(--ease-out), transform 100ms var(--ease-out)",
         background: isActive ? "var(--accent-soft)" : "transparent",
         color: isActive ? "var(--foreground)" : "var(--muted)",
         borderLeft: `3px solid ${isActive ? "var(--primary)" : "transparent"}`,
       }}
+      onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
+      onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
     >
       {label}
     </button>
@@ -288,7 +284,7 @@ export default function LandingPage() {
           backdropFilter: "blur(24px) saturate(200%)",
           WebkitBackdropFilter: "blur(24px) saturate(200%)",
           borderBottom: scrolled ? "1px solid rgba(0,0,0,0.08)" : "1px solid transparent",
-          transition: "all 0.3s",
+          transition: "background 200ms var(--ease-out), border-color 200ms var(--ease-out)",
         }}
       >
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">

@@ -40,7 +40,7 @@ export default function StatusTracker({ status, onUpdate, isPlanner }: Props) {
                 background: isActive ? "var(--primary)" : isPast ? "var(--blush-soft)" : "transparent",
                 color: isActive ? "white" : isPast ? "var(--primary)" : "var(--muted)",
                 cursor: isPlanner ? "pointer" : "default",
-                transition: "all 0.15s",
+                transition: "background 140ms var(--ease-out), color 140ms var(--ease-out), border-color 140ms var(--ease-out)",
               }}
             >
               {s.label}

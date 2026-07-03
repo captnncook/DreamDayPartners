@@ -73,9 +73,13 @@
   --radius-full: 999px;
 
   /* ── Transitions ── */
-  --transition-fast: 160ms ease;
-  --transition-base: 180ms ease;
-  --transition-slow: 0.4s ease;
+  /* Sterke, opzettelijke curves i.p.v. de zwakke browser-default "ease" —
+     ease-out voor interacties/binnenkomst, ease-in-out voor beweging op het scherm. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --transition-fast: 140ms var(--ease-out);
+  --transition-base: 180ms var(--ease-out);
+  --transition-slow: 0.35s var(--ease-out);
 }
 
 @theme inline {
@@ -196,8 +200,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ddp-btn-primary:active {
-  transform: translateY(0);
+  transform: scale(0.97);
   background: var(--color-charcoal);
+  transition-duration: 100ms;
 }
 
 .ddp-btn-primary:disabled {
@@ -231,6 +236,11 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-1px);
 }
 
+.ddp-btn-secondary:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
 .ddp-btn-soft {
   display: inline-flex;
   align-items: center;
@@ -255,6 +265,11 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-1px);
 }
 
+.ddp-btn-soft:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
 .ddp-btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -268,13 +283,18 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
   text-decoration: none;
 }
 
 .ddp-btn-ghost:hover {
   background: rgba(31,36,40,0.05);
   color: var(--foreground);
+}
+
+.ddp-btn-ghost:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -359,10 +379,11 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--muted);
   cursor: pointer;
   white-space: nowrap;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  transition: color var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
 }
 
 .ddp-cat-tab:hover { color: var(--foreground); }
+.ddp-cat-tab:active { opacity: 0.6; transition-duration: 80ms; }
 
 .ddp-cat-tab.active {
   color: var(--foreground);
@@ -472,6 +493,11 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--foreground);
 }
 
+.ddp-nav-item:active {
+  background: rgba(31,36,40,0.09);
+  transition-duration: 80ms;
+}
+
 .ddp-nav-item.active {
   background: var(--color-blush-soft);
   color: var(--foreground);
@@ -510,6 +536,11 @@ h1, h2, h3, h4, h5, h6 {
 .ddp-nav-item-dark:hover {
   background: rgba(255,255,255,0.06);
   color: var(--ink-text);
+}
+
+.ddp-nav-item-dark:active {
+  background: rgba(255,255,255,0.10);
+  transition-duration: 80ms;
 }
 
 .ddp-nav-item-dark.active {
@@ -552,6 +583,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .dash-row:hover { background: rgba(28,43,36,0.035); }
+.dash-row:active { background: rgba(28,43,36,0.06); transition-duration: 80ms; }
 .dash-row:last-child { border-bottom: none; }
 
 .dash-section-title {
@@ -679,6 +711,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LANDING FEATURE CARD
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.ddp-feature-card {
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ddp-feature-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+    transform: translateY(-3px);
+  }
+}
+
+.ddp-feature-card:active {
+  transform: scale(0.985);
+  transition-duration: 100ms;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    LANDING NAV
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
@@ -772,10 +824,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .sr-hidden {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(24px);
   transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
+    opacity 0.5s var(--ease-out),
+    transform 0.5s var(--ease-out);
 }
 
 .sr-visible {
@@ -806,9 +858,9 @@ h1, h2, h3, h4, h5, h6 {
   to   { opacity: 1; transform: scale(1); }
 }
 
-.animate-fade-in-up { animation: fadeInUp 0.55s ease both; }
-.animate-fade-in    { animation: fadeIn 0.4s ease both; }
-.animate-scale-in   { animation: scaleIn 0.4s ease both; }
+.animate-fade-in-up { animation: fadeInUp 0.5s var(--ease-out) both; }
+.animate-fade-in    { animation: fadeIn 0.4s var(--ease-out) both; }
+.animate-scale-in   { animation: scaleIn 0.35s var(--ease-out) both; }
 
 @keyframes skeleton-shimmer {
   0%   { background-position: 200% 0; }
