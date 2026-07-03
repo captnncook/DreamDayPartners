@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
-import { DraaiboekPdf } from "./DraaiboekPdf";
+import { DraaiboekPdf, getLogoDataUri } from "./DraaiboekPdf";
 import React, { type ReactElement } from "react";
 
 export async function GET(
@@ -37,6 +37,8 @@ export async function GET(
   }
   items = [...items].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
+  const logoDataUri = await getLogoDataUri();
+
   const pdfBuffer = await renderToBuffer(
     React.createElement(DraaiboekPdf, {
       weddingTitle: wedding.title,
@@ -44,6 +46,7 @@ export async function GET(
       venue: wedding.venue ?? null,
       draaiboekTitle: draaiboek.title,
       version: draaiboek.version,
+      logoDataUri,
       items: items.map((item) => ({
         startTime: item.startTime,
         duration: item.duration,

@@ -1,7 +1,20 @@
 import { Document, Page, Text, View, Image, StyleSheet, Font } from "@react-pdf/renderer";
 import path from "path";
+import sharp from "sharp";
 
-const LOGO_PATH = path.join(process.cwd(), "public", "logo.png");
+const LOGO_SVG_PATH = path.join(process.cwd(), "public", "images", "logo-wit.svg");
+
+let logoPngPromise: Promise<string> | null = null;
+export function getLogoDataUri(): Promise<string> {
+  if (!logoPngPromise) {
+    logoPngPromise = sharp(LOGO_SVG_PATH)
+      .resize(160, 160)
+      .png()
+      .toBuffer()
+      .then((buf) => `data:image/png;base64,${buf.toString("base64")}`);
+  }
+  return logoPngPromise;
+}
 
 const INK = "#1C2B24";
 const GOLD = "#C9A75D";
@@ -32,17 +45,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 14,
   },
-  logoBadge: {
-    width: 22,
-    height: 22,
-    borderRadius: 5,
-    backgroundColor: "#FFFFFF",
-    padding: 3,
-    marginRight: 8,
-  },
   logoImg: {
-    width: "100%",
-    height: "100%",
+    width: 18,
+    height: 18,
+    marginRight: 8,
   },
   brand: {
     fontSize: 11,
@@ -162,6 +168,7 @@ export function DraaiboekPdf({
   draaiboekTitle,
   version,
   items,
+  logoDataUri,
 }: {
   weddingTitle: string;
   weddingDate: string;
@@ -169,15 +176,14 @@ export function DraaiboekPdf({
   draaiboekTitle: string;
   version: string;
   items: PdfItem[];
+  logoDataUri: string;
 }) {
   return (
     <Document title={`Draaiboek ${weddingTitle}`}>
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.header} fixed>
           <View style={styles.brandRow}>
-            <View style={styles.logoBadge}>
-              <Image src={LOGO_PATH} style={styles.logoImg} />
-            </View>
+            <Image src={logoDataUri} style={styles.logoImg} />
             <Text style={styles.brand}>DREAMDAY PLATFORM</Text>
           </View>
           <Text style={styles.weddingTitle}>{weddingTitle}</Text>
