@@ -123,7 +123,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#ffffff", color: "var(--foreground)" }}>
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--background)", color: "var(--foreground)" }}>
 
       {/* ── Nav ─────────────────────────────────────────── */}
       <nav
@@ -190,12 +190,13 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ background: "#ffffff", minHeight: "90vh", display: "flex", alignItems: "center" }}>
+      <section className="relative overflow-hidden" style={{ background: "var(--background)", minHeight: "90vh", display: "flex", alignItems: "center" }}>
         <div className="w-full px-5 md:px-10 py-20 md:py-28" style={{ maxWidth: "clamp(1200px, 82vw, 1600px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
             {/* Text */}
             <div className="lg:w-1/2 animate-fade-in">
               <h1
+                className="font-serif"
                 style={{
                   fontSize: "clamp(2.5rem, 7vw, 5rem)",
                   fontWeight: 700,
@@ -277,7 +278,7 @@ export default function LandingPage() {
       </ScrollReveal>
 
       {/* ── Herkenning ───────────────────────────────────── */}
-      <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
+      <section className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-20">
             <ScrollReveal className="lg:w-2/5 lg:flex-shrink-0">
@@ -293,7 +294,7 @@ export default function LandingPage() {
             </ScrollReveal>
             <div className="lg:flex-1">
               <ScrollReveal>
-                <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "1.25rem" }}>
+                <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "1.25rem" }}>
                   Een bruiloft plannen.{" "}
                   <span style={{ color: "var(--muted)", fontWeight: 500 }}>Voelt al snel als een tweede baan.</span>
                 </h2>
@@ -312,11 +313,11 @@ export default function LandingPage() {
       </section>
 
       {/* ── Hoe het werkt ────────────────────────────────── */}
-      <section id="hoe-het-werkt" className="px-5 py-24 md:py-32" style={{ background: "#f5f5f7" }}>
+      <section id="hoe-het-werkt" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Hoe het werkt</p>
-            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "4rem", maxWidth: "520px" }}>
+            <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "4rem", maxWidth: "520px" }}>
               Drie stappen.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Dat is alles.</span>
             </h2>
           </ScrollReveal>
@@ -343,14 +344,14 @@ export default function LandingPage() {
       </section>
 
       {/* ── Functies voor bruidsparen ─────────────────────── */}
-      <section id="stellen" className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
+      <section id="stellen" className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
             {/* Left: text + features grid */}
             <div className="flex-1">
               <ScrollReveal>
                 <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Voor bruidsparen</p>
-                <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem" }}>
+                <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem" }}>
                   Altijd gratis.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Voor altijd.</span>
                 </h2>
                 <p style={{ fontSize: "1rem", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
@@ -393,14 +394,14 @@ export default function LandingPage() {
       </section>
 
       {/* ── Voor leveranciers ────────────────────────────── */}
-      <section id="leveranciers" className="px-5 py-24 md:py-32" style={{ background: "#f5f5f7" }}>
+      <section id="leveranciers" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row-reverse gap-12 lg:gap-16 items-start">
             {/* Right (visually): features */}
             <div className="flex-1">
               <ScrollReveal>
                 <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Voor leveranciers</p>
-                <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem" }}>
+                <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem" }}>
                   Beheer al je bruiloften{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>op één plek.</span>
                 </h2>
                 <p style={{ fontSize: "1rem", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
@@ -443,11 +444,11 @@ export default function LandingPage() {
       </section>
 
       {/* ── Social proof ─────────────────────────────────── */}
-      <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
+      <section className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Ervaringen</p>
-            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3.5rem" }}>
+            <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3.5rem" }}>
               Bruidsparen gingen{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>je voor.</span>
             </h2>
           </ScrollReveal>
@@ -474,7 +475,7 @@ export default function LandingPage() {
                 { quote: "Op onze trouwdag hoefden we nergens aan te denken. Alles was geregeld dankzij DreamDay.", name: "Nora & Daan" },
               ].map((r, i) => (
                 <ScrollReveal key={i} delay={(i + 1) * 100}>
-                  <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
+                  <div style={{ background: "var(--sand)", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
                     <p style={{ fontSize: "0.9375rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1.25rem", fontStyle: "italic" }}>
                       &ldquo;{r.quote}&rdquo;
                     </p>
@@ -492,11 +493,11 @@ export default function LandingPage() {
       </section>
 
       {/* ── Prijzen ──────────────────────────────────────── */}
-      <section id="prijzen" className="px-5 py-24 md:py-32" style={{ background: "#f5f5f7" }}>
+      <section id="prijzen" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Transparante prijzen</p>
-            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem" }}>
+            <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem" }}>
               Eerlijk geprijsd.
             </h2>
             <p style={{ fontSize: "1rem", color: "var(--muted)", marginBottom: "3.5rem" }}>
@@ -544,7 +545,7 @@ export default function LandingPage() {
             </ScrollReveal>
 
             <ScrollReveal delay={160}>
-              <div style={{ background: "var(--foreground)", borderRadius: "20px", padding: "2rem", position: "relative", overflow: "hidden" }}>
+              <div style={{ background: "var(--ink)", borderRadius: "20px", padding: "2rem", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", top: "1.25rem", right: "1.25rem", background: "var(--gradient-primary)", borderRadius: "999px", color: "white", fontSize: "0.625rem", fontWeight: 700, padding: "3px 10px", letterSpacing: "0.05em" }}>
                   POPULAIRST
                 </div>
@@ -569,16 +570,16 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────── */}
-      <section id="faq" className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
+      <section id="faq" className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "680px", margin: "0 auto" }}>
           <ScrollReveal>
             <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "0.75rem" }}>Vragen</p>
-            <h2 style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3rem" }}>
+            <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3rem" }}>
               Veel gestelde vragen.
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={80}>
-            <div style={{ background: "#f5f5f7", borderRadius: "20px", padding: "0 1.75rem", border: "1px solid rgba(0,0,0,0.04)" }}>
+            <div style={{ background: "var(--sand)", borderRadius: "20px", padding: "0 1.75rem", border: "1px solid rgba(0,0,0,0.04)" }}>
               {FAQS.map((faq) => (
                 <FaqItem key={faq.q} q={faq.q} a={faq.a} />
               ))}
@@ -588,7 +589,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Afsluitende CTA met gouden logo ──────────────── */}
-      <section className="relative overflow-hidden py-0" style={{ background: "var(--foreground)", minHeight: "420px", display: "flex", alignItems: "center" }}>
+      <section className="relative overflow-hidden py-0" style={{ background: "var(--ink)", minHeight: "420px", display: "flex", alignItems: "center" }}>
         {/* Background image */}
         <div style={{ position: "absolute", inset: 0 }}>
           <Image
@@ -600,7 +601,7 @@ export default function LandingPage() {
         </div>
         <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: "560px", margin: "0 auto", padding: "5rem 1.25rem", textAlign: "center" }}>
           <ScrollReveal>
-            <h2 style={{ fontSize: "clamp(2.25rem, 6vw, 3.75rem)", fontWeight: 700, letterSpacing: "-0.055em", lineHeight: 1.04, color: "white", marginBottom: "1.25rem" }}>
+            <h2 className="font-serif" style={{ fontSize: "clamp(2.25rem, 6vw, 3.75rem)", fontWeight: 700, letterSpacing: "-0.055em", lineHeight: 1.04, color: "white", marginBottom: "1.25rem" }}>
               Klaar om met plezier te plannen?
             </h2>
             <p style={{ fontSize: "1.0625rem", color: "rgba(255,255,255,0.50)", marginBottom: "2.5rem", lineHeight: 1.6 }}>
@@ -619,7 +620,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────── */}
-      <footer className="px-5 py-10" style={{ background: "var(--foreground)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <footer className="px-5 py-10" style={{ background: "var(--ink)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
             <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={26} height={26} />
