@@ -711,6 +711,58 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   GOUDEN CTA-KNOP (op inkt-achtergrond)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.ddp-btn-gold {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+}
+
+.ddp-btn-gold:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+}
+
+.ddp-btn-gold:active {
+  transform: scale(0.97);
+  filter: brightness(0.97);
+  transition-duration: 100ms;
+}
+
+/* Outline-knop op inkt-achtergrond (bijv. 404, dark hero's) */
+.ddp-btn-outline-ink {
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.ddp-btn-outline-ink:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.24);
+}
+
+.ddp-btn-outline-ink:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DM ZOEKRESULTAAT-RIJ
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.ddp-dm-result-row {
+  transition: background var(--transition-fast);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ddp-dm-result-row:hover { background: var(--accent); }
+}
+
+.ddp-dm-result-row:active {
+  background: var(--accent);
+  transition-duration: 80ms;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    LANDING FEATURE CARD
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 

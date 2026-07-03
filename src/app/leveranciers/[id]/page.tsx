@@ -572,10 +572,10 @@ export default function VendorProfilePage() {
 
               {!currentUser ? (
                 <div className="flex flex-col gap-2">
-                  <Link href="/aanmelden" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
+                  <Link href="/aanmelden" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
                     Account aanmaken
                   </Link>
-                  <Link href="/login" style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", fontWeight: 600, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
+                  <Link href="/login" className="ddp-btn-outline-ink" style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", fontWeight: 600, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
                     Inloggen
                   </Link>
                 </div>
@@ -607,6 +607,7 @@ export default function VendorProfilePage() {
                   <button
                     onClick={handleAddToDreamTeam}
                     disabled={adding || !selectedWedding}
+                    className="ddp-btn-gold"
                     style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer", fontSize: "0.875rem", opacity: (adding || !selectedWedding) ? 0.6 : 1 }}
                   >
                     {adding ? "Bezig…" : "Uitnodigen voor Dream Team"}

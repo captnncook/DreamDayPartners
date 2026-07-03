@@ -188,8 +188,12 @@ export default function DraaiboekClient({
                     border: "1px solid",
                     borderColor: activeDraaiboekId === d.id ? "var(--gold)" : "var(--border)",
                     background: activeDraaiboekId === d.id ? "var(--sand)" : "white",
-                    cursor: "pointer", transition: "all 150ms",
+                    cursor: "pointer",
+                    transition: "background 140ms var(--ease-out), border-color 140ms var(--ease-out), transform 100ms var(--ease-out)",
                   }}
+                  onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.98)"; }}
+                  onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                 >
                   <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground)" }} className="truncate">{d.title}</div>
                   <div className="flex items-center gap-1.5 mt-1">

@@ -108,7 +108,7 @@ function LeveranciersContent() {
               </span>
             </Link>
             {loggedIn ? (
-              <Link href="/dashboard" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.45rem 1.125rem", borderRadius: "var(--radius-full)", whiteSpace: "nowrap", flexShrink: 0 }}>
+              <Link href="/dashboard" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.45rem 1.125rem", borderRadius: "var(--radius-full)", whiteSpace: "nowrap", flexShrink: 0 }}>
                 Profiel
               </Link>
             ) : (

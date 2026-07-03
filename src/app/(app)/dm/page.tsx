@@ -310,9 +310,8 @@ export default function DmPage() {
                 : results.length === 0 ? <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "0.875rem" }}>Begin te typen om te zoeken</div>
                 : results.map(r => (
                   <button key={r.userId} onClick={() => !creating && startConversation(r.userId)} disabled={creating}
-                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.875rem 1.25rem", border: "none", background: "none", cursor: "pointer", textAlign: "left", borderBottom: "1px solid var(--border)" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "var(--accent)")}
-                    onMouseLeave={e => (e.currentTarget.style.background = "none")}>
+                    className="ddp-dm-result-row"
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.875rem 1.25rem", border: "none", background: "none", cursor: "pointer", textAlign: "left", borderBottom: "1px solid var(--border)" }}>
                     <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.9375rem", color: "var(--primary)", flexShrink: 0 }}>{r.name.charAt(0).toUpperCase()}</div>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--charcoal)" }}>{r.name}</div>

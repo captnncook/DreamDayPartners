@@ -34,12 +34,14 @@ export default function NotFound() {
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "center" }}>
         <Link
           href="/"
-          style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, padding: "0.75rem 1.75rem", fontSize: "0.9375rem", borderRadius: "var(--radius-full)", textDecoration: "none" }}
+          className="ddp-btn-gold"
+          style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, padding: "0.75rem 1.75rem", fontSize: "0.9375rem", borderRadius: "var(--radius-full)", textDecoration: "none", display: "inline-block" }}
         >
           Terug naar home
         </Link>
         <Link
           href="/leveranciers"
+          className="ddp-btn-outline-ink"
           style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", fontWeight: 600, padding: "0.75rem 1.75rem", fontSize: "0.9375rem", borderRadius: "var(--radius-full)", textDecoration: "none" }}
         >
           Vind leveranciers

@@ -150,7 +150,7 @@ export default function BudgetPage() {
               <form onSubmit={handleUpdateTotal} className="flex gap-2 mt-2">
                 <input type="number" value={newTotal} onChange={(e) => setNewTotal(e.target.value)} autoFocus
                   className="flex-1 rounded-lg px-3 py-1.5 text-sm" style={{ border: "none", minWidth: "120px" }} />
-                <button type="submit" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.75rem", padding: "0.35rem 0.875rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer" }}>Opslaan</button>
+                <button type="submit" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.75rem", padding: "0.35rem 0.875rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer" }}>Opslaan</button>
                 <button type="button" onClick={() => setEditTotal(false)} style={{ background: "none", border: "none", color: "var(--ink-muted)", cursor: "pointer", display: "flex", alignItems: "center" }}><X className="w-4 h-4" /></button>
               </form>
             ) : (

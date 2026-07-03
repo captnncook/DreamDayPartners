@@ -288,7 +288,7 @@ export default function LoginPage() {
           </p>
           <Link
             href="/aanmelden"
-            className="w-full inline-flex items-center justify-center py-2.5 text-sm font-bold"
+            className="ddp-btn-gold w-full inline-flex items-center justify-center py-2.5 text-sm font-bold"
             style={{ background: "var(--gold)", color: "var(--ink)", borderRadius: "var(--radius-full)" }}
           >
             Begin gratis

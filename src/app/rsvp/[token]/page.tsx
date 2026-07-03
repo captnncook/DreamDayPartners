@@ -95,7 +95,7 @@ export default function RsvpPage() {
                 style={{ width: "1rem", height: "1rem" }} />
               <label htmlFor="plusOne" style={{ fontSize: "0.875rem" }}>Ik breng een partner mee (+1)</label>
             </div>
-            <button type="submit" disabled={saving}
+            <button type="submit" disabled={saving} className="ddp-btn-gold"
               style={{ width: "100%", background: "linear-gradient(135deg, #e8567a, #c4404f)", color: "white", border: "none", borderRadius: "12px", padding: "0.875rem", fontSize: "1rem", fontWeight: 700, cursor: saving ? "wait" : "pointer" }}>
               {saving ? "Versturen…" : "RSVP versturen"}
             </button>

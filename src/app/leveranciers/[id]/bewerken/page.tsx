@@ -961,6 +961,7 @@ function VendorEditPage() {
               <button
                 onClick={handleUpgrade}
                 disabled={billingLoading}
+                className="ddp-btn-gold"
                 style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
               >
                 {billingLoading ? "Laden…" : "Upgrade — €29/maand"}

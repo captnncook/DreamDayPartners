@@ -171,6 +171,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             </div>
             <Link
               href={`/weddings/${w.id}`}
+              className="ddp-btn-gold"
               style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.6rem 1.25rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}
             >
               Open draaiboek
@@ -488,6 +489,7 @@ function NextWeddingHero({ wedding }: { wedding: Wedding }) {
 
         <Link
           href={`/weddings/${wedding.id}`}
+          className="ddp-btn-gold"
           style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}
         >
           Open draaiboek
