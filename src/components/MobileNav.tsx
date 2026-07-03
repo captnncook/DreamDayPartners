@@ -77,7 +77,7 @@ export default function MobileNav({ user }: { user: User }) {
           href="/dashboard"
           style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
         >
-          <Image src="/images/logo.svg" alt="DreamDay Partners" width={30} height={30} style={{ flexShrink: 0 }} />
+          <Image src="/images/logo.svg" alt="DreamDay Platform" width={30} height={30} style={{ flexShrink: 0 }} />
           <span
             style={{
               fontWeight: 700,

@@ -89,7 +89,7 @@ function emailLayout(opts: {
 
         <!-- Footer -->
         <tr><td style="padding-top:24px;text-align:center;font-size:12px;color:#9ca3af;">
-          © ${new Date().getFullYear()} DreamDay Partners &nbsp;·&nbsp;
+          © ${new Date().getFullYear()} DreamDay Platform &nbsp;·&nbsp;
           <a href="mailto:info@dreamdaypartners.com" style="color:#9ca3af;text-decoration:underline;">info@dreamdaypartners.com</a>
         </td></tr>
 
@@ -181,7 +181,7 @@ export function premiumGrantedEmail(name: string, vendorType: string | null): { 
     .join("");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
   return {
-    subject: "Gefeliciteerd — je hebt nu Premium toegang op DreamDay Partners!",
+    subject: "Gefeliciteerd — je hebt nu Premium toegang op DreamDay Platform!",
     html: emailLayout({
       heading: "Welkom bij Premium",
       body: `
@@ -210,7 +210,7 @@ export function newTaskEmail(taskTitle: string, weddingTitle: string, appUrl: st
 
 export function claimWelcomeEmail(vendorName: string): { subject: string; html: string } {
   return {
-    subject: `Welkom op DreamDay Partners, ${vendorName}!`,
+    subject: `Welkom op DreamDay Platform, ${vendorName}!`,
     html: emailLayout({
       heading: `Welkom, ${vendorName}!`,
       body: `
@@ -227,11 +227,11 @@ export function claimWelcomeEmail(vendorName: string): { subject: string; html: 
 
 export function accountActivationEmail(name: string, activateUrl: string): { subject: string; html: string } {
   return {
-    subject: "Je account op DreamDay Partners is aangemaakt",
+    subject: "Je account op DreamDay Platform is aangemaakt",
     html: emailLayout({
       heading: "Account activeren",
       body: `
-        <p style="margin:0 0 12px;">Welkom op DreamDay Partners${name ? `, ${name}` : ""}!</p>
+        <p style="margin:0 0 12px;">Welkom op DreamDay Platform${name ? `, ${name}` : ""}!</p>
         <p style="margin:0;">Er is een account voor je aangemaakt. Klik op de knop om je wachtwoord in te stellen en in te loggen. De link is <strong>7 dagen</strong> geldig.</p>
       `,
       cta: { label: "Account activeren", url: activateUrl },
@@ -246,7 +246,7 @@ export function passwordResetEmail(resetUrl: string): { subject: string; html: s
     html: emailLayout({
       heading: "Nieuw wachtwoord instellen",
       body: `
-        <p style="margin:0 0 12px;">Je hebt gevraagd om je wachtwoord opnieuw in te stellen voor DreamDay Partners.</p>
+        <p style="margin:0 0 12px;">Je hebt gevraagd om je wachtwoord opnieuw in te stellen voor DreamDay Platform.</p>
         <p style="margin:0;">Klik op de knop hieronder om een nieuw wachtwoord te kiezen. De link is <strong>1 uur</strong> geldig.</p>
       `,
       cta: { label: "Nieuw wachtwoord instellen", url: resetUrl },
@@ -257,7 +257,7 @@ export function passwordResetEmail(resetUrl: string): { subject: string; html: s
 
 export function adminPasswordResetEmail(resetUrl: string): { subject: string; html: string } {
   return {
-    subject: "Stel je wachtwoord in voor DreamDay Partners",
+    subject: "Stel je wachtwoord in voor DreamDay Platform",
     html: emailLayout({
       heading: "Wachtwoord instellen",
       body: `
@@ -276,7 +276,7 @@ export function deleteRequestEmail(vendorName: string, confirmUrl: string): { su
     html: emailLayout({
       heading: "Profiel verwijderen",
       body: `
-        <p style="margin:0 0 12px;">Hallo ${vendorName}, je hebt gevraagd om je profiel op DreamDay Partners te verwijderen.</p>
+        <p style="margin:0 0 12px;">Hallo ${vendorName}, je hebt gevraagd om je profiel op DreamDay Platform te verwijderen.</p>
         <p style="margin:0;">Klik op de knop hieronder om de verwijdering te bevestigen. De link is <strong>24 uur</strong> geldig. <strong>Deze actie kan niet ongedaan worden gemaakt.</strong></p>
       `,
       cta: { label: "Profiel definitief verwijderen", url: confirmUrl, danger: true },

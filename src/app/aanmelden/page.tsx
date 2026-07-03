@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Store, ArrowRight, ArrowLeft, Check, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, Eye, EyeOff } from "lucide-react";
 
 type Account = "couple" | "vendor" | null;
 type AuthStep = "form" | "send-code" | "verify-code" | "choose-auth" | "password";
@@ -173,9 +173,9 @@ function AanmeldenForm() {
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <div className="px-5 md:px-10 py-4">
         <Link href="/" className="inline-flex items-center gap-2">
-          <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
-          <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
-            DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
+          <Image src="/images/logo.svg" alt="DreamDay Platform" width={28} height={28} />
+          <span className="font-serif" style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
+            DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
           </span>
         </Link>
       </div>
@@ -183,16 +183,16 @@ function AanmeldenForm() {
       <div className="flex items-start justify-center px-4 pb-16 pt-4">
         <div className="w-full max-w-lg">
           <div className="text-center mb-7">
-            <h1 className="text-2xl font-bold" style={{ color: "var(--foreground)" }}>Begin gratis</h1>
+            <h1 className="font-serif text-2xl" style={{ fontWeight: 700, color: "var(--foreground)" }}>Begin gratis</h1>
             <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-              {account === null ? "Voor wie maken we een account aan?" : "Nog een paar stappen — je kunt alles later aanpassen."}
+              {account === null ? "Voor wie maken we een account aan?" : "Nog een paar stappen. Je kunt alles later aanpassen."}
             </p>
           </div>
 
           {account && (
             <div className="mb-6">
               <div className="h-1 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
-                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress}%`, background: "var(--primary)" }} />
+                <div className="h-full rounded-full" style={{ width: `${progress}%`, background: "var(--primary)", transition: "width 500ms var(--ease-out)" }} />
               </div>
             </div>
           )}
@@ -200,27 +200,21 @@ function AanmeldenForm() {
           <div className="ddp-card shadow-lg">
             {/* ── STAP 0: Keuze ── */}
             {formStep === 0 && (
-              <div className="space-y-3">
-                <button onClick={() => chooseAccount("couple")} className="w-full text-left rounded-2xl p-5 flex items-center gap-4 transition-all" style={{ border: "1px solid var(--border)", background: "var(--surface-2)" }}>
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
-                    <Heart className="w-6 h-6" style={{ color: "var(--primary)" }} />
-                  </div>
+              <div>
+                <button onClick={() => chooseAccount("couple")} className="dash-row w-full text-left flex items-center gap-4">
                   <div className="flex-1">
-                    <div className="font-semibold">Wij zijn een bruidspaar</div>
-                    <div className="text-sm" style={{ color: "var(--muted)" }}>Plan jullie bruiloft — gratis, voor altijd.</div>
+                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.05rem" }}>Wij zijn een bruidspaar</div>
+                    <div className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>Plan jullie bruiloft, gratis, voor altijd.</div>
                   </div>
-                  <ArrowRight className="w-5 h-5" style={{ color: "var(--muted)" }} />
+                  <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: "var(--gold-deep)" }} />
                 </button>
 
-                <button onClick={() => chooseAccount("vendor")} className="w-full text-left rounded-2xl p-5 flex items-center gap-4 transition-all" style={{ border: "1px solid var(--border)", background: "var(--surface-2)" }}>
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--accent)" }}>
-                    <Store className="w-6 h-6" style={{ color: "var(--primary)" }} />
-                  </div>
+                <button onClick={() => chooseAccount("vendor")} className="dash-row w-full text-left flex items-center gap-4">
                   <div className="flex-1">
-                    <div className="font-semibold">Ik ben een leverancier</div>
-                    <div className="text-sm" style={{ color: "var(--muted)" }}>Presenteer je bedrijf en beheer je bruiloften.</div>
+                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.05rem" }}>Ik ben een leverancier</div>
+                    <div className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>Presenteer je bedrijf en beheer je bruiloften.</div>
                   </div>
-                  <ArrowRight className="w-5 h-5" style={{ color: "var(--muted)" }} />
+                  <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: "var(--gold-deep)" }} />
                 </button>
               </div>
             )}
@@ -239,8 +233,8 @@ function AanmeldenForm() {
                   <input value={couple.partner2} onChange={e => setCouple({ ...couple, partner2: e.target.value })} placeholder="bijv. Thomas" className="ddp-input" />
                 </Field>
                 {couple.partner1 && couple.partner2 && (
-                  <div className="p-3 rounded-xl text-center text-sm font-medium flex items-center justify-center gap-2" style={{ background: "var(--accent)", color: "var(--primary)" }}>
-                    <Heart className="w-4 h-4 fill-current" /> Bruiloft {couple.partner1} &amp; {couple.partner2}
+                  <div className="font-serif p-3 rounded-xl text-center text-sm" style={{ fontWeight: 700, background: "var(--accent)", color: "var(--primary)" }}>
+                    Bruiloft {couple.partner1} &amp; {couple.partner2}
                   </div>
                 )}
               </div>
@@ -380,8 +374,7 @@ function AanmeldenForm() {
 
                 <a
                   href={`/api/auth/google?pending=${verifiedToken}`}
-                  className="w-full flex items-center justify-center gap-3 rounded-xl px-4 py-3 border font-medium text-sm transition-all hover:bg-gray-50"
-                  style={{ borderColor: "var(--border)" }}
+                  className="ddp-btn-secondary w-full"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -394,8 +387,8 @@ function AanmeldenForm() {
 
                 <a
                   href={`/api/auth/apple?pending=${verifiedToken}`}
-                  className="w-full flex items-center justify-center gap-3 rounded-xl px-4 py-3 font-medium text-sm transition-all"
-                  style={{ background: "#000", color: "#fff", borderRadius: "0.75rem" }}
+                  className="ddp-btn-secondary w-full"
+                  style={{ background: "#000", color: "#fff", borderColor: "#000" }}
                 >
                   <svg width="16" height="16" viewBox="0 0 814 1000" fill="white">
                     <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.5-150.3-96.3C27.2 761.6-.5 679.9-.5 601.7c0-237.2 154.4-362.7 306.3-362.7 78.3 0 143.4 51.5 192.4 51.5 46.8 0 120.3-54.7 211.3-54.7zm-174.5-92.3c37.5-44.8 64.4-107.3 64.4-169.8 0-8.7-.6-17.4-2-25.4-61 2.3-134 40.8-178.1 91.4-34.2 38.8-66.5 101.3-66.5 164.6 0 9.6 1.6 19.2 2.3 22.4 3.9.6 10.3 1.6 16.6 1.6 54.7 0 123.4-36.6 163.3-84.8z"/>
@@ -411,8 +404,7 @@ function AanmeldenForm() {
 
                 <button
                   onClick={() => setAuthStep("password")}
-                  className="w-full rounded-xl px-4 py-3 border font-medium text-sm transition-all hover:bg-gray-50"
-                  style={{ borderColor: "var(--border)" }}
+                  className="ddp-btn-secondary w-full"
                 >
                   Account aanmaken met wachtwoord
                 </button>

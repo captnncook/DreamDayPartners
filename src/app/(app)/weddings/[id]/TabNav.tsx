@@ -30,12 +30,13 @@ export default function TabNav({ id, isVendor = false }: { id: string; isVendor?
           <Link
             key={tab.href}
             href={tab.href}
-            className="flex-shrink-0 px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all"
+            className="flex-shrink-0 px-4 py-2 rounded-full font-medium whitespace-nowrap"
             style={{
               fontSize: "0.8125rem",
               background: isActive ? "var(--ink)" : "rgba(0,0,0,0.05)",
               color: isActive ? "white" : "var(--muted)",
               letterSpacing: "-0.01em",
+              transition: "background 180ms var(--ease-out), color 180ms var(--ease-out)",
             }}
           >
             {tab.label}

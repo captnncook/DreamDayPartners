@@ -517,12 +517,12 @@ function VendorEditPage() {
         {isUserPremium && (
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.75rem 1rem", marginBottom: "1rem", fontSize: "0.875rem", color: "var(--foreground)", fontWeight: 600 }}>
             <Star className="w-4 h-4" style={{ color: "var(--gold-deep)", flexShrink: 0 }} />
-            Premium actief — je profiel staat bovenaan de zoekresultaten.
+            Premium actief. Je profiel staat bovenaan de zoekresultaten.
           </div>
         )}
         {upgradeStatus === "success" && (
           <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "var(--foreground)", marginBottom: "1rem" }}>
-            Premium actief — welkom bij DreamDay Platform Pro!
+            Premium actief, welkom bij DreamDay Platform Pro!
           </div>
         )}
         {upgradeStatus === "cancelled" && (
@@ -789,7 +789,7 @@ function VendorEditPage() {
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
               <h2 className="dash-section-title mb-1">Capaciteit</h2>
               <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
-                Aantal gasten per moment van de dag — bruidsparen filteren hier direct op.
+                Aantal gasten per moment van de dag. Bruidsparen filteren hier direct op.
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 {([
@@ -964,7 +964,7 @@ function VendorEditPage() {
                 className="ddp-btn-gold"
                 style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
               >
-                {billingLoading ? "Laden…" : "Upgrade — €29/maand"}
+                {billingLoading ? "Laden…" : "Upgrade: €29/maand"}
               </button>
             )}
           </div>

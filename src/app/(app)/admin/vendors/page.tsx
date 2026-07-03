@@ -63,7 +63,7 @@ export default function AdminVendorsPage() {
         Leveranciers
       </h1>
       <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
-        Markeer een leverancier als "Aanbevolen" — ook profielen zonder eigen account (bijv. uit een bulkimport).
+        Markeer een leverancier als "Aanbevolen", ook profielen zonder eigen account (bijv. uit een bulkimport).
       </p>
 
       <input

@@ -145,7 +145,7 @@ export default function AccountsPage() {
     if (res.ok) {
       setUsers(us => us.map(x => x.id === u.id ? { ...x, isPremium: newVal } : x));
       setPendingPremium(p => { const n = { ...p }; delete n[u.id]; return n; });
-      setMsg(u.id, newVal ? "✓ Premium toegekend — e-mail verstuurd" : "✓ Premium verwijderd");
+      setMsg(u.id, newVal ? "✓ Premium toegekend, e-mail verstuurd" : "✓ Premium verwijderd");
     } else {
       const d = await res.json();
       setMsg(u.id, d.error ?? "Fout bij opslaan");
@@ -189,7 +189,7 @@ export default function AccountsPage() {
           <h2 className="font-semibold">Massa-import via CSV</h2>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
             Kolommen (kommagescheiden): <code className="text-xs px-1 py-0.5 rounded" style={{ background: "var(--accent)" }}>name, email, role, vendorType, city, phone, website</code><br />
-            <span className="text-xs">Role: vendor / couple / planner / team_member — standaard: vendor. Bestaande e-mailadressen worden overgeslagen.</span>
+            <span className="text-xs">Role: vendor / couple / planner / team_member. Standaard: vendor. Bestaande e-mailadressen worden overgeslagen.</span>
           </p>
           <div className="flex items-center gap-3">
             <input

@@ -31,7 +31,7 @@ export default function WachtwoordVergetenPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "var(--gradient-hero)" }}>
       <Link href="/" className="fixed top-4 left-5 md:left-10 inline-flex items-center gap-2 z-20">
-        <Image src="/images/logo.svg" alt="DreamDay Partners" width={28} height={28} />
+        <Image src="/images/logo.svg" alt="DreamDay Platform" width={28} height={28} />
         <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.03em", color: "var(--foreground)" }}>
           DreamDay<span style={{ color: "var(--primary)" }}> Partners</span>
         </span>

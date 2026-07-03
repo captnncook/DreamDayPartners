@@ -102,6 +102,8 @@ a { text-decoration: none; color: inherit; }
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -111,6 +113,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 h1, h2, h3, h4, h5, h6 {

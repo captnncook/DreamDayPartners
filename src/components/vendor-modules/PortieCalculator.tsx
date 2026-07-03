@@ -47,7 +47,7 @@ export default function PortieCalculator({ guests, totalGuests, intakeData }: Pr
 
       {baseCount === 0 ? (
         <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
-          Nog geen gasten bevestigd — portieadvies beschikbaar zodra de gastenlijst gevuld is.
+          Nog geen gasten bevestigd. Portieadvies is beschikbaar zodra de gastenlijst gevuld is.
         </p>
       ) : (
         <div style={{ display: "grid", gap: "0.75rem" }}>

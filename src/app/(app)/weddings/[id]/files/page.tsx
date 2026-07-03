@@ -105,7 +105,7 @@ export default function FilesPage() {
         setUploadError(data.error ?? "Upload mislukt");
       }
     } catch {
-      setUploadError("Netwerkfout — probeer opnieuw");
+      setUploadError("Netwerkfout, probeer opnieuw");
     } finally {
       setUploadProgress(100);
       setTimeout(() => { setUploading(false); setUploadProgress(0); }, 500);
@@ -184,7 +184,7 @@ export default function FilesPage() {
                 <div className="flex justify-center mb-2"><Upload className="w-10 h-10" style={{ color: "var(--muted-light)" }} /></div>
                 <div className="text-sm font-medium">Klik om bestand te kiezen</div>
                 <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>
-                  Afbeeldingen, PDF, Word, Excel — max 50 MB
+                  Afbeeldingen, PDF, Word, Excel, max 50 MB
                 </div>
               </div>
             )}
@@ -223,8 +223,8 @@ export default function FilesPage() {
             <div className="mb-4">
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
                 <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress}%`, background: "var(--primary)" }}
+                  className="h-full rounded-full"
+                  style={{ width: `${uploadProgress}%`, background: "var(--primary)", transition: "width 300ms var(--ease-out)" }}
                 />
               </div>
               <div className="text-xs mt-1 text-center" style={{ color: "var(--muted)" }}>

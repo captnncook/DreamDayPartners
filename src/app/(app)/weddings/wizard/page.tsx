@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Heart } from "lucide-react";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -80,10 +79,10 @@ export default function WeddingWizardPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center">
-            <Image src="/images/logo.svg" alt="DreamDay Partners" width={56} height={56} />
+            <Image src="/images/logo.svg" alt="DreamDay Platform" width={56} height={56} />
           </div>
           <h1 className="font-serif mt-3" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Begin jullie dream day</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>In een paar stappen klaar — alles kun je later aanpassen</p>
+          <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>In een paar stappen klaar. Alles kun je later aanpassen</p>
         </div>
 
         {/* Progress */}
@@ -92,10 +91,11 @@ export default function WeddingWizardPage() {
             {STEPS.map((s) => (
               <div key={s.n} className="flex flex-col items-center" style={{ width: "25%" }}>
                 <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mb-1 transition-all"
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mb-1"
                   style={{
                     background: step >= s.n ? "var(--primary)" : "var(--border)",
                     color: step >= s.n ? "white" : "var(--muted)",
+                    transition: "background 180ms var(--ease-out), color 180ms var(--ease-out)",
                   }}
                 >
                   {step > s.n ? "" : s.n}
@@ -107,7 +107,7 @@ export default function WeddingWizardPage() {
             ))}
           </div>
           <div className="h-1 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
-            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress}%`, background: "var(--primary)" }} />
+            <div className="h-full rounded-full" style={{ width: `${progress}%`, background: "var(--primary)", transition: "width 500ms var(--ease-out)" }} />
           </div>
         </div>
 
@@ -143,8 +143,8 @@ export default function WeddingWizardPage() {
                 </div>
               </div>
               {form.partner1 && form.partner2 && (
-                <div className="p-3 rounded-xl text-center text-sm font-medium flex items-center justify-center gap-2" style={{ background: "var(--accent)", color: "var(--primary)" }}>
-                  <Heart className="w-4 h-4 fill-current" /> Bruiloft {form.partner1} & {form.partner2}
+                <div className="font-serif p-3 rounded-xl text-center text-sm" style={{ fontWeight: 700, background: "var(--accent)", color: "var(--primary)" }}>
+                  Bruiloft {form.partner1} & {form.partner2}
                 </div>
               )}
             </div>
@@ -222,10 +222,11 @@ export default function WeddingWizardPage() {
                     key={b}
                     type="button"
                     onClick={() => set("budget", b)}
-                    className="py-2 rounded-xl text-xs font-medium transition-all"
+                    className="py-2 rounded-xl text-xs font-medium"
                     style={{
                       background: form.budget === b ? "var(--primary)" : "var(--accent)",
                       color: form.budget === b ? "white" : "var(--foreground)",
+                      transition: "background 180ms var(--ease-out), color 180ms var(--ease-out)",
                     }}
                   >
                     €{parseInt(b).toLocaleString("nl-NL")}

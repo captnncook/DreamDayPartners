@@ -121,7 +121,7 @@ export default function LoginPage() {
             </div>
           </Link>
           <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
-            Jouw dream day, zonder de stress — Demo
+            Jouw dream day, zonder de stress. Demo
           </p>
         </div>
 
@@ -181,7 +181,7 @@ export default function LoginPage() {
               {selectedRole === "planner" && <p>Volledig bruiloftsbeheer: taken, gasten, budget, draaiboek, communicatie</p>}
               {selectedRole === "couple"  && <p>Overzicht van de eigen bruiloft, taken en communicatie met het team</p>}
               {!["admin","planner","couple"].includes(selectedRole) && (
-                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek — <span style={{ color: "var(--gold-deep)", fontWeight: 700, textTransform: "uppercase", fontSize: "0.6875rem", letterSpacing: "0.05em" }}>Premium</span></p>
+                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek. <span style={{ color: "var(--gold-deep)", fontWeight: 700, textTransform: "uppercase", fontSize: "0.6875rem", letterSpacing: "0.05em" }}>Premium</span></p>
               )}
             </div>
 
@@ -284,7 +284,7 @@ export default function LoginPage() {
           <Image src="/images/logo-wit.svg" alt="DreamDay" width={36} height={36} className="mx-auto mb-3" />
           <h2 className="font-serif font-bold mb-1" style={{ fontSize: "1.0625rem", color: "var(--ink-text)" }}>Jullie dream day plannen?</h2>
           <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
-            Stel jullie dream team samen en regel alles op één plek — gratis voor bruidsparen.
+            Stel jullie dream team samen en regel alles op één plek, gratis voor bruidsparen.
           </p>
           <Link
             href="/aanmelden"

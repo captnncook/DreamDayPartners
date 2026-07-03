@@ -34,7 +34,7 @@ export default function VendorNotesEditor({ weddingId, wvId, initialNotes }: { w
       <textarea
         value={value}
         onChange={handleChange}
-        placeholder="Eigen aantekeningen over deze bruiloft — alleen voor jou zichtbaar…"
+        placeholder="Eigen aantekeningen over deze bruiloft, alleen voor jou zichtbaar…"
         rows={4}
         className="ddp-input resize-none"
         style={{ fontSize: "0.875rem" }}
