@@ -1,13 +1,13 @@
 "use client";
 import { useState, useRef, useCallback, useEffect } from "react";
-import { X, Check, MapPin, Briefcase } from "lucide-react";
+import { X, Check, MapPin, Briefcase, Plus } from "lucide-react";
 
 const PPM = 2; // pixels per minute → 120px per hour
 const DAY_START = 6 * 60;  // 06:00
 const DAY_END = 23 * 60;   // 23:00
 const SNAP = 5;             // snap to 5 min while dragging
 const TIME_W = 52;
-const HANDLE = 8;
+const HANDLE = 14;
 
 function toMin(t: string): number {
   const [h, m] = t.split(":").map(Number);
@@ -145,11 +145,12 @@ interface Props {
   onDeleteItem: (id: string) => Promise<void>;
   onAddItem: (data: Record<string, unknown>) => Promise<void>;
   onTogglePublic: (id: string, current: boolean) => Promise<void>;
+  onDragStateChange?: (dragging: boolean) => void;
 }
 
 export default function DraaiboekGrid({
   items, vendors, canEditItem, isPlanner,
-  onUpdateItem, onDeleteItem, onAddItem, onTogglePublic,
+  onUpdateItem, onDeleteItem, onAddItem, onTogglePublic, onDragStateChange,
 }: Props) {
   const draftRef = useRef<GridItem[]>(items);
   const [display, setDisplay] = useState<GridItem[]>(items);
@@ -166,7 +167,7 @@ export default function DraaiboekGrid({
   const H = (DAY_END - DAY_START) * PPM;
   const hours = Array.from({ length: (DAY_END - DAY_START) / 60 + 1 }, (_, i) => DAY_START + i * 60);
 
-  const onMove = useCallback((e: MouseEvent) => {
+  const onMove = useCallback((e: PointerEvent) => {
     const d = drag.current;
     if (!d) return;
     didDrag.current = true;
@@ -192,8 +193,10 @@ export default function DraaiboekGrid({
     const d = drag.current;
     if (!d) return;
     drag.current = null;
-    document.removeEventListener("mousemove", onMove);
-    document.removeEventListener("mouseup", onUp);
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", onUp);
+    document.removeEventListener("pointercancel", onUp);
+    onDragStateChange?.(false);
 
     const it = draftRef.current.find(i => i.id === d.id);
     if (!it) return;
@@ -202,14 +205,16 @@ export default function DraaiboekGrid({
       await onUpdateItem(it.id, { startTime: it.startTime, duration: it.duration });
     }
     setTimeout(() => { didDrag.current = false; }, 10);
-  }, [onMove, onUpdateItem]);
+  }, [onMove, onUpdateItem, onDragStateChange]);
 
-  function startDrag(e: React.MouseEvent, it: GridItem, type: DragState["type"]) {
+  function startDrag(e: React.PointerEvent, it: GridItem, type: DragState["type"]) {
     e.preventDefault();
     e.stopPropagation();
     drag.current = { type, id: it.id, y0: e.clientY, s0: toMin(it.startTime), d0: it.duration };
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseup", onUp);
+    onDragStateChange?.(true);
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("pointercancel", onUp);
   }
 
   function handleGridClick(e: React.MouseEvent) {
@@ -334,11 +339,20 @@ export default function DraaiboekGrid({
         </div>
       )}
 
-      {/* Hint */}
+      {/* Hint + expliciete toevoeg-knop (belangrijk op mobiel, waar precies tikken op het raster lastig is) */}
       {!formMode && !selItem && (
-        <p style={{ fontSize: "0.75rem", color: "var(--muted)", fontStyle: "italic" }}>
-          Klik op het raster om een item toe te voegen · Sleep een item om te verplaatsen · Sleep de randen om de tijd aan te passen
-        </p>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <p style={{ fontSize: "0.75rem", color: "var(--muted)", fontStyle: "italic" }}>
+            Tik op een item om te bewerken · Tik op het raster of gebruik de knop om iets toe te voegen
+          </p>
+          <button
+            onClick={() => { setNewTime("09:00"); setSelected(null); setFormMode("add"); }}
+            className="ddp-btn-secondary"
+            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", flexShrink: 0 }}
+          >
+            <Plus className="w-3.5 h-3.5" />Item toevoegen
+          </button>
+        </div>
       )}
 
       {/* Grid */}
@@ -453,12 +467,12 @@ export default function DraaiboekGrid({
                 {/* Top resize handle */}
                 {editable && (
                   <div
-                    onMouseDown={e => startDrag(e, item, "top")}
+                    onPointerDown={e => startDrag(e, item, "top")}
                     title="Begintijd aanpassen"
                     style={{
                       position: "absolute", top: 0, left: 0, right: 0, height: HANDLE,
-                      cursor: "n-resize", zIndex: 4,
-                      background: "linear-gradient(to bottom, rgba(0,0,0,0.06), transparent)",
+                      cursor: "n-resize", zIndex: 4, touchAction: "none",
+                      background: "linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)",
                       borderRadius: "6px 6px 0 0",
                     }}
                   />
@@ -466,13 +480,14 @@ export default function DraaiboekGrid({
 
                 {/* Body — drag to move */}
                 <div
-                  onMouseDown={editable ? e => startDrag(e, item, "move") : undefined}
+                  onPointerDown={editable ? e => startDrag(e, item, "move") : undefined}
                   style={{
                     position: "absolute",
                     top: HANDLE, bottom: HANDLE, left: 0, right: 0,
                     padding: "1px 5px",
                     overflow: "hidden",
                     cursor: editable ? "grab" : "default",
+                    touchAction: editable ? "none" : undefined,
                   }}
                 >
                   <div style={{
@@ -492,12 +507,12 @@ export default function DraaiboekGrid({
                 {/* Bottom resize handle */}
                 {editable && (
                   <div
-                    onMouseDown={e => startDrag(e, item, "bot")}
+                    onPointerDown={e => startDrag(e, item, "bot")}
                     title="Eindtijd aanpassen"
                     style={{
                       position: "absolute", bottom: 0, left: 0, right: 0, height: HANDLE,
-                      cursor: "s-resize", zIndex: 4,
-                      background: "linear-gradient(to top, rgba(0,0,0,0.06), transparent)",
+                      cursor: "s-resize", zIndex: 4, touchAction: "none",
+                      background: "linear-gradient(to top, rgba(0,0,0,0.1), transparent)",
                       borderRadius: "0 0 6px 6px",
                     }}
                   />

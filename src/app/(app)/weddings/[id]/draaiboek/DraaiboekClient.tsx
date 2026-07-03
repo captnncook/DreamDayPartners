@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { ClipboardList, Plus, Printer } from "lucide-react";
 import DraaiboekGrid, { type GridItem, type WeddingVendorRef } from "./DraaiboekGrid";
@@ -45,9 +45,53 @@ export default function DraaiboekClient({
   const [newDraaiboekTitle, setNewDraaiboekTitle] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [exporting, setExporting] = useState(false);
   const activeDraaiboek = draaiboeken.find(d => d.id === activeDraaiboekId);
   const isPlanner = ["admin", "planner", "team_member"].includes(currentUser.role);
   const isVendor = currentUser.role === "vendor";
+  const draggingRef = useRef(false);
+
+  const refresh = useCallback(async () => {
+    if (draggingRef.current) return;
+    const res = await fetch(`/api/weddings/${weddingId}/draaiboek`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.draaiboeken) return;
+    setDraaiboeken(data.draaiboeken);
+    setActiveDraaiboekId(prev => (prev && data.draaiboeken.some((d: Draaiboek) => d.id === prev)) ? prev : (data.draaiboeken[0]?.id ?? null));
+  }, [weddingId]);
+
+  useEffect(() => {
+    const interval = setInterval(refresh, 12000);
+    function onFocus() { refresh(); }
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
+  }, [refresh]);
+
+  async function exportPdf() {
+    if (!activeDraaiboekId) return;
+    setExporting(true);
+    try {
+      const res = await fetch(`/api/weddings/${weddingId}/draaiboek/${activeDraaiboekId}/export`);
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `draaiboek-${weddingTitle.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   function canEditItem(item: DraaiboekItem): boolean {
     if (isPlanner) return true;
@@ -143,8 +187,8 @@ export default function DraaiboekClient({
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => window.print()} className="ddp-btn-secondary">
-              <Printer className="inline w-3.5 h-3.5 mr-1" />Exporteren
+            <button onClick={exportPdf} disabled={exporting || !activeDraaiboekId} className="ddp-btn-secondary">
+              <Printer className="inline w-3.5 h-3.5 mr-1" />{exporting ? "Bezig…" : "Exporteren als pdf"}
             </button>
             {isPlanner && (
               <button onClick={() => setShowNewDraaiboek(!showNewDraaiboek)} className="ddp-btn-secondary">
@@ -219,6 +263,7 @@ export default function DraaiboekClient({
                 onDeleteItem={deleteItem}
                 onAddItem={addItem}
                 onTogglePublic={togglePublic}
+                onDragStateChange={dragging => { draggingRef.current = dragging; }}
               />
             )}
           </div>

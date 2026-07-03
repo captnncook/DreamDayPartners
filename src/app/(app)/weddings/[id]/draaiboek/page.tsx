@@ -9,8 +9,15 @@ export default async function DraaiboekPage({ params }: { params: Promise<{ id: 
 
   const { id } = await params;
 
-  const wedding = await prisma.wedding.findUnique({
-    where: { id },
+  const accessWhere =
+    user.role === "admin"
+      ? { id }
+      : user.role === "vendor"
+      ? { id, vendors: { some: { vendor: { userId: user.id }, portalAccess: true } } }
+      : { id, teamMembers: { some: { userId: user.id } } };
+
+  const wedding = await prisma.wedding.findFirst({
+    where: accessWhere,
     select: { id: true, title: true, date: true, isPremium: true },
   });
   if (!wedding) notFound();

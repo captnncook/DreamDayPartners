@@ -24,6 +24,7 @@ export async function POST(
       assignedUserId: body.assignedUserId ?? null,
       vendorId: body.vendorId ?? null,
       notes: body.notes ?? null,
+      isPublic: body.isPublic ?? true,
     },
     include: { vendor: true },
   });
