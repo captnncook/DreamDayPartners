@@ -1,4 +1,7 @@
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet, Font } from "@react-pdf/renderer";
+import path from "path";
+
+const LOGO_PATH = path.join(process.cwd(), "public", "logo.png");
 
 const INK = "#1C2B24";
 const GOLD = "#C9A75D";
@@ -24,12 +27,28 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     paddingBottom: 24,
   },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  logoBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 5,
+    backgroundColor: "#FFFFFF",
+    padding: 3,
+    marginRight: 8,
+  },
+  logoImg: {
+    width: "100%",
+    height: "100%",
+  },
   brand: {
     fontSize: 11,
     fontFamily: "Helvetica-Bold",
     color: GOLD,
     letterSpacing: 2,
-    marginBottom: 14,
   },
   weddingTitle: {
     fontSize: 22,
@@ -155,7 +174,12 @@ export function DraaiboekPdf({
     <Document title={`Draaiboek ${weddingTitle}`}>
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.header} fixed>
-          <Text style={styles.brand}>DREAMDAY PLATFORM</Text>
+          <View style={styles.brandRow}>
+            <View style={styles.logoBadge}>
+              <Image src={LOGO_PATH} style={styles.logoImg} />
+            </View>
+            <Text style={styles.brand}>DREAMDAY PLATFORM</Text>
+          </View>
           <Text style={styles.weddingTitle}>{weddingTitle}</Text>
           <Text style={styles.weddingMeta}>
             {formatDate(weddingDate)}{venue ? `  ·  ${venue}` : ""}
