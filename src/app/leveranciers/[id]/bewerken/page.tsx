@@ -26,12 +26,65 @@ const CATEGORIES = [
 
 void CATEGORIES;
 
+type VenueRoom = {
+  id: string; name: string; surfaceArea?: number | null; ceilingHeight?: number | null;
+  ceremonyMin?: number | null; ceremonyMax?: number | null;
+  receptionMin?: number | null; receptionMax?: number | null;
+  dinnerMin?: number | null; dinnerMax?: number | null;
+  partyMin?: number | null; partyMax?: number | null;
+};
+
 type Vendor = {
   id: string; name: string; category: string; contactPerson?: string;
   email?: string; phone?: string; website?: string; description?: string;
   isPremium: boolean; photos: string[]; city?: string; userId?: string;
   priceFrom?: number; priceTo?: number; priceUnit?: string; specializations?: string[]; busyDates?: string[];
+  averageWeddingPrice?: number | null;
+  ceremonyMinGuests?: number | null; ceremonyMaxGuests?: number | null;
+  receptionMinGuests?: number | null; receptionMaxGuests?: number | null;
+  dinnerMinGuests?: number | null; dinnerMaxGuests?: number | null;
+  partyMinGuests?: number | null; partyMaxGuests?: number | null;
+  hotelRooms?: number | null;
+  closingTime?: string | null; soundLimit?: string | null;
+  isOfficialCeremonyLocation?: boolean; outdoorCeremonyPossible?: boolean;
+  accessibility?: string[]; venueFacilities?: string[]; cateringOptions?: string[];
+  barOptions?: string[]; environment?: string[];
+  venueRooms?: VenueRoom[];
 };
+
+const ACCESSIBILITY_OPTIONS = ["Rolstoeltoegankelijk", "Gratis parkeerplaatsen", "Invalidentoilet", "Oplaadpunt elektrische auto's", "Valetparking", "Shuttleservice/P&R"];
+const VENUE_FACILITIES_OPTIONS = ["(Dak)terras", "Tuin", "Zwembad", "Omkleedruimte", "Bruidssuite", "Wellness", "Overdekte buitenlocatie"];
+const CATERING_OPTIONS_LIST = ["Eigen catering toegestaan", "Halal/koosjer mogelijk", "Eigen taart toegestaan", "Buiten eten mogelijk", "Buffet", "Walking dinner", "Shared dining", "BBQ"];
+const BAR_OPTIONS_LIST = ["Eigen drank toegestaan", "Afkoop mogelijk", "Buitenbar aanwezig", "Champagnetoren mogelijk", "Speciaalbier", "Cocktails"];
+const ENVIRONMENT_OPTIONS = ["Aan het water", "In het bos", "Op het platteland", "In de stad", "Aan het strand", "In het park"];
+
+function CheckboxGroup({ options, selected, onChange }: { options: string[]; selected: string[]; onChange: (next: string[]) => void }) {
+  function toggle(opt: string) {
+    onChange(selected.includes(opt) ? selected.filter((o) => o !== opt) : [...selected, opt]);
+  }
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const active = selected.includes(opt);
+        return (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => toggle(opt)}
+            style={{
+              fontSize: "0.8125rem", fontWeight: active ? 700 : 500, padding: "0.4rem 0.75rem",
+              borderRadius: "var(--radius-full)", border: `1px solid ${active ? "var(--gold)" : "var(--border)"}`,
+              background: active ? "var(--sand)" : "transparent", color: active ? "var(--gold-deep)" : "var(--muted)",
+              cursor: "pointer",
+            }}
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 import { Suspense } from "react";
 
@@ -165,7 +218,19 @@ function VendorEditPage() {
   const [form, setForm] = useState({
     description: "", city: "", contactPerson: "", phone: "", website: "",
     priceFrom: "", priceTo: "", priceUnit: "", specializations: "",
+    averageWeddingPrice: "",
+    ceremonyMinGuests: "", ceremonyMaxGuests: "", receptionMinGuests: "", receptionMaxGuests: "",
+    dinnerMinGuests: "", dinnerMaxGuests: "", partyMinGuests: "", partyMaxGuests: "",
+    hotelRooms: "", closingTime: "", soundLimit: "",
   });
+  const [isOfficialCeremonyLocation, setIsOfficialCeremonyLocation] = useState(false);
+  const [outdoorCeremonyPossible, setOutdoorCeremonyPossible] = useState(false);
+  const [accessibility, setAccessibility] = useState<string[]>([]);
+  const [venueFacilities, setVenueFacilities] = useState<string[]>([]);
+  const [cateringOptions, setCateringOptions] = useState<string[]>([]);
+  const [barOptions, setBarOptions] = useState<string[]>([]);
+  const [environment, setEnvironment] = useState<string[]>([]);
+  const [venueRooms, setVenueRooms] = useState<VenueRoom[]>([]);
 
   const load = useCallback(async () => {
     const [vRes, meRes] = await Promise.all([
@@ -194,8 +259,28 @@ function VendorEditPage() {
       priceTo: v.priceTo != null ? String(v.priceTo) : "",
       priceUnit: v.priceUnit ?? "",
       specializations: (v.specializations ?? []).join(", "),
+      averageWeddingPrice: v.averageWeddingPrice != null ? String(v.averageWeddingPrice) : "",
+      ceremonyMinGuests: v.ceremonyMinGuests != null ? String(v.ceremonyMinGuests) : "",
+      ceremonyMaxGuests: v.ceremonyMaxGuests != null ? String(v.ceremonyMaxGuests) : "",
+      receptionMinGuests: v.receptionMinGuests != null ? String(v.receptionMinGuests) : "",
+      receptionMaxGuests: v.receptionMaxGuests != null ? String(v.receptionMaxGuests) : "",
+      dinnerMinGuests: v.dinnerMinGuests != null ? String(v.dinnerMinGuests) : "",
+      dinnerMaxGuests: v.dinnerMaxGuests != null ? String(v.dinnerMaxGuests) : "",
+      partyMinGuests: v.partyMinGuests != null ? String(v.partyMinGuests) : "",
+      partyMaxGuests: v.partyMaxGuests != null ? String(v.partyMaxGuests) : "",
+      hotelRooms: v.hotelRooms != null ? String(v.hotelRooms) : "",
+      closingTime: v.closingTime ?? "",
+      soundLimit: v.soundLimit ?? "",
     });
     setBusyDates(v.busyDates ?? []);
+    setIsOfficialCeremonyLocation(Boolean(v.isOfficialCeremonyLocation));
+    setOutdoorCeremonyPossible(Boolean(v.outdoorCeremonyPossible));
+    setAccessibility(v.accessibility ?? []);
+    setVenueFacilities(v.venueFacilities ?? []);
+    setCateringOptions(v.cateringOptions ?? []);
+    setBarOptions(v.barOptions ?? []);
+    setEnvironment(v.environment ?? []);
+    setVenueRooms(v.venueRooms ?? []);
 
     const photosRes = await fetch(`/api/catalogus/${id}/signed-photos`);
     const pData = await photosRes.json();
@@ -217,7 +302,11 @@ function VendorEditPage() {
     const res = await fetch(`/api/catalogus/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, specializations }),
+      body: JSON.stringify({
+        ...form, specializations,
+        isOfficialCeremonyLocation, outdoorCeremonyPossible,
+        accessibility, venueFacilities, cateringOptions, barOptions, environment,
+      }),
     });
     if (!res.ok) {
       const d = await res.json();
@@ -227,6 +316,35 @@ function VendorEditPage() {
       setTimeout(() => setSaved(false), 3000);
     }
     setSaving(false);
+  }
+
+  async function addVenueRoom() {
+    const res = await fetch(`/api/catalogus/${id}/rooms`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "Nieuwe zaal" }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setVenueRooms((rooms) => [...rooms, data.room]);
+    }
+  }
+
+  function updateVenueRoomLocal(roomId: string, patch: Partial<VenueRoom>) {
+    setVenueRooms((rooms) => rooms.map((r) => (r.id === roomId ? { ...r, ...patch } : r)));
+  }
+
+  async function saveVenueRoom(room: VenueRoom) {
+    await fetch(`/api/catalogus/${id}/rooms/${room.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(room),
+    });
+  }
+
+  async function deleteVenueRoom(roomId: string) {
+    setVenueRooms((rooms) => rooms.filter((r) => r.id !== roomId));
+    await fetch(`/api/catalogus/${id}/rooms/${roomId}`, { method: "DELETE" });
   }
 
   async function toggleBusyDate(date: string) {
@@ -646,6 +764,169 @@ function VendorEditPage() {
             />
           </div>
         </section>
+
+        {vendor.category === "trouwlocatie" && (
+          <>
+            {/* Gemiddelde bruiloftprijs */}
+            <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+              <h2 className="dash-section-title mb-1">Gemiddelde bruiloftprijs</h2>
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+                Naast de startprijs hierboven: wat geeft een gemiddeld bruidspaar in totaal uit bij jullie?
+              </p>
+              <div style={{ maxWidth: "200px" }}>
+                <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Gemiddeld totaalbedrag (€)</label>
+                <input
+                  type="number"
+                  value={form.averageWeddingPrice}
+                  onChange={(e) => setForm({ ...form, averageWeddingPrice: e.target.value })}
+                  placeholder="bijv. 7500"
+                  className="ddp-input"
+                />
+              </div>
+            </section>
+
+            {/* Capaciteit */}
+            <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+              <h2 className="dash-section-title mb-1">Capaciteit</h2>
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+                Aantal gasten per moment van de dag — bruidsparen filteren hier direct op.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                {([
+                  ["ceremonyMinGuests", "ceremonyMaxGuests", "Ceremonie"],
+                  ["receptionMinGuests", "receptionMaxGuests", "Receptie"],
+                  ["dinnerMinGuests", "dinnerMaxGuests", "Diner"],
+                  ["partyMinGuests", "partyMaxGuests", "Feest"],
+                ] as const).map(([minKey, maxKey, label]) => (
+                  <div key={label}>
+                    <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{label}</label>
+                    <div className="flex items-center gap-1.5">
+                      <input type="number" value={form[minKey]} onChange={(e) => setForm({ ...form, [minKey]: e.target.value })} placeholder="min" className="ddp-input" style={{ width: "100%" }} />
+                      <span style={{ color: "var(--muted)" }}>–</span>
+                      <input type="number" value={form[maxKey]} onChange={(e) => setForm({ ...form, [maxKey]: e.target.value })} placeholder="max" className="ddp-input" style={{ width: "100%" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ maxWidth: "200px" }}>
+                <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Aantal hotelkamers</label>
+                <input type="number" value={form.hotelRooms} onChange={(e) => setForm({ ...form, hotelRooms: e.target.value })} placeholder="bijv. 20" className="ddp-input" />
+              </div>
+            </section>
+
+            {/* Zalen */}
+            <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+              <h2 className="dash-section-title mb-1">Zalen</h2>
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+                Heb je meerdere ruimtes? Voeg ze los toe met eigen oppervlakte en capaciteit.
+              </p>
+              <div className="space-y-4 mb-4">
+                {venueRooms.map((room) => (
+                  <div key={room.id} className="p-4" style={{ background: "var(--sand)", borderRadius: "var(--radius-md)" }}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <input
+                        type="text"
+                        value={room.name}
+                        onChange={(e) => updateVenueRoomLocal(room.id, { name: e.target.value })}
+                        onBlur={() => saveVenueRoom(room)}
+                        placeholder="Naam van de zaal"
+                        className="ddp-input"
+                        style={{ flex: 1, fontWeight: 700 }}
+                      />
+                      <button type="button" onClick={() => deleteVenueRoom(room.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)" }} aria-label="Zaal verwijderen">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Oppervlakte (m²)</label>
+                        <input type="number" value={room.surfaceArea ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { surfaceArea: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} className="ddp-input" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Hoogte (m)</label>
+                        <input type="number" value={room.ceilingHeight ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { ceilingHeight: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} className="ddp-input" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {([
+                        ["ceremonyMin", "ceremonyMax", "Ceremonie"],
+                        ["receptionMin", "receptionMax", "Receptie"],
+                        ["dinnerMin", "dinnerMax", "Diner"],
+                        ["partyMin", "partyMax", "Feest"],
+                      ] as const).map(([minKey, maxKey, label]) => (
+                        <div key={label}>
+                          <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>{label}</label>
+                          <div className="flex items-center gap-1">
+                            <input type="number" value={room[minKey] ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { [minKey]: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} placeholder="min" className="ddp-input" style={{ width: "100%" }} />
+                            <input type="number" value={room[maxKey] ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { [maxKey]: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} placeholder="max" className="ddp-input" style={{ width: "100%" }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button type="button" onClick={addVenueRoom} className="ddp-btn-secondary">
+                + Zaal toevoegen
+              </button>
+            </section>
+
+            {/* Eigenschappen */}
+            <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+              <h2 className="dash-section-title mb-4">Eigenschappen</h2>
+
+              <div className="flex flex-wrap gap-4 mb-5">
+                <label className="flex items-center gap-2" style={{ fontSize: "0.875rem", cursor: "pointer" }}>
+                  <input type="checkbox" checked={isOfficialCeremonyLocation} onChange={(e) => setIsOfficialCeremonyLocation(e.target.checked)} />
+                  Officiële trouwlocatie
+                </label>
+                <label className="flex items-center gap-2" style={{ fontSize: "0.875rem", cursor: "pointer" }}>
+                  <input type="checkbox" checked={outdoorCeremonyPossible} onChange={(e) => setOutdoorCeremonyPossible(e.target.checked)} />
+                  Buiten trouwen mogelijk
+                </label>
+              </div>
+
+              <div className="mb-5">
+                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Toegankelijkheid</p>
+                <CheckboxGroup options={ACCESSIBILITY_OPTIONS} selected={accessibility} onChange={setAccessibility} />
+              </div>
+              <div className="mb-5">
+                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Faciliteiten</p>
+                <CheckboxGroup options={VENUE_FACILITIES_OPTIONS} selected={venueFacilities} onChange={setVenueFacilities} />
+              </div>
+              <div className="mb-5">
+                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Dinermogelijkheden</p>
+                <CheckboxGroup options={CATERING_OPTIONS_LIST} selected={cateringOptions} onChange={setCateringOptions} />
+              </div>
+              <div className="mb-5">
+                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Barmogelijkheden</p>
+                <CheckboxGroup options={BAR_OPTIONS_LIST} selected={barOptions} onChange={setBarOptions} />
+              </div>
+              <div>
+                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Omgeving</p>
+                <CheckboxGroup options={ENVIRONMENT_OPTIONS} selected={environment} onChange={setEnvironment} />
+              </div>
+            </section>
+
+            {/* Regels */}
+            <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+              <h2 className="dash-section-title mb-1">Regels</h2>
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+                Praktische afspraken die bruidsparen vaak vroeg willen weten.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Sluitingstijd</label>
+                  <input type="time" value={form.closingTime} onChange={(e) => setForm({ ...form, closingTime: e.target.value })} className="ddp-input" />
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Geluidslimiet</label>
+                  <input type="text" value={form.soundLimit} onChange={(e) => setForm({ ...form, soundLimit: e.target.value })} placeholder="bijv. 90 dB na 23:00" className="ddp-input" />
+                </div>
+              </div>
+            </section>
+          </>
+        )}
 
         {/* Beschikbaarheid */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>

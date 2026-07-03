@@ -14,12 +14,43 @@ const CATEGORY_LABELS: Record<string, string> = {
   decoratie: "Decoratie & Styling", fotocabine: "Fotocabine", overig: "Overig",
 };
 
+type VenueRoom = {
+  id: string; name: string; surfaceArea?: number | null; ceilingHeight?: number | null;
+  ceremonyMin?: number | null; ceremonyMax?: number | null;
+  receptionMin?: number | null; receptionMax?: number | null;
+  dinnerMin?: number | null; dinnerMax?: number | null;
+  partyMin?: number | null; partyMax?: number | null;
+};
+
 type Vendor = {
   id: string; name: string; category: string; contactPerson?: string;
   email?: string; phone?: string; website?: string; description?: string;
   isPremium: boolean; photos: string[]; city?: string; userId?: string;
   priceFrom?: number; priceTo?: number; priceUnit?: string; specializations?: string[]; busyDates?: string[];
+  averageWeddingPrice?: number | null;
+  ceremonyMinGuests?: number | null; ceremonyMaxGuests?: number | null;
+  receptionMinGuests?: number | null; receptionMaxGuests?: number | null;
+  dinnerMinGuests?: number | null; dinnerMaxGuests?: number | null;
+  partyMinGuests?: number | null; partyMaxGuests?: number | null;
+  hotelRooms?: number | null;
+  closingTime?: string | null; soundLimit?: string | null;
+  isOfficialCeremonyLocation?: boolean; outdoorCeremonyPossible?: boolean;
+  accessibility?: string[]; venueFacilities?: string[]; cateringOptions?: string[];
+  barOptions?: string[]; environment?: string[];
+  venueRooms?: VenueRoom[];
 };
+
+function GuestRange({ label, min, max }: { label: string; min?: number | null; max?: number | null }) {
+  if (min == null && max == null) return null;
+  return (
+    <div>
+      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>{label}</span>
+      <span className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>
+        {min != null && max != null ? `${min} – ${max}` : min != null ? `vanaf ${min}` : `tot ${max}`}
+      </span>
+    </div>
+  );
+}
 type Review = { id: string; rating: number; text?: string; createdAt: string; author: { name: string } };
 type Wedding = { id: string; title: string; date: string };
 type CurrentUser = { id: string; role: string; name: string };
@@ -252,7 +283,7 @@ export default function VendorProfilePage() {
             )}
 
             {/* Price + specializations */}
-            {(vendor.priceFrom || (vendor.specializations && vendor.specializations.length > 0)) && (
+            {(vendor.priceFrom || vendor.averageWeddingPrice != null || (vendor.specializations && vendor.specializations.length > 0)) && (
               <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                 <h2 className="dash-section-title mb-3">Diensten & prijzen</h2>
                 {(vendor.priceFrom || vendor.priceTo) && (
@@ -266,11 +297,139 @@ export default function VendorProfilePage() {
                     </span>
                   </div>
                 )}
+                {vendor.averageWeddingPrice != null && (
+                  <div style={{ marginBottom: "0.75rem" }}>
+                    <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "0.25rem" }}>Gemiddelde bruiloft</span>
+                    <span className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>
+                      €{vendor.averageWeddingPrice.toLocaleString("nl-NL")}
+                    </span>
+                  </div>
+                )}
                 {vendor.specializations && vendor.specializations.length > 0 && (
                   <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600 }}>
                     {vendor.specializations.join(" · ")}
                   </p>
                 )}
+              </section>
+            )}
+
+            {/* Capaciteit (alleen trouwlocaties) */}
+            {vendor.category === "trouwlocatie" && (
+              vendor.ceremonyMinGuests != null || vendor.ceremonyMaxGuests != null ||
+              vendor.receptionMinGuests != null || vendor.receptionMaxGuests != null ||
+              vendor.dinnerMinGuests != null || vendor.dinnerMaxGuests != null ||
+              vendor.partyMinGuests != null || vendor.partyMaxGuests != null ||
+              vendor.hotelRooms != null
+            ) && (
+              <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                <h2 className="dash-section-title mb-3">Capaciteit</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3">
+                  <GuestRange label="Ceremonie" min={vendor.ceremonyMinGuests} max={vendor.ceremonyMaxGuests} />
+                  <GuestRange label="Receptie" min={vendor.receptionMinGuests} max={vendor.receptionMaxGuests} />
+                  <GuestRange label="Diner" min={vendor.dinnerMinGuests} max={vendor.dinnerMaxGuests} />
+                  <GuestRange label="Feest" min={vendor.partyMinGuests} max={vendor.partyMaxGuests} />
+                </div>
+                {vendor.hotelRooms != null && (
+                  <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
+                    <strong style={{ color: "var(--foreground)" }}>{vendor.hotelRooms}</strong> hotelkamers beschikbaar
+                  </p>
+                )}
+              </section>
+            )}
+
+            {/* Zalen (alleen trouwlocaties) */}
+            {vendor.category === "trouwlocatie" && vendor.venueRooms && vendor.venueRooms.length > 0 && (
+              <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                <h2 className="dash-section-title mb-3">Zaalindeling</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full" style={{ borderCollapse: "collapse", fontSize: "0.8125rem" }}>
+                    <thead>
+                      <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                        <th style={{ textAlign: "left", padding: "0.5rem 0.5rem 0.5rem 0", color: "var(--muted)", fontWeight: 600 }}>Zaal</th>
+                        <th style={{ textAlign: "left", padding: "0.5rem", color: "var(--muted)", fontWeight: 600 }}>Opp.</th>
+                        <th style={{ textAlign: "left", padding: "0.5rem", color: "var(--muted)", fontWeight: 600 }}>Hoogte</th>
+                        <th style={{ textAlign: "left", padding: "0.5rem", color: "var(--muted)", fontWeight: 600 }}>Ceremonie</th>
+                        <th style={{ textAlign: "left", padding: "0.5rem", color: "var(--muted)", fontWeight: 600 }}>Receptie</th>
+                        <th style={{ textAlign: "left", padding: "0.5rem", color: "var(--muted)", fontWeight: 600 }}>Diner</th>
+                        <th style={{ textAlign: "left", padding: "0.5rem", color: "var(--muted)", fontWeight: 600 }}>Feest</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vendor.venueRooms.map((room) => (
+                        <tr key={room.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                          <td style={{ padding: "0.625rem 0.5rem 0.625rem 0", fontWeight: 700, color: "var(--foreground)" }}>{room.name}</td>
+                          <td style={{ padding: "0.625rem 0.5rem", color: "var(--muted)" }}>{room.surfaceArea != null ? `${room.surfaceArea}m²` : "–"}</td>
+                          <td style={{ padding: "0.625rem 0.5rem", color: "var(--muted)" }}>{room.ceilingHeight != null ? `${room.ceilingHeight}m` : "–"}</td>
+                          <td style={{ padding: "0.625rem 0.5rem", color: "var(--muted)" }}>{room.ceremonyMin != null || room.ceremonyMax != null ? `${room.ceremonyMin ?? "–"} - ${room.ceremonyMax ?? "–"}` : "–"}</td>
+                          <td style={{ padding: "0.625rem 0.5rem", color: "var(--muted)" }}>{room.receptionMin != null || room.receptionMax != null ? `${room.receptionMin ?? "–"} - ${room.receptionMax ?? "–"}` : "–"}</td>
+                          <td style={{ padding: "0.625rem 0.5rem", color: "var(--muted)" }}>{room.dinnerMin != null || room.dinnerMax != null ? `${room.dinnerMin ?? "–"} - ${room.dinnerMax ?? "–"}` : "–"}</td>
+                          <td style={{ padding: "0.625rem 0.5rem", color: "var(--muted)" }}>{room.partyMin != null || room.partyMax != null ? `${room.partyMin ?? "–"} - ${room.partyMax ?? "–"}` : "–"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
+
+            {/* Eigenschappen (alleen trouwlocaties) */}
+            {vendor.category === "trouwlocatie" && (
+              vendor.isOfficialCeremonyLocation || vendor.outdoorCeremonyPossible ||
+              (vendor.accessibility && vendor.accessibility.length > 0) ||
+              (vendor.venueFacilities && vendor.venueFacilities.length > 0) ||
+              (vendor.cateringOptions && vendor.cateringOptions.length > 0) ||
+              (vendor.barOptions && vendor.barOptions.length > 0) ||
+              (vendor.environment && vendor.environment.length > 0)
+            ) && (
+              <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                <h2 className="dash-section-title mb-3">Eigenschappen</h2>
+
+                {(vendor.isOfficialCeremonyLocation || vendor.outdoorCeremonyPossible) && (
+                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600, marginBottom: "0.75rem" }}>
+                    {[
+                      vendor.isOfficialCeremonyLocation && "Officiële trouwlocatie",
+                      vendor.outdoorCeremonyPossible && "Buiten trouwen mogelijk",
+                    ].filter(Boolean).join(" · ")}
+                  </p>
+                )}
+
+                {[
+                  ["Toegankelijkheid", vendor.accessibility],
+                  ["Faciliteiten", vendor.venueFacilities],
+                  ["Dinermogelijkheden", vendor.cateringOptions],
+                  ["Barmogelijkheden", vendor.barOptions],
+                  ["Omgeving", vendor.environment],
+                ].map(([label, values]) => {
+                  const list = values as string[] | undefined;
+                  if (!list || list.length === 0) return null;
+                  return (
+                    <div key={label as string} style={{ marginBottom: "0.75rem" }}>
+                      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "0.25rem" }}>{label}</span>
+                      <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>{list.join(" · ")}</p>
+                    </div>
+                  );
+                })}
+              </section>
+            )}
+
+            {/* Regels (alleen trouwlocaties) */}
+            {vendor.category === "trouwlocatie" && (vendor.closingTime || vendor.soundLimit) && (
+              <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                <h2 className="dash-section-title mb-3">Regels</h2>
+                <div className="flex flex-wrap gap-x-8 gap-y-3">
+                  {vendor.closingTime && (
+                    <div>
+                      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>Sluitingstijd</span>
+                      <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)" }}>{vendor.closingTime}</span>
+                    </div>
+                  )}
+                  {vendor.soundLimit && (
+                    <div>
+                      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>Geluidslimiet</span>
+                      <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)" }}>{vendor.soundLimit}</span>
+                    </div>
+                  )}
+                </div>
               </section>
             )}
 

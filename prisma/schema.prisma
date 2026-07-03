@@ -144,10 +144,31 @@ model Vendor {
   priceFrom       Int?
   priceTo         Int?
   priceUnit       String?
+  averageWeddingPrice Int?
   specializations String[]
   busyDates       String[]
   viewCount       Int      @default(0)
   createdAt       DateTime @default(now())
+
+  // Trouwlocatie-specifieke velden (alleen relevant/getoond voor category "trouwlocatie")
+  ceremonyMinGuests  Int?
+  ceremonyMaxGuests  Int?
+  receptionMinGuests Int?
+  receptionMaxGuests Int?
+  dinnerMinGuests    Int?
+  dinnerMaxGuests    Int?
+  partyMinGuests     Int?
+  partyMaxGuests     Int?
+  hotelRooms         Int?
+  closingTime        String?
+  soundLimit         String?
+  isOfficialCeremonyLocation Boolean @default(false)
+  outdoorCeremonyPossible    Boolean @default(false)
+  accessibility    String[]
+  venueFacilities  String[]
+  cateringOptions  String[]
+  barOptions       String[]
+  environment      String[]
 
   weddingVendors   WeddingVendor[]
   draaiboekItems   DraaiboekItem[]
@@ -156,10 +177,32 @@ model Vendor {
   contactRequests  VendorContactRequest[]
   reviews          VendorReview[]
   claimRequests    VendorClaimRequest[]
+  venueRooms       VenueRoom[]
 
   @@index([category])
   @@index([isPremium])
   @@map("vendors")
+}
+
+model VenueRoom {
+  id            String  @id @default(uuid())
+  vendorId      String
+  vendor        Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  name          String
+  surfaceArea   Float?  // m²
+  ceilingHeight Float?  // m
+  ceremonyMin  Int?
+  ceremonyMax  Int?
+  receptionMin Int?
+  receptionMax Int?
+  dinnerMin    Int?
+  dinnerMax    Int?
+  partyMin     Int?
+  partyMax     Int?
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@map("venue_rooms")
 }
 
 model PendingRegistration {

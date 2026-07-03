@@ -25,8 +25,28 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       priceFrom: true,
       priceTo: true,
       priceUnit: true,
+      averageWeddingPrice: true,
       specializations: true,
       busyDates: true,
+      ceremonyMinGuests: true,
+      ceremonyMaxGuests: true,
+      receptionMinGuests: true,
+      receptionMaxGuests: true,
+      dinnerMinGuests: true,
+      dinnerMaxGuests: true,
+      partyMinGuests: true,
+      partyMaxGuests: true,
+      hotelRooms: true,
+      closingTime: true,
+      soundLimit: true,
+      isOfficialCeremonyLocation: true,
+      outdoorCeremonyPossible: true,
+      accessibility: true,
+      venueFacilities: true,
+      cateringOptions: true,
+      barOptions: true,
+      environment: true,
+      venueRooms: { orderBy: { order: "asc" } },
     },
   });
 
@@ -55,7 +75,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const body = await req.json();
-  const { description, city, contactPerson, phone, website, priceFrom, priceTo, priceUnit, specializations } = body;
+  const {
+    description, city, contactPerson, phone, website, priceFrom, priceTo, priceUnit, specializations,
+    averageWeddingPrice,
+    ceremonyMinGuests, ceremonyMaxGuests, receptionMinGuests, receptionMaxGuests,
+    dinnerMinGuests, dinnerMaxGuests, partyMinGuests, partyMaxGuests, hotelRooms,
+    closingTime, soundLimit, isOfficialCeremonyLocation, outdoorCeremonyPossible,
+    accessibility, venueFacilities, cateringOptions, barOptions, environment,
+  } = body;
+
+  const toIntOrNull = (v: unknown) => (v === undefined ? undefined : v === null || v === "" ? null : Number(v));
 
   let geoData: { latitude?: number; longitude?: number } = {};
   const needsGeo = city !== undefined && city.trim() && (city !== vendor.city || !vendor.latitude);
@@ -86,6 +115,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(priceTo !== undefined ? { priceTo: priceTo ? Number(priceTo) : null } : {}),
       ...(priceUnit !== undefined ? { priceUnit: priceUnit || null } : {}),
       ...(specializations !== undefined ? { specializations } : {}),
+      ...(averageWeddingPrice !== undefined ? { averageWeddingPrice: toIntOrNull(averageWeddingPrice) } : {}),
+      ...(ceremonyMinGuests !== undefined ? { ceremonyMinGuests: toIntOrNull(ceremonyMinGuests) } : {}),
+      ...(ceremonyMaxGuests !== undefined ? { ceremonyMaxGuests: toIntOrNull(ceremonyMaxGuests) } : {}),
+      ...(receptionMinGuests !== undefined ? { receptionMinGuests: toIntOrNull(receptionMinGuests) } : {}),
+      ...(receptionMaxGuests !== undefined ? { receptionMaxGuests: toIntOrNull(receptionMaxGuests) } : {}),
+      ...(dinnerMinGuests !== undefined ? { dinnerMinGuests: toIntOrNull(dinnerMinGuests) } : {}),
+      ...(dinnerMaxGuests !== undefined ? { dinnerMaxGuests: toIntOrNull(dinnerMaxGuests) } : {}),
+      ...(partyMinGuests !== undefined ? { partyMinGuests: toIntOrNull(partyMinGuests) } : {}),
+      ...(partyMaxGuests !== undefined ? { partyMaxGuests: toIntOrNull(partyMaxGuests) } : {}),
+      ...(hotelRooms !== undefined ? { hotelRooms: toIntOrNull(hotelRooms) } : {}),
+      ...(closingTime !== undefined ? { closingTime: closingTime || null } : {}),
+      ...(soundLimit !== undefined ? { soundLimit: soundLimit || null } : {}),
+      ...(isOfficialCeremonyLocation !== undefined ? { isOfficialCeremonyLocation: Boolean(isOfficialCeremonyLocation) } : {}),
+      ...(outdoorCeremonyPossible !== undefined ? { outdoorCeremonyPossible: Boolean(outdoorCeremonyPossible) } : {}),
+      ...(accessibility !== undefined ? { accessibility } : {}),
+      ...(venueFacilities !== undefined ? { venueFacilities } : {}),
+      ...(cateringOptions !== undefined ? { cateringOptions } : {}),
+      ...(barOptions !== undefined ? { barOptions } : {}),
+      ...(environment !== undefined ? { environment } : {}),
       ...geoData,
     },
   });
