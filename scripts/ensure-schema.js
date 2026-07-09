@@ -17,6 +17,18 @@ const STATEMENTS = [
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "emblemPhoto" TEXT`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "contactPerson" TEXT`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+  `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "disabledModules" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[]`,
+  `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "extraModules" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[]`,
+  `CREATE TABLE IF NOT EXISTS "vendor_feature_requests" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "vendorId" TEXT NOT NULL REFERENCES "vendors"("id") ON DELETE CASCADE,
+    "moduleKey" TEXT NOT NULL,
+    "message" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "decidedAt" TIMESTAMP(3),
+    "decidedBy" TEXT
+  )`,
 
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "viewCount" INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE "vendor_claim_requests" ADD COLUMN IF NOT EXISTS "completedAt" TIMESTAMP(3)`,

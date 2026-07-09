@@ -20,6 +20,9 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
     tasks: Parameters<typeof DashboardEngine>[0]["tasks"];
     guests: Parameters<typeof DashboardEngine>[0]["guests"];
     totalGuests: number;
+    vendorIsPremium: boolean;
+    vendorDisabledModules: string[];
+    vendorExtraModules: string[];
   }>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,6 +48,9 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
           tasks: b.tasks ?? [],
           guests: [],
           totalGuests: 0,
+          vendorIsPremium: b.vendor?.isPremium ?? false,
+          vendorDisabledModules: b.vendor?.disabledModules ?? [],
+          vendorExtraModules: b.vendor?.extraModules ?? [],
         });
       })
       .finally(() => setLoading(false));
@@ -78,6 +84,9 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
             userRole={userRole}
             userId={userId}
             vendorUserId={vendorUserId}
+            vendorIsPremium={data.vendorIsPremium}
+            vendorDisabledModules={data.vendorDisabledModules}
+            vendorExtraModules={data.vendorExtraModules}
           />
         )}
       </div>

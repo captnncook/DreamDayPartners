@@ -132,6 +132,9 @@ export default async function VendorBookingPage({
         userRole={user.role}
         userId={user.id}
         vendorUserId={booking.vendor.userId}
+        vendorIsPremium={booking.vendor.isPremium}
+        vendorDisabledModules={booking.vendor.disabledModules}
+        vendorExtraModules={booking.vendor.extraModules}
       />
     </div>
   );

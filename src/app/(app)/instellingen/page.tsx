@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { User, Bell, LogOut, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SkeletonBlock } from "@/components/Skeleton";
+import VendorDashboardModulesSection from "@/components/VendorDashboardModulesSection";
 
 type UserInfo = { id: string; name: string; email: string; role: string; vendorType?: string | null };
 
@@ -151,6 +152,8 @@ export default function InstellingenPage() {
           </button>
         </form>
       </div>
+
+      {user?.role === "vendor" && <VendorDashboardModulesSection />}
 
       {/* Notifications — hidden for admins */}
       {user?.role !== "admin" && <div className="ddp-card mb-6">

@@ -87,6 +87,70 @@ export const BASE_MODULES: ModuleKey[] = [
 ];
 
 // ────────────────────────────────────────────────────────────
+// Menselijk leesbare labels + de set modules die een leverancier
+// zelf aan/uit kan zetten (BASE_MODULES zijn altijd verplicht en
+// worden hier bewust niet in opgenomen).
+// ────────────────────────────────────────────────────────────
+
+export const MODULE_LABELS: Record<ModuleKey, string> = {
+  statusTracker: "Statusbalk",
+  contractPayment: "Contract & betaling",
+  messageThread: "Berichten",
+  fileVault: "Documentenkluis",
+  intakeForm: "Intakeformulier",
+  timelinePlanner: "Tijdlijnplanner",
+  checklistDeadlines: "Checklist & deadlines",
+  logisticsPanel: "Logistiek",
+  deliverablesTracker: "Opleverpunten",
+  moodboardUploader: "Moodboard",
+  guestDataPanel: "Gastgegevens",
+  approvalButton: "Goedkeuringsknop",
+  photoUpload: "Foto-upload",
+  documentUpload: "Documentupload",
+  setlistPlanner: "Setlist",
+  menuBuilder: "Menusamenstelling",
+  couvertCalculator: "Couvert-calculator",
+  shotlistBuilder: "Shotlist",
+  galleryDelivery: "Galerij-oplevering",
+  videoDelivery: "Video-oplevering",
+  bruidsteamBuilder: "Bruidsteam",
+  materialChecklist: "Materiaalchecklist",
+  venueRooms: "Locatieruimtes",
+  vendorAccessTimes: "Toegangstijden leveranciers",
+  dayOfContact: "Contactpersoon op de dag zelf",
+  rittenPlanner: "Rittenplanner",
+  chauffeurInfo: "Chauffeursinformatie",
+  portieCalculator: "Portie-calculator",
+};
+
+// Modules die daadwerkelijk los aan/uit te zetten zijn in het dashboard
+// (BASE_MODULES zijn verplicht; approvalButton/deliverablesTracker hangen
+// niet aan de modules-toggle maar aan andere logica).
+export const TOGGLEABLE_MODULE_KEYS: ModuleKey[] = [
+  "timelinePlanner",
+  "checklistDeadlines",
+  "logisticsPanel",
+  "moodboardUploader",
+  "guestDataPanel",
+  "photoUpload",
+  "documentUpload",
+  "setlistPlanner",
+  "menuBuilder",
+  "couvertCalculator",
+  "shotlistBuilder",
+  "galleryDelivery",
+  "videoDelivery",
+  "bruidsteamBuilder",
+  "materialChecklist",
+  "venueRooms",
+  "vendorAccessTimes",
+  "dayOfContact",
+  "rittenPlanner",
+  "chauffeurInfo",
+  "portieCalculator",
+];
+
+// ────────────────────────────────────────────────────────────
 // Vendor type configurations
 // ────────────────────────────────────────────────────────────
 

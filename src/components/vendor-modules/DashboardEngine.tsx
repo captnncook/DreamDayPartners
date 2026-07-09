@@ -49,11 +49,15 @@ interface Props {
   userRole: string;
   userId: string;
   vendorUserId?: string | null;
+  vendorIsPremium?: boolean;
+  vendorDisabledModules?: string[];
+  vendorExtraModules?: string[];
 }
 
 export default function DashboardEngine({
   weddingId, wvId, vendorType, initialBooking,
   documents, timelineBlocks, tasks, guests, totalGuests, userRole, userId, vendorUserId,
+  vendorIsPremium, vendorDisabledModules, vendorExtraModules,
 }: Props) {
   const config = getVendorTypeConfig(vendorType);
   const [booking, setBooking] = useState(initialBooking);
@@ -62,11 +66,16 @@ export default function DashboardEngine({
   const isVendor = userRole === "vendor" && vendorUserId === userId;
   const intakeData = (booking.intakeData ?? {}) as Record<string, unknown>;
 
-  const modules = config.modules ?? [];
+  // Effectieve moduleset = (categorie-default ∪ door admin toegekende extra's)
+  // min de modules die de leverancier zelf uitgezet heeft (alleen premium
+  // leveranciers mogen modules uitzetten — anders blijft de default staan).
+  const disabled = vendorIsPremium ? (vendorDisabledModules ?? []) : [];
+  const available = Array.from(new Set([...(config.modules ?? []), ...(vendorExtraModules ?? [])]));
+  const modules = available.filter((m) => !disabled.includes(m));
   const hasIntake = (config.intakeFields?.length ?? 0) > 0;
-  const hasLogistics = (config.logisticsFields?.length ?? 0) > 0;
-  const hasTimeline = (config.timelineTemplate?.length ?? 0) > 0;
-  const showFileVault = !modules.includes("documentUpload") && modules.includes("fileVault");
+  const hasLogistics = (config.logisticsFields?.length ?? 0) > 0 && !disabled.includes("logisticsPanel");
+  const hasTimeline = (config.timelineTemplate?.length ?? 0) > 0 && !disabled.includes("timelinePlanner");
+  const showFileVault = !modules.includes("documentUpload") && (config.modules ?? []).includes("fileVault");
 
   const patchBooking = useCallback(async (patch: Record<string, unknown>) => {
     const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}`, {

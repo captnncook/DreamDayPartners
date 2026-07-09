@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { MODULE_LABELS, TOGGLEABLE_MODULE_KEYS, getVendorTypeConfig, type ModuleKey } from "@/lib/vendorTypeConfigs";
+import VendorFeatureRequestsPanel from "./VendorFeatureRequestsPanel";
 
 const CATEGORY_MAP: Record<string, string> = {
   weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
@@ -10,7 +12,7 @@ const CATEGORY_MAP: Record<string, string> = {
   decoratie: "Decoratie & Styling", fotocabine: "Fotocabine", overig: "Overig",
 };
 
-type Vendor = { id: string; name: string; category: string; city: string | null; isPremium: boolean; userId: string | null };
+type Vendor = { id: string; name: string; category: string; city: string | null; isPremium: boolean; userId: string | null; extraModules: string[] };
 
 export default function AdminVendorsPage() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -22,6 +24,7 @@ export default function AdminVendorsPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [cleanupMsg, setCleanupMsg] = useState("");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350);
@@ -57,6 +60,16 @@ export default function AdminVendorsPage() {
     setBusyId(null);
   }
 
+  async function toggleExtraModule(v: Vendor, key: string) {
+    const next = v.extraModules.includes(key) ? v.extraModules.filter((m) => m !== key) : [...v.extraModules, key];
+    setVendors((vs) => vs.map((x) => (x.id === v.id ? { ...x, extraModules: next } : x)));
+    await fetch(`/api/admin/vendors/${v.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ extraModules: next }),
+    });
+  }
+
   async function cleanupDuplicatePhotos() {
     setCleaning(true);
     setCleanupMsg("");
@@ -89,6 +102,8 @@ export default function AdminVendorsPage() {
         Markeer een leverancier als "Aanbevolen", ook profielen zonder eigen account (bijv. uit een bulkimport).
       </p>
 
+      <VendorFeatureRequestsPanel />
+
       <div className="mb-6">
         <button onClick={cleanupDuplicatePhotos} disabled={cleaning} className="ddp-btn-secondary">
           {cleaning ? "Bezig…" : "Gedeelde stockfoto's opschonen"}
@@ -115,24 +130,57 @@ export default function AdminVendorsPage() {
       ) : (
         <>
           <div style={{ borderTop: "1px solid var(--border)" }}>
-            {vendors.map((v) => (
-              <div key={v.id} className="dash-row">
-                <div className="flex-1 min-w-0">
-                  <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{v.name}</div>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-                    {CATEGORY_MAP[v.category] ?? v.category}{v.city ? ` · ${v.city}` : ""}{!v.userId ? " · geen account" : ""}
+            {vendors.map((v) => {
+              const config = getVendorTypeConfig(v.category);
+              const grantable = TOGGLEABLE_MODULE_KEYS.filter((key) => !(config.modules ?? []).includes(key));
+              return (
+                <div key={v.id}>
+                  <div className="dash-row">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{v.name}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
+                        {CATEGORY_MAP[v.category] ?? v.category}{v.city ? ` · ${v.city}` : ""}{!v.userId ? " · geen account" : ""}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setExpandedId(expandedId === v.id ? null : v.id)}
+                      className="text-xs flex-shrink-0"
+                      style={{ fontWeight: 600, color: "var(--muted)" }}
+                    >
+                      Functies {expandedId === v.id ? "▲" : "▼"}
+                    </button>
+                    <button
+                      onClick={() => togglePremium(v)}
+                      disabled={busyId === v.id}
+                      className="text-sm flex-shrink-0"
+                      style={{ fontWeight: 700, color: v.isPremium ? "var(--gold-deep)" : "var(--muted)", opacity: busyId === v.id ? 0.5 : 1 }}
+                    >
+                      {v.isPremium ? "Aanbevolen ✓" : "Markeer als aanbevolen"}
+                    </button>
                   </div>
+                  {expandedId === v.id && (
+                    <div style={{ padding: "0.75rem 0.5rem 1.25rem", background: "var(--surface-2)" }}>
+                      {grantable.length === 0 ? (
+                        <p className="text-xs" style={{ color: "var(--muted)" }}>Geen extra functies beschikbaar buiten het standaardpakket van deze categorie.</p>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                          {grantable.map((key) => (
+                            <label key={key} className="flex items-center gap-2 text-xs cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={v.extraModules.includes(key)}
+                                onChange={() => toggleExtraModule(v, key)}
+                              />
+                              {MODULE_LABELS[key as ModuleKey] ?? key}
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={() => togglePremium(v)}
-                  disabled={busyId === v.id}
-                  className="text-sm flex-shrink-0"
-                  style={{ fontWeight: 700, color: v.isPremium ? "var(--gold-deep)" : "var(--muted)", opacity: busyId === v.id ? 0.5 : 1 }}
-                >
-                  {v.isPremium ? "Aanbevolen ✓" : "Markeer als aanbevolen"}
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {totalPages > 1 && (

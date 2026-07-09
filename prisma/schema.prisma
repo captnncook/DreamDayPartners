@@ -150,6 +150,12 @@ model Vendor {
   viewCount       Int      @default(0)
   createdAt       DateTime @default(now())
 
+  // Dashboard-functies: welke modules deze leverancier zelf uitschakelde
+  // (alleen van kracht als isPremium) en welke extra modules de admin
+  // heeft toegekend (bijv. na een goedgekeurd functieverzoek).
+  disabledModules String[]
+  extraModules    String[]
+
   // Trouwlocatie-specifieke velden (alleen relevant/getoond voor category "trouwlocatie")
   ceremonyMinGuests  Int?
   ceremonyMaxGuests  Int?
@@ -178,6 +184,7 @@ model Vendor {
   reviews          VendorReview[]
   claimRequests    VendorClaimRequest[]
   venueRooms       VenueRoom[]
+  featureRequests  VendorFeatureRequest[]
 
   @@index([category])
   @@index([isPremium])
@@ -234,6 +241,21 @@ model VendorClaimRequest {
   vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   @@map("vendor_claim_requests")
+}
+
+model VendorFeatureRequest {
+  id         String    @id @default(uuid())
+  vendorId   String
+  moduleKey  String
+  message    String?
+  status     String    @default("pending") // pending | approved | rejected
+  createdAt  DateTime  @default(now())
+  decidedAt  DateTime?
+  decidedBy  String?
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_feature_requests")
 }
 
 model VendorContactRequest {

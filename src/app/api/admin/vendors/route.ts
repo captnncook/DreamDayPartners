@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   const [vendors, total] = await Promise.all([
     prisma.vendor.findMany({
       where,
-      select: { id: true, name: true, category: true, city: true, isPremium: true, userId: true },
+      select: { id: true, name: true, category: true, city: true, isPremium: true, userId: true, extraModules: true },
       orderBy: [{ isPremium: "desc" }, { name: "asc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
