@@ -208,7 +208,7 @@ export default function VendorProfilePage() {
                   <Image src={photoUrls[0]} alt={`${vendor.name}`} fill style={{ objectFit: "cover" }} />
                 ) : (
                   <div style={{ height: "100%", background: "var(--sand)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{vendor.category}</span>
+                    <Image src="/images/logo.svg" alt="" width={48} height={48} style={{ opacity: 0.5 }} />
                   </div>
                 )}
                 {photoUrls.length > 0 && (
@@ -232,7 +232,7 @@ export default function VendorProfilePage() {
         ) : (
           <div style={{ maxWidth: "1040px", margin: "1.25rem auto 0", padding: "0 1.25rem" }}>
             <div style={{ height: "220px", borderRadius: "var(--radius-lg)", background: "var(--sand)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--muted)", opacity: 0.5 }}>{vendor.category}</span>
+              <Image src="/images/logo.svg" alt="" width={56} height={56} style={{ opacity: 0.5 }} />
             </div>
           </div>
         )}

@@ -260,7 +260,6 @@ function LeveranciersContent() {
 function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boolean }) {
   const catLabel = CATEGORY_MAP[vendor.category] ?? vendor.category;
   const meta = [vendor.city, showCategory ? catLabel : null].filter(Boolean).join(" · ");
-  const initials = vendor.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
   return (
     <Link href={`/leveranciers/${vendor.id}`} className={`vcat-row${vendor.isPremium ? " premium" : ""}`}>
@@ -268,7 +267,7 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
         {vendor.coverPhotoUrl ? (
           <Image src={vendor.coverPhotoUrl} alt={vendor.name} fill sizes="84px" style={{ objectFit: "cover" }} />
         ) : (
-          <span className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--muted-light)" }}>{initials}</span>
+          <Image src="/images/logo.svg" alt="" width={28} height={28} style={{ opacity: 0.5 }} />
         )}
       </div>
 

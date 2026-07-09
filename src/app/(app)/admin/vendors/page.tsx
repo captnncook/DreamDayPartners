@@ -20,6 +20,8 @@ export default function AdminVendorsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [cleaning, setCleaning] = useState(false);
+  const [cleanupMsg, setCleanupMsg] = useState("");
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350);
@@ -55,6 +57,27 @@ export default function AdminVendorsPage() {
     setBusyId(null);
   }
 
+  async function cleanupDuplicatePhotos() {
+    setCleaning(true);
+    setCleanupMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup-duplicate-photos", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setCleanupMsg(
+          data.cleared === 0
+            ? "Geen gedeelde stockfoto's gevonden."
+            : `${data.cleared} leverancier${data.cleared === 1 ? "" : "s"} met een gedeelde stockfoto opgeschoond — toont nu het DreamDay-logo.`
+        );
+        load();
+      } else {
+        setCleanupMsg(data.error ?? "Opschonen mislukt");
+      }
+    } finally {
+      setCleaning(false);
+    }
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / 40));
 
   return (
@@ -62,9 +85,20 @@ export default function AdminVendorsPage() {
       <h1 className="font-serif mb-1" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>
         Leveranciers
       </h1>
-      <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
+      <p className="text-sm mb-4" style={{ color: "var(--muted)" }}>
         Markeer een leverancier als "Aanbevolen", ook profielen zonder eigen account (bijv. uit een bulkimport).
       </p>
+
+      <div className="mb-6">
+        <button onClick={cleanupDuplicatePhotos} disabled={cleaning} className="ddp-btn-secondary">
+          {cleaning ? "Bezig…" : "Gedeelde stockfoto's opschonen"}
+        </button>
+        <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
+          Leveranciers uit een bulkimport delen soms dezelfde standaardfoto per categorie. Deze actie wist die gedeelde
+          foto's (unieke, echt geüploade foto's blijven staan) — de leverancier toont daarna het DreamDay-logo.
+        </p>
+        {cleanupMsg && <p className="text-xs mt-1.5" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{cleanupMsg}</p>}
+      </div>
 
       <input
         value={search}
