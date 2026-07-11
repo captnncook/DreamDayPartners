@@ -23,6 +23,14 @@ type Wedding = { id: string; title: string; venue?: string | null; date: string;
 type Task = { id: string; title: string; priority: string; dueDate?: string; weddingId: string; weddingTitle: string };
 type Stats = { total: number; upcoming30: number; thisYear: number };
 type VendorRequest = { id: string; weddingTitle: string; weddingVenue?: string | null; weddingDate: string };
+type CoupleSetup = {
+  weddingId: string;
+  hasBudget: boolean;
+  hasTasks: boolean;
+  hasGuests: boolean;
+  hasVendors: boolean;
+  hasDraaiboek: boolean;
+} | null;
 
 interface Props {
   user: { id: string; name: string; role: string };
@@ -32,13 +40,17 @@ interface Props {
   tasks: Task[];
   vendorRequests?: VendorRequest[];
   taskProgress?: { total: number; done: number };
+  coupleSetup?: CoupleSetup;
 }
 
-export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress }: Props) {
+export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress, coupleSetup }: Props) {
   const router = useRouter();
   const [requests, setRequests] = useState(vendorRequests);
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
   const [tasks, setTasks] = useState(initialTasks);
+  // Sync met verse server-props na router.refresh() (bijv. na taken-seed),
+  // anders blijft de lijst op de oude state hangen.
+  useEffect(() => { setTasks(initialTasks); }, [initialTasks]);
   const [showNewTask, setShowNewTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskWedding, setNewTaskWedding] = useState(weddings[0]?.id ?? "");
@@ -255,6 +267,11 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             </Link>
           </div>
         </section>
+      )}
+
+      {/* Setup-checklist (bruidspaar) — verdwijnt zodra alles is gestart */}
+      {user.role === "couple" && coupleSetup && (
+        <CoupleSetupChecklist setup={coupleSetup} onSeeded={() => router.refresh()} />
       )}
 
       {/* Vendor tasks */}
@@ -631,6 +648,90 @@ function VendorTasksSection({ weddings }: { weddings: Wedding[] }) {
           ))}
         </div>
       )}
+    </section>
+  );
+}
+
+function CoupleSetupChecklist({ setup, onSeeded }: {
+  setup: NonNullable<CoupleSetup>;
+  onSeeded: () => void;
+}) {
+  const [seeding, setSeeding] = useState(false);
+
+  async function seedTasks() {
+    setSeeding(true);
+    const res = await fetch(`/api/weddings/${setup.weddingId}/tasks/seed`, { method: "POST" });
+    setSeeding(false);
+    if (res.ok) onSeeded();
+  }
+
+  // Alleen échte, controleerbare acties tellen als voltooid.
+  const steps: { key: string; label: string; sub: string; done: boolean; href?: string; action?: () => void }[] = [
+    { key: "wedding", label: "Jullie bruiloft staat", sub: "Account en bruiloft aangemaakt", done: true },
+    { key: "budget", label: "Budget instellen", sub: "Bepaal wat jullie willen uitgeven", done: setup.hasBudget, href: `/weddings/${setup.weddingId}/budget` },
+    { key: "tasks", label: "Takenlijst klaarzetten", sub: "Wij zetten 20 standaardtaken voor jullie klaar", done: setup.hasTasks, action: seedTasks },
+    { key: "guests", label: "Eerste gasten toevoegen", sub: "Start de gastenlijst met RSVP", done: setup.hasGuests, href: "/guests" },
+    { key: "vendors", label: "Dream team starten", sub: "Vind en koppel jullie eerste leverancier", done: setup.hasVendors, href: "/dream-team" },
+    { key: "draaiboek", label: "Draaiboek starten", sub: "De tijdlijn van de grote dag", done: setup.hasDraaiboek, href: "/draaiboek" },
+  ];
+
+  const doneCount = steps.filter((s) => s.done).length;
+  if (doneCount === steps.length) return null;
+
+  return (
+    <section className="mb-8">
+      <div className="flex items-baseline justify-between mb-2 gap-3 flex-wrap">
+        <h2 className="dash-section-title">Jullie voorbereiding</h2>
+        <span className="text-sm" style={{ color: "var(--muted)" }}>
+          <strong style={{ color: "var(--foreground)" }}>{doneCount}</strong> van {steps.length} gestart
+        </span>
+      </div>
+      <div className="h-1 rounded-full overflow-hidden mb-1" style={{ background: "var(--border)" }}>
+        <div className="h-full rounded-full" style={{ width: `${(doneCount / steps.length) * 100}%`, background: "var(--gold)", transition: "width 500ms var(--ease-out)" }} />
+      </div>
+      <div style={{ borderBottom: "1px solid var(--border)" }}>
+        {steps.map((step) => {
+          const inner = (
+            <>
+              <span
+                className="flex items-center justify-center flex-shrink-0"
+                style={{ width: "20px", height: "20px", borderRadius: "50%", border: step.done ? "none" : "1.5px solid var(--border)", background: step.done ? "var(--gold)" : "transparent" }}
+              >
+                {step.done && <Check className="w-3 h-3" style={{ color: "var(--ink)" }} />}
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-sm" style={{ fontWeight: step.done ? 500 : 600, color: step.done ? "var(--muted-light)" : "var(--foreground)" }}>
+                  {step.label}
+                </span>
+                {!step.done && (
+                  <span className="block text-xs mt-0.5" style={{ color: "var(--muted)" }}>{step.sub}</span>
+                )}
+              </span>
+              {!step.done && (
+                <span className="flex-shrink-0 text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>
+                  {step.action ? (seeding ? "Bezig…" : "Klaarzetten") : "→"}
+                </span>
+              )}
+            </>
+          );
+
+          if (step.done) {
+            return <div key={step.key} className="dash-row">{inner}</div>;
+          }
+          if (step.action) {
+            return (
+              <button key={step.key} onClick={step.action} disabled={seeding} className="dash-row w-full text-left" style={{ background: "none", border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer" }}>
+                {inner}
+              </button>
+            );
+          }
+          return (
+            <Link key={step.key} href={step.href!} className="dash-row">
+              {inner}
+            </Link>
+          );
+        })}
+      </div>
     </section>
   );
 }

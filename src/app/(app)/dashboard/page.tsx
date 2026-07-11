@@ -103,6 +103,27 @@ export default async function DashboardPage() {
   const totalTasks = taskCounts.reduce((s, g) => s + g._count, 0);
   const doneTasks = taskCounts.find(g => g.status === "done")?._count ?? 0;
 
+  // Setup-voortgang voor het bruidspaar: echte, al voltooide acties tellen mee
+  // als voortgang (goal gradient) — nooit verzonnen stappen.
+  let coupleSetup = null;
+  if (user.role === "couple" && weddings[0]) {
+    const weddingId = weddings[0].id;
+    const [guestCount, vendorCount, draaiboekCount, budget] = await Promise.all([
+      prisma.guest.count({ where: { weddingId } }),
+      prisma.weddingVendor.count({ where: { weddingId } }),
+      prisma.draaiboek.count({ where: { weddingId } }),
+      prisma.budget.findUnique({ where: { weddingId }, select: { totalAmount: true } }),
+    ]);
+    coupleSetup = {
+      weddingId,
+      hasBudget: (budget?.totalAmount ?? 0) > 0,
+      hasTasks: totalTasks > 0,
+      hasGuests: guestCount > 0,
+      hasVendors: vendorCount > 0,
+      hasDraaiboek: draaiboekCount > 0,
+    };
+  }
+
   return (
     <DashboardClient
       user={{ id: user.id, name: user.name, role: user.role }}
@@ -112,6 +133,7 @@ export default async function DashboardPage() {
       tasks={tasksData}
       taskProgress={user.role === "couple" ? { total: totalTasks, done: doneTasks } : undefined}
       vendorRequests={requestsData}
+      coupleSetup={coupleSetup}
     />
   );
 }

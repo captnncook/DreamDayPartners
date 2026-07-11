@@ -705,7 +705,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/login" className="ddp-btn-secondary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
+                <Link href="/aanmelden?type=vendor" className="ddp-btn-secondary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
                   Word leverancier
                 </Link>
               </div>
@@ -727,7 +727,7 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/login" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
+                <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
                   Pro starten
                 </Link>
               </div>

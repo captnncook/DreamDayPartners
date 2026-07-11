@@ -69,6 +69,12 @@ function AanmeldenForm() {
       setAccount("couple");
       setFormStep(1);
     }
+    // ?type=vendor|couple slaat de keuzestap over (bijv. vanaf de prijzensectie)
+    const type = searchParams.get("type");
+    if (!email && (type === "vendor" || type === "couple")) {
+      setAccount(type);
+      setFormStep(1);
+    }
     const err = searchParams.get("error");
     if (err) setError(decodeURIComponent(err));
   }, [searchParams]);
