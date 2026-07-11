@@ -7,6 +7,14 @@ import VendorNotesEditor from "@/components/VendorNotesEditor";
 import TabNav from "./TabNav";
 import { getServerLang } from "@/lib/server-lang";
 
+const VENDOR_STATUS_LABELS: Record<string, string> = {
+  lead: "Lead",
+  booked: "Geboekt",
+  in_progress: "In uitvoering",
+  ready: "Klaar",
+  completed: "Afgerond",
+};
+
 function formatDate(date: Date, lang: string) {
   return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
 }
@@ -260,30 +268,43 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               <p className="text-sm text-center py-6" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>{tw.noVendors}</p>
             ) : (
               <div style={{ borderTop: "1px solid var(--border)" }}>
-                {wedding.vendors.map((wv) => (
-                  <div key={wv.id} className="dash-row">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-serif text-sm truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>{wv.vendor.name}</div>
-                      <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
-                    </div>
-                  </div>
-                ))}
+                {/* Eén rij per leverancier die doorklikt naar het eigen dashboard —
+                    géén gestapelde volledige dashboards meer op deze pagina. */}
+                {wedding.vendors.map((wv) => {
+                  const statusLabel = VENDOR_STATUS_LABELS[wv.status] ?? wv.status;
+                  const needsAttention = wv.status === "lead";
+                  return (
+                    <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="dash-row">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-serif text-sm truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>{wv.vendor.name}</div>
+                        <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
+                      </div>
+                      <span
+                        className="text-xs flex-shrink-0"
+                        style={{
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                          color: needsAttention ? "var(--gold-deep)" : "var(--muted-light)",
+                        }}
+                      >
+                        {statusLabel}
+                      </span>
+                      <span className="flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </section>
 
-          {/* Vendor-specifieke dashboards */}
-          {(() => {
-            const visibleVendors = isVendor
-              ? wedding.vendors.filter((wv) => wv.vendor.id === ownVendorId)
-              : wedding.vendors;
-            if (visibleVendors.length === 0) return null;
+          {/* Leverancier ziet zijn eigen werkpaneel direct op deze pagina */}
+          {isVendor && (() => {
+            const own = wedding.vendors.filter((wv) => wv.vendor.id === ownVendorId);
+            if (own.length === 0) return null;
             return (
               <div className="space-y-4">
-                {!isVendor && (
-                  <h2 className="dash-section-title">{tw.vendorDashboards}</h2>
-                )}
-                {visibleVendors.map((wv) => (
+                {own.map((wv) => (
                   <VendorDashboardInline
                     key={wv.id}
                     weddingId={id}

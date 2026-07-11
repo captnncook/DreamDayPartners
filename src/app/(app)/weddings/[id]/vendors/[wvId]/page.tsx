@@ -15,6 +15,21 @@ export default async function VendorBookingPage({
 
   const { id: weddingId, wvId } = await params;
 
+  // Toegangscontrole: alleen leden van deze bruiloft (of de gekoppelde
+  // leverancier zelf, of admin) mogen dit dashboard zien.
+  const accessWhere =
+    user.role === "admin"
+      ? { id: weddingId }
+      : user.role === "vendor"
+      ? { id: weddingId, vendors: { some: { vendor: { userId: user.id }, portalAccess: true } } }
+      : { id: weddingId, teamMembers: { some: { userId: user.id } } };
+
+  const wedding = await prisma.wedding.findFirst({
+    where: accessWhere,
+    select: { title: true, id: true },
+  });
+  if (!wedding) return notFound();
+
   const booking = await prisma.weddingVendor.findFirst({
     where: { id: wvId, weddingId },
     include: {
@@ -29,12 +44,6 @@ export default async function VendorBookingPage({
   });
 
   if (!booking) return notFound();
-
-  const wedding = await prisma.wedding.findFirst({
-    where: { id: weddingId },
-    select: { title: true, id: true },
-  });
-  if (!wedding) return notFound();
 
   const guests = await prisma.guest.findMany({
     where: { weddingId },
