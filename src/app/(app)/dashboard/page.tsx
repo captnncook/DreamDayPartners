@@ -103,6 +103,33 @@ export default async function DashboardPage() {
   const totalTasks = taskCounts.reduce((s, g) => s + g._count, 0);
   const doneTasks = taskCounts.find(g => g.status === "done")?._count ?? 0;
 
+  // Naderende betaaldeadlines (feitelijk, uit echte boekingsdata):
+  // onbetaalde aanbetalingen/eindbetalingen die binnen 14 dagen vervallen of al
+  // verlopen zijn. Alleen voor rollen die betalingen beheren.
+  let paymentDeadlines: { wvId: string; weddingId: string; vendorName: string; label: string; due: string; days: number }[] = [];
+  if (["couple", "planner", "team_member"].includes(user.role) && weddings.length > 0) {
+    const horizon = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+    const bookings = await prisma.weddingVendor.findMany({
+      where: {
+        weddingId: { in: weddings.map((w) => w.id) },
+        OR: [
+          { depositPaid: false, depositDue: { not: null, lte: horizon } },
+          { finalPaid: false, finalDue: { not: null, lte: horizon } },
+        ],
+      },
+      include: { vendor: { select: { name: true } } },
+    });
+    for (const b of bookings) {
+      if (!b.depositPaid && b.depositDue && b.depositDue <= horizon) {
+        paymentDeadlines.push({ wvId: b.id, weddingId: b.weddingId, vendorName: b.vendor.name, label: "Aanbetaling", due: b.depositDue.toISOString(), days: daysUntil(b.depositDue) });
+      }
+      if (!b.finalPaid && b.finalDue && b.finalDue <= horizon) {
+        paymentDeadlines.push({ wvId: b.id, weddingId: b.weddingId, vendorName: b.vendor.name, label: "Eindbetaling", due: b.finalDue.toISOString(), days: daysUntil(b.finalDue) });
+      }
+    }
+    paymentDeadlines = paymentDeadlines.sort((a, b) => a.days - b.days).slice(0, 4);
+  }
+
   // Setup-voortgang voor het bruidspaar: echte, al voltooide acties tellen mee
   // als voortgang (goal gradient) — nooit verzonnen stappen.
   let coupleSetup = null;
@@ -134,6 +161,7 @@ export default async function DashboardPage() {
       taskProgress={user.role === "couple" ? { total: totalTasks, done: doneTasks } : undefined}
       vendorRequests={requestsData}
       coupleSetup={coupleSetup}
+      paymentDeadlines={paymentDeadlines}
     />
   );
 }

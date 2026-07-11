@@ -31,6 +31,7 @@ type CoupleSetup = {
   hasVendors: boolean;
   hasDraaiboek: boolean;
 } | null;
+type PaymentDeadline = { wvId: string; weddingId: string; vendorName: string; label: string; due: string; days: number };
 
 interface Props {
   user: { id: string; name: string; role: string };
@@ -41,9 +42,10 @@ interface Props {
   vendorRequests?: VendorRequest[];
   taskProgress?: { total: number; done: number };
   coupleSetup?: CoupleSetup;
+  paymentDeadlines?: PaymentDeadline[];
 }
 
-export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress, coupleSetup }: Props) {
+export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress, coupleSetup, paymentDeadlines = [] }: Props) {
   const router = useRouter();
   const [requests, setRequests] = useState(vendorRequests);
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
@@ -191,6 +193,36 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
           </div>
         </section>
       ))}
+
+      {/* Naderende betaaldeadlines — feitelijk, uit echte boekingen */}
+      {paymentDeadlines.length > 0 && (
+        <section className="mb-8">
+          <h2 className="dash-section-title mb-1">Betaaldeadlines</h2>
+          <div style={{ borderTop: "1px solid var(--border)" }}>
+            {paymentDeadlines.map((d) => {
+              const urgent = d.days <= 3;
+              const timing =
+                d.days < 0 ? `${Math.abs(d.days)} ${Math.abs(d.days) === 1 ? "dag" : "dagen"} te laat`
+                : d.days === 0 ? "vandaag"
+                : `over ${d.days} ${d.days === 1 ? "dag" : "dagen"}`;
+              return (
+                <Link key={`${d.wvId}-${d.label}`} href={`/weddings/${d.weddingId}/vendors/${d.wvId}`} className="dash-row">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm" style={{ fontWeight: 600 }}>
+                      {d.label} <span className="font-serif" style={{ fontWeight: 700 }}>{d.vendorName}</span>
+                    </div>
+                    <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{formatDate(d.due)}</div>
+                  </div>
+                  <span className="text-sm flex-shrink-0" style={{ fontWeight: 700, color: urgent ? "var(--gold-deep)" : "var(--muted)" }}>
+                    {timing}
+                  </span>
+                  <span className="flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Signature-element: eerstvolgende bruiloft */}
       {heroWedding && <NextWeddingHero wedding={heroWedding} />}
