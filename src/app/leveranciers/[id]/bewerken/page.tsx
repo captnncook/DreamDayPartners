@@ -214,6 +214,7 @@ function VendorEditPage() {
   const [deleteSent, setDeleteSent] = useState(false);
   const [busyDates, setBusyDates] = useState<string[]>([]);
   const [newBusyDate, setNewBusyDate] = useState("");
+  const [profileViews, setProfileViews] = useState<number | null>(null);
 
   const [form, setForm] = useState({
     description: "", city: "", contactPerson: "", phone: "", website: "",
@@ -294,6 +295,15 @@ function VendorEditPage() {
   }, [id, router]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Profielweergaven voor de upgrade-context (alleen beschikbaar voor de
+  // ingelogde leverancier zelf; faalt stil voor bijv. admins).
+  useEffect(() => {
+    fetch("/api/vendor/analytics")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d && typeof d.profileViews === "number") setProfileViews(d.profileViews); })
+      .catch(() => {});
+  }, []);
 
   async function handleSave() {
     setSaving(true);
@@ -535,6 +545,38 @@ function VendorEditPage() {
             {error}
           </div>
         )}
+
+        {/* Profielsterkte — live berekend uit wat er al ingevuld is */}
+        {(() => {
+          const criteria = [
+            { label: "Profielfoto", done: !!coverKey },
+            { label: "Beschrijving", done: form.description.trim().length > 0 },
+            { label: "Plaats", done: form.city.trim().length > 0 },
+            { label: "Prijsindicatie", done: form.priceFrom.trim().length > 0 },
+            { label: "Galerijfoto's", done: photoKeys.length > 0 },
+            { label: "Specialisaties", done: form.specializations.trim().length > 0 },
+          ];
+          const doneCount = criteria.filter((c) => c.done).length;
+          if (doneCount === criteria.length) return null;
+          const missing = criteria.filter((c) => !c.done).map((c) => c.label);
+          return (
+            <section className="mb-8">
+              <div className="flex items-baseline justify-between mb-2 gap-3 flex-wrap">
+                <h2 className="dash-section-title">Profielsterkte</h2>
+                <span className="text-sm" style={{ color: "var(--muted)" }}>
+                  <strong style={{ color: "var(--foreground)" }}>{doneCount}</strong> van {criteria.length} onderdelen
+                </span>
+              </div>
+              <div className="h-1 rounded-full overflow-hidden mb-2" style={{ background: "var(--border)" }}>
+                <div className="h-full rounded-full" style={{ width: `${(doneCount / criteria.length) * 100}%`, background: "var(--gold)", transition: "width 500ms var(--ease-out)" }} />
+              </div>
+              <p className="text-sm" style={{ color: "var(--muted)" }}>
+                Bruidsparen kiezen vrijwel altijd voor profielen met foto's en een prijsindicatie. Vul hieronder nog aan:{" "}
+                <span style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{missing.join(" · ")}</span>
+              </p>
+            </section>
+          );
+        })()}
 
         {/* Profielfoto (cover) */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
@@ -935,19 +977,40 @@ function VendorEditPage() {
         </section>
 
         <section className={isUserPremium ? "" : "dash-hero"} style={isUserPremium ? { background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem", marginBottom: "2rem" } : { padding: "1.5rem", marginBottom: "2rem" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
-            <div>
+          <div style={{ display: "flex", alignItems: isUserPremium ? "center" : "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+            <div style={{ flex: "1 1 300px", minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
                 <Star className="w-4 h-4" style={{ color: "var(--gold)", flexShrink: 0 }} />
                 <span className="font-serif" style={{ fontWeight: 700, fontSize: "1.0625rem", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
                   {isUserPremium ? "Premium actief" : "Upgrade naar Premium"}
                 </span>
               </div>
-              <p style={{ fontSize: "0.8125rem", color: isUserPremium ? "var(--muted)" : "var(--ink-muted)", maxWidth: "360px" }}>
-                {isUserPremium
-                  ? "Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen."
-                  : "Kom bovenaan zoekresultaten, toon het Aanbevolen-label en bereik meer bruidsparen. Slechts €29/maand."}
-              </p>
+              {isUserPremium ? (
+                <p style={{ fontSize: "0.8125rem", color: "var(--muted)", maxWidth: "360px" }}>
+                  Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen.
+                </p>
+              ) : (
+                <>
+                  {profileViews !== null && profileViews > 0 && (
+                    <p style={{ fontSize: "0.8125rem", color: "var(--gold)", fontWeight: 600, marginBottom: "0.375rem" }}>
+                      Je profiel is al {profileViews}× bekeken door bruidsparen.
+                    </p>
+                  )}
+                  <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "0.3rem" }}>
+                    {[
+                      "Bovenaan de zoekresultaten in jouw categorie",
+                      "Aanbevolen-label op je profiel",
+                      "Dashboard zelf inrichten + extra functies aanvragen",
+                      "Analytisch overzicht van weergaven en boekingen",
+                    ].map((b) => (
+                      <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "0.8125rem", color: "var(--ink-muted)" }}>
+                        <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--gold)", marginTop: "2px" }} />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
             {isUserPremium ? (
               <button
@@ -958,14 +1021,19 @@ function VendorEditPage() {
                 {billingLoading ? "Laden…" : "Abonnement beheren"}
               </button>
             ) : (
-              <button
-                onClick={handleUpgrade}
-                disabled={billingLoading}
-                className="ddp-btn-gold"
-                style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
-              >
-                {billingLoading ? "Laden…" : "Upgrade: €29/maand"}
-              </button>
+              <div style={{ flexShrink: 0 }}>
+                <button
+                  onClick={handleUpgrade}
+                  disabled={billingLoading}
+                  className="ddp-btn-gold"
+                  style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
+                >
+                  {billingLoading ? "Laden…" : "Upgrade: €29/maand"}
+                </button>
+                <p style={{ fontSize: "0.6875rem", color: "var(--ink-muted)", marginTop: "0.375rem", textAlign: "center" }}>
+                  Maandelijks opzegbaar · nog geen €1 per dag
+                </p>
+              </div>
             )}
           </div>
         </section>
