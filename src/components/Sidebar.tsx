@@ -25,6 +25,7 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/guests",     label: n.guests,    roles: ["planner", "team_member", "couple"] },
     { href: "/budget",     label: n.budget,    roles: ["planner", "team_member"] },
     { href: "/dm",                        label: "Berichten",        roles: ["planner", "team_member", "couple", "vendor"] },
+    { href: "/draaiboek",                 label: "Draaiboek",        roles: ["planner", "team_member", "couple", "vendor"] },
     { href: "/dream-team",                label: "Dream Team",       roles: ["couple"] },
     { href: "/vendors",                   label: "Onze leveranciers", roles: ["planner", "team_member"] },
     { href: "/leveranciers",              label: "Catalogus",         roles: ["admin", "planner", "couple"] },
