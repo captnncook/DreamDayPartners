@@ -41,6 +41,10 @@ export async function GET(req: NextRequest) {
       : {}),
   };
 
+  // Bewust géén contactPerson/email/phone/website in de lijst-response:
+  // dit endpoint is publiek en zou anders in bulk (60 per pagina) de complete
+  // contactdatabase van leveranciers lekken naar scrapers. Contactgegevens
+  // staan alleen in de detail-API, één leverancier per request.
   const [vendors, total] = await Promise.all([
     prisma.vendor.findMany({
       where,
@@ -48,10 +52,6 @@ export async function GET(req: NextRequest) {
         id: true,
         name: true,
         category: true,
-        contactPerson: true,
-        email: true,
-        phone: true,
-        website: true,
         description: true,
         isPremium: true,
         coverPhoto: true,

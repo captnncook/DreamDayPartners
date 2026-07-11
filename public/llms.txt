@@ -1,0 +1,29 @@
+# DreamDay Platform
+
+> DreamDay Platform is een Nederlandse web-app waarin bruidsparen, weddingplanners en leveranciers samen een bruiloft plannen. Eén gedeeld draaiboek, gastenlijst met dieetwensen, budget met betaalstatus, taken en berichten. Gratis voor bruidsparen; leveranciers kunnen een premium-abonnement afsluiten (€29/maand) voor een uitgebreid catalogusprofiel en extra dashboard-functies.
+
+DreamDay lost het versie-probleem van bruiloftsplanning op: in plaats van losse mails, spreadsheets en appgroepen werkt iedereen (bruidspaar, planner, fotograaf, cateraar, DJ, locatie) in dezelfde actuele gegevens. Wijzigt het gastenaantal of een tijd in het draaiboek, dan ziet elke betrokken leverancier dat direct.
+
+Belangrijkste functies:
+- Gedeeld draaiboek per bruiloft, met pdf-export en per-leverancier zichtbaarheid
+- Leverancierscatalogus met ~30 categorieën (fotograaf, catering, trouwlocatie, DJ, bloemist, enz.), doorzoekbaar op categorie en plaats
+- Per leverancierstype een eigen dashboard met vakspecifieke modules (shotlist voor fotografen, setlist voor DJ's, portiecalculator voor cateraars)
+- Gastenlijst met RSVP-links, dieetwensen en automatische doorwerking naar cateraar en bakker
+- Budgetbeheer met aanbetalingen en betaaldeadlines per leverancier
+- Ingebouwde chat tussen bruidspaar, planner en leveranciers
+
+## Belangrijkste pagina's
+
+- [Homepage](https://dreamdaypartners-production.up.railway.app/): uitleg van het platform voor bruidsparen en leveranciers, met voordelen per leverancierscategorie
+- [Leverancierscatalogus](https://dreamdaypartners-production.up.railway.app/leveranciers): doorzoekbare catalogus van bruiloftsleveranciers in Nederland
+- [Blog](https://dreamdaypartners-production.up.railway.app/blog): praktische artikelen over bruiloften plannen (draaiboek maken, budget, leveranciers kiezen)
+- [Aanmelden](https://dreamdaypartners-production.up.railway.app/aanmelden): gratis account voor bruidsparen, leveranciersaccount voor bedrijven
+
+## Voorwaarden en privacy
+
+- [Privacybeleid](https://dreamdaypartners-production.up.railway.app/privacy)
+- [Algemene voorwaarden](https://dreamdaypartners-production.up.railway.app/voorwaarden)
+
+## Doelgroep en taal
+
+Het platform is Nederlandstalig en gericht op de Nederlandse bruiloftsmarkt. Vragen van gebruikers gaan typisch over: een bruiloft plannen zonder weddingplanner, een draaiboek voor de trouwdag maken, leveranciers per regio vinden en vergelijken, en samenwerken tussen bruidspaar en leveranciers.

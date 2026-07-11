@@ -799,6 +799,9 @@ export default function LandingPage() {
               { href: "#prijzen",       label: "Prijzen" },
               { href: "#faq",           label: "FAQ" },
               { href: "/leveranciers",  label: "Vind leveranciers" },
+              { href: "/blog",          label: "Blog" },
+              { href: "/privacy",       label: "Privacybeleid" },
+              { href: "/voorwaarden",   label: "Algemene voorwaarden" },
               { href: "/login",         label: "Inloggen" },
             ].map((l) => (
               <a key={l.href} href={l.href} style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.40)", textDecoration: "none" }}>{l.label}</a>
