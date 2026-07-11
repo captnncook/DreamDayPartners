@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { APPLE_LOGIN_ENABLED } from "@/lib/featureFlags";
 
 export default function ClaimVerifyPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params);
@@ -73,9 +74,11 @@ export default function ClaimVerifyPage({ params }: { params: Promise<{ token: s
                 <a href={`/api/auth/google?claim=${token}`} className="ddp-btn-secondary w-full text-center block">
                   Doorgaan met Google
                 </a>
-                <a href={`/api/auth/apple?claim=${token}`} className="ddp-btn-secondary w-full text-center block">
-                  Doorgaan met Apple
-                </a>
+                {APPLE_LOGIN_ENABLED && (
+                  <a href={`/api/auth/apple?claim=${token}`} className="ddp-btn-secondary w-full text-center block">
+                    Doorgaan met Apple
+                  </a>
+                )}
               </div>
 
               <div className="flex items-center gap-3 my-4">

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ArrowLeft, Check, Eye, EyeOff } from "lucide-react";
+import { APPLE_LOGIN_ENABLED } from "@/lib/featureFlags";
 
 type Account = "couple" | "vendor" | null;
 type AuthStep = "form" | "send-code" | "verify-code" | "choose-auth" | "password";
@@ -385,16 +386,18 @@ function AanmeldenForm() {
                   Doorgaan met Google
                 </a>
 
-                <a
-                  href={`/api/auth/apple?pending=${verifiedToken}`}
-                  className="ddp-btn-secondary w-full"
-                  style={{ background: "#000", color: "#fff", borderColor: "#000" }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 814 1000" fill="white">
-                    <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.5-150.3-96.3C27.2 761.6-.5 679.9-.5 601.7c0-237.2 154.4-362.7 306.3-362.7 78.3 0 143.4 51.5 192.4 51.5 46.8 0 120.3-54.7 211.3-54.7zm-174.5-92.3c37.5-44.8 64.4-107.3 64.4-169.8 0-8.7-.6-17.4-2-25.4-61 2.3-134 40.8-178.1 91.4-34.2 38.8-66.5 101.3-66.5 164.6 0 9.6 1.6 19.2 2.3 22.4 3.9.6 10.3 1.6 16.6 1.6 54.7 0 123.4-36.6 163.3-84.8z"/>
-                  </svg>
-                  Doorgaan met Apple
-                </a>
+                {APPLE_LOGIN_ENABLED && (
+                  <a
+                    href={`/api/auth/apple?pending=${verifiedToken}`}
+                    className="ddp-btn-secondary w-full"
+                    style={{ background: "#000", color: "#fff", borderColor: "#000" }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 814 1000" fill="white">
+                      <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.5-150.3-96.3C27.2 761.6-.5 679.9-.5 601.7c0-237.2 154.4-362.7 306.3-362.7 78.3 0 143.4 51.5 192.4 51.5 46.8 0 120.3-54.7 211.3-54.7zm-174.5-92.3c37.5-44.8 64.4-107.3 64.4-169.8 0-8.7-.6-17.4-2-25.4-61 2.3-134 40.8-178.1 91.4-34.2 38.8-66.5 101.3-66.5 164.6 0 9.6 1.6 19.2 2.3 22.4 3.9.6 10.3 1.6 16.6 1.6 54.7 0 123.4-36.6 163.3-84.8z"/>
+                    </svg>
+                    Doorgaan met Apple
+                  </a>
+                )}
 
                 <div className="relative flex items-center gap-3">
                   <div className="flex-1 h-px" style={{ background: "var(--border)" }} />

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
+import { APPLE_LOGIN_ENABLED } from "@/lib/featureFlags";
 import { Heart, Settings, Users, Leaf, Music, Utensils, Camera, Video, Scissors, Mic2, Cake, MapPin, Car, CalendarCheck, Eye, EyeOff } from "lucide-react";
 
 const ROLE_OPTIONS: { value: DemoRole; label: string; Icon: React.ElementType; description: string }[] = [
@@ -267,16 +268,18 @@ export default function LoginPage() {
             </svg>
             Inloggen met Google
           </a>
-          <a
-            href="/api/auth/apple"
-            className="w-full py-2.5 text-sm flex items-center justify-center gap-2.5 no-underline"
-            style={{ textDecoration: "none", background: "var(--surface)", borderRadius: "var(--radius-full)", fontWeight: 600, color: "var(--foreground)" }}
-          >
-            <svg width="16" height="18" viewBox="0 0 814 1000" fill="currentColor">
-              <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.7C199.4 718 128 583 128 462.9c0-0-96.5-197.9 0-288.2C174.5 128.4 221.2 128 224 128c6.8 0 25.5 2.5 31 4.1 25.3 7.3 51.9 27.7 72.9 44.6 24.9 20.1 49.2 54.3 57.7 87.5 7.7 30.9 9.6 62.9 5.8 95.5 48.8 9.4 115.7 7.5 162.1-45.5 19.3-22.1 35.6-55.1 41.5-86.2z"/>
-            </svg>
-            Inloggen met Apple
-          </a>
+          {APPLE_LOGIN_ENABLED && (
+            <a
+              href="/api/auth/apple"
+              className="w-full py-2.5 text-sm flex items-center justify-center gap-2.5 no-underline"
+              style={{ textDecoration: "none", background: "var(--surface)", borderRadius: "var(--radius-full)", fontWeight: 600, color: "var(--foreground)" }}
+            >
+              <svg width="16" height="18" viewBox="0 0 814 1000" fill="currentColor">
+                <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.7C199.4 718 128 583 128 462.9c0-0-96.5-197.9 0-288.2C174.5 128.4 221.2 128 224 128c6.8 0 25.5 2.5 31 4.1 25.3 7.3 51.9 27.7 72.9 44.6 24.9 20.1 49.2 54.3 57.7 87.5 7.7 30.9 9.6 62.9 5.8 95.5 48.8 9.4 115.7 7.5 162.1-45.5 19.3-22.1 35.6-55.1 41.5-86.2z"/>
+              </svg>
+              Inloggen met Apple
+            </a>
+          )}
         </div>
 
         {/* Register CTA — donker paneel met gouden knop, consistent met dash-hero */}
