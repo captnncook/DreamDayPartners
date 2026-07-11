@@ -60,6 +60,11 @@ function AanmeldenForm() {
     businessName: "", category: "", contactPerson: "", phone: "", website: "", city: "", email: "",
   });
 
+  // Duplicaat-check op bedrijfsnaam (fuzzy): null = nog niet gecheckt
+  type NameMatch = { id: string; name: string; city: string | null; category: string; hasAccount: boolean };
+  const [nameMatches, setNameMatches] = useState<NameMatch[] | null>(null);
+  const [checkingName, setCheckingName] = useState(false);
+
   useEffect(() => {
     const email = searchParams.get("email");
     const name = searchParams.get("name") ?? "";
@@ -89,9 +94,35 @@ function AanmeldenForm() {
     setError("");
   }
 
-  function nextFormStep() { setFormStep(s => s + 1); setError(""); }
+  async function nextFormStep() {
+    setError("");
+    // Leverancier stap 1: controleer eerst of het bedrijf (bijna) al in de
+    // catalogus staat, zodat we een bestaand profiel kunnen laten claimen
+    // in plaats van een duplicaat aan te maken.
+    if (account === "vendor" && formStep === 1 && nameMatches === null) {
+      setCheckingName(true);
+      try {
+        const res = await fetch(`/api/catalogus/check-name?name=${encodeURIComponent(vendor.businessName)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.matches) && data.matches.length > 0) {
+            setNameMatches(data.matches);
+            return; // toon eerst de "is dit jouw bedrijf?"-tussenstap
+          }
+        }
+      } catch {
+        // check is best-effort; bij een netwerkfout gewoon doorgaan
+      } finally {
+        setCheckingName(false);
+      }
+    }
+    setNameMatches(null);
+    setFormStep(s => s + 1);
+  }
+
   function prevFormStep() {
     setError("");
+    setNameMatches(null);
     if (formStep === 1) { setAccount(null); setFormStep(0); return; }
     setFormStep(s => s - 1);
   }
@@ -281,14 +312,14 @@ function AanmeldenForm() {
             )}
 
             {/* ── LEVERANCIER stap 1 ── */}
-            {account === "vendor" && authStep === "form" && formStep === 1 && (
+            {account === "vendor" && authStep === "form" && formStep === 1 && !(nameMatches && nameMatches.length > 0) && (
               <div className="space-y-5">
                 <div>
                   <h2 className="text-lg font-semibold">Over je bedrijf</h2>
                   <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Hoe heet je en wat doe je?</p>
                 </div>
                 <Field label="Bedrijfsnaam *">
-                  <input value={vendor.businessName} onChange={e => setVendor({ ...vendor, businessName: e.target.value })} placeholder="bijv. Lichtvang Fotografie" className="ddp-input" />
+                  <input value={vendor.businessName} onChange={e => { setVendor({ ...vendor, businessName: e.target.value }); setNameMatches(null); }} placeholder="bijv. Lichtvang Fotografie" className="ddp-input" />
                 </Field>
                 <Field label="Categorie *">
                   <select value={vendor.category} onChange={e => setVendor({ ...vendor, category: e.target.value })} className="ddp-input">
@@ -296,6 +327,55 @@ function AanmeldenForm() {
                     {VENDOR_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                 </Field>
+              </div>
+            )}
+
+            {/* ── LEVERANCIER duplicaat-check: bedrijf lijkt al te bestaan ── */}
+            {account === "vendor" && authStep === "form" && formStep === 1 && nameMatches && nameMatches.length > 0 && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Staat jouw bedrijf al in de catalogus?</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
+                    We vonden {nameMatches.length === 1 ? "een profiel dat lijkt" : "profielen die lijken"} op
+                    {" "}&ldquo;{vendor.businessName}&rdquo;. Claim je bestaande profiel in plaats van een dubbel profiel aan te maken.
+                  </p>
+                </div>
+                <div style={{ borderTop: "1px solid var(--border)" }}>
+                  {nameMatches.map((m) => {
+                    const catLabel = VENDOR_CATEGORIES.find((c) => c.value === m.category)?.label ?? m.category;
+                    return (
+                      <div key={m.id} className="dash-row" style={{ flexWrap: "wrap" }}>
+                        <div className="flex-1 min-w-0" style={{ minWidth: "160px" }}>
+                          <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{m.name}</div>
+                          <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
+                            {catLabel}{m.city ? ` · ${m.city}` : ""}
+                          </div>
+                        </div>
+                        {m.hasAccount ? (
+                          <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>
+                            Heeft al een account —{" "}
+                            <Link href="/login" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>inloggen</Link>
+                          </span>
+                        ) : (
+                          <Link href={`/leveranciers/${m.id}`} className="text-sm flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>
+                            Dit is mijn bedrijf →
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-xs" style={{ color: "var(--muted)" }}>
+                  Via &ldquo;Dit is mijn bedrijf&rdquo; kom je op het profiel, waar je het met je e-mailadres kunt claimen.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={() => { setNameMatches(null); }} className="ddp-btn-secondary flex-1">
+                    <ArrowLeft className="w-4 h-4" /> Terug
+                  </button>
+                  <button onClick={() => { setNameMatches([]); setFormStep(2); }} className="ddp-btn-primary flex-1">
+                    Nee, nieuw bedrijf <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             )}
 
@@ -475,8 +555,9 @@ function AanmeldenForm() {
               </div>
             )}
 
-            {/* ── Navigatie (alleen tijdens form-invul fase) ── */}
-            {authStep === "form" && formStep > 0 && (
+            {/* ── Navigatie (alleen tijdens form-invul fase; de duplicaat-check
+                 tussenstap heeft eigen knoppen) ── */}
+            {authStep === "form" && formStep > 0 && !(account === "vendor" && formStep === 1 && nameMatches && nameMatches.length > 0) && (
               <div className="flex gap-3 mt-6">
                 <button onClick={prevFormStep} className="ddp-btn-secondary flex-1">
                   <ArrowLeft className="w-4 h-4" /> Terug
@@ -485,11 +566,12 @@ function AanmeldenForm() {
                   <button
                     onClick={nextFormStep}
                     disabled={
+                      checkingName ||
                       (account === "vendor" && formStep === 1 && (!vendor.businessName || !vendor.category))
                     }
                     className="ddp-btn-primary flex-1"
                   >
-                    Volgende <ArrowRight className="w-4 h-4" />
+                    {checkingName ? "Controleren…" : <>Volgende <ArrowRight className="w-4 h-4" /></>}
                   </button>
                 ) : (
                   // Last form step = email step → send code
