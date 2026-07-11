@@ -197,13 +197,12 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
         </section>
       )}
 
-      {/* Bruiloften — leverancier heeft de agenda hierboven al, admin beheert dit via de sidebar */}
-      {user.role !== "vendor" && user.role !== "admin" && (
+      {/* Bruiloften — leverancier heeft de agenda hierboven al, admin beheert dit via de sidebar,
+          bruidspaar heeft altijd maar één bruiloft (die staat al in de countdown hieronder) */}
+      {user.role !== "vendor" && user.role !== "admin" && user.role !== "couple" && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="dash-section-title">
-              {user.role === "couple" ? "Onze bruiloft" : "Bruiloften"}
-            </h2>
+            <h2 className="dash-section-title">Bruiloften</h2>
             {user.role === "planner" && (
               <Link href="/weddings/new" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
                 <Plus className="w-3.5 h-3.5" /> Nieuw
@@ -247,6 +246,13 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
                 </div>
               )}
             </div>
+            <Link
+              href={`/weddings/${weddings[0].id}`}
+              className="ddp-btn-gold mt-4"
+              style={{ display: "inline-flex", background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none" }}
+            >
+              Naar onze bruiloft
+            </Link>
           </div>
         </section>
       )}
