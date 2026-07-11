@@ -32,7 +32,7 @@ export default function ChecklistDeadlines({ tasks, weddingId }: Props) {
     <div className="card" style={{ padding: "1.5rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
         <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Checklist & Deadlines</h3>
-        <a href={`/weddings/${weddingId}/taken`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alle taken →</a>
+        <a href={`/weddings/${weddingId}/tasks`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alle taken →</a>
       </div>
 
       {tasks.length === 0 ? (
