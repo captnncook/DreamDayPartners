@@ -22,6 +22,11 @@ export default async function AllDraaiboekPage() {
     });
   }
 
+  // Een bruidspaar heeft altijd maar één bruiloft — spring de keuzelijst over.
+  if (user.role === "couple" && weddings.length === 1) {
+    redirect(`/weddings/${weddings[0].id}/draaiboek`);
+  }
+
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
