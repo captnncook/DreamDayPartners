@@ -27,10 +27,30 @@ export type GridItem = {
   description?: string;
   location?: string;
   vendorId?: string | null;
+  visibleVendorIds?: string[];
   notes?: string;
   isPublic?: boolean;
   vendor?: { id: string; name: string; category: string } | null;
 };
+
+type Audience = "all" | "vendors" | "private";
+
+function audienceOf(item: GridItem): Audience {
+  if (item.isPublic) return "all";
+  if ((item.visibleVendorIds?.length ?? 0) > 0) return "vendors";
+  return "private";
+}
+
+function audienceLabel(item: GridItem, vendors: WeddingVendorRef[]): string {
+  const audience = audienceOf(item);
+  if (audience === "all") return "Iedereen";
+  if (audience === "private") return "Alleen bruidspaar";
+  const ids = item.visibleVendorIds ?? [];
+  const names = ids.map(id => vendors.find(v => v.vendor.id === id)?.vendor.name).filter(Boolean) as string[];
+  if (names.length === 0) return "Specifieke leverancier";
+  if (names.length === 1) return names[0];
+  return `${names[0]} +${names.length - 1}`;
+}
 
 export type WeddingVendorRef = {
   id: string;
@@ -69,7 +89,7 @@ const INP: React.CSSProperties = {
   fontSize: "0.875rem", background: "white", outline: "none",
 };
 
-type FormData = { startTime: string; endTime: string; title: string; location: string; vendorId: string; notes: string };
+type FormData = { startTime: string; endTime: string; title: string; location: string; audience: Audience; vendorIds: string[]; notes: string };
 
 function Modal({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
   useEffect(() => {
@@ -119,7 +139,18 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
   saving: boolean;
 }) {
   const [f, setF] = useState(init);
-  const set = (k: keyof FormData, v: string) => setF(p => ({ ...p, [k]: v }));
+  const set = (k: "startTime" | "endTime" | "title" | "location" | "notes", v: string) => setF(p => ({ ...p, [k]: v }));
+  const setAudience = (audience: Audience) => setF(p => ({ ...p, audience, vendorIds: audience === "vendors" ? p.vendorIds : [] }));
+  const toggleVendor = (id: string) => setF(p => ({
+    ...p,
+    vendorIds: p.vendorIds.includes(id) ? p.vendorIds.filter(v => v !== id) : [...p.vendorIds, id],
+  }));
+
+  const AUDIENCE_OPTIONS: { value: Audience; label: string; hint: string }[] = [
+    { value: "all", label: "Iedereen", hint: "Bruidspaar, planner en alle leveranciers zien dit" },
+    { value: "vendors", label: "Specifieke leverancier(s)", hint: "Kies wie dit item mag zien" },
+    { value: "private", label: "Alleen bruidspaar", hint: "Leveranciers zien dit niet" },
+  ];
 
   return (
     <Modal onClose={onCancel}>
@@ -146,19 +177,72 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
           Titel *<br />
           <input value={f.title} onChange={e => set("title", e.target.value)} placeholder="bijv. Huwelijksinzegening" style={{ ...INP, marginTop: "0.25rem" }} />
         </label>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-          <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
-            Locatie<br />
-            <input value={f.location} onChange={e => set("location", e.target.value)} placeholder="bijv. Feestzaal" style={{ ...INP, marginTop: "0.25rem" }} />
-          </label>
-          <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
-            Leverancier<br />
-            <select value={f.vendorId} onChange={e => set("vendorId", e.target.value)} style={{ ...INP, marginTop: "0.25rem", appearance: "auto" } as React.CSSProperties}>
-              <option value="">— geen —</option>
-              {vendors.map(v => <option key={v.vendor.id} value={v.vendor.id}>{v.vendor.name}</option>)}
-            </select>
-          </label>
+        <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+          Locatie<br />
+          <input value={f.location} onChange={e => set("location", e.target.value)} placeholder="bijv. Feestzaal" style={{ ...INP, marginTop: "0.25rem" }} />
+        </label>
+
+        <div>
+          <p style={{ fontSize: "0.75rem", fontWeight: 600, marginBottom: "0.4rem" }}>Zichtbaar voor</p>
+          <div style={{ display: "flex", flexDirection: "column", border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
+            {AUDIENCE_OPTIONS.map((opt, i) => {
+              const active = f.audience === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setAudience(opt.value)}
+                  style={{
+                    textAlign: "left", padding: "0.625rem 0.875rem",
+                    background: active ? "var(--sand)" : "white",
+                    border: "none", cursor: "pointer",
+                    borderTop: i === 0 ? "none" : "1px solid var(--border)",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{
+                      width: 16, height: 16, borderRadius: "50%", flexShrink: 0,
+                      border: `1.5px solid ${active ? "var(--gold-deep)" : "var(--muted-light)"}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      {active && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--gold-deep)" }} />}
+                    </span>
+                    <span style={{ fontSize: "0.8125rem", fontWeight: active ? 700 : 500, color: active ? "var(--gold-deep)" : "var(--foreground)" }}>
+                      {opt.label}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "0.6875rem", color: "var(--muted)", marginTop: "2px", marginLeft: "1.5rem" }}>{opt.hint}</p>
+                </button>
+              );
+            })}
+          </div>
+
+          {f.audience === "vendors" && (
+            <div style={{ marginTop: "0.5rem", border: "1px solid var(--border)", borderRadius: "10px", maxHeight: "180px", overflowY: "auto" }}>
+              {vendors.length === 0 ? (
+                <p style={{ fontSize: "0.75rem", color: "var(--muted)", padding: "0.75rem" }}>Nog geen leveranciers gekoppeld aan deze bruiloft.</p>
+              ) : vendors.map((v, i) => {
+                const checked = f.vendorIds.includes(v.vendor.id);
+                return (
+                  <label
+                    key={v.vendor.id}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "0.625rem",
+                      padding: "0.625rem 0.875rem", cursor: "pointer",
+                      borderTop: i === 0 ? "none" : "1px solid var(--border)",
+                      background: checked ? "var(--sand)" : "white",
+                    }}
+                  >
+                    <input type="checkbox" checked={checked} onChange={() => toggleVendor(v.vendor.id)} style={{ width: 16, height: 16, accentColor: "var(--gold-deep)" }} />
+                    <span style={{ fontSize: "0.8125rem", fontWeight: checked ? 600 : 500 }}>{v.vendor.name}</span>
+                    <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "capitalize" }}>{v.vendor.category}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
         </div>
+
         <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
           Notities<br />
           <input value={f.notes} onChange={e => set("notes", e.target.value)} placeholder="Extra info" style={{ ...INP, marginTop: "0.25rem" }} />
@@ -189,13 +273,12 @@ interface Props {
   onUpdateItem: (id: string, patch: Record<string, unknown>) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onAddItem: (data: Record<string, unknown>) => Promise<void>;
-  onTogglePublic: (id: string, current: boolean) => Promise<void>;
   onDragStateChange?: (dragging: boolean) => void;
 }
 
 export default function DraaiboekGrid({
   items, vendors, canEditItem, isPlanner,
-  onUpdateItem, onDeleteItem, onAddItem, onTogglePublic, onDragStateChange,
+  onUpdateItem, onDeleteItem, onAddItem, onDragStateChange,
 }: Props) {
   const draftRef = useRef<GridItem[]>(items);
   const [display, setDisplay] = useState<GridItem[]>(items);
@@ -285,7 +368,9 @@ export default function DraaiboekGrid({
     const dur = Math.max(SNAP, toMin(f.endTime) - toMin(f.startTime));
     await onAddItem({
       startTime: f.startTime, duration: dur, title: f.title,
-      location: f.location || undefined, vendorId: f.vendorId || null,
+      location: f.location || undefined,
+      vendorIds: f.audience === "vendors" ? f.vendorIds : [],
+      isPublic: f.audience === "all",
       notes: f.notes || undefined,
     });
     setSaving(false);
@@ -297,7 +382,9 @@ export default function DraaiboekGrid({
     const dur = Math.max(SNAP, toMin(f.endTime) - toMin(f.startTime));
     await onUpdateItem(id, {
       startTime: f.startTime, duration: dur, title: f.title,
-      location: f.location || undefined, vendorId: f.vendorId || null,
+      location: f.location || undefined,
+      vendorIds: f.audience === "vendors" ? f.vendorIds : [],
+      isPublic: f.audience === "all",
       notes: f.notes || undefined,
     });
     setSaving(false);
@@ -323,7 +410,7 @@ export default function DraaiboekGrid({
       {/* Add form */}
       {formMode === "add" && (
         <ItemForm
-          init={{ startTime: newTime, endTime: addEndTime(), title: "", location: "", vendorId: "", notes: "" }}
+          init={{ startTime: newTime, endTime: addEndTime(), title: "", location: "", audience: "all", vendorIds: [], notes: "" }}
           vendors={vendors}
           onSave={saveNew}
           onCancel={() => setFormMode(null)}
@@ -339,7 +426,8 @@ export default function DraaiboekGrid({
             endTime: endMin(selItem.startTime, selItem.duration),
             title: selItem.title,
             location: selItem.location ?? "",
-            vendorId: selItem.vendorId ?? "",
+            audience: audienceOf(selItem),
+            vendorIds: selItem.visibleVendorIds ?? (selItem.vendorId ? [selItem.vendorId] : []),
             notes: selItem.notes ?? "",
           }}
           vendors={vendors}
@@ -357,18 +445,12 @@ export default function DraaiboekGrid({
             <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
               <span>{selItem.startTime} – {endMin(selItem.startTime, selItem.duration)}</span>
               {selItem.location && <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}><MapPin className="w-3 h-3" />{selItem.location}</span>}
-              {selItem.vendor && <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", textTransform: "capitalize" }}><Briefcase className="w-3 h-3" />{selItem.vendor.category} · {selItem.vendor.name}</span>}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontWeight: audienceOf(selItem) !== "all" ? 700 : 400, color: audienceOf(selItem) !== "all" ? "var(--gold-deep)" : "var(--muted)" }}>
+                <Briefcase className="w-3 h-3" />{audienceLabel(selItem, vendors)}
+              </span>
             </div>
           </div>
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexShrink: 0 }}>
-            {isPlanner && (
-              <button
-                onClick={() => onTogglePublic(selItem.id, selItem.isPublic ?? false)}
-                style={{ fontSize: "0.75rem", padding: "0.25rem 0.625rem", borderRadius: "6px", border: "none", cursor: "pointer", fontWeight: 600, background: selItem.isPublic ? "#22c55e20" : "var(--border)", color: selItem.isPublic ? "#16a34a" : "var(--muted)" }}
-              >
-                {selItem.isPublic ? "Publiek" : "Privé"}
-              </button>
-            )}
             {canEditItem(selItem) && (
               <>
                 <button onClick={() => setFormMode("edit")} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem", padding: "0.3rem 0.75rem" }}>Bewerken</button>

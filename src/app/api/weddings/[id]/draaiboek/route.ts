@@ -29,7 +29,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const vendor = await prisma.vendor.findFirst({ where: { userId: user.id } });
     result = draaiboeken.map((d) => ({
       ...d,
-      items: d.items.filter((item) => !vendor || item.vendorId === vendor.id || item.isPublic),
+      items: d.items.filter((item) => !vendor || item.isPublic || item.vendorId === vendor.id || item.visibleVendorIds.includes(vendor.id)),
     }));
   }
 

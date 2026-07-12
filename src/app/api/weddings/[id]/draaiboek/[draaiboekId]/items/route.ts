@@ -27,6 +27,7 @@ export async function POST(
   if (!draaiboek) return NextResponse.json({ error: "Draaiboek niet gevonden" }, { status: 404 });
 
   const body = await req.json();
+  const vendorIds: string[] = Array.isArray(body.vendorIds) ? body.vendorIds.filter(Boolean) : [];
 
   const item = await prisma.draaiboekItem.create({
     data: {
@@ -38,7 +39,8 @@ export async function POST(
       location: body.location ?? null,
       sortOrder: body.sortOrder ?? 0,
       assignedUserId: body.assignedUserId ?? null,
-      vendorId: body.vendorId ?? null,
+      vendorId: vendorIds[0] ?? null,
+      visibleVendorIds: vendorIds,
       notes: body.notes ?? null,
       isPublic: body.isPublic ?? true,
     },

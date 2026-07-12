@@ -33,7 +33,7 @@ export async function GET(
   let items = draaiboek.items;
   if (user.role === "vendor") {
     const vendor = await prisma.vendor.findFirst({ where: { userId: user.id } });
-    items = items.filter((item) => !vendor || item.vendorId === vendor.id || item.isPublic);
+    items = items.filter((item) => !vendor || item.isPublic || item.vendorId === vendor.id || item.visibleVendorIds.includes(vendor.id));
   }
   items = [...items].sort((a, b) => a.startTime.localeCompare(b.startTime));
 

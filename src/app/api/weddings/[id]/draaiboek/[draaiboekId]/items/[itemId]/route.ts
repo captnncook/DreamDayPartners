@@ -11,7 +11,7 @@ type Params = { params: Promise<{ itemId: string }> };
 async function canEditItem(userId: string, role: string, itemId: string): Promise<boolean> {
   const item = await prisma.draaiboekItem.findUnique({
     where: { id: itemId },
-    select: { vendorId: true, draaiboek: { select: { weddingId: true } } },
+    select: { vendorId: true, visibleVendorIds: true, draaiboek: { select: { weddingId: true } } },
   });
   if (!item) return false;
 
@@ -27,7 +27,8 @@ async function canEditItem(userId: string, role: string, itemId: string): Promis
 
   if (role === "vendor") {
     const ownVendorId = await getOwnVendorId(userId);
-    return !!ownVendorId && item.vendorId === ownVendorId;
+    if (!ownVendorId) return false;
+    return item.vendorId === ownVendorId || item.visibleVendorIds.includes(ownVendorId);
   }
 
   return false;
@@ -54,6 +55,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
   const body = await req.json();
+  const vendorIds: string[] | undefined = Array.isArray(body.vendorIds) ? body.vendorIds.filter(Boolean) : undefined;
 
   const item = await prisma.draaiboekItem.update({
     where: { id: itemId },
@@ -64,7 +66,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ...(body.description !== undefined && { description: body.description }),
       ...(body.location !== undefined && { location: body.location }),
       ...(body.notes !== undefined && { notes: body.notes }),
-      ...(body.vendorId !== undefined && { vendorId: body.vendorId || null }),
+      ...(vendorIds !== undefined && { vendorId: vendorIds[0] ?? null, visibleVendorIds: vendorIds }),
       ...(body.isPublic !== undefined && { isPublic: body.isPublic }),
     },
     include: { vendor: { select: { id: true, name: true, category: true } } },

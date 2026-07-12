@@ -137,7 +137,7 @@ export default function DraaiboekClient({
 
   function canEditItem(item: DraaiboekItem): boolean {
     if (isPlanner) return true;
-    if (isVendor) return !!ownVendorId && item.vendorId === ownVendorId;
+    if (isVendor) return !!ownVendorId && (item.vendorId === ownVendorId || (item.visibleVendorIds ?? []).includes(ownVendorId));
     return false;
   }
 
@@ -198,22 +198,6 @@ export default function DraaiboekClient({
         ? { ...d, items: d.items.filter(i => i.id !== itemId) }
         : d)
     );
-  }
-
-  async function togglePublic(itemId: string, current: boolean) {
-    if (!activeDraaiboekId) return;
-    const res = await fetch(`/api/weddings/${weddingId}/draaiboek/${activeDraaiboekId}/items/${itemId}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isPublic: !current }),
-    });
-    const data = await res.json();
-    if (data.item) {
-      setDraaiboeken(prev =>
-        prev.map(d => d.id === activeDraaiboekId
-          ? { ...d, items: d.items.map(i => i.id === itemId ? { ...i, isPublic: data.item.isPublic } : i) }
-          : d)
-      );
-    }
   }
 
   const visibleDraaiboeken = isMultiDay
@@ -381,7 +365,6 @@ export default function DraaiboekClient({
                 onUpdateItem={updateItem}
                 onDeleteItem={deleteItem}
                 onAddItem={addItem}
-                onTogglePublic={togglePublic}
                 onDragStateChange={dragging => { draggingRef.current = dragging; }}
               />
             )}

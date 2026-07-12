@@ -174,6 +174,7 @@ const STATEMENTS = [
   `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "isPublic" BOOLEAN NOT NULL DEFAULT false`,
   `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "phase" TEXT`,
   `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "assignedUserId" TEXT`,
+  `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "visibleVendorIds" TEXT[] NOT NULL DEFAULT '{}'`,
 
   `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
 

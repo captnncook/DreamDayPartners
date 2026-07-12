@@ -469,6 +469,7 @@ model DraaiboekItem {
   phase           String?  // arrival | setup | perform | teardown | custom
   notes           String?
   isPublic        Boolean  @default(false)
+  visibleVendorIds String[] @default([]) // gekozen leverancier(s) als audience "vendors" (leeg + isPublic=false = privé voor bruidspaar/planner)
 
   draaiboek     Draaiboek      @relation(fields: [draaiboekId], references: [id], onDelete: Cascade)
   vendor        Vendor?        @relation(fields: [vendorId], references: [id])
