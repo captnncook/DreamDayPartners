@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Upload, Trash2, Save, Check, Star } from "lucide-react";
+import { Upload, Trash2, Save, Check, Star } from "lucide-react";
 
 const CATEGORIES = [
   { value: "weddingplanner", label: "Weddingplanner" },
@@ -520,15 +520,8 @@ function VendorEditPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
-      <div className="dash-hero" style={{ borderRadius: 0, padding: "1.25rem 1.25rem 2rem" }}>
+      <div className="dash-hero" style={{ borderRadius: 0, padding: "1.75rem 1.25rem 2rem" }}>
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-          <Link
-            href={`/leveranciers/${id}`}
-            className="inline-flex items-center gap-2"
-            style={{ color: "var(--ink-muted)", textDecoration: "none", fontSize: "0.875rem", marginBottom: "1.5rem", display: "inline-flex" }}
-          >
-            <ArrowLeft className="w-4 h-4" /> Terug naar profiel
-          </Link>
           <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
             Profiel bewerken
           </h1>
@@ -1054,7 +1047,7 @@ function VendorEditPage() {
 
         <div className="flex gap-3 justify-end">
           <Link href={`/leveranciers/${id}`} className="ddp-btn-secondary">
-            Annuleren
+            Bekijk publiek profiel
           </Link>
           <button
             onClick={handleSave}
