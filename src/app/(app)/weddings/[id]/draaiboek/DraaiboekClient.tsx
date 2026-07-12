@@ -47,7 +47,7 @@ export default function DraaiboekClient({
 
   const [exporting, setExporting] = useState(false);
   const activeDraaiboek = draaiboeken.find(d => d.id === activeDraaiboekId);
-  const isPlanner = ["admin", "planner", "team_member"].includes(currentUser.role);
+  const isPlanner = ["admin", "planner", "team_member", "couple"].includes(currentUser.role);
   const isVendor = currentUser.role === "vendor";
   const draggingRef = useRef(false);
 

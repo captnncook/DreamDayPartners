@@ -41,6 +41,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const { id } = await params;
+
+  // Aanmaken mag door admin of teamleden van deze bruiloft (planner,
+  // team_member, bruidspaar) — niet door leveranciers.
+  const memberWhere =
+    user.role === "admin"
+      ? { id }
+      : { id, teamMembers: { some: { userId: user.id } } };
+  const wedding = await prisma.wedding.findFirst({ where: memberWhere, select: { id: true } });
+  if (!wedding || user.role === "vendor") {
+    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  }
+
   const { title, version } = await req.json();
 
   const draaiboek = await prisma.draaiboek.create({

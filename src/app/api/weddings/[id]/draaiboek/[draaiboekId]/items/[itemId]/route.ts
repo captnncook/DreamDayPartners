@@ -5,17 +5,31 @@ import { getOwnVendorId } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ itemId: string }> };
 
-const PLANNER_ROLES = ["admin", "planner", "team_member"];
-
+// Bewerken mag door: admin, teamleden van déze bruiloft (planner,
+// team_member én bruidspaar), of de leverancier aan wie het item is
+// gekoppeld. Membership wordt echt gecontroleerd, niet alleen de rol.
 async function canEditItem(userId: string, role: string, itemId: string): Promise<boolean> {
-  if (PLANNER_ROLES.includes(role)) return true;
-  if (role === "vendor") {
-    const [item, ownVendorId] = await Promise.all([
-      prisma.draaiboekItem.findUnique({ where: { id: itemId }, select: { vendorId: true } }),
-      getOwnVendorId(userId),
-    ]);
-    return !!item && !!ownVendorId && item.vendorId === ownVendorId;
+  const item = await prisma.draaiboekItem.findUnique({
+    where: { id: itemId },
+    select: { vendorId: true, draaiboek: { select: { weddingId: true } } },
+  });
+  if (!item) return false;
+
+  if (role === "admin") return true;
+
+  if (["planner", "team_member", "couple"].includes(role)) {
+    const member = await prisma.weddingTeamMember.findFirst({
+      where: { weddingId: item.draaiboek.weddingId, userId },
+      select: { id: true },
+    });
+    return !!member;
   }
+
+  if (role === "vendor") {
+    const ownVendorId = await getOwnVendorId(userId);
+    return !!ownVendorId && item.vendorId === ownVendorId;
+  }
+
   return false;
 }
 
