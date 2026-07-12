@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
   if (input.length < 3) return NextResponse.json({ matches: [] });
 
   const vendors = await prisma.vendor.findMany({
+    where: { archivedAt: null },
     select: { id: true, name: true, city: true, category: true, userId: true },
   });
 

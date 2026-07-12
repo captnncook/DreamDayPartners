@@ -285,6 +285,38 @@ export function deleteRequestEmail(vendorName: string, confirmUrl: string): { su
   };
 }
 
+// Naar het bruidspaar/team van een geplande bruiloft wanneer een gekoppelde
+// leverancier zijn DreamDay-account verwijdert. Boekingsdata blijft bewaard.
+export function vendorLeftWeddingEmail(vendorName: string, weddingTitle: string): { subject: string; html: string } {
+  return {
+    subject: `${vendorName} is gestopt met DreamDay Platform`,
+    html: emailLayout({
+      heading: "Een leverancier heeft DreamDay verlaten",
+      body: `
+        <p style="margin:0 0 12px;"><strong>${vendorName}</strong> heeft zijn account op DreamDay Platform verwijderd.</p>
+        <p style="margin:0 0 12px;">Voor <strong>${weddingTitle}</strong> verandert er in jullie planning niets: de gemaakte afspraken, draaiboek-onderdelen, documenten en betaalafspraken blijven gewoon in DreamDay staan.</p>
+        <p style="margin:0;">Alleen chatten via het platform kan niet meer met deze leverancier. Neem voor nieuwe afspraken rechtstreeks contact op via de contactgegevens die jullie eerder hebben uitgewisseld.</p>
+      `,
+    }),
+  };
+}
+
+// Naar alle gekoppelde leveranciers wanneer een bruidspaar zijn account (en
+// daarmee de bruiloft) verwijdert voor de trouwdag.
+export function weddingCancelledEmail(vendorName: string, weddingTitle: string, weddingDate: string): { subject: string; html: string } {
+  return {
+    subject: `Bruiloft geannuleerd in DreamDay: ${weddingTitle}`,
+    html: emailLayout({
+      heading: "Bruiloft geannuleerd",
+      body: `
+        <p style="margin:0 0 12px;">Beste ${vendorName},</p>
+        <p style="margin:0 0 12px;">Het bruidspaar van <strong>${weddingTitle}</strong> (${weddingDate}) heeft zijn account op DreamDay Platform verwijderd. De bruiloft en het bijbehorende draaiboek zijn daarmee uit het platform verdwenen.</p>
+        <p style="margin:0;">Let op: dit zegt alleen iets over het platform, niet automatisch over jullie onderlinge overeenkomst. Neem bij twijfel rechtstreeks contact op met het bruidspaar.</p>
+      `,
+    }),
+  };
+}
+
 export function deleteAdminNotificationEmail(vendorName: string, userEmail: string): { subject: string; html: string } {
   return {
     subject: `Leveranciersprofiel verwijderd: ${vendorName}`,

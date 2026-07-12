@@ -156,6 +156,11 @@ model Vendor {
   disabledModules String[]
   extraModules    String[]
 
+  // Gezet wanneer de leverancier zijn account verwijderde terwijl hij nog
+  // aan geplande bruiloften meewerkte: profiel verdwijnt uit de catalogus,
+  // maar boekingen/draaiboek-items van die bruiloften blijven intact.
+  archivedAt      DateTime?
+
   // Trouwlocatie-specifieke velden (alleen relevant/getoond voor category "trouwlocatie")
   ceremonyMinGuests  Int?
   ceremonyMaxGuests  Int?
@@ -241,6 +246,18 @@ model VendorClaimRequest {
   vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   @@map("vendor_claim_requests")
+}
+
+// Afscheids-feedback: platformcijfer dat een gebruiker geeft bij het
+// verwijderen van zijn account.
+model PlatformFeedback {
+  id        String   @id @default(uuid())
+  rating    Int
+  text      String?
+  role      String
+  createdAt DateTime @default(now())
+
+  @@map("platform_feedback")
 }
 
 model VendorFeatureRequest {

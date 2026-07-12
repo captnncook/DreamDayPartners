@@ -47,10 +47,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       barOptions: true,
       environment: true,
       venueRooms: { orderBy: { order: "asc" } },
+      archivedAt: true,
     },
   });
 
-  if (!vendor) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
+  if (!vendor || vendor.archivedAt) return NextResponse.json({ error: "Niet gevonden" }, { status: 404 });
 
   // Tel een profielweergave, maar niet wanneer de eigenaar zijn eigen profiel bekijkt/bewerkt.
   const viewer = await getSession();

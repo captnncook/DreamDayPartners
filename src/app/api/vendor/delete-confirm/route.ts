@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { clearSession } from "@/lib/session";
-import { sendMail, deleteAdminNotificationEmail } from "@/lib/mail";
+import { sendMail, deleteAdminNotificationEmail, vendorLeftWeddingEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
   const { token } = await req.json();
@@ -30,8 +30,33 @@ export async function POST(req: NextRequest) {
   // Clean up token
   await prisma.$executeRawUnsafe(`DELETE FROM "vendor_delete_tokens" WHERE "userId" = $1`, row.userId);
 
-  // Delete vendor profile(s) and user account
-  await prisma.vendor.deleteMany({ where: { userId: row.userId } });
+  // Werkt deze leverancier nog mee aan geplande bruiloften? Dan archiveren we
+  // het profiel in plaats van het te verwijderen: het verdwijnt uit de
+  // catalogus en het account gaat weg, maar draaiboek-items, betaalafspraken
+  // en documenten van die bruiloften blijven intact voor het bruidspaar.
+  const upcomingBookings = vendorProfile
+    ? await prisma.weddingVendor.findMany({
+        where: { vendorId: vendorProfile.id, wedding: { date: { gte: new Date() } } },
+        include: { wedding: { select: { title: true, coupleEmail1: true } } },
+      })
+    : [];
+
+  if (vendorProfile && upcomingBookings.length > 0) {
+    await prisma.vendor.update({
+      where: { id: vendorProfile.id },
+      data: { userId: null, archivedAt: new Date(), isPremium: false },
+    });
+    // Informeer elk betrokken bruidspaar dat de planning intact blijft.
+    for (const booking of upcomingBookings) {
+      if (!booking.wedding.coupleEmail1) continue;
+      const tpl = vendorLeftWeddingEmail(vendorName, booking.wedding.title);
+      await sendMail({ to: booking.wedding.coupleEmail1, subject: tpl.subject, html: tpl.html }).catch(() => {});
+    }
+  } else {
+    // Geen geplande bruiloften: volledig verwijderen mag veilig.
+    await prisma.vendor.deleteMany({ where: { userId: row.userId } });
+  }
+
   await prisma.user.delete({ where: { id: row.userId } });
 
   // Clear session
@@ -42,5 +67,5 @@ export async function POST(req: NextRequest) {
   const tpl = deleteAdminNotificationEmail(vendorName, userEmail);
   await sendMail({ to: adminEmail, subject: tpl.subject, html: tpl.html });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, archived: upcomingBookings.length > 0 });
 }

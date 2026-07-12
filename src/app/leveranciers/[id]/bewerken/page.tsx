@@ -212,6 +212,7 @@ function VendorEditPage() {
   const [error, setError] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteSent, setDeleteSent] = useState(false);
+  const [deleteInfo, setDeleteInfo] = useState<null | { upcomingWeddings: number; totalWeddings: number; profileViews: number; documents: number }>(null);
   const [busyDates, setBusyDates] = useState<string[]>([]);
   const [newBusyDate, setNewBusyDate] = useState("");
   const [profileViews, setProfileViews] = useState<number | null>(null);
@@ -477,8 +478,20 @@ function VendorEditPage() {
     else { setError(data.error ?? "Kan niet verbinden met betaalservice"); setBillingLoading(false); }
   }
 
+  async function showDeleteConfirmation() {
+    setDeleteLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/vendor/delete-info`);
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? "Er ging iets mis"); return; }
+      setDeleteInfo(data);
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
   async function handleRequestDelete() {
-    if (!confirm("Weet je zeker dat je een verwijderverzoek wilt indienen? Je ontvangt een bevestigingsmail.")) return;
     setDeleteLoading(true);
     setError("");
     try {
@@ -486,6 +499,7 @@ function VendorEditPage() {
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Er ging iets mis"); return; }
       setDeleteSent(true);
+      setDeleteInfo(null);
     } finally {
       setDeleteLoading(false);
     }
@@ -1062,14 +1076,39 @@ function VendorEditPage() {
             <p className="text-xs mt-3 font-medium" style={{ color: "var(--danger)" }}>
               Bevestigingsmail verstuurd. Controleer je inbox en klik op de link om de verwijdering te voltooien.
             </p>
+          ) : deleteInfo ? (
+            <div className="mt-3" style={{ borderLeft: "3px solid var(--danger)", background: "var(--danger-bg)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1rem 1.25rem" }}>
+              <p className="text-sm font-semibold mb-2">Weet je het zeker? Dit is wat je achterlaat op DreamDay:</p>
+              <ul className="text-sm space-y-1 mb-3" style={{ margin: 0, paddingLeft: "1.25rem" }}>
+                {deleteInfo.upcomingWeddings > 0 && (
+                  <li><strong>{deleteInfo.upcomingWeddings}</strong> geplande bruiloft{deleteInfo.upcomingWeddings === 1 ? "" : "en"} waar je nog aan meewerkt</li>
+                )}
+                <li><strong>{deleteInfo.totalWeddings}</strong> bruiloft{deleteInfo.totalWeddings === 1 ? "" : "en"} in totaal via DreamDay</li>
+                <li><strong>{deleteInfo.profileViews}</strong> profielweergave{deleteInfo.profileViews === 1 ? "" : "n"} door bruidsparen</li>
+                <li><strong>{deleteInfo.documents}</strong> gedeelde document{deleteInfo.documents === 1 ? "" : "en"}</li>
+              </ul>
+              {deleteInfo.upcomingWeddings > 0 && (
+                <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
+                  De bruidsparen van je geplande bruiloften behouden hun draaiboek, afspraken en documenten; zij krijgen bericht dat je bent gestopt met DreamDay.
+                </p>
+              )}
+              <div className="flex gap-2 flex-wrap">
+                <button onClick={handleRequestDelete} disabled={deleteLoading} className="ddp-btn-secondary" style={{ color: "var(--danger)", borderColor: "var(--danger)", fontSize: "0.8125rem" }}>
+                  {deleteLoading ? "Versturen…" : "Bevestig: stuur verwijdermail"}
+                </button>
+                <button onClick={() => setDeleteInfo(null)} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem" }}>
+                  Annuleren
+                </button>
+              </div>
+            </div>
           ) : (
             <button
-              onClick={handleRequestDelete}
+              onClick={showDeleteConfirmation}
               disabled={deleteLoading}
               className="mt-3 text-xs font-semibold"
               style={{ color: "var(--danger)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}
             >
-              {deleteLoading ? "Versturen…" : "Profiel verwijderen"}
+              {deleteLoading ? "Laden…" : "Profiel verwijderen"}
             </button>
           )}
         </section>

@@ -5,6 +5,7 @@ import { User, Bell, LogOut, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SkeletonBlock } from "@/components/Skeleton";
 import VendorDashboardModulesSection from "@/components/VendorDashboardModulesSection";
+import CoupleDeleteSection from "@/components/CoupleDeleteSection";
 
 type UserInfo = { id: string; name: string; email: string; role: string; vendorType?: string | null };
 
@@ -205,6 +206,7 @@ export default function InstellingenPage() {
         <button onClick={handleLogout} className="flex items-center gap-2 text-sm" style={{ color: "var(--danger)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
           <LogOut className="w-4 h-4" /> Uitloggen
         </button>
+        {user?.role === "couple" && <CoupleDeleteSection />}
       </div>
     </div>
   );

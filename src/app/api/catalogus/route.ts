@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
   const where = {
+    archivedAt: null, // gearchiveerde (vertrokken) leveranciers niet tonen
     ...(category ? { category } : {}),
     ...(search
       ? {

@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let vendors: { id: string }[] = [];
   try {
-    vendors = await prisma.vendor.findMany({ select: { id: true } });
+    vendors = await prisma.vendor.findMany({ where: { archivedAt: null }, select: { id: true } });
   } catch {
     // DB unreachable at build time — return static URLs only
   }
