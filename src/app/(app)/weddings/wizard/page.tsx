@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -325,7 +326,7 @@ export default function WeddingWizardPage() {
         </div>
 
         <p className="text-center text-xs mt-4" style={{ color: "var(--muted)" }}>
-          <a href="/login" className="">← Terug naar inloggen</a>
+          <Link href="/login">← Terug naar inloggen</Link>
         </p>
       </div>
     </div>

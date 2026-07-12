@@ -40,10 +40,6 @@ export default function VendorAnalyticsPage() {
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <div className="dash-hero" style={{ borderRadius: 0, padding: "1.25rem 1.25rem 2rem" }}>
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-          <Link href="/dashboard" className="inline-flex items-center gap-2 mb-6"
-            style={{ color: "var(--ink-muted)", textDecoration: "none", fontSize: "0.875rem" }}>
-            ← Dashboard
-          </Link>
           <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>Analytisch overzicht</h1>
           <p style={{ fontSize: "0.9rem", color: "var(--ink-muted)", marginTop: "0.25rem" }}>Jouw prestaties als leverancier</p>
         </div>

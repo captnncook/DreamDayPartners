@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, useRef } from "react";
 import { Upload, FileText, X } from "lucide-react";
 
@@ -88,7 +89,7 @@ export default function FileVault({ documents: initial, weddingId, isPlanner, is
           </h3>
           <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Offertes, facturen en contracten voor deze bruiloft. Gebruik het Draaiboek voor de tijdlijn van de dag.</p>
         </div>
-        <a href={`/weddings/${weddingId}/files`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alles →</a>
+        <Link href={`/weddings/${weddingId}/files`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alles →</Link>
       </div>
 
       {canUpload && (
