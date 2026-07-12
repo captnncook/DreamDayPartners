@@ -21,7 +21,7 @@ export async function GET(
       ? { id, vendors: { some: { vendor: { userId: user.id }, portalAccess: true } } }
       : { id, teamMembers: { some: { userId: user.id } } };
 
-  const wedding = await prisma.wedding.findFirst({ where: accessWhere, select: { id: true, title: true, date: true, venue: true } });
+  const wedding = await prisma.wedding.findFirst({ where: accessWhere, select: { id: true, title: true, date: true, endDate: true, venue: true } });
   if (!wedding) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
   const draaiboek = await prisma.draaiboek.findFirst({
@@ -43,8 +43,10 @@ export async function GET(
     React.createElement(DraaiboekPdf, {
       weddingTitle: wedding.title,
       weddingDate: wedding.date.toISOString(),
+      weddingEndDate: wedding.endDate ? wedding.endDate.toISOString() : null,
       venue: wedding.venue ?? null,
       draaiboekTitle: draaiboek.title,
+      draaiboekDate: draaiboek.date ? draaiboek.date.toISOString() : null,
       version: draaiboek.version,
       logoDataUri,
       items: items.map((item) => ({

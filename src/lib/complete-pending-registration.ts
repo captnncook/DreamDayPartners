@@ -34,7 +34,7 @@ export async function completePendingRegistrationViaOAuth(
   await prisma.$executeRawUnsafe(`DELETE FROM "pending_registrations" WHERE "verifiedToken" = $1`, verifiedToken);
 
   if (pending.type === "couple") {
-    const { partner1, partner2, date, venue, budget } = data;
+    const { partner1, partner2, date, endDate, venue, budget } = data;
     const coupleName = partner1 && partner2 ? `${partner1} & ${partner2}` : partner1 || "Bruidspaar";
 
     const user = await prisma.user.create({
@@ -52,6 +52,7 @@ export async function completePendingRegistrationViaOAuth(
         weddingCode,
         title,
         date: weddingDate,
+        endDate: endDate ? new Date(endDate) : null,
         venue: venue || null,
         coupleEmail1: pending.email,
         coupleEmail2: email2,

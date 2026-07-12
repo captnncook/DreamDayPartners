@@ -53,10 +53,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
 
-  const { title, version } = await req.json();
+  const { title, version, date } = await req.json();
 
   const draaiboek = await prisma.draaiboek.create({
-    data: { weddingId: id, title, version: version ?? "1.0", status: "draft" },
+    data: { weddingId: id, title, version: version ?? "1.0", status: "draft", date: date ? new Date(date) : null },
   });
 
   return NextResponse.json({ draaiboek }, { status: 201 });

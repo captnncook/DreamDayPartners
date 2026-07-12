@@ -81,6 +81,7 @@ model Wedding {
   weddingCode  String   @unique
   title        String
   date         DateTime
+  endDate      DateTime?  // laatste dag bij een meerdaagse bruiloft (leeg = eendaags)
   venue        String?
   status       String   @default("planning")
   coupleEmail1 String
@@ -441,6 +442,7 @@ model Draaiboek {
   id        String   @id @default(uuid())
   weddingId String
   title     String
+  date      DateTime? // de dag waarvoor dit draaiboek geldt (meerdaagse bruiloft)
   version   String   @default("1.0")
   status    String   @default("draft")
   createdAt DateTime @default(now())

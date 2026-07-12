@@ -86,6 +86,7 @@ export default async function DashboardPage() {
     title: w.title,
     venue: w.venue,
     date: w.date.toISOString(),
+    endDate: w.endDate ? w.endDate.toISOString() : null,
     status: w.status,
     isPremium: w.isPremium,
     days: daysUntil(w.date),

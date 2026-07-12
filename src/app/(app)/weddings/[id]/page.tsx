@@ -6,6 +6,7 @@ import VendorDashboardInline from "@/components/VendorDashboardInline";
 import VendorNotesEditor from "@/components/VendorNotesEditor";
 import TabNav from "./TabNav";
 import { getServerLang } from "@/lib/server-lang";
+import { formatDateRange } from "@/lib/dateRange";
 
 const VENDOR_STATUS_LABELS: Record<string, string> = {
   lead: "Lead",
@@ -127,7 +128,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             )}
           </div>
           <div className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
-            {formatDate(wedding.date, lang)}{wedding.venue ? ` · ${wedding.venue}` : ""}
+            {formatDateRange(new Date(wedding.date), wedding.endDate ? new Date(wedding.endDate) : null, lang === "en" ? "en-GB" : "nl-NL")}{wedding.venue ? ` · ${wedding.venue}` : ""}
           </div>
         </div>
 

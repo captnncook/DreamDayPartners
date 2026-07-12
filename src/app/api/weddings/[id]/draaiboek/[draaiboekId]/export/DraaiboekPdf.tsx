@@ -151,6 +151,18 @@ function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
 }
 
+function formatHeaderDate(startIso: string, endIso: string | null): string {
+  if (!endIso) return formatDate(startIso);
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  if (start.getFullYear() === end.getFullYear() && start.getMonth() === end.getMonth()) {
+    const monthYear = new Intl.DateTimeFormat("nl-NL", { month: "long", year: "numeric" }).format(start);
+    return `${start.getDate()}–${end.getDate()} ${monthYear}`;
+  }
+  const short = new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(start);
+  return `${short} – ${formatDate(endIso)}`;
+}
+
 export type PdfItem = {
   startTime: string;
   duration: number;
@@ -164,16 +176,20 @@ export type PdfItem = {
 export function DraaiboekPdf({
   weddingTitle,
   weddingDate,
+  weddingEndDate,
   venue,
   draaiboekTitle,
+  draaiboekDate,
   version,
   items,
   logoDataUri,
 }: {
   weddingTitle: string;
   weddingDate: string;
+  weddingEndDate?: string | null;
   venue: string | null;
   draaiboekTitle: string;
+  draaiboekDate?: string | null;
   version: string;
   items: PdfItem[];
   logoDataUri: string;
@@ -188,13 +204,15 @@ export function DraaiboekPdf({
           </View>
           <Text style={styles.weddingTitle}>{weddingTitle}</Text>
           <Text style={styles.weddingMeta}>
-            {formatDate(weddingDate)}{venue ? `  ·  ${venue}` : ""}
+            {formatHeaderDate(weddingDate, weddingEndDate ?? null)}{venue ? `  ·  ${venue}` : ""}
           </Text>
         </View>
 
         <View style={styles.body}>
           <View style={styles.draaiboekTitleRow}>
-            <Text style={styles.draaiboekTitle}>{draaiboekTitle}</Text>
+            <Text style={styles.draaiboekTitle}>
+              {draaiboekTitle}{draaiboekDate ? ` · ${formatDate(draaiboekDate)}` : ""}
+            </Text>
             <Text style={styles.draaiboekVersion}>versie {version}</Text>
           </View>
 

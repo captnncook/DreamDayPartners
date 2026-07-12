@@ -18,10 +18,12 @@ export default function WeddingWizardPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [saving, setSaving] = useState(false);
+  const [multiDay, setMultiDay] = useState(false);
   const [form, setForm] = useState({
     partner1: "",
     partner2: "",
     date: "",
+    endDate: "",
     venue: "",
     guestCount: "",
     budget: "",
@@ -56,6 +58,7 @@ export default function WeddingWizardPage() {
       body: JSON.stringify({
         title,
         date: form.date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        endDate: multiDay && form.endDate ? form.endDate : null,
         venue: form.venue || null,
         budget: form.budget ? parseFloat(form.budget) : null,
         notes: form.notes || null,
@@ -169,6 +172,28 @@ export default function WeddingWizardPage() {
                   style={{ borderColor: "var(--border)" }}
                 />
               </div>
+              <label className="flex items-center gap-2.5 text-sm cursor-pointer" style={{ fontWeight: 500 }}>
+                <input
+                  type="checkbox"
+                  checked={multiDay}
+                  onChange={(e) => { setMultiDay(e.target.checked); if (!e.target.checked) set("endDate", ""); }}
+                  style={{ width: "1rem", height: "1rem", accentColor: "var(--gold)" }}
+                />
+                De bruiloft duurt meerdere dagen
+              </label>
+              {multiDay && (
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">Laatste dag</label>
+                  <input
+                    type="date"
+                    value={form.endDate}
+                    onChange={(e) => set("endDate", e.target.value)}
+                    min={form.date || new Date().toISOString().split("T")[0]}
+                    className="w-full border rounded-xl px-4 py-3 text-sm"
+                    style={{ borderColor: "var(--border)" }}
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium mb-1.5">Locatie / Trouwzaal</label>
                 <input

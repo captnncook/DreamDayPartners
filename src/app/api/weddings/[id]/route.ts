@@ -40,6 +40,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     data: {
       title: body.title,
       date: body.date ? new Date(body.date) : undefined,
+      ...(body.endDate !== undefined && { endDate: body.endDate ? new Date(body.endDate) : null }),
       venue: body.venue,
       status: body.status,
       notes: body.notes,

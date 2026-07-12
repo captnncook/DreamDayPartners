@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const body = await req.json();
-  const { title, date, venue, coupleEmail1, coupleEmail2, notes } = body;
+  const { title, date, endDate, venue, coupleEmail1, coupleEmail2, notes } = body;
 
   if (!title || !date || !coupleEmail1 || !coupleEmail2) {
     return NextResponse.json({ error: "Verplichte velden ontbreken" }, { status: 400 });
@@ -106,7 +106,8 @@ export async function POST(req: NextRequest) {
     if (coupleUser?.role === "couple") ownerId = coupleUser.id;
 
     wedding = await prisma.wedding.create({
-      data: { weddingCode, title, date: new Date(date), venue, coupleEmail1: e1, coupleEmail2: e2, ownerId, notes },
+      data: { weddingCode, title, date: new Date(date),
+      endDate: endDate ? new Date(endDate) : null, venue, coupleEmail1: e1, coupleEmail2: e2, ownerId, notes },
     });
 
     await prisma.weddingTeamMember.create({

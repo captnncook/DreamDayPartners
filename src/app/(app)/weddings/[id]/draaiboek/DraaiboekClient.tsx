@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ClipboardList, Plus, Printer } from "lucide-react";
 import DraaiboekGrid, { type GridItem, type WeddingVendorRef } from "./DraaiboekGrid";
+import { eachDay, sameDay } from "@/lib/dateRange";
 
 type DraaiboekItem = GridItem;
 
 type Draaiboek = {
   id: string;
   title: string;
+  date?: string | null; // de dag waarvoor dit draaiboek geldt (meerdaags)
   version: string;
   status: string;
   items: DraaiboekItem[];
@@ -22,6 +25,7 @@ interface Props {
   weddingId: string;
   weddingTitle: string;
   weddingDate: string;
+  weddingEndDate?: string | null;
   draaiboeken: Draaiboek[];
   teamMembers: TeamMember[];
   vendors: WeddingVendor[];
@@ -37,15 +41,53 @@ const INPUT_STYLE: React.CSSProperties = {
 };
 
 export default function DraaiboekClient({
-  weddingId, weddingTitle, draaiboeken: initial, vendors, currentUser, ownVendorId,
+  weddingId, weddingTitle, weddingDate, weddingEndDate, draaiboeken: initial, vendors, currentUser, ownVendorId,
 }: Props) {
+  // Meerdaagse bruiloft: één tab per dag; elk draaiboek hoort bij één dag.
+  // Draaiboeken zonder datum (van vóór deze feature) horen bij dag 1.
+  const days = useMemo(() => eachDay(new Date(weddingDate), new Date(weddingEndDate ?? weddingDate)), [weddingDate, weddingEndDate]);
+  const isMultiDay = days.length > 1;
+  const dayIndexOf = useCallback((d: Draaiboek) => {
+    if (!d.date) return 0;
+    const date = new Date(d.date);
+    const idx = days.findIndex(day => sameDay(day, date));
+    return idx === -1 ? 0 : idx;
+  }, [days]);
+
   const [draaiboeken, setDraaiboeken] = useState<Draaiboek[]>(initial);
-  const [activeDraaiboekId, setActiveDraaiboekId] = useState<string | null>(initial[0]?.id ?? null);
+  const [activeDayIndex, setActiveDayIndex] = useState(0);
+  const [activeDraaiboekId, setActiveDraaiboekId] = useState<string | null>(() => {
+    if (days.length <= 1) return initial[0]?.id ?? null;
+    const firstOfDay1 = initial.find(d => !d.date || sameDay(days[0], new Date(d.date)));
+    return firstOfDay1?.id ?? null;
+  });
   const [showNewDraaiboek, setShowNewDraaiboek] = useState(false);
   const [newDraaiboekTitle, setNewDraaiboekTitle] = useState("");
   const [saving, setSaving] = useState(false);
 
   const [exporting, setExporting] = useState(false);
+  const router = useRouter();
+  const [showDateEditor, setShowDateEditor] = useState(false);
+  const [endDateDraft, setEndDateDraft] = useState(weddingEndDate ? weddingEndDate.split("T")[0] : "");
+  const [savingEndDate, setSavingEndDate] = useState(false);
+
+  // Einddatum instellen/aanpassen (meerdaagse bruiloft) — kan ook later nog.
+  async function saveEndDate(clear = false) {
+    setSavingEndDate(true);
+    try {
+      const res = await fetch(`/api/weddings/${weddingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endDate: clear ? null : endDateDraft || null }),
+      });
+      if (res.ok) {
+        setShowDateEditor(false);
+        router.refresh();
+      }
+    } finally {
+      setSavingEndDate(false);
+    }
+  }
   const activeDraaiboek = draaiboeken.find(d => d.id === activeDraaiboekId);
   const isPlanner = ["admin", "planner", "team_member", "couple"].includes(currentUser.role);
   const isVendor = currentUser.role === "vendor";
@@ -104,7 +146,7 @@ export default function DraaiboekClient({
     setSaving(true);
     const res = await fetch(`/api/weddings/${weddingId}/draaiboek`, {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newDraaiboekTitle }),
+      body: JSON.stringify({ title: newDraaiboekTitle, date: isMultiDay ? days[activeDayIndex].toISOString() : null }),
     });
     const data = await res.json();
     if (data.draaiboek) {
@@ -174,6 +216,20 @@ export default function DraaiboekClient({
     }
   }
 
+  const visibleDraaiboeken = isMultiDay
+    ? draaiboeken.filter(d => dayIndexOf(d) === activeDayIndex)
+    : draaiboeken;
+
+  function switchDay(idx: number) {
+    setActiveDayIndex(idx);
+    const first = draaiboeken.find(d => dayIndexOf(d) === idx);
+    setActiveDraaiboekId(first?.id ?? null);
+    setShowNewDraaiboek(false);
+  }
+
+  const dayLabel = (d: Date) =>
+    new Intl.DateTimeFormat("nl-NL", { weekday: "short", day: "numeric", month: "short" }).format(d);
+
   return (
     <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       {/* Header */}
@@ -199,6 +255,63 @@ export default function DraaiboekClient({
         </div>
       </div>
 
+      {/* Einddatum instellen/aanpassen — alleen voor het team van de bruiloft */}
+      {isPlanner && (
+        <div className="mb-4">
+          {showDateEditor ? (
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                type="date"
+                value={endDateDraft}
+                min={weddingDate.split("T")[0]}
+                onChange={e => setEndDateDraft(e.target.value)}
+                style={{ ...INPUT_STYLE, width: "auto" }}
+              />
+              <button onClick={() => saveEndDate(false)} disabled={savingEndDate || !endDateDraft} className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem" }}>
+                {savingEndDate ? "Opslaan…" : "Opslaan"}
+              </button>
+              {isMultiDay && (
+                <button onClick={() => saveEndDate(true)} disabled={savingEndDate} className="text-xs" style={{ color: "var(--muted)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+                  Terug naar eendaags
+                </button>
+              )}
+              <button onClick={() => setShowDateEditor(false)} className="text-xs" style={{ color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>
+                Annuleren
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setShowDateEditor(true)} className="text-xs" style={{ color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              {isMultiDay ? "Einddatum aanpassen" : "Meerdaagse bruiloft? Einddatum toevoegen"}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Dag-tabs (meerdaagse bruiloft) */}
+      {isMultiDay && (
+        <div className="flex gap-2 mb-5 overflow-x-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+          {days.map((day, idx) => {
+            const active = idx === activeDayIndex;
+            return (
+              <button
+                key={idx}
+                onClick={() => switchDay(idx)}
+                className="flex-shrink-0 px-4 py-2 rounded-full font-medium whitespace-nowrap"
+                style={{
+                  fontSize: "0.8125rem",
+                  background: active ? "var(--ink)" : "rgba(0,0,0,0.05)",
+                  color: active ? "white" : "var(--muted)",
+                  border: "none", cursor: "pointer",
+                  transition: "background 180ms var(--ease-out), color 180ms var(--ease-out)",
+                }}
+              >
+                Dag {idx + 1} · {dayLabel(day)}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* New draaiboek form */}
       {showNewDraaiboek && isPlanner && (
         <form onSubmit={createDraaiboek} className="ddp-card mb-5 flex gap-3">
@@ -208,11 +321,17 @@ export default function DraaiboekClient({
         </form>
       )}
 
-      {draaiboeken.length === 0 ? (
+      {visibleDraaiboeken.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
           <ClipboardList className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--color-rose)" }} />
-          <h2 style={{ fontWeight: 700, fontSize: "1.0625rem", marginBottom: "0.5rem" }}>Nog geen draaiboek</h2>
-          <p className="text-sm mb-4">Maak een draaiboek aan om de tijdlijn van de trouwdag te plannen</p>
+          <h2 style={{ fontWeight: 700, fontSize: "1.0625rem", marginBottom: "0.5rem" }}>
+            {isMultiDay ? `Nog geen draaiboek voor dag ${activeDayIndex + 1}` : "Nog geen draaiboek"}
+          </h2>
+          <p className="text-sm mb-4">
+            {isMultiDay
+              ? `Maak een draaiboek aan voor ${dayLabel(days[activeDayIndex])}`
+              : "Maak een draaiboek aan om de tijdlijn van de trouwdag te plannen"}
+          </p>
           {isPlanner && (
             <button onClick={() => setShowNewDraaiboek(true)} className="ddp-btn-primary">Draaiboek aanmaken</button>
           )}
@@ -223,7 +342,7 @@ export default function DraaiboekClient({
           <div style={{ width: "100%", maxWidth: "200px", flexShrink: 0 }}>
             <p style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted-light)", marginBottom: "0.75rem" }}>Versies</p>
             <div className="flex flex-col gap-1.5">
-              {draaiboeken.map(d => (
+              {visibleDraaiboeken.map(d => (
                 <button
                   key={d.id}
                   onClick={() => setActiveDraaiboekId(d.id)}

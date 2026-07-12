@@ -54,8 +54,9 @@ function AanmeldenForm() {
   const [saving, setSaving] = useState(false);
 
   const [couple, setCouple] = useState({
-    partner1: "", partner2: "", date: "", venue: "", guestCount: "", budget: "", email: "",
+    partner1: "", partner2: "", date: "", endDate: "", venue: "", guestCount: "", budget: "", email: "",
   });
+  const [multiDay, setMultiDay] = useState(false);
   const [vendor, setVendor] = useState({
     businessName: "", category: "", contactPerson: "", phone: "", website: "", city: "", email: "",
   });
@@ -287,6 +288,20 @@ function AanmeldenForm() {
                 <Field label="Trouwdatum">
                   <input type="date" value={couple.date} onChange={e => setCouple({ ...couple, date: e.target.value })} min={new Date().toISOString().split("T")[0]} className="ddp-input" />
                 </Field>
+                <label className="flex items-center gap-2.5 text-sm cursor-pointer" style={{ fontWeight: 500 }}>
+                  <input
+                    type="checkbox"
+                    checked={multiDay}
+                    onChange={e => { setMultiDay(e.target.checked); if (!e.target.checked) setCouple(c => ({ ...c, endDate: "" })); }}
+                    style={{ width: "1rem", height: "1rem", accentColor: "var(--gold)" }}
+                  />
+                  Onze bruiloft duurt meerdere dagen
+                </label>
+                {multiDay && (
+                  <Field label="Laatste dag">
+                    <input type="date" value={couple.endDate} onChange={e => setCouple({ ...couple, endDate: e.target.value })} min={couple.date || new Date().toISOString().split("T")[0]} className="ddp-input" />
+                  </Field>
+                )}
                 <Field label="Locatie / Trouwzaal">
                   <input value={couple.venue} onChange={e => setCouple({ ...couple, venue: e.target.value })} placeholder="bijv. Kasteel de Haar, Utrecht" className="ddp-input" />
                 </Field>

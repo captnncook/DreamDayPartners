@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Trash2, ChevronRight, Check, X } from "lucide-react";
 import ClaimRequests from "@/components/admin/ClaimRequests";
+import { formatDateRange } from "@/lib/dateRange";
 
 const PRIORITY_META: Record<string, { label: string; color: string; weight: number }> = {
   high:   { label: "Urgent", color: "var(--gold-deep)",   weight: 700 },
@@ -19,7 +20,7 @@ function formatDateShort(iso: string) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(new Date(iso));
 }
 
-type Wedding = { id: string; title: string; venue?: string | null; date: string; status: string; isPremium: boolean; days: number };
+type Wedding = { id: string; title: string; venue?: string | null; date: string; endDate?: string | null; status: string; isPremium: boolean; days: number };
 type Task = { id: string; title: string; priority: string; dueDate?: string; weddingId: string; weddingTitle: string };
 type Stats = { total: number; upcoming30: number; thisYear: number };
 type VendorRequest = { id: string; weddingTitle: string; weddingVenue?: string | null; weddingDate: string };
@@ -281,7 +282,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--color-blush)" }}>
               <div className="flex justify-between text-sm mb-2">
                 <span style={{ color: "var(--muted)" }}>Datum</span>
-                <span className="font-medium">{formatDate(weddings[0].date)}</span>
+                <span className="font-medium">{formatDateRange(new Date(weddings[0].date), weddings[0].endDate ? new Date(weddings[0].endDate) : null)}</span>
               </div>
               {weddings[0].venue && (
                 <div className="flex justify-between text-sm">
@@ -529,7 +530,7 @@ function NextWeddingHero({ wedding }: { wedding: Wedding }) {
             {wedding.title}
           </div>
           <div style={{ fontSize: "0.8125rem", color: "var(--ink-muted)", marginTop: "0.3rem" }}>
-            {wedding.venue ? `${wedding.venue} · ` : ""}{formatDate(wedding.date)}
+            {wedding.venue ? `${wedding.venue} · ` : ""}{formatDateRange(new Date(wedding.date), wedding.endDate ? new Date(wedding.endDate) : null)}
           </div>
         </div>
 
