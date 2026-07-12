@@ -1011,3 +1011,16 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
   }
 }
+
+/* Draaiboek-item modal: bottom sheet op mobiel, gecentreerde dialoog vanaf tablet */
+@media (min-width: 640px) {
+  .ddp-modal-overlay {
+    align-items: center !important;
+    padding: 1.5rem !important;
+  }
+  .ddp-modal-panel {
+    border-radius: 20px !important;
+    max-height: 85vh !important;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.3) !important;
+  }
+}

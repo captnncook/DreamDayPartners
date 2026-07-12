@@ -71,6 +71,46 @@ const INP: React.CSSProperties = {
 
 type FormData = { startTime: string; endTime: string; title: string; location: string; vendorId: string; notes: string };
 
+function Modal({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = prevOverflow; };
+  }, [onClose]);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 100,
+        background: "rgba(28,43,36,0.45)",
+        display: "flex", alignItems: "flex-end", justifyContent: "center",
+        padding: 0,
+      }}
+      className="ddp-modal-overlay"
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="ddp-modal-panel"
+        style={{
+          background: "var(--background)",
+          width: "100%",
+          maxWidth: "480px",
+          maxHeight: "88vh",
+          overflowY: "auto",
+          borderRadius: "20px 20px 0 0",
+          boxShadow: "0 -8px 40px rgba(0,0,0,0.25)",
+          padding: "1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom))",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function ItemForm({ init, vendors, onSave, onCancel, saving }: {
   init: FormData;
   vendors: WeddingVendorRef[];
@@ -82,10 +122,15 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
   const set = (k: keyof FormData, v: string) => setF(p => ({ ...p, [k]: v }));
 
   return (
-    <div className="ddp-card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
-      <h3 style={{ fontSize: "0.9375rem", fontWeight: 700, marginBottom: "1rem" }}>
-        {init.title ? "Item bewerken" : "Item toevoegen"}
-      </h3>
+    <Modal onClose={onCancel}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+        <h3 style={{ fontSize: "1rem", fontWeight: 700 }}>
+          {init.title ? "Item bewerken" : "Item toevoegen"}
+        </h3>
+        <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted-light)", padding: "4px", display: "flex" }}>
+          <X className="w-5 h-5" />
+        </button>
+      </div>
       <div style={{ display: "grid", gap: "0.75rem" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
           <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
@@ -130,7 +175,7 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
           <button onClick={onCancel} className="ddp-btn-secondary">Annuleren</button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 
