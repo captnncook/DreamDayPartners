@@ -198,6 +198,7 @@ function VendorEditPage() {
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [isUserPremium, setIsUserPremium] = useState(false);
   const [billingLoading, setBillingLoading] = useState(false);
+  const [billingInterval, setBillingInterval] = useState<"month" | "year">("year");
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverKey, setCoverKey] = useState<string | null>(null);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
@@ -462,9 +463,13 @@ function VendorEditPage() {
     }
   }
 
-  async function handleUpgrade() {
+  async function handleUpgrade(interval: "month" | "year") {
     setBillingLoading(true);
-    const res = await fetch("/api/billing/checkout", { method: "POST" });
+    const res = await fetch("/api/billing/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ interval }),
+    });
     const data = await res.json();
     if (data.url) window.location.href = data.url;
     else { setError(data.error ?? "Kan niet verbinden met betaalservice"); setBillingLoading(false); }
@@ -1028,17 +1033,43 @@ function VendorEditPage() {
                 {billingLoading ? "Laden…" : "Abonnement beheren"}
               </button>
             ) : (
-              <div style={{ flexShrink: 0 }}>
+              <div style={{ flexShrink: 0, minWidth: "220px" }}>
+                <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.625rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => setBillingInterval("month")}
+                    style={{
+                      flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
+                      fontSize: "0.75rem", fontWeight: billingInterval === "month" ? 700 : 500,
+                      background: billingInterval === "month" ? "var(--ink)" : "transparent",
+                      color: billingInterval === "month" ? "white" : "var(--muted)",
+                    }}
+                  >
+                    Maandelijks
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBillingInterval("year")}
+                    style={{
+                      flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
+                      fontSize: "0.75rem", fontWeight: billingInterval === "year" ? 700 : 500,
+                      background: billingInterval === "year" ? "var(--ink)" : "transparent",
+                      color: billingInterval === "year" ? "var(--gold)" : "var(--muted)",
+                    }}
+                  >
+                    Jaarlijks · 10% korting
+                  </button>
+                </div>
                 <button
-                  onClick={handleUpgrade}
+                  onClick={() => handleUpgrade(billingInterval)}
                   disabled={billingLoading}
                   className="ddp-btn-gold"
-                  style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
+                  style={{ width: "100%", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
                 >
-                  {billingLoading ? "Laden…" : "Upgrade: €29/maand"}
+                  {billingLoading ? "Laden…" : billingInterval === "year" ? "Upgrade: €313/jaar" : "Upgrade: €29/maand"}
                 </button>
                 <p style={{ fontSize: "0.6875rem", color: "var(--ink-muted)", marginTop: "0.375rem", textAlign: "center" }}>
-                  Maandelijks opzegbaar · nog geen €1 per dag
+                  {billingInterval === "year" ? "Eenmalig per jaar · bespaart €35 t.o.v. maandelijks" : "Maandelijks opzegbaar · nog geen €1 per dag"}
                 </p>
               </div>
             )}
