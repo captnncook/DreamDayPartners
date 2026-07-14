@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Globe, Phone, Mail, ArrowLeft, Check, ChevronDown, Pencil, User } from "lucide-react";
+import { getVendorProfileSection } from "@/lib/vendorProfileSections";
 
 const CATEGORY_LABELS: Record<string, string> = {
   weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
@@ -38,6 +39,7 @@ type Vendor = {
   accessibility?: string[]; venueFacilities?: string[]; cateringOptions?: string[];
   barOptions?: string[]; environment?: string[];
   venueRooms?: VenueRoom[];
+  profileDetails?: Record<string, unknown>;
 };
 
 function GuestRange({ label, min, max }: { label: string; min?: number | null; max?: number | null }) {
@@ -432,6 +434,34 @@ export default function VendorProfilePage() {
                 </div>
               </section>
             )}
+
+            {/* Categorie-specifiek profiel (alle categorieën behalve trouwlocatie, die heeft de secties hierboven) */}
+            {vendor.category !== "trouwlocatie" && vendor.profileDetails && Object.keys(vendor.profileDetails).length > 0 && (() => {
+              const section = getVendorProfileSection(vendor.category);
+              const entries = section.fields
+                .map((field) => ({ field, value: vendor.profileDetails?.[field.key] }))
+                .filter(({ value }) => value !== undefined && value !== null && value !== "" && !(Array.isArray(value) && value.length === 0));
+              if (entries.length === 0) return null;
+              return (
+                <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                  <h2 className="dash-section-title mb-3">{section.title}</h2>
+                  <div className="flex flex-col gap-3">
+                    {entries.map(({ field, value }) => (
+                      <div key={field.key}>
+                        <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>{field.label}</span>
+                        {field.type === "boolean" ? (
+                          <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--gold-deep)" }}>Ja</span>
+                        ) : (
+                          <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)" }}>
+                            {Array.isArray(value) ? value.join(" · ") : String(value)}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })()}
 
             {/* Contact */}
             <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>

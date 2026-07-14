@@ -48,6 +48,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       environment: true,
       venueRooms: { orderBy: { order: "asc" } },
       archivedAt: true,
+      profileDetails: true,
     },
   });
 
@@ -83,6 +84,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     dinnerMinGuests, dinnerMaxGuests, partyMinGuests, partyMaxGuests, hotelRooms,
     closingTime, soundLimit, isOfficialCeremonyLocation, outdoorCeremonyPossible,
     accessibility, venueFacilities, cateringOptions, barOptions, environment,
+    profileDetails,
   } = body;
 
   const toIntOrNull = (v: unknown) => (v === undefined ? undefined : v === null || v === "" ? null : Number(v));
@@ -135,6 +137,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(cateringOptions !== undefined ? { cateringOptions } : {}),
       ...(barOptions !== undefined ? { barOptions } : {}),
       ...(environment !== undefined ? { environment } : {}),
+      ...(profileDetails !== undefined ? { profileDetails } : {}),
       ...geoData,
     },
   });

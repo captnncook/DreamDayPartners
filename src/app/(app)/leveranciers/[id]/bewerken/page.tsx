@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Upload, Trash2, Save, Check, Star } from "lucide-react";
+import { getVendorProfileSection, type ProfileField } from "@/lib/vendorProfileSections";
 
 const CATEGORIES = [
   { value: "weddingplanner", label: "Weddingplanner" },
@@ -50,6 +51,7 @@ type Vendor = {
   accessibility?: string[]; venueFacilities?: string[]; cateringOptions?: string[];
   barOptions?: string[]; environment?: string[];
   venueRooms?: VenueRoom[];
+  profileDetails?: Record<string, unknown>;
 };
 
 const ACCESSIBILITY_OPTIONS = ["Rolstoeltoegankelijk", "Gratis parkeerplaatsen", "Invalidentoilet", "Oplaadpunt elektrische auto's", "Valetparking", "Shuttleservice/P&R"];
@@ -82,6 +84,62 @@ function CheckboxGroup({ options, selected, onChange }: { options: string[]; sel
           </button>
         );
       })}
+    </div>
+  );
+}
+
+function ProfileDetailField({ field, value, onChange }: {
+  field: ProfileField;
+  value: unknown;
+  onChange: (v: unknown) => void;
+}) {
+  if (field.type === "boolean") {
+    return (
+      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+        <input type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} style={{ width: 16, height: 16, accentColor: "var(--gold-deep)" }} />
+        <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>{field.label}</span>
+      </label>
+    );
+  }
+  if (field.type === "multiselect") {
+    return (
+      <div>
+        <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{field.label}</label>
+        <CheckboxGroup options={field.options ?? []} selected={Array.isArray(value) ? (value as string[]) : []} onChange={onChange} />
+      </div>
+    );
+  }
+  if (field.type === "select") {
+    return (
+      <div>
+        <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{field.label}</label>
+        <select value={typeof value === "string" ? value : ""} onChange={(e) => onChange(e.target.value)} className="ddp-select">
+          <option value="">— kies —</option>
+          {(field.options ?? []).map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+      </div>
+    );
+  }
+  return (
+    <div>
+      <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{field.label}</label>
+      {field.type === "longtext" ? (
+        <textarea
+          value={typeof value === "string" ? value : ""}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={field.placeholder}
+          className="ddp-input"
+          rows={3}
+        />
+      ) : (
+        <input
+          type={field.type === "number" ? "number" : "text"}
+          value={typeof value === "string" || typeof value === "number" ? value : ""}
+          onChange={(e) => onChange(field.type === "number" ? e.target.value : e.target.value)}
+          placeholder={field.placeholder}
+          className="ddp-input"
+        />
+      )}
     </div>
   );
 }
@@ -234,6 +292,7 @@ function VendorEditPage() {
   const [barOptions, setBarOptions] = useState<string[]>([]);
   const [environment, setEnvironment] = useState<string[]>([]);
   const [venueRooms, setVenueRooms] = useState<VenueRoom[]>([]);
+  const [profileDetails, setProfileDetails] = useState<Record<string, unknown>>({});
 
   const load = useCallback(async () => {
     const [vRes, meRes] = await Promise.all([
@@ -284,6 +343,7 @@ function VendorEditPage() {
     setBarOptions(v.barOptions ?? []);
     setEnvironment(v.environment ?? []);
     setVenueRooms(v.venueRooms ?? []);
+    setProfileDetails(v.profileDetails ?? {});
 
     const photosRes = await fetch(`/api/catalogus/${id}/signed-photos`);
     const pData = await photosRes.json();
@@ -318,6 +378,7 @@ function VendorEditPage() {
         ...form, specializations,
         isOfficialCeremonyLocation, outdoorCeremonyPossible,
         accessibility, venueFacilities, cateringOptions, barOptions, environment,
+        profileDetails,
       }),
     });
     if (!res.ok) {
@@ -818,6 +879,31 @@ function VendorEditPage() {
             />
           </div>
         </section>
+
+        {/* Categorie-specifiek profiel — elke leverancierssoort heeft hier eigen, relevante velden */}
+        {(() => {
+          const section = getVendorProfileSection(vendor.category);
+          if (section.fields.length === 0) return null;
+          return (
+            <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
+              <h2 className="dash-section-title mb-1">{section.title}</h2>
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+                Deze gegevens helpen bruidsparen om snel te zien of jullie bij elkaar passen.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {section.fields.map((field) => (
+                  <div key={field.key} className={field.type === "longtext" || field.type === "multiselect" ? "col-span-2" : ""}>
+                    <ProfileDetailField
+                      field={field}
+                      value={profileDetails[field.key]}
+                      onChange={(v) => setProfileDetails((prev) => ({ ...prev, [field.key]: v }))}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
 
         {vendor.category === "trouwlocatie" && (
           <>

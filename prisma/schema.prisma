@@ -182,6 +182,12 @@ model Vendor {
   barOptions       String[]
   environment      String[]
 
+  // Categorie-specifiek profiel (DJ, fotograaf, catering, etc.) — vrije
+  // key/value-data volgens de velden in src/lib/vendorProfileSections.ts,
+  // zodat elke leverancierssoort een eigen profielsectie heeft zonder dat
+  // elke categorie losse kolommen nodig heeft.
+  profileDetails   Json?
+
   weddingVendors   WeddingVendor[]
   draaiboekItems   DraaiboekItem[]
   budgetItems      BudgetItem[]
