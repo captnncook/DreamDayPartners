@@ -257,6 +257,8 @@ function VendorEditPage() {
   const [isUserPremium, setIsUserPremium] = useState(false);
   const [billingLoading, setBillingLoading] = useState(false);
   const [billingInterval, setBillingInterval] = useState<"month" | "year">("year");
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
+  const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverKey, setCoverKey] = useState<string | null>(null);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
@@ -311,6 +313,8 @@ function VendorEditPage() {
     const v = vData.vendor;
     setVendor(v);
     setIsUserPremium(meData.user?.isPremium ?? false);
+    setCancelAtPeriodEnd(meData.user?.stripeCancelAtPeriodEnd ?? false);
+    setCurrentPeriodEnd(meData.user?.stripeCurrentPeriodEnd ?? null);
     setForm({
       description: v.description ?? "",
       city: v.city ?? "",
@@ -526,22 +530,67 @@ function VendorEditPage() {
 
   async function handleUpgrade(interval: "month" | "year") {
     setBillingLoading(true);
-    const res = await fetch("/api/billing/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ interval }),
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    else { setError(data.error ?? "Kan niet verbinden met betaalservice"); setBillingLoading(false); }
+    try {
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.url) { window.location.href = data.url; return; }
+      setError(data.error ?? "Kan niet verbinden met betaalservice");
+    } catch {
+      setError("Kan niet verbinden met betaalservice");
+    }
+    setBillingLoading(false);
   }
 
   async function handlePortal() {
     setBillingLoading(true);
-    const res = await fetch("/api/billing/portal", { method: "POST" });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    else { setError(data.error ?? "Kan niet verbinden met betaalservice"); setBillingLoading(false); }
+    try {
+      const res = await fetch("/api/billing/portal", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (data.url) { window.location.href = data.url; return; }
+      setError(data.error ?? "Kan niet verbinden met betaalservice");
+    } catch {
+      setError("Kan niet verbinden met betaalservice");
+    }
+    setBillingLoading(false);
+  }
+
+  async function handleCancelSubscription() {
+    if (!confirm("Abonnement opzeggen? Je blijft Premium tot het einde van de huidige betaalperiode.")) return;
+    setBillingLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/billing/cancel", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setCancelAtPeriodEnd(true);
+        if (data.currentPeriodEnd) setCurrentPeriodEnd(data.currentPeriodEnd);
+      } else {
+        setError(data.error ?? "Opzeggen mislukt");
+      }
+    } catch {
+      setError("Opzeggen mislukt");
+    } finally {
+      setBillingLoading(false);
+    }
+  }
+
+  async function handleResumeSubscription() {
+    setBillingLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/billing/resume", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) setCancelAtPeriodEnd(false);
+      else setError(data.error ?? "Heractiveren mislukt");
+    } catch {
+      setError("Heractiveren mislukt");
+    } finally {
+      setBillingLoading(false);
+    }
   }
 
   async function showDeleteConfirmation() {
@@ -1080,12 +1129,14 @@ function VendorEditPage() {
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
                 <Star className="w-4 h-4" style={{ color: "var(--gold)", flexShrink: 0 }} />
                 <span className="font-serif" style={{ fontWeight: 700, fontSize: "1.0625rem", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
-                  {isUserPremium ? "Premium actief" : "Upgrade naar Premium"}
+                  {isUserPremium ? (cancelAtPeriodEnd ? "Premium opgezegd" : "Premium actief") : "Upgrade naar Premium"}
                 </span>
               </div>
               {isUserPremium ? (
                 <p style={{ fontSize: "0.8125rem", color: "var(--muted)", maxWidth: "360px" }}>
-                  Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen.
+                  {cancelAtPeriodEnd
+                    ? `Je blijft Premium tot ${currentPeriodEnd ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(currentPeriodEnd)) : "het einde van je huidige periode"}. Daarna wordt je profiel niet meer verlengd.`
+                    : "Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen."}
                 </p>
               ) : (
                 <>
@@ -1111,13 +1162,32 @@ function VendorEditPage() {
               )}
             </div>
             {isUserPremium ? (
-              <button
-                onClick={handlePortal}
-                disabled={billingLoading}
-                className="ddp-btn-secondary"
-              >
-                {billingLoading ? "Laden…" : "Abonnement beheren"}
-              </button>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", alignItems: "flex-end" }}>
+                <button
+                  onClick={handlePortal}
+                  disabled={billingLoading}
+                  className="ddp-btn-secondary"
+                >
+                  {billingLoading ? "Laden…" : "Betaalgegevens beheren"}
+                </button>
+                {cancelAtPeriodEnd ? (
+                  <button
+                    onClick={handleResumeSubscription}
+                    disabled={billingLoading}
+                    style={{ fontSize: "0.75rem", color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                  >
+                    Opzegging ongedaan maken
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleCancelSubscription}
+                    disabled={billingLoading}
+                    style={{ fontSize: "0.75rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                  >
+                    Abonnement opzeggen
+                  </button>
+                )}
+              </div>
             ) : (
               <div style={{ flexShrink: 0, minWidth: "220px" }}>
                 <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.625rem" }}>

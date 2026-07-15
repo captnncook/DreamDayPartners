@@ -22,6 +22,8 @@ model User {
   isPremium            Boolean  @default(false)
   stripeCustomerId     String?
   stripeSubscriptionId String?
+  stripeCancelAtPeriodEnd Boolean  @default(false)
+  stripeCurrentPeriodEnd  DateTime?
   loginCount           Int      @default(0)
   lastLoginAt          DateTime?
   createdAt  DateTime @default(now())

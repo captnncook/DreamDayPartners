@@ -5,6 +5,11 @@ import Stripe from "stripe";
 
 export const config = { api: { bodyParser: false } };
 
+function periodEndOf(sub: Stripe.Subscription): Date | null {
+  const ts = sub.items.data[0]?.current_period_end;
+  return ts ? new Date(ts * 1000) : null;
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -24,11 +29,14 @@ export async function POST(req: NextRequest) {
       if (session.mode !== "subscription") break;
       const userId = session.metadata?.userId;
       if (!userId) break;
+      const sub = await getStripe().subscriptions.retrieve(session.subscription as string);
       await prisma.user.update({
         where: { id: userId },
         data: {
           isPremium: true,
-          stripeSubscriptionId: session.subscription as string,
+          stripeSubscriptionId: sub.id,
+          stripeCancelAtPeriodEnd: sub.cancel_at_period_end,
+          stripeCurrentPeriodEnd: periodEndOf(sub),
         },
       });
       // Also mark the vendor profile as premium
@@ -36,24 +44,34 @@ export async function POST(req: NextRequest) {
       break;
     }
 
+    case "customer.subscription.updated": {
+      // Dekt o.a. opzeggen (cancel_at_period_end) en heractiveren vóór het einde van de periode.
+      const sub = event.data.object as Stripe.Subscription;
+      const userId = sub.metadata?.userId;
+      const where = userId ? { id: userId } : { stripeSubscriptionId: sub.id };
+      await prisma.user.updateMany({
+        where,
+        data: {
+          stripeCancelAtPeriodEnd: sub.cancel_at_period_end,
+          stripeCurrentPeriodEnd: periodEndOf(sub),
+        },
+      });
+      break;
+    }
+
     case "customer.subscription.deleted":
     case "customer.subscription.paused": {
       const sub = event.data.object as Stripe.Subscription;
       const userId = sub.metadata?.userId;
-      if (!userId) {
-        // Fallback: find by stripeSubscriptionId
-        await prisma.user.updateMany({
-          where: { stripeSubscriptionId: sub.id },
-          data: { isPremium: false, stripeSubscriptionId: null },
-        });
-        await prisma.vendor.updateMany({
-          where: { userId: { in: (await prisma.user.findMany({ where: { stripeSubscriptionId: sub.id }, select: { id: true } })).map(u => u.id) } },
-          data: { isPremium: false },
-        });
-        break;
-      }
-      await prisma.user.update({ where: { id: userId }, data: { isPremium: false, stripeSubscriptionId: null } });
-      await prisma.vendor.updateMany({ where: { userId }, data: { isPremium: false } });
+      const affectedIds = userId
+        ? [userId]
+        : (await prisma.user.findMany({ where: { stripeSubscriptionId: sub.id }, select: { id: true } })).map((u) => u.id);
+      if (affectedIds.length === 0) break;
+      await prisma.user.updateMany({
+        where: { id: { in: affectedIds } },
+        data: { isPremium: false, stripeSubscriptionId: null, stripeCancelAtPeriodEnd: false, stripeCurrentPeriodEnd: null },
+      });
+      await prisma.vendor.updateMany({ where: { userId: { in: affectedIds } }, data: { isPremium: false } });
       break;
     }
 
