@@ -50,3 +50,16 @@ next-env.d.ts
 
 # Claude local preview config
 /.claude/
+
+# Capacitor native projects — bouwartefacten, geen broncode
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/capacitor-cordova-android-plugins/build/
+ios/App/Pods/
+ios/App/build/
+ios/App/App/public/
+ios/App/App/capacitor.config.json
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
