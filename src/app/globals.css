@@ -1024,3 +1024,17 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 24px 64px rgba(0,0,0,0.3) !important;
   }
 }
+
+/* Berichten (/dm): op mobiel toont het gesprekkenlijstje óf het open
+   gesprek, nooit beide naast elkaar (dat perst het gesprek anders in
+   een paar tientallen pixels breedte). Vanaf tablet altijd beide. */
+.ddp-dm-back-btn { display: none; }
+@media (max-width: 767px) {
+  .ddp-dm-list-hidden-mobile,
+  .ddp-dm-chat-hidden-mobile {
+    display: none !important;
+  }
+  .ddp-dm-back-btn {
+    display: flex !important;
+  }
+}

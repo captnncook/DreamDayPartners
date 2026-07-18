@@ -6,9 +6,10 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import {
-  LogOut, Menu, X, Globe,
+  LogOut, Menu, X, Globe, MessageCircle,
 } from "lucide-react";
 import { useLang } from "./LangProvider";
+import { useUnreadDmCount, formatUnreadBadge } from "@/lib/useUnreadDmCount";
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "Admin",
@@ -23,6 +24,7 @@ export default function MobileNav({ user }: { user: User }) {
   const router = useRouter();
   const { lang, t, toggle } = useLang();
   const n = t.nav;
+  const unreadCount = useUnreadDmCount();
 
   const NAV_ITEMS = [
     { href: "/dashboard",                  label: n.dashboard,         roles: ["admin", "planner", "team_member", "couple", "vendor"] },
@@ -91,23 +93,66 @@ export default function MobileNav({ user }: { user: User }) {
           </span>
         </Link>
 
-        <button
-          onClick={() => setOpen(true)}
-          style={{
-            width: "36px",
-            height: "36px",
-            borderRadius: "10px",
-            background: "rgba(0,0,0,0.06)",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          aria-label="Open menu"
-        >
-          <Menu style={{ width: "20px", height: "20px", color: "var(--foreground)" }} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Link
+            href="/dm"
+            style={{
+              position: "relative",
+              width: "36px",
+              height: "36px",
+              borderRadius: "10px",
+              background: "rgba(0,0,0,0.06)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            aria-label="Berichten"
+          >
+            <MessageCircle style={{ width: "19px", height: "19px", color: "var(--foreground)" }} />
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-3px",
+                  right: "-3px",
+                  minWidth: "17px",
+                  height: "17px",
+                  padding: "0 4px",
+                  borderRadius: "999px",
+                  background: "var(--gold-deep)",
+                  color: "white",
+                  fontSize: "0.625rem",
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1.5px solid white",
+                  lineHeight: 1,
+                }}
+              >
+                {formatUnreadBadge(unreadCount)}
+              </span>
+            )}
+          </Link>
+
+          <button
+            onClick={() => setOpen(true)}
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "10px",
+              background: "rgba(0,0,0,0.06)",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            aria-label="Open menu"
+          >
+            <Menu style={{ width: "20px", height: "20px", color: "var(--foreground)" }} />
+          </button>
+        </div>
       </header>
 
       {/* ── Full-screen overlay ── */}

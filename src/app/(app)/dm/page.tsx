@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, Pencil, Search, X, ArrowLeft, Send } from "lucide-react";
+import { MessageCircle, Pencil, Search, X, ArrowLeft, Send, Check, Calendar } from "lucide-react";
 
 type Conv = {
   id: string;
@@ -21,6 +21,90 @@ type DmMessage = {
 
 type Recipient = { userId: string; name: string; role: string; category?: string };
 
+type VendorRequestItem = {
+  id: string;
+  wedding: { id: string; title: string; date: string; venue?: string | null };
+};
+
+function formatDate(iso: string) {
+  return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
+}
+
+function RequestsPanel() {
+  const [requests, setRequests] = useState<VendorRequestItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/vendor/requests")
+      .then(r => r.ok ? r.json() : { requests: [] })
+      .then(d => setRequests(d.requests ?? []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function respond(id: string, action: "accept" | "decline") {
+    setBusyId(id);
+    const res = await fetch(`/api/vendor/requests/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    if (res.ok) setRequests(prev => prev.filter(r => r.id !== id));
+    setBusyId(null);
+  }
+
+  if (loading) {
+    return <div style={{ padding: "2rem", textAlign: "center", color: "var(--muted)", fontSize: "0.875rem" }}>Laden…</div>;
+  }
+
+  if (requests.length === 0) {
+    return (
+      <div style={{ padding: "3rem 1.5rem", textAlign: "center", color: "var(--muted)" }}>
+        <Calendar className="w-8 h-8" style={{ margin: "0 auto 0.75rem", color: "var(--border)" }} />
+        <p style={{ fontSize: "0.875rem" }}>Geen openstaande verzoeken</p>
+        <p style={{ fontSize: "0.8125rem", marginTop: "0.25rem" }}>Nieuwe Dream Team-uitnodigingen verschijnen hier.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "0.875rem", maxWidth: "560px", margin: "0 auto", width: "100%" }}>
+      {requests.map(r => {
+        const busy = busyId === r.id;
+        return (
+          <div key={r.id} style={{ borderLeft: "3px solid var(--gold)", background: "var(--sand)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1rem 1.25rem" }}>
+            <div className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>{r.wedding.title}</div>
+            <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>
+              {r.wedding.venue ? `${r.wedding.venue} · ` : ""}{formatDate(r.wedding.date)}
+            </div>
+            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", margin: "0.625rem 0" }}>
+              Je bent uitgenodigd voor het Dream Team van deze bruiloft.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => respond(r.id, "accept")}
+                disabled={busy}
+                className="ddp-btn-primary"
+                style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}
+              >
+                <Check className="w-3.5 h-3.5" /> {busy ? "Bezig…" : "Accepteren"}
+              </button>
+              <button
+                onClick={() => respond(r.id, "decline")}
+                disabled={busy}
+                className="ddp-btn-ghost"
+                style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem" }}
+              >
+                <X className="w-3.5 h-3.5" /> Afwijzen
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
@@ -39,7 +123,7 @@ function formatTime(iso: string) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(d);
 }
 
-function ChatPanel({ conversationId, currentUserId, otherUser }: { conversationId: string; currentUserId: string; otherUser: { id: string; name: string; role: string } }) {
+function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conversationId: string; currentUserId: string; otherUser: { id: string; name: string; role: string }; onBack: () => void }) {
   const [messages, setMessages] = useState<DmMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -116,6 +200,14 @@ function ChatPanel({ conversationId, currentUserId, otherUser }: { conversationI
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
       <div style={{ padding: "1rem 1.25rem", borderBottom: "1px solid var(--border)", background: "white", display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
+        <button
+          onClick={onBack}
+          className="ddp-dm-back-btn"
+          style={{ background: "none", border: "none", cursor: "pointer", padding: "0.25rem", margin: "-0.25rem 0 -0.25rem -0.25rem", color: "var(--muted)" }}
+          aria-label="Terug naar gesprekken"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "50%", background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9375rem", fontWeight: 700, color: "var(--primary)", flexShrink: 0 }}>
           {otherUser.name.charAt(0)}
         </div>
@@ -172,6 +264,8 @@ function ChatPanel({ conversationId, currentUserId, otherUser }: { conversationI
 export default function DmPage() {
   const [convs, setConvs] = useState<Conv[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
+  const [role, setRole] = useState("");
+  const [tab, setTab] = useState<"gesprekken" | "verzoeken">("gesprekken");
   const [loading, setLoading] = useState(true);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [composing, setComposing] = useState(false);
@@ -191,6 +285,7 @@ export default function DmPage() {
       clearTimeout(timeout);
       const list = convData.conversations ?? [];
       setConvs(list);
+      setRole(meData.user?.role ?? "");
       setCurrentUserId(meData.user?.id ?? "");
       if (list.length > 0) setActiveConvId(list[0].id);
       setLoading(false);
@@ -233,9 +328,35 @@ export default function DmPage() {
   const otherUser = activeConv?.participants.find(p => p.userId !== currentUserId)?.user;
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 60px)", overflow: "hidden" }}>
-      {/* Left: conversation list */}
-      <div style={{ width: "280px", flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "white" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 60px)", overflow: "hidden" }}>
+      {role === "vendor" && (
+        <div style={{ display: "flex", gap: "1.5rem", padding: "0.75rem 1.25rem 0", borderBottom: "1px solid var(--border)", background: "white", flexShrink: 0 }}>
+          {([["gesprekken", "Gesprekken"], ["verzoeken", "Verzoeken"]] as const).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                padding: "0 0 0.75rem", fontSize: "0.875rem",
+                fontWeight: tab === key ? 700 : 500,
+                color: tab === key ? "var(--foreground)" : "var(--muted)",
+                borderBottom: tab === key ? "2px solid var(--gold)" : "2px solid transparent",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {tab === "verzoeken" && role === "vendor" ? (
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          <RequestsPanel />
+        </div>
+      ) : (
+      <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
+      {/* Left: conversation list — op mobiel verborgen zodra een gesprek open staat */}
+      <div className={activeConvId ? "ddp-dm-list-hidden-mobile" : undefined} style={{ width: "280px", flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "white" }}>
         <div style={{ padding: "1rem", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ fontWeight: 700, fontSize: "1rem" }}>Berichten</span>
           <button onClick={() => { setComposing(true); setQuery(""); setResults([]); }}
@@ -273,8 +394,8 @@ export default function DmPage() {
         </div>
       </div>
 
-      {/* Right: chat panel */}
-      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+      {/* Right: chat panel — op mobiel alleen zichtbaar als er een gesprek open staat */}
+      <div className={!activeConvId ? "ddp-dm-chat-hidden-mobile" : undefined} style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
         {!activeConvId || !otherUser ? (
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
             <div style={{ textAlign: "center" }}>
@@ -284,9 +405,11 @@ export default function DmPage() {
             </div>
           </div>
         ) : (
-          <ChatPanel conversationId={activeConvId} currentUserId={currentUserId} otherUser={otherUser} />
+          <ChatPanel conversationId={activeConvId} currentUserId={currentUserId} otherUser={otherUser} onBack={() => setActiveConvId(null)} />
         )}
       </div>
+      </div>
+      )}
 
       {/* Compose modal */}
       {composing && (

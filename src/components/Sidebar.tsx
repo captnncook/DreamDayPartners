@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import { useLang } from "@/components/LangProvider";
 import { Globe, LogOut } from "lucide-react";
+import { useUnreadDmCount, formatUnreadBadge } from "@/lib/useUnreadDmCount";
 
 interface SidebarProps {
   user: User;
@@ -17,6 +18,7 @@ export default function Sidebar({ user }: SidebarProps) {
   const router = useRouter();
   const { t, toggle } = useLang();
   const n = t.nav;
+  const unreadCount = useUnreadDmCount();
 
   const NAV_ITEMS = [
     { href: "/dashboard",  label: n.dashboard, roles: ["admin", "planner", "team_member", "couple", "vendor"] },
@@ -112,9 +114,30 @@ export default function Sidebar({ user }: SidebarProps) {
             pathname === item.href ||
             pathname.startsWith(item.href + "/") ||
             (item.href === "/leveranciers/mijn-profiel" && pathname.startsWith("/leveranciers/"));
+          const showBadge = item.href === "/dm" && unreadCount > 0;
           return (
-            <Link key={item.href} href={item.href} className={`ddp-nav-item-dark${active ? " active" : ""}`}>
-              {item.label}
+            <Link key={item.href} href={item.href} className={`ddp-nav-item-dark${active ? " active" : ""}`} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>{item.label}</span>
+              {showBadge && (
+                <span
+                  style={{
+                    minWidth: "18px",
+                    height: "18px",
+                    padding: "0 5px",
+                    borderRadius: "999px",
+                    background: "var(--gold)",
+                    color: "var(--ink)",
+                    fontSize: "0.6875rem",
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 1,
+                  }}
+                >
+                  {formatUnreadBadge(unreadCount)}
+                </span>
+              )}
             </Link>
           );
         })}
