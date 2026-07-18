@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <Sidebar user={user} coupleWeddingId={coupleWeddingId} />
       <div className="flex-1 min-w-0 flex flex-col">
         <MobileNav user={user} />
-        <main className="flex-1 min-w-0 overflow-auto" style={{ background: "var(--background)" }}>
+        <main className="ddp-main-content flex-1 min-w-0 overflow-auto" style={{ background: "var(--background)" }}>
           {children}
         </main>
       </div>

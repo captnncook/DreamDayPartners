@@ -874,6 +874,34 @@ h1, h2, h3, h4, h5, h6 {
   .ddp-mobile-header { display: none; }
 }
 
+/* Vaste onderbalk (mobiel) — 4 rolgebonden knoppen + "Meer" */
+.ddp-bottom-nav {
+  display: flex;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(0,0,0,0.08);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (min-width: 768px) {
+  .ddp-bottom-nav { display: none; }
+}
+
+/* Ruimte onder de content zodat de onderbalk niets overlapt (mobiel) */
+.ddp-main-content {
+  padding-bottom: calc(58px + env(safe-area-inset-bottom, 0));
+}
+
+@media (min-width: 768px) {
+  .ddp-main-content { padding-bottom: 0; }
+}
+
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    SCROLL REVEAL
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */

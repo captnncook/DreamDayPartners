@@ -6,7 +6,8 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@prisma/client";
 import {
-  LogOut, Menu, X, Globe, MessageCircle,
+  LogOut, X, Globe, MessageCircle, Home, CalendarClock, Users, CheckSquare,
+  MoreHorizontal, User as UserIcon, Inbox, CalendarRange, ShieldCheck,
 } from "lucide-react";
 import { useLang } from "./LangProvider";
 import { useUnreadDmCount, formatUnreadBadge } from "@/lib/useUnreadDmCount";
@@ -17,6 +18,39 @@ const ROLE_LABELS: Record<string, string> = {
   team_member: "Teamlid",
   couple: "Bruidspaar",
 };
+
+type BottomTab = { key: string; href: string; label: string; icon: React.ElementType };
+
+// Vaste onderbalk van 5 items per rol — "Meer" opent altijd hetzelfde
+// volledige menu-overlay. Bruidspaar en staff (planner/teamlid/leverancier)
+// delen dezelfde 4+1-structuur; alleen de doelpagina's van "Mijn
+// bruiloften" en "Profiel" verschillen tussen leverancier en planner.
+function getBottomTabs(user: User): BottomTab[] {
+  if (user.role === "couple") {
+    return [
+      { key: "dashboard", href: "/dashboard", label: "Dashboard", icon: Home },
+      { key: "draaiboek", href: "/draaiboek", label: "Draaiboek", icon: CalendarClock },
+      { key: "dreamteam", href: "/dream-team", label: "Dream Team", icon: ShieldCheck },
+      { key: "taken", href: "/tasks", label: "Taken", icon: CheckSquare },
+    ];
+  }
+  if (user.role === "admin") {
+    return [
+      { key: "dashboard", href: "/dashboard", label: "Dashboard", icon: Home },
+      { key: "weddings", href: "/weddings", label: "Bruiloften", icon: CalendarRange },
+      { key: "accounts", href: "/admin/accounts", label: "Accounts", icon: Users },
+      { key: "verzoeken", href: "/admin/vendors", label: "Verzoeken", icon: Inbox },
+    ];
+  }
+  // planner, team_member, vendor (incl. weddingplanner-categorie)
+  const isVendor = user.role === "vendor";
+  return [
+    { key: "dashboard", href: "/dashboard", label: "Dashboard", icon: Home },
+    { key: "weddings", href: isVendor ? "/mijn-bruiloften" : "/weddings", label: "Mijn bruiloften", icon: CalendarRange },
+    { key: "profiel", href: isVendor ? "/leveranciers/mijn-profiel" : "/instellingen", label: "Profiel", icon: UserIcon },
+    { key: "aanvragen", href: "/dm", label: isVendor ? "Aanvragen" : "Berichten", icon: Inbox },
+  ];
+}
 
 export default function MobileNav({ user }: { user: User }) {
   const [open, setOpen] = useState(false);
@@ -44,7 +78,10 @@ export default function MobileNav({ user }: { user: User }) {
     { href: "/admin",                      label: n.admin,             roles: ["admin"] },
   ];
 
-  const visibleItems = NAV_ITEMS.filter((i) => i.roles.includes(user.role));
+  const bottomTabs = getBottomTabs(user);
+  const bottomHrefs = new Set(bottomTabs.map((t) => t.href));
+  // "Meer" toont alles wat niet al als eigen knop in de onderbalk staat.
+  const visibleItems = NAV_ITEMS.filter((i) => i.roles.includes(user.role) && !bottomHrefs.has(i.href));
   const initials = user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const roleLabel = ROLE_LABELS[user.role] ?? user.vendorType ?? "Leverancier";
 
@@ -134,24 +171,6 @@ export default function MobileNav({ user }: { user: User }) {
               </span>
             )}
           </Link>
-
-          <button
-            onClick={() => setOpen(true)}
-            style={{
-              width: "36px",
-              height: "36px",
-              borderRadius: "10px",
-              background: "rgba(0,0,0,0.06)",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            aria-label="Open menu"
-          >
-            <Menu style={{ width: "20px", height: "20px", color: "var(--foreground)" }} />
-          </button>
         </div>
       </header>
 
@@ -303,6 +322,59 @@ export default function MobileNav({ user }: { user: User }) {
           </div>
         </div>
       )}
+
+      {/* ── Onderbalk ── */}
+      <nav className="ddp-bottom-nav">
+        {bottomTabs.map((tab) => {
+          const Icon = tab.icon;
+          const active = !open && (pathname === tab.href || pathname.startsWith(tab.href + "/"));
+          const showBadge = tab.key === "aanvragen" && unreadCount > 0;
+          return (
+            <Link
+              key={tab.key}
+              href={tab.href}
+              onClick={() => setOpen(false)}
+              style={{
+                flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+                justifyContent: "center", gap: "2px", padding: "6px 2px 4px",
+                textDecoration: "none", position: "relative",
+                color: active ? "var(--gold-deep)" : "var(--muted)",
+              }}
+            >
+              <div style={{ position: "relative" }}>
+                <Icon style={{ width: "21px", height: "21px" }} strokeWidth={active ? 2.4 : 2} />
+                {showBadge && (
+                  <span
+                    style={{
+                      position: "absolute", top: "-4px", right: "-8px",
+                      minWidth: "15px", height: "15px", padding: "0 3px",
+                      borderRadius: "999px", background: "var(--gold-deep)", color: "white",
+                      fontSize: "0.5625rem", fontWeight: 700, display: "flex",
+                      alignItems: "center", justifyContent: "center", lineHeight: 1,
+                      border: "1.5px solid white",
+                    }}
+                  >
+                    {formatUnreadBadge(unreadCount)}
+                  </span>
+                )}
+              </div>
+              <span style={{ fontSize: "0.625rem", fontWeight: active ? 700 : 500 }}>{tab.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          onClick={() => setOpen(true)}
+          style={{
+            flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+            justifyContent: "center", gap: "2px", padding: "6px 2px 4px",
+            background: "none", border: "none", cursor: "pointer",
+            color: open ? "var(--gold-deep)" : "var(--muted)",
+          }}
+        >
+          <MoreHorizontal style={{ width: "21px", height: "21px" }} strokeWidth={open ? 2.4 : 2} />
+          <span style={{ fontSize: "0.625rem", fontWeight: open ? 700 : 500 }}>Meer</span>
+        </button>
+      </nav>
     </div>
   );
 }
