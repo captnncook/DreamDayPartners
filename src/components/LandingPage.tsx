@@ -185,15 +185,13 @@ function SidebarItem({ label, isActive, onClick }: { label: string; isActive: bo
 }
 
 function VendorStoryPicker() {
-  const [active, setActive] = useState<string>("bruidspaar");
+  const [active, setActive] = useState<string>(VENDOR_STORIES[0].value);
   const story = VENDOR_STORIES.find((s) => s.value === active);
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
       {/* Sidebar — desktop only */}
       <div className="hidden lg:flex flex-col gap-1 lg:w-64 flex-shrink-0">
-        <SidebarItem label="Bruidspaar" isActive={active === "bruidspaar"} onClick={() => setActive("bruidspaar")} />
-        <div style={{ height: "1px", background: "rgba(0,0,0,0.10)", margin: "0.75rem 0.25rem" }} />
         {VENDOR_STORIES.map((s) => (
           <SidebarItem key={s.value} label={s.label} isActive={active === s.value} onClick={() => setActive(s.value)} />
         ))}
@@ -207,27 +205,15 @@ function VendorStoryPicker() {
           className="ddp-select"
           style={{ fontWeight: 700, fontSize: "1rem" }}
         >
-          <option value="bruidspaar">Bruidspaar</option>
-          <optgroup label="Leveranciers">
-            {VENDOR_STORIES.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </optgroup>
+          {VENDOR_STORIES.map((s) => (
+            <option key={s.value} value={s.value}>{s.label}</option>
+          ))}
         </select>
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        {active === "bruidspaar" ? (
-          <div key="bruidspaar" className="animate-fade-in">
-            <p className="ddp-section-label mb-4" style={{ color: "var(--primary)" }}>Voor het bruidspaar</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {FEATURES_COUPLES.map((f) => (
-                <FeatureCard key={f.title} title={f.title} desc={f.desc} />
-              ))}
-            </div>
-          </div>
-        ) : story ? (
+        {story && (
           <div key={story.value} className="animate-fade-in" style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
             <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label}: de vervelende realiteit</p>
             <p style={{ fontSize: "1.0625rem", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "1.25rem" }}>
@@ -238,7 +224,7 @@ function VendorStoryPicker() {
               {story.solution}
             </p>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );
@@ -330,9 +316,12 @@ export default function LandingPage() {
                   Inloggen
                 </Link>
               </div>
-              <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 0.875rem" }}>
-                Begin gratis
-              </Link>
+              <a href="#bruidsparen" className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
+                Voor bruidsparen
+              </a>
+              <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.45rem 0.875rem" }}>
+                Voor leveranciers
+              </a>
             </>
           )}
         </div>
@@ -399,6 +388,40 @@ export default function LandingPage() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Audience-splitser ─────────────────────────────── */}
+      <section className="px-5" style={{ background: "var(--background)" }}>
+        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto", paddingBottom: "clamp(3rem, 6vw, 5rem)" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <ScrollReveal>
+              <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
+                <h3 className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "0.625rem" }}>
+                  Wij gaan trouwen
+                </h3>
+                <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.65, marginBottom: "1.5rem" }}>
+                  Stel je dream team samen, regel offertes en maak jullie draaiboek. Voor altijd gratis.
+                </p>
+                <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                  Begin gratis
+                </Link>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={80}>
+              <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
+                <h3 className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "0.625rem" }}>
+                  Ik ben leverancier
+                </h3>
+                <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.65, marginBottom: "1.5rem" }}>
+                  Beheer al je bruiloften op één plek: draaiboek, communicatie en documenten, zonder losse tools.
+                </p>
+                <a href="#leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                  Bekijk voor leveranciers
+                </a>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -493,7 +516,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Functies voor bruidsparen ─────────────────────── */}
-      <section id="stellen" className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
+      <section id="bruidsparen" className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
             {/* Left: text + features grid */}
@@ -565,7 +588,7 @@ export default function LandingPage() {
               </div>
 
               <ScrollReveal>
-                <Link href="/login" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                <Link href="/aanmelden?type=vendor" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Word leverancier
                 </Link>
               </ScrollReveal>
@@ -600,8 +623,12 @@ export default function LandingPage() {
             <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "0.75rem", maxWidth: "640px" }}>
               Wat kost jou nu tijd?{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Kies je vak.</span>
             </h2>
-            <p style={{ fontSize: "1rem", color: "var(--muted)", marginBottom: "2.5rem", maxWidth: "520px" }}>
+            <p style={{ fontSize: "1rem", color: "var(--muted)", marginBottom: "1.25rem", maxWidth: "520px" }}>
               Elke leveranciersoort heeft zijn eigen administratieve rompslomp. Klik hieronder en zie precies wat DreamDay voor jou oplost.
+            </p>
+            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginBottom: "2.5rem", maxWidth: "520px" }}>
+              Ben je een bruidspaar? Bekijk in plaats daarvan{" "}
+              <a href="#bruidsparen" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline" }}>wat DreamDay voor jullie doet</a>.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={80}>
