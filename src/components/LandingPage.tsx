@@ -825,6 +825,7 @@ export default function LandingPage() {
               { href: "#hoe-het-werkt", label: "Hoe het werkt" },
               { href: "#prijzen",       label: "Prijzen" },
               { href: "#faq",           label: "FAQ" },
+              { href: "/roadmap",       label: "Roadmap" },
               { href: "/leveranciers",  label: "Vind leveranciers" },
               { href: "/blog",          label: "Blog" },
               { href: "/privacy",       label: "Privacybeleid" },

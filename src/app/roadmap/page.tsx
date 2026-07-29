@@ -1,17 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import RoadmapTimeline from "./RoadmapTimeline";
 
-// Gedeelde schil voor publieke inhoudspagina's (privacy, voorwaarden, blog):
-// logo-header, serif titel, prettige leesbreedte en de donkere footer.
-export default function PublicPageShell({
-  title,
-  intro,
-  children,
-}: {
-  title: string;
-  intro?: string;
-  children: React.ReactNode;
-}) {
+export const metadata: Metadata = {
+  title: "Roadmap — DreamDay Platform",
+  description: "Hoever staan we met DreamDay Platform, welke mijlpalen komen er nog, en wanneer verwachten we live te gaan.",
+};
+
+export default function RoadmapPage() {
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <header className="px-5 md:px-10 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
@@ -28,14 +25,18 @@ export default function PublicPageShell({
         </div>
       </header>
 
-      <main className="px-5 py-10 md:py-14" style={{ maxWidth: "720px", margin: "0 auto" }}>
+      <main className="px-5 py-10 md:py-14" style={{ maxWidth: "1040px", margin: "0 auto" }}>
         <h1 className="font-serif" style={{ fontSize: "clamp(1.75rem, 5vw, 2.375rem)", fontWeight: 700, letterSpacing: "-0.015em", lineHeight: 1.15, color: "var(--foreground)" }}>
-          {title}
+          Roadmap
         </h1>
-        {intro && (
-          <p className="mt-3 text-base" style={{ color: "var(--muted)", lineHeight: 1.65 }}>{intro}</p>
-        )}
-        <div className="mt-8 ddp-prose">{children}</div>
+        <p className="mt-3 text-base" style={{ color: "var(--muted)", lineHeight: 1.65, maxWidth: "640px" }}>
+          Hoever staan we, welke stappen komen er nog en wanneer gaan we live? Beweeg over de tijdlijn
+          (op mobiel staat alles direct open) voor meer uitleg per mijlpaal.
+        </p>
+
+        <div className="mt-10 md:mt-14">
+          <RoadmapTimeline />
+        </div>
       </main>
 
       <footer className="px-5 py-10 mt-10" style={{ background: "var(--ink)" }}>
