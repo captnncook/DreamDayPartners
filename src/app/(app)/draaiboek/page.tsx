@@ -54,7 +54,7 @@ export default async function AllDraaiboekPage() {
             </div>
             {w.draaiboeken.map((d) => (
               <div key={d.id} className="mb-3">
-                <div className="ddp-section-label mb-1 mt-3">{d.title} — v{d.version}</div>
+                <div className="ddp-section-label mb-1 mt-3">{d.title}</div>
                 <div style={{ borderTop: "1px solid var(--border)" }}>
                   {d.items.slice(0, 5).map((item) => (
                     <div key={item.id} className="dash-row" style={{ padding: "0.55rem 0.25rem" }}>

@@ -1053,6 +1053,13 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@media (min-width: 900px) {
+  .ddp-modal-panel--form {
+    max-width: 640px !important;
+    padding: 2rem !important;
+  }
+}
+
 /* Berichten (/dm): op mobiel toont het gesprekkenlijstje óf het open
    gesprek, nooit beide naast elkaar (dat perst het gesprek anders in
    een paar tientallen pixels breedte). Vanaf tablet altijd beide. */

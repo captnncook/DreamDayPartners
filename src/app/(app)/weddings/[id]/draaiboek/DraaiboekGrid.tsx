@@ -91,6 +91,18 @@ const INP: React.CSSProperties = {
 
 type FormData = { startTime: string; endTime: string; title: string; location: string; audience: Audience; vendorIds: string[]; notes: string };
 
+// Onthoudt de laatst gekozen zichtbaarheid, zodat een nieuw item standaard
+// dezelfde doelgroep krijgt als het vorige (planners voegen vaak een reeks
+// items met dezelfde zichtbaarheid achter elkaar toe).
+const LAST_AUDIENCE_KEY = "ddp-draaiboek-last-audience";
+function lastAudience(): Audience {
+  try {
+    const v = localStorage.getItem(LAST_AUDIENCE_KEY);
+    if (v === "all" || v === "vendors" || v === "private") return v;
+  } catch {}
+  return "all";
+}
+
 function Modal({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
@@ -113,7 +125,7 @@ function Modal({ onClose, children }: { onClose: () => void; children: React.Rea
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="ddp-modal-panel"
+        className="ddp-modal-panel ddp-modal-panel--form"
         style={{
           background: "var(--background)",
           width: "100%",
@@ -373,6 +385,7 @@ export default function DraaiboekGrid({
       isPublic: f.audience === "all",
       notes: f.notes || undefined,
     });
+    try { localStorage.setItem(LAST_AUDIENCE_KEY, f.audience); } catch {}
     setSaving(false);
     setFormMode(null);
   }
@@ -410,7 +423,7 @@ export default function DraaiboekGrid({
       {/* Add form */}
       {formMode === "add" && (
         <ItemForm
-          init={{ startTime: newTime, endTime: addEndTime(), title: "", location: "", audience: "all", vendorIds: [], notes: "" }}
+          init={{ startTime: newTime, endTime: addEndTime(), title: "", location: "", audience: lastAudience(), vendorIds: [], notes: "" }}
           vendors={vendors}
           onSave={saveNew}
           onCancel={() => setFormMode(null)}
