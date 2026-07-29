@@ -417,7 +417,7 @@ export default function LandingPage() {
                 <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.65, marginBottom: "1.5rem" }}>
                   Beheer al je bruiloften op één plek: draaiboek, communicatie en documenten, zonder losse tools.
                 </p>
-                <a href="#leveranciers" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Bekijk voor leveranciers
                 </a>
               </div>
