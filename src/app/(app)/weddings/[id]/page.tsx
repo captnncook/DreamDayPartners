@@ -89,11 +89,14 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
   if (!wedding) notFound();
 
-  // For vendor users: find their own Vendor.id so we can filter the dashboard list
+  // For vendor users: find their own Vendor.id (and category) so we can
+  // filter the dashboard list and gate the Dream Team overview.
   let ownVendorId: string | null = null;
+  let ownVendorCategory: string | null = null;
   if (user.role === "vendor") {
-    const ownVendor = await prisma.vendor.findFirst({ where: { userId: user.id }, select: { id: true } });
+    const ownVendor = await prisma.vendor.findFirst({ where: { userId: user.id }, select: { id: true, category: true } });
     ownVendorId = ownVendor?.id ?? null;
+    ownVendorCategory = ownVendor?.category ?? null;
   }
 
   const days = daysUntil(wedding.date);
@@ -106,6 +109,11 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
   const draaiboek = wedding.draaiboeken[0] ?? null;
 
   const isVendor = user.role === "vendor";
+  // Het volledige Dream Team-overzicht (alle leveranciers op deze bruiloft)
+  // is alleen relevant voor wie de bruiloft coördineert: bruidspaar/planner/
+  // teamlid, en de weddingplanner-leverancier. Andere leveranciers zien hun
+  // eigen werkpaneel verderop op deze pagina, niet de rest van het team.
+  const showDreamTeam = !isVendor || ownVendorCategory === "weddingplanner";
   const urgent = days >= 0 && days <= 14;
 
   return (
@@ -143,7 +151,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Tabs */}
-      <TabNav id={id} isVendor={isVendor} />
+      <TabNav id={id} isVendor={isVendor} hideTeamTab={isVendor && !showDreamTeam} />
 
       {/* Content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -255,49 +263,51 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </section>
           )}
 
-          {/* Leveranciers */}
-          <section className="mb-8">
-            <div className="flex items-baseline justify-between mb-1">
-              <h3 className="dash-section-title">{tw.dreamTeam}</h3>
-              {!isVendor && (
-                <Link href={`/weddings/${id}/vendors`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>
-                  {tw.manage}
-                </Link>
-              )}
-            </div>
-            {wedding.vendors.length === 0 ? (
-              <p className="text-sm text-center py-6" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>{tw.noVendors}</p>
-            ) : (
-              <div style={{ borderTop: "1px solid var(--border)" }}>
-                {/* Eén rij per leverancier die doorklikt naar het eigen dashboard —
-                    géén gestapelde volledige dashboards meer op deze pagina. */}
-                {wedding.vendors.map((wv) => {
-                  const statusLabel = VENDOR_STATUS_LABELS[wv.status] ?? wv.status;
-                  const needsAttention = wv.status === "lead";
-                  return (
-                    <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="dash-row">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-serif text-sm truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>{wv.vendor.name}</div>
-                        <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
-                      </div>
-                      <span
-                        className="text-xs flex-shrink-0"
-                        style={{
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          color: needsAttention ? "var(--gold-deep)" : "var(--muted-light)",
-                        }}
-                      >
-                        {statusLabel}
-                      </span>
-                      <span className="flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
-                    </Link>
-                  );
-                })}
+          {/* Leveranciers — alleen voor bruidspaar/planner/teamlid en de weddingplanner-leverancier */}
+          {showDreamTeam && (
+            <section className="mb-8">
+              <div className="flex items-baseline justify-between mb-1">
+                <h3 className="dash-section-title">{tw.dreamTeam}</h3>
+                {!isVendor && (
+                  <Link href={`/weddings/${id}/vendors`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>
+                    {tw.manage}
+                  </Link>
+                )}
               </div>
-            )}
-          </section>
+              {wedding.vendors.length === 0 ? (
+                <p className="text-sm text-center py-6" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>{tw.noVendors}</p>
+              ) : (
+                <div style={{ borderTop: "1px solid var(--border)" }}>
+                  {/* Eén rij per leverancier die doorklikt naar het eigen dashboard —
+                      géén gestapelde volledige dashboards meer op deze pagina. */}
+                  {wedding.vendors.map((wv) => {
+                    const statusLabel = VENDOR_STATUS_LABELS[wv.status] ?? wv.status;
+                    const needsAttention = wv.status === "lead";
+                    return (
+                      <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="dash-row">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-serif text-sm truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>{wv.vendor.name}</div>
+                          <div className="text-xs capitalize" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
+                        </div>
+                        <span
+                          className="text-xs flex-shrink-0"
+                          style={{
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            color: needsAttention ? "var(--gold-deep)" : "var(--muted-light)",
+                          }}
+                        >
+                          {statusLabel}
+                        </span>
+                        <span className="flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Leverancier ziet zijn eigen werkpaneel direct op deze pagina */}
           {isVendor && (() => {

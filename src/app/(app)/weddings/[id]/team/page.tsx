@@ -19,15 +19,22 @@ export default function TeamPage() {
   const [members, setMembers] = useState<WeddingMember[]>([]);
   const [weddingTitle, setWeddingTitle] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showVendorRoster, setShowVendorRoster] = useState(true);
 
   const load = useCallback(async () => {
-    const [wvRes, wRes] = await Promise.all([
+    const [wvRes, wRes, meRes] = await Promise.all([
       fetch(`/api/weddings/${id}/vendors`),
       fetch(`/api/weddings/${id}`),
+      fetch("/api/auth/me"),
     ]);
-    const [wvData, wData] = await Promise.all([wvRes.json(), wRes.json()]);
+    const [wvData, wData, meData] = await Promise.all([wvRes.json(), wRes.json(), meRes.ok ? meRes.json() : null]);
     setWeddingVendors(wvData.vendors ?? []);
     setWeddingTitle(wData.wedding?.title ?? "");
+    // Het volledige leveranciers-overzicht is alleen relevant voor wie de
+    // bruiloft coördineert (bruidspaar/planner/teamlid) en de
+    // weddingplanner-leverancier — andere leveranciers zien hier niets.
+    const me = meData?.user;
+    setShowVendorRoster(!me || me.role !== "vendor" || me.vendorType === "weddingplanner");
     // Derive planner/couple members from wedding data
     const w = wData.wedding;
     if (w) {
@@ -59,7 +66,7 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {weddingVendors.length === 0 ? (
+      {!showVendorRoster ? null : weddingVendors.length === 0 ? (
         <div className="ddp-card text-center py-20" style={{ color: "var(--muted)" }}>
           <h2 className="font-semibold text-lg mb-2">{tm.noVendors}</h2>
           <p className="text-sm mb-6">{tm.noVendorsSub}</p>

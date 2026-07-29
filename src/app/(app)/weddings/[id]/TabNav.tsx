@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLang } from "@/components/LangProvider";
 
-export default function TabNav({ id, isVendor = false }: { id: string; isVendor?: boolean }) {
+export default function TabNav({ id, isVendor = false, hideTeamTab = false }: { id: string; isVendor?: boolean; hideTeamTab?: boolean }) {
   const pathname = usePathname();
   const { t } = useLang();
   const tb = t.tabs;
@@ -16,7 +16,7 @@ export default function TabNav({ id, isVendor = false }: { id: string; isVendor?
     { href: `/weddings/${id}/budget`,    label: tb.budget,     always: false },
     { href: `/weddings/${id}/draaiboek`, label: tb.draaiboek,  always: true },
     { href: `/weddings/${id}/vendors`,   label: tb.vendors,    always: false },
-    { href: `/weddings/${id}/team`,      label: tb.team,       always: true },
+    { href: `/weddings/${id}/team`,      label: tb.team,       always: !hideTeamTab },
   ].filter((tab) => tab.always || !isVendor);
 
   return (
