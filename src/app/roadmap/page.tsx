@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import RoadmapTimeline from "./RoadmapTimeline";
+import ScrollRoadmap from "./ScrollRoadmap";
 
 export const metadata: Metadata = {
   title: "Roadmap — DreamDay Platform",
@@ -25,21 +25,21 @@ export default function RoadmapPage() {
         </div>
       </header>
 
-      <main className="px-5 py-10 md:py-14" style={{ maxWidth: "1040px", margin: "0 auto" }}>
+      <div className="px-5 py-10 md:py-14" style={{ maxWidth: "1040px", margin: "0 auto" }}>
         <h1 className="font-serif" style={{ fontSize: "clamp(1.75rem, 5vw, 2.375rem)", fontWeight: 700, letterSpacing: "-0.015em", lineHeight: 1.15, color: "var(--foreground)" }}>
           Roadmap
         </h1>
         <p className="mt-3 text-base" style={{ color: "var(--muted)", lineHeight: 1.65, maxWidth: "640px" }}>
-          Hoever staan we, welke stappen komen er nog en wanneer gaan we live? Beweeg over de tijdlijn
-          (op mobiel staat alles direct open) voor meer uitleg per mijlpaal.
+          Hoever staan we, welke stappen komen er nog en wanneer gaan we live? Scroll naar beneden —
+          hoe verder je komt, hoe verder we in het proces zijn.
         </p>
+      </div>
 
-        <div className="mt-10 md:mt-14">
-          <RoadmapTimeline />
-        </div>
+      <main>
+        <ScrollRoadmap />
       </main>
 
-      <footer className="px-5 py-10 mt-10" style={{ background: "var(--ink)" }}>
+      <footer className="px-5 py-10" style={{ background: "var(--ink)" }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "1040px", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
             <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={24} height={24} />
