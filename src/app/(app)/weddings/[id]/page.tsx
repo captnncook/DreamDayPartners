@@ -314,22 +314,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             </section>
           )}
 
-          {/* Discovery-link voor overige leveranciers: geen inline lijst,
-              wel op aanvraag zien wie er nog meer werkt + contact leggen. */}
-          {showTeamDiscoveryLink && (
-            <section className="mb-8">
-              <div style={{ borderTop: "1px solid var(--border)" }}>
-                <Link href={`/weddings/${id}/team`} className="dash-row">
-                  <div className="flex-1 min-w-0">
-                    <div className="font-serif text-sm" style={{ fontWeight: 700, color: "var(--foreground)" }}>Wie werkt er nog meer aan deze bruiloft?</div>
-                    <div className="text-xs" style={{ color: "var(--muted)" }}>Bekijk het team en leg contact</div>
-                  </div>
-                  <span className="flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
-                </Link>
-              </div>
-            </section>
-          )}
-
           {/* Leverancier ziet zijn eigen werkpaneel direct op deze pagina */}
           {isVendor && (() => {
             const own = wedding.vendors.filter((wv) => wv.vendor.id === ownVendorId);

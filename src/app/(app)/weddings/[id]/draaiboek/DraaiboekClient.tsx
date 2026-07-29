@@ -344,7 +344,6 @@ export default function DraaiboekClient({
                 >
                   <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground)" }} className="truncate">{d.title}</div>
                   <div className="flex items-center gap-1.5 mt-1">
-                    <span style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>v{d.version}</span>
                     <span style={{ fontSize: "0.625rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: d.status === "final" ? "var(--gold-deep)" : "var(--muted-light)" }}>
                       {d.status === "final" ? "Definitief" : "Concept"}
                     </span>

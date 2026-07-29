@@ -102,8 +102,8 @@ export default function SetlistPlanner({ intakeData, onUpdate, isVendor, isPlann
       {wantList.length > 0 && (
         <div className="mb-4">
           <div className="flex items-center gap-1.5 mb-2">
-            <Heart className="w-3.5 h-3.5" style={{ color: "var(--success)" }} />
-            <span className="text-xs font-semibold" style={{ color: "var(--success)" }}>Must play ({wantList.length})</span>
+            <Heart className="w-3.5 h-3.5" style={{ color: "var(--gold-deep)" }} />
+            <span className="text-xs font-semibold" style={{ color: "var(--gold-deep)" }}>Must play ({wantList.length})</span>
           </div>
           <div className="space-y-1.5">
             {wantList.map(song => (
@@ -128,8 +128,8 @@ export default function SetlistPlanner({ intakeData, onUpdate, isVendor, isPlann
       {doNotList.length > 0 && (
         <div>
           <div className="flex items-center gap-1.5 mb-2">
-            <X className="w-3.5 h-3.5" style={{ color: "var(--danger)" }} />
-            <span className="text-xs font-semibold" style={{ color: "var(--danger)" }}>Do not play ({doNotList.length})</span>
+            <X className="w-3.5 h-3.5" style={{ color: "var(--muted)" }} />
+            <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>Do not play ({doNotList.length})</span>
           </div>
           <div className="space-y-1.5">
             {doNotList.map(song => (

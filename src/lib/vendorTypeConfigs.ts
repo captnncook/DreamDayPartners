@@ -65,7 +65,6 @@ export type ModuleKey =
 export interface VendorTypeConfig {
   type: string;
   label: string;
-  emoji: string;
   modules: ModuleKey[]; // EXTRA modules beyond BASE_MODULES
   intakeFields: Field[];
   deliverables: DeliverableConfig[];
@@ -160,7 +159,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "weddingplanner",
     label: "Weddingplanner",
-    emoji: "💍",
     modules: ["checklistDeadlines", "timelinePlanner"],
     intakeFields: [
       { key: "scope", label: "Scope van opdracht", type: "text", placeholder: "Volledig, dag-van, advies..." },
@@ -180,7 +178,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "ceremoniespreker",
     label: "Ceremoniespreker",
-    emoji: "🎤",
     modules: ["deliverablesTracker", "timelinePlanner"],
     intakeFields: [
       { key: "liefdesverhaal", label: "Liefdesverhaal & achtergrond", type: "longtext", placeholder: "Vertel het verhaal van het stel..." },
@@ -207,7 +204,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "ceremoniemeester",
     label: "Ceremoniemeester",
-    emoji: "🎙️",
     modules: ["timelinePlanner", "checklistDeadlines"],
     intakeFields: [
       { key: "rolafbakening", label: "Rolafbakening", type: "longtext", placeholder: "Dagcoördinatie, aankondigingen, gasten begeleiden..." },
@@ -230,7 +226,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "fotograaf",
     label: "Fotograaf",
-    emoji: "📷",
     modules: ["deliverablesTracker", "timelinePlanner", "shotlistBuilder", "galleryDelivery"],
     intakeFields: [
       {
@@ -262,7 +257,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "videograaf",
     label: "Videograaf",
-    emoji: "🎥",
     modules: ["deliverablesTracker", "timelinePlanner", "videoDelivery"],
     intakeFields: [
       {
@@ -305,7 +299,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "contentcreator",
     label: "Content Creator",
-    emoji: "📱",
     modules: ["deliverablesTracker", "timelinePlanner"],
     intakeFields: [
       { key: "stijl", label: "Contentstijl & feed-esthetiek", type: "longtext", placeholder: "Warm, licht, donker, kleurrijk..." },
@@ -328,7 +321,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "fotocabine",
     label: "Fotocabine",
-    emoji: "📸",
     modules: ["timelinePlanner"],
     intakeFields: [
       {
@@ -359,7 +351,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "fotoboothspeciaal",
     label: "Fotoboothspeciaal",
-    emoji: "📸",
     modules: ["timelinePlanner"],
     intakeFields: [
       {
@@ -392,7 +383,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "dj",
     label: "DJ / Muziek",
-    emoji: "🎧",
     modules: ["setlistPlanner", "timelinePlanner", "deliverablesTracker", "logisticsPanel"],
     intakeFields: [
       { key: "vibe", label: "Gewenste vibe & muziekstijlen", type: "longtext", placeholder: "Commercieel, R&B, jaren 80, latin..." },
@@ -423,7 +413,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "liveband",
     label: "Liveband & Muziek",
-    emoji: "🎵",
     modules: ["setlistPlanner", "timelinePlanner", "deliverablesTracker", "logisticsPanel", "documentUpload"],
     intakeFields: [
       {
@@ -465,7 +454,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "entertainment",
     label: "Entertainment / Acts",
-    emoji: "🎭",
     modules: ["timelinePlanner"],
     intakeFields: [
       { key: "typeAct", label: "Type act", type: "text", placeholder: "Goochelaar, acrobaat, caricaturist..." },
@@ -489,7 +477,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "vuurwerk",
     label: "Vuurwerk & Effecten",
-    emoji: "🎆",
     modules: ["timelinePlanner", "logisticsPanel"],
     intakeFields: [
       { key: "type", label: "Type vuurwerk / effect", type: "text", placeholder: "Fonteinen, indoor confetti, outdoor show..." },
@@ -516,7 +503,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "bloemist",
     label: "Bloemist",
-    emoji: "🌸",
     modules: ["photoUpload", "timelinePlanner", "documentUpload"],
     intakeFields: [
       { key: "palette", label: "Kleurenpalet", type: "color-multi" },
@@ -542,7 +528,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "decoratie",
     label: "Decoratie & Styling",
-    emoji: "✨",
     modules: ["moodboardUploader", "timelinePlanner", "deliverablesTracker"],
     intakeFields: [
       { key: "thema", label: "Thema & stijl", type: "text", placeholder: "Boho, klassiek, modern, romantisch..." },
@@ -569,7 +554,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "verlichting",
     label: "Verlichting",
-    emoji: "💡",
     modules: ["timelinePlanner"],
     intakeFields: [
       { key: "lichtplanPerZone", label: "Lichtplan per zone", type: "longtext", placeholder: "Ceremonie, diner, dance floor, exterieur..." },
@@ -595,7 +579,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "catering",
     label: "Catering",
-    emoji: "🍽️",
     modules: ["menuBuilder", "couvertCalculator", "guestDataPanel", "deliverablesTracker", "timelinePlanner"],
     readsGuestData: ["counts", "allergies"],
     intakeFields: [
@@ -626,7 +609,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "bakker",
     label: "Bruidstaart & Bakker",
-    emoji: "🎂",
     modules: ["portieCalculator", "moodboardUploader", "timelinePlanner"],
     readsGuestData: ["counts", "allergies"],
     intakeFields: [
@@ -658,7 +640,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "bar",
     label: "Bar / Cocktails",
-    emoji: "🍸",
     modules: ["guestDataPanel", "timelinePlanner"],
     readsGuestData: ["counts"],
     intakeFields: [
@@ -683,7 +664,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "koffiebar",
     label: "Koffiebar / Foodtruck",
-    emoji: "☕",
     modules: ["guestDataPanel", "timelinePlanner"],
     readsGuestData: ["counts"],
     intakeFields: [
@@ -710,7 +690,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "trouwlocatie",
     label: "Trouwlocatie",
-    emoji: "🏛️",
     modules: ["timelinePlanner", "venueRooms", "vendorAccessTimes", "dayOfContact", "fileVault"],
     intakeFields: [
       { key: "capaciteit", label: "Capaciteit (max. personen)", type: "number" },
@@ -748,7 +727,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "verhuur",
     label: "Verhuur",
-    emoji: "📦",
     modules: ["timelinePlanner", "deliverablesTracker"],
     intakeFields: [
       { key: "itemlijst", label: "Itemlijst", type: "longtext", placeholder: "Tafels, stoelen, servies, linnengoed..." },
@@ -773,7 +751,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "tentverhuur",
     label: "Tentverhuur",
-    emoji: "⛺",
     modules: ["timelinePlanner", "logisticsPanel"],
     intakeFields: [
       { key: "type", label: "Type tent", type: "text", placeholder: "Partytent, tipi, glazen paviljoen, feesttent..." },
@@ -800,7 +777,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "vervoer",
     label: "Vervoer",
-    emoji: "🚗",
     modules: ["timelinePlanner", "rittenPlanner", "chauffeurInfo", "logisticsPanel"],
     intakeFields: [
       {
@@ -845,7 +821,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "trouwauto",
     label: "Trouwauto",
-    emoji: "🚗",
     modules: ["timelinePlanner"],
     intakeFields: [
       {
@@ -871,7 +846,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "gastenvervoer",
     label: "Gastenvervoer",
-    emoji: "🚌",
     modules: ["timelinePlanner", "guestDataPanel"],
     readsGuestData: ["counts"],
     intakeFields: [
@@ -896,7 +870,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "haarstylist",
     label: "Haar & Make-up",
-    emoji: "💄",
     modules: ["moodboardUploader", "timelinePlanner", "bruidsteamBuilder", "materialChecklist"],
     intakeFields: [
       { key: "trialDatum", label: "Datum proefsessie", type: "date" },
@@ -924,7 +897,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "visagist",
     label: "Visagist",
-    emoji: "💋",
     modules: ["moodboardUploader", "timelinePlanner"],
     intakeFields: [
       { key: "trialDatum", label: "Datum proefsessie", type: "date" },
@@ -949,7 +921,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "bruidsmode",
     label: "Bruidsmode",
-    emoji: "👗",
     modules: ["checklistDeadlines"],
     intakeFields: [
       { key: "stijl", label: "Jurk-stijl", type: "text", placeholder: "A-lijn, ballerina, zeemeermin, bohemian..." },
@@ -968,7 +939,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "herenmode",
     label: "Herenmode",
-    emoji: "🤵",
     modules: ["checklistDeadlines"],
     intakeFields: [
       { key: "stijl", label: "Pak-stijl & kleur", type: "text", placeholder: "Donkerblauw, grijs, krijtstreep, smoking..." },
@@ -987,7 +957,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "juwelier",
     label: "Juwelier",
-    emoji: "💍",
     modules: ["checklistDeadlines"],
     intakeFields: [
       { key: "ontwerp", label: "Ringontwerp / -stijl", type: "text", placeholder: "Klassiek, modern, gravering, steentype..." },
@@ -1008,7 +977,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "drukwerk",
     label: "Drukwerk",
-    emoji: "🖨️",
     modules: ["approvalButton", "deliverablesTracker", "checklistDeadlines"],
     intakeFields: [
       { key: "huisstijl", label: "Huisstijl / thema", type: "text", placeholder: "Kleuren, lettertype, stijl..." },
@@ -1029,7 +997,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "overnachting",
     label: "Overnachting",
-    emoji: "🏨",
     modules: ["guestDataPanel"],
     readsGuestData: ["counts"],
     intakeFields: [
@@ -1049,7 +1016,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "kinderoppas",
     label: "Kinderoppas",
-    emoji: "👶",
     modules: ["guestDataPanel", "timelinePlanner"],
     readsGuestData: ["ages", "allergies"],
     intakeFields: [
@@ -1074,7 +1040,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "bedankjes",
     label: "Bedankjes & Favors",
-    emoji: "🎁",
     modules: ["deliverablesTracker"],
     intakeFields: [
       { key: "type", label: "Type bedankje", type: "text", placeholder: "Zelfgemaakt, gekocht, ervaringsgift..." },
@@ -1092,7 +1057,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "huwelijksreis",
     label: "Huwelijksreis",
-    emoji: "✈️",
     modules: ["checklistDeadlines"],
     intakeFields: [
       { key: "bestemming", label: "Bestemming(en)", type: "text", placeholder: "Malediven, Italië, Thailand..." },
@@ -1110,7 +1074,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "beveiliging",
     label: "Beveiliging",
-    emoji: "🔒",
     modules: ["timelinePlanner"],
     intakeFields: [
       { key: "gastenaantal", label: "Verwacht gastenaantal", type: "number" },
@@ -1132,7 +1095,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "schoonmaak",
     label: "Schoonmaak",
-    emoji: "🧹",
     modules: ["checklistDeadlines", "timelinePlanner"],
     intakeFields: [
       { key: "scope", label: "Scope schoonmaak", type: "longtext", placeholder: "Tussenschoonmaak WC, eindschoonmaak zalen..." },
@@ -1154,7 +1116,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "trouwverzekering",
     label: "Trouwverzekering",
-    emoji: "🛡️",
     modules: [],
     intakeFields: [
       { key: "dekking", label: "Dekkingsomschrijving", type: "longtext", placeholder: "Annulering, schade, aansprakelijkheid..." },
@@ -1173,7 +1134,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "overig",
     label: "Overig",
-    emoji: "⭐",
     modules: ["timelinePlanner"],
     intakeFields: [
       { key: "omschrijving", label: "Omschrijving dienst", type: "longtext", placeholder: "Wat levert deze leverancier?" },

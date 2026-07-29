@@ -11,9 +11,6 @@ type WeddingVendor = {
   vendor: Vendor;
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  invited: "badge-warning", contacted: "badge-neutral", quote_received: "badge-warning", booked: "badge-info", confirmed: "badge-success", declined: "badge-danger",
-};
 const STATUS_LABELS: Record<string, string> = {
   invited: "Uitgenodigd", contacted: "Gecontacteerd", quote_received: "Offerte ontvangen", booked: "Geboekt", confirmed: "Bevestigd", declined: "Afgewezen",
 };

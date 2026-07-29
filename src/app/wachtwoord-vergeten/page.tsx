@@ -41,7 +41,6 @@ export default function WachtwoordVergetenPage() {
         <div className="ddp-card shadow-lg">
           {sent ? (
             <div className="text-center space-y-3 py-2">
-              <div className="text-4xl">📬</div>
               <h1 className="text-xl font-bold">Check je inbox</h1>
               <p className="text-sm" style={{ color: "var(--muted)" }}>
                 Als er een account bestaat voor <strong>{email}</strong>, ontvang je een e-mail met een link om je wachtwoord opnieuw in te stellen. De link is 1 uur geldig.

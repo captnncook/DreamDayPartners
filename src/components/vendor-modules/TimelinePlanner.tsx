@@ -208,7 +208,7 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
           {canEdit && templates && templates.length > 0 && blocks.length > 0 && !adding && !editingId && (
             <button onClick={() => setShowTemplateConfirm(true)} disabled={loadingTemplate}
               style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
-              {loadingTemplate ? "Laden…" : "✨ Template"}
+              {loadingTemplate ? "Laden…" : "Template"}
             </button>
           )}
           {canEdit && !adding && !editingId && (
@@ -237,7 +237,7 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
               disabled={loadingTemplate}
               style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.4rem 0.875rem", cursor: "pointer", fontWeight: 600 }}
             >
-              {loadingTemplate ? "Template laden…" : "✨ Template toepassen"}
+              {loadingTemplate ? "Template laden…" : "Template toepassen"}
             </button>
           )}
         </div>

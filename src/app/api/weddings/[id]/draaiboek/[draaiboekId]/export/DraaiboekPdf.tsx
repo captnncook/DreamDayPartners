@@ -83,10 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Helvetica-Bold",
   },
-  draaiboekVersion: {
-    fontSize: 9,
-    color: MUTED,
-  },
   row: {
     flexDirection: "row",
     borderBottomWidth: 1,
@@ -180,7 +176,6 @@ export function DraaiboekPdf({
   venue,
   draaiboekTitle,
   draaiboekDate,
-  version,
   items,
   logoDataUri,
 }: {
@@ -190,7 +185,6 @@ export function DraaiboekPdf({
   venue: string | null;
   draaiboekTitle: string;
   draaiboekDate?: string | null;
-  version: string;
   items: PdfItem[];
   logoDataUri: string;
 }) {
@@ -213,7 +207,6 @@ export function DraaiboekPdf({
             <Text style={styles.draaiboekTitle}>
               {draaiboekTitle}{draaiboekDate ? ` · ${formatDate(draaiboekDate)}` : ""}
             </Text>
-            <Text style={styles.draaiboekVersion}>versie {version}</Text>
           </View>
 
           {items.length === 0 ? (

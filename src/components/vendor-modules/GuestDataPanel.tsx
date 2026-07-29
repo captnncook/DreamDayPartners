@@ -61,19 +61,19 @@ export default function GuestDataPanel({ guests, weddingId, isPlanner }: Props) 
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "1rem" }}>
-        <div style={{ padding: "0.75rem", background: "var(--color-blush-soft)", borderRadius: "0.5rem", textAlign: "center" }}>
+      <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1rem" }}>
+        <div>
           <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--foreground)" }}>{total}</div>
           <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Totaal gasten</div>
         </div>
-        <div style={{ padding: "0.75rem", background: "var(--color-blush-soft)", borderRadius: "0.5rem", textAlign: "center" }}>
+        <div>
           <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--foreground)" }}>{confirmed.length}</div>
           <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Bevestigd</div>
         </div>
       </div>
 
       {total > 0 && (
-        <div style={{ padding: "0.625rem 0.875rem", background: "var(--accent)", borderRadius: "0.5rem", marginBottom: "0.75rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
+        <div style={{ padding: "0.625rem 0", borderTop: "1px solid var(--border)", marginBottom: "0.75rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
           <strong style={{ color: "var(--foreground)" }}>{confirmed.length} couverts</strong> bevestigd
           {withDietary.length > 0 && <> · <strong style={{ color: "var(--foreground)" }}>{withDietary.length}</strong> met dieetwens</>}
         </div>

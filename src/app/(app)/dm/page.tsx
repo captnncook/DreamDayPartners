@@ -356,11 +356,11 @@ export default function DmPage() {
       ) : (
       <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
       {/* Left: conversation list — op mobiel verborgen zodra een gesprek open staat */}
-      <div className={activeConvId ? "ddp-dm-list-hidden-mobile" : undefined} style={{ width: "280px", flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "white" }}>
-        <div style={{ padding: "1rem", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontWeight: 700, fontSize: "1rem" }}>Berichten</span>
+      <div className={`ddp-dm-list${activeConvId ? " ddp-dm-list-hidden-mobile" : ""}`} style={{ width: "280px", flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "white" }}>
+        <div style={{ padding: "1rem", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+          <span style={{ fontWeight: 700, fontSize: "1rem", flexShrink: 0 }}>Berichten</span>
           <button onClick={() => { setComposing(true); setQuery(""); setResults([]); }}
-            style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.375rem 0.75rem", borderRadius: "9999px", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600 }}>
+            style={{ display: "flex", alignItems: "center", gap: "0.25rem", padding: "0.375rem 0.75rem", borderRadius: "9999px", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600, whiteSpace: "nowrap", flexShrink: 0 }}>
             <Pencil className="w-3 h-3" /> Nieuw bericht
           </button>
         </div>

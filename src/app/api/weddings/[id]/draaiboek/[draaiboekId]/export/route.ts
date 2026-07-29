@@ -47,7 +47,6 @@ export async function GET(
       venue: wedding.venue ?? null,
       draaiboekTitle: draaiboek.title,
       draaiboekDate: draaiboek.date ? draaiboek.date.toISOString() : null,
-      version: draaiboek.version,
       logoDataUri,
       items: items.map((item) => ({
         startTime: item.startTime,
