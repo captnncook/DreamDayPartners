@@ -588,7 +588,7 @@ export default function LandingPage() {
               </div>
 
               <ScrollReveal>
-                <Link href="/aanmelden?type=vendor" className="ddp-btn-secondary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
+                <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ fontSize: "0.9375rem", padding: "0.75rem 1.875rem" }}>
                   Word leverancier
                 </Link>
               </ScrollReveal>
