@@ -9,19 +9,18 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   const { id } = await params;
 
-  // Vendors only see their own record within this wedding
-  let vendorIdFilter: string | undefined;
+  // Vendors mogen alleen het team zien van een bruiloft waar ze zelf ook
+  // aan gekoppeld zijn (discovery + contact met collega-leveranciers) —
+  // geen toegang tot bruiloften waar ze niets mee te maken hebben.
   if (user.role === "vendor") {
     const ownVendorId = await getOwnVendorId(user.id);
     if (!ownVendorId) return NextResponse.json({ vendors: [] });
-    vendorIdFilter = ownVendorId;
+    const ownBooking = await prisma.weddingVendor.findFirst({ where: { weddingId: id, vendorId: ownVendorId } });
+    if (!ownBooking) return NextResponse.json({ vendors: [] });
   }
 
   const vendors = await prisma.weddingVendor.findMany({
-    where: {
-      weddingId: id,
-      ...(vendorIdFilter ? { vendorId: vendorIdFilter } : {}),
-    },
+    where: { weddingId: id },
     include: { vendor: true },
     orderBy: { createdAt: "asc" },
   });

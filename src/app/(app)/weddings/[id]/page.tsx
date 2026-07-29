@@ -109,11 +109,16 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
   const draaiboek = wedding.draaiboeken[0] ?? null;
 
   const isVendor = user.role === "vendor";
-  // Het volledige Dream Team-overzicht (alle leveranciers op deze bruiloft)
-  // is alleen relevant voor wie de bruiloft coördineert: bruidspaar/planner/
-  // teamlid, en de weddingplanner-leverancier. Andere leveranciers zien hun
-  // eigen werkpaneel verderop op deze pagina, niet de rest van het team.
+  const ownStatus = isVendor ? wedding.vendors.find((wv) => wv.vendor.id === ownVendorId)?.status ?? null : null;
+  // Het volledige Dream Team-overzicht (alle leveranciers op deze bruiloft,
+  // altijd inline zichtbaar) is alleen relevant voor wie de bruiloft
+  // coördineert: bruidspaar/planner/teamlid, en de weddingplanner-leverancier.
   const showDreamTeam = !isVendor || ownVendorCategory === "weddingplanner";
+  // Overige leveranciers krijgen geen inline lijst, maar wel een link om op
+  // aanvraag te zien wie er nog meer werkt (en contact te leggen) — zolang
+  // hun eigen boeking nog "lead" is. Zodra ze zelf bevestigd zijn is die
+  // taak klaar en verdwijnt de link weer.
+  const showTeamDiscoveryLink = isVendor && ownVendorCategory !== "weddingplanner" && ownStatus === "lead";
   const urgent = days >= 0 && days <= 14;
 
   return (
@@ -151,7 +156,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
       </div>
 
       {/* Tabs */}
-      <TabNav id={id} isVendor={isVendor} hideTeamTab={isVendor && !showDreamTeam} />
+      <TabNav id={id} isVendor={isVendor} hideTeamTab={isVendor && !showDreamTeam && !showTeamDiscoveryLink} />
 
       {/* Content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -306,6 +311,22 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                   })}
                 </div>
               )}
+            </section>
+          )}
+
+          {/* Discovery-link voor overige leveranciers: geen inline lijst,
+              wel op aanvraag zien wie er nog meer werkt + contact leggen. */}
+          {showTeamDiscoveryLink && (
+            <section className="mb-8">
+              <div style={{ borderTop: "1px solid var(--border)" }}>
+                <Link href={`/weddings/${id}/team`} className="dash-row">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-serif text-sm" style={{ fontWeight: 700, color: "var(--foreground)" }}>Wie werkt er nog meer aan deze bruiloft?</div>
+                    <div className="text-xs" style={{ color: "var(--muted)" }}>Bekijk het team en leg contact</div>
+                  </div>
+                  <span className="flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
+                </Link>
+              </div>
             </section>
           )}
 
