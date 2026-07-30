@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { geocodeCity } from "@/lib/geocode";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
@@ -35,6 +36,26 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const body = await req.json();
 
+  // Als de plaats van het bruidspaar wijzigt, opnieuw geocoderen zodat we
+  // leveranciers bij hen in de buurt kunnen tonen in de catalogus.
+  let locationUpdate: { locationCity?: string | null; province?: string | null; latitude?: number | null; longitude?: number | null } = {};
+  if (body.locationCity !== undefined || body.province !== undefined) {
+    const current = await prisma.wedding.findUnique({ where: { id }, select: { locationCity: true } });
+    const nextCity: string | null = body.locationCity !== undefined ? (body.locationCity || null) : (current?.locationCity ?? null);
+    locationUpdate = {
+      ...(body.locationCity !== undefined && { locationCity: nextCity }),
+      ...(body.province !== undefined && { province: body.province || null }),
+    };
+    if (body.locationCity !== undefined && nextCity && nextCity !== current?.locationCity) {
+      const geo = await geocodeCity(nextCity);
+      locationUpdate.latitude = geo.latitude ?? null;
+      locationUpdate.longitude = geo.longitude ?? null;
+    } else if (body.locationCity !== undefined && !nextCity) {
+      locationUpdate.latitude = null;
+      locationUpdate.longitude = null;
+    }
+  }
+
   const wedding = await prisma.wedding.update({
     where: { id },
     data: {
@@ -44,6 +65,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       venue: body.venue,
       status: body.status,
       notes: body.notes,
+      ...locationUpdate,
     },
   });
 

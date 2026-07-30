@@ -4,6 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import VendorDashboardInline from "@/components/VendorDashboardInline";
 import VendorNotesEditor from "@/components/VendorNotesEditor";
+import WeddingLocationEditor from "@/components/WeddingLocationEditor";
 import TabNav from "./TabNav";
 import { getServerLang } from "@/lib/server-lang";
 import { formatDateRange } from "@/lib/dateRange";
@@ -359,6 +360,19 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               ))}
             </div>
           </section>
+
+          {/* Locatie — alleen voor het bruidspaar zelf, stuurt de sortering
+              op de leverancierscatalogus (dichtstbijzijnde eerst). */}
+          {user.role === "couple" && (
+            <section className="mb-8">
+              <h3 className="dash-section-title mb-1">Locatie</h3>
+              <WeddingLocationEditor
+                weddingId={id}
+                initialCity={wedding.locationCity ?? ""}
+                initialProvince={wedding.province ?? ""}
+              />
+            </section>
+          )}
 
           {!isVendor && wedding.notes && (
             <section className="mb-8">

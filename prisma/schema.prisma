@@ -91,6 +91,10 @@ model Wedding {
   ownerId      String
   isPremium    Boolean  @default(false)
   notes        String?
+  locationCity String?  // plaats van het bruidspaar, voor "leveranciers bij jou in de buurt"
+  province     String?
+  latitude     Float?
+  longitude    Float?
   rsvpToken    String   @unique @default(uuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

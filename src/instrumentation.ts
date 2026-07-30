@@ -18,6 +18,11 @@ export async function register() {
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "busyDates" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[]`,
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP`,
 
+      `ALTER TABLE "weddings" ADD COLUMN IF NOT EXISTS "locationCity" TEXT`,
+      `ALTER TABLE "weddings" ADD COLUMN IF NOT EXISTS "province" TEXT`,
+      `ALTER TABLE "weddings" ADD COLUMN IF NOT EXISTS "latitude" DOUBLE PRECISION`,
+      `ALTER TABLE "weddings" ADD COLUMN IF NOT EXISTS "longitude" DOUBLE PRECISION`,
+
       `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "intakeData" JSONB`,
       `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositAmount" DOUBLE PRECISION`,
       `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositDue" TIMESTAMP(3)`,

@@ -1,26 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getDownloadUrl } from "@/lib/r2";
+import { geocodeCity } from "@/lib/geocode";
 
-async function geocodeCity(city?: string | null): Promise<{ latitude?: number; longitude?: number }> {
-  if (!city) return {};
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ", Nederland")}&format=json&limit=1`,
-      { headers: { "User-Agent": "DreamDayPartners/1.0" } }
-    );
-    const json = await res.json();
-    if (Array.isArray(json) && json[0]) {
-      return { latitude: parseFloat(json[0].lat), longitude: parseFloat(json[0].lon) };
-    }
-  } catch {
-    // geocoding is best-effort
-  }
-  return {};
-}
+const VENDOR_LIST_SELECT = {
+  id: true,
+  name: true,
+  category: true,
+  description: true,
+  isPremium: true,
+  coverPhoto: true,
+  city: true,
+  latitude: true,
+  longitude: true,
+  priceFrom: true,
+  specializations: true,
+} satisfies Prisma.VendorSelect;
+
+type VendorListItem = Prisma.VendorGetPayload<{ select: typeof VENDOR_LIST_SELECT }>;
 
 const PAGE_SIZE = 60;
+const EARTH_KM = 6371;
+
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return EARTH_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Zoekt de bruiloftslocatie van de ingelogde gebruiker (bruidspaar, planner
+// of teamlid) op, zodat we leveranciers bij hen in de buurt bovenaan kunnen
+// tonen. Geeft null terug als er geen (gegeocodeerde) locatie bekend is.
+async function findUserLocation(userId: string): Promise<{ latitude: number; longitude: number } | null> {
+  const wedding = await prisma.wedding.findFirst({
+    where: {
+      latitude: { not: null },
+      OR: [{ ownerId: userId }, { teamMembers: { some: { userId } } }],
+    },
+    select: { latitude: true, longitude: true },
+    orderBy: { updatedAt: "desc" },
+  });
+  if (!wedding?.latitude || !wedding.longitude) return null;
+  return { latitude: wedding.latitude, longitude: wedding.longitude };
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -46,28 +74,49 @@ export async function GET(req: NextRequest) {
   // dit endpoint is publiek en zou anders in bulk (60 per pagina) de complete
   // contactdatabase van leveranciers lekken naar scrapers. Contactgegevens
   // staan alleen in de detail-API, één leverancier per request.
-  const [vendors, total] = await Promise.all([
-    prisma.vendor.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        category: true,
-        description: true,
-        isPremium: true,
-        coverPhoto: true,
-        city: true,
-        latitude: true,
-        longitude: true,
-        priceFrom: true,
-        specializations: true,
-      },
-      orderBy: [{ isPremium: "desc" }, { name: "asc" }],
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-    }),
-    prisma.vendor.count({ where }),
-  ]);
+  const select = VENDOR_LIST_SELECT;
+
+  const user = await getSession();
+  const location = user ? await findUserLocation(user.id) : null;
+
+  let vendors: Array<VendorListItem & { distanceKm?: number | null }>;
+  let total: number;
+
+  if (location) {
+    // Locatie bekend: alle matches ophalen, op afstand sorteren en pas dan
+    // pagineren. De catalogus is nog klein genoeg om dit in het geheugen te
+    // doen; bij duizenden leveranciers zou dit met PostGIS moeten.
+    const all = await prisma.vendor.findMany({ where, select });
+    total = all.length;
+    const withDistance = all.map((v) => ({
+      ...v,
+      distanceKm: v.latitude != null && v.longitude != null
+        ? distanceKm(location.latitude, location.longitude, v.latitude, v.longitude)
+        : null,
+    }));
+    withDistance.sort((a, b) => {
+      if (a.distanceKm == null && b.distanceKm == null) {
+        return Number(b.isPremium) - Number(a.isPremium) || a.name.localeCompare(b.name);
+      }
+      if (a.distanceKm == null) return 1;
+      if (b.distanceKm == null) return -1;
+      return a.distanceKm - b.distanceKm;
+    });
+    vendors = withDistance.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  } else {
+    const [pageVendors, count] = await Promise.all([
+      prisma.vendor.findMany({
+        where,
+        select,
+        orderBy: [{ isPremium: "desc" }, { name: "asc" }],
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+      }),
+      prisma.vendor.count({ where }),
+    ]);
+    vendors = pageVendors;
+    total = count;
+  }
 
   // Generate signed URLs for cover photos
   const vendorsWithCover = await Promise.all(
