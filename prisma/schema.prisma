@@ -346,6 +346,7 @@ model WeddingVendor {
   notes           String?
   contractUrl     String?
   intakeData      Json?
+  requiredIntakeKeys String[] @default([]) // intake/logistics-velden die de leverancier graag ingevuld ziet — genereren automatisch een taak
   depositAmount   Float?
   depositDue      DateTime?
   depositPaid     Boolean   @default(false)
@@ -442,6 +443,7 @@ model Task {
   updatedAt   DateTime  @updatedAt
 
   vendorBookingId String?
+  sourceFieldKey  String? // intake/logistics-veldsleutel die deze taak bewaakt — automatisch afgevinkt zodra ingevuld
 
   wedding       Wedding        @relation(fields: [weddingId], references: [id], onDelete: Cascade)
   assignedUser  User?          @relation(fields: [assignedTo], references: [id])

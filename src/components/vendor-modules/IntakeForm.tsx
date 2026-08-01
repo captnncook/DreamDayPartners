@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Flag } from "lucide-react";
 import type { Field } from "@/lib/vendorTypeConfigs";
 
 interface Props {
@@ -10,9 +11,11 @@ interface Props {
   onUpdate: (data: Record<string, unknown>) => void;
   isPlanner: boolean;
   isVendor: boolean;
+  requiredKeys?: string[];
+  onToggleRequired?: (key: string, next: boolean) => void;
 }
 
-export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, isVendor }: Props) {
+export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, isVendor, requiredKeys = [], onToggleRequired }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, unknown>>(intakeData ?? {});
 
@@ -40,7 +43,11 @@ export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, is
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
         <div>
           <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Intake gegevens</h3>
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Deze gegevens worden ingevuld door het bruidspaar of de planner.</p>
+          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>
+            {isVendor
+              ? "Zet een vlag bij een veld om er een taak van te maken bij het bruidspaar/de planner."
+              : "Deze gegevens worden ingevuld door het bruidspaar of de planner."}
+          </p>
         </div>
         {canEdit && (
           <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
@@ -107,10 +114,23 @@ export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, is
 
           const display = value == null || value === "" ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>Niet ingevuld</span> :
             typeof value === "boolean" ? (value ? "Ja" : "Nee") : String(value);
+          const isRequired = requiredKeys.includes(field.key);
 
           return (
-            <div key={field.key} style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
-              <span style={{ fontSize: "0.875rem", color: "var(--muted)", flexShrink: 0 }}>{field.label}</span>
+            <div key={field.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+                {isVendor && onToggleRequired && (
+                  <button
+                    type="button"
+                    onClick={() => onToggleRequired(field.key, !isRequired)}
+                    title={isRequired ? "Zet niet meer als taak bij bruidspaar/planner" : "Zet als taak bij bruidspaar/planner"}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}
+                  >
+                    <Flag className="w-3.5 h-3.5" style={{ color: isRequired ? "var(--gold-deep)" : "var(--muted-light)", fill: isRequired ? "var(--gold-deep)" : "none" }} />
+                  </button>
+                )}
+                <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}>{field.label}</span>
+              </span>
               <span style={{ fontSize: "0.875rem", color: "var(--charcoal)", textAlign: "right" }}>{display}</span>
             </div>
           );

@@ -222,8 +222,8 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 )}
                 {wedding.tasks.slice(0, 4).map((task) => {
                   const isDone = task.status === "done";
-                  return (
-                    <div key={task.id} className="dash-row" style={{ padding: "0.6rem 0.25rem" }}>
+                  const content = (
+                    <>
                       <span
                         className={`flex-1 text-sm truncate${isDone ? " line-through" : ""}`}
                         style={{ color: isDone ? "var(--muted-light)" : "var(--foreground)", fontWeight: isDone ? 400 : 500 }}
@@ -238,6 +238,18 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                           {task.assignedUser.name.charAt(0)}
                         </div>
                       )}
+                      {task.vendorBookingId && (
+                        <span className="flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
+                      )}
+                    </>
+                  );
+                  return task.vendorBookingId ? (
+                    <Link key={task.id} href={`/weddings/${id}/vendors/${task.vendorBookingId}`} className="dash-row" style={{ padding: "0.6rem 0.25rem" }}>
+                      {content}
+                    </Link>
+                  ) : (
+                    <div key={task.id} className="dash-row" style={{ padding: "0.6rem 0.25rem" }}>
+                      {content}
                     </div>
                   );
                 })}

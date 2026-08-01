@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { authorizeWeddingVendor } from "@/lib/vendorAuth";
+import { syncIntakeTasks } from "@/lib/intakeTasks";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
@@ -18,6 +19,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     where: { id: wvId },
     data: { intakeData: body.intakeData },
   });
+
+  await syncIntakeTasks(wvId);
 
   return NextResponse.json({ booking: updated });
 }

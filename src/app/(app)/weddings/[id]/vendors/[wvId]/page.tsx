@@ -62,6 +62,7 @@ export default async function VendorBookingPage({
     finalPaid: b.finalPaid,
     contractUrl: b.contractUrl,
     intakeData: b.intakeData as Record<string, unknown> | null,
+    requiredIntakeKeys: b.requiredIntakeKeys,
   });
 
   const serializedBlocks = booking.draaiboekItems.map(item => ({

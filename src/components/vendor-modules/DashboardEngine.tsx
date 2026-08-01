@@ -40,6 +40,7 @@ interface Props {
     finalPaid: boolean;
     contractUrl?: string | null;
     intakeData?: Record<string, unknown> | null;
+    requiredIntakeKeys?: string[];
   };
   documents: Array<{ id: string; name: string; fileKey: string; mimeType: string; fileSize: number; category: string; createdAt: string }>;
   timelineBlocks: Array<{ id: string; startTime: string; duration: number; title: string; description?: string | null; location?: string | null; phase?: string | null }>;
@@ -65,6 +66,22 @@ export default function DashboardEngine({
   const isPlanner = ["admin", "planner", "team_member"].includes(userRole);
   const isVendor = userRole === "vendor" && vendorUserId === userId;
   const intakeData = (booking.intakeData ?? {}) as Record<string, unknown>;
+  const requiredIntakeKeys = booking.requiredIntakeKeys ?? [];
+
+  const toggleRequiredKey = useCallback(async (key: string, next: boolean) => {
+    const nextKeys = next
+      ? Array.from(new Set([...requiredIntakeKeys, key]))
+      : requiredIntakeKeys.filter((k) => k !== key);
+    const res = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requiredIntakeKeys: nextKeys }),
+    });
+    if (res.ok) {
+      const { booking: updated } = await res.json();
+      setBooking(updated);
+    }
+  }, [weddingId, wvId, requiredIntakeKeys]);
 
   // Effectieve moduleset = (categorie-default ∪ door admin toegekende extra's)
   // min de modules die de leverancier zelf uitgezet heeft (alleen premium
@@ -204,6 +221,8 @@ export default function DashboardEngine({
           onUpdate={patchIntake}
           isPlanner={isPlanner}
           isVendor={isVendor}
+          requiredKeys={requiredIntakeKeys}
+          onToggleRequired={toggleRequiredKey}
         />
       )}
 
@@ -216,6 +235,8 @@ export default function DashboardEngine({
           onUpdate={patchIntake}
           isPlanner={isPlanner}
           isVendor={isVendor}
+          requiredKeys={requiredIntakeKeys}
+          onToggleRequired={toggleRequiredKey}
         />
       )}
 

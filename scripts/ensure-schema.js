@@ -168,6 +168,7 @@ const STATEMENTS = [
   )`,
 
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "intakeData" JSONB`,
+  `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "requiredIntakeKeys" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[]`,
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositAmount" DOUBLE PRECISION`,
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositDue" TIMESTAMP(3)`,
   `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositPaid" BOOLEAN NOT NULL DEFAULT false`,
@@ -184,6 +185,7 @@ const STATEMENTS = [
   `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "visibleVendorIds" TEXT[] NOT NULL DEFAULT '{}'`,
 
   `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
+  `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "sourceFieldKey" TEXT`,
 
   `ALTER TABLE "documents" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
 

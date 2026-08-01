@@ -15,6 +15,7 @@ type Task = {
   status: string;
   priority: string;
   assignedUser?: { id: string; name: string } | null;
+  vendorBookingId?: string | null;
 };
 
 type Member = { id: string; name: string; label: string };
@@ -199,10 +200,20 @@ export default function TasksPage() {
               {(() => { const Icon = STATUS_ICON_MAP[task.status] ?? Circle; return <Icon className="w-5 h-5" style={{ color: STATUS_ICON_COLOR[task.status] ?? "var(--muted-light)" }} />; })()}
             </button>
             <div className="flex-1 min-w-0">
-              <span className={`text-sm ${isDone ? "line-through" : ""}`}
-                style={{ fontWeight: isUrgent ? 700 : isDone ? 400 : 500, color: isDone ? "var(--muted-light)" : "var(--foreground)" }}>
-                {task.title}
-              </span>
+              {task.vendorBookingId ? (
+                <Link href={`/weddings/${id}/vendors/${task.vendorBookingId}`} className="inline-flex items-center gap-1.5 group">
+                  <span className={`text-sm ${isDone ? "line-through" : ""}`}
+                    style={{ fontWeight: isUrgent ? 700 : isDone ? 400 : 500, color: isDone ? "var(--muted-light)" : "var(--foreground)" }}>
+                    {task.title}
+                  </span>
+                  <span style={{ color: "var(--gold-deep)", fontWeight: 600 }}>→</span>
+                </Link>
+              ) : (
+                <span className={`text-sm ${isDone ? "line-through" : ""}`}
+                  style={{ fontWeight: isUrgent ? 700 : isDone ? 400 : 500, color: isDone ? "var(--muted-light)" : "var(--foreground)" }}>
+                  {task.title}
+                </span>
+              )}
               {task.description && (
                 <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{task.description}</p>
               )}

@@ -24,6 +24,7 @@ export async function register() {
       `ALTER TABLE "weddings" ADD COLUMN IF NOT EXISTS "longitude" DOUBLE PRECISION`,
 
       `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "intakeData" JSONB`,
+      `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "requiredIntakeKeys" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[]`,
       `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositAmount" DOUBLE PRECISION`,
       `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositDue" TIMESTAMP(3)`,
       `ALTER TABLE "wedding_vendors" ADD COLUMN IF NOT EXISTS "depositPaid" BOOLEAN NOT NULL DEFAULT false`,
@@ -39,6 +40,7 @@ export async function register() {
       `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "assignedUserId" TEXT`,
 
       `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
+      `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "sourceFieldKey" TEXT`,
       `ALTER TABLE "documents" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
 
       `CREATE TABLE IF NOT EXISTS "vendor_contact_requests" (

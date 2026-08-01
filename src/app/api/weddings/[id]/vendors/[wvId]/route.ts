@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { authorizeWeddingVendor } from "@/lib/vendorAuth";
+import { syncIntakeTasks } from "@/lib/intakeTasks";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
@@ -65,6 +66,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
 
+  // Welke intake/logistics-velden de leverancier graag ingevuld ziet: alleen
+  // de leverancier zelf bepaalt dat voor de eigen boeking.
+  if (body.requiredIntakeKeys !== undefined && user.role !== "vendor") {
+    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  }
+
   // Paid toggles are allowed for all authenticated users (vendor marks own invoice paid)
 
   const updated = await prisma.weddingVendor.update({
@@ -79,9 +86,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ...(body.finalAmount !== undefined && { finalAmount: body.finalAmount }),
       ...(body.finalDue !== undefined && { finalDue: body.finalDue ? new Date(body.finalDue) : null }),
       ...(body.finalPaid !== undefined && { finalPaid: body.finalPaid }),
+      ...(body.requiredIntakeKeys !== undefined && { requiredIntakeKeys: body.requiredIntakeKeys }),
     },
     include: { vendor: true },
   });
+
+  if (body.requiredIntakeKeys !== undefined) {
+    await syncIntakeTasks(wvId);
+  }
 
   return NextResponse.json({ booking: updated });
 }
