@@ -65,6 +65,9 @@ export default function DashboardEngine({
 
   const isPlanner = ["admin", "planner", "team_member"].includes(userRole);
   const isVendor = userRole === "vendor" && vendorUserId === userId;
+  // Intake/logistics-velden mag ook het bruidspaar zelf invullen — de taken
+  // die uit deze velden voortkomen zijn immers voor bruidspaar én planner.
+  const canEditIntake = isPlanner || userRole === "couple";
   const intakeData = (booking.intakeData ?? {}) as Record<string, unknown>;
   const requiredIntakeKeys = booking.requiredIntakeKeys ?? [];
 
@@ -219,7 +222,7 @@ export default function DashboardEngine({
           fields={config.logisticsFields!}
           intakeData={intakeData}
           onUpdate={patchIntake}
-          isPlanner={isPlanner}
+          isPlanner={canEditIntake}
           isVendor={isVendor}
           requiredKeys={requiredIntakeKeys}
           onToggleRequired={toggleRequiredKey}
@@ -233,7 +236,7 @@ export default function DashboardEngine({
           fields={config.intakeFields!}
           intakeData={intakeData}
           onUpdate={patchIntake}
-          isPlanner={isPlanner}
+          isPlanner={canEditIntake}
           isVendor={isVendor}
           requiredKeys={requiredIntakeKeys}
           onToggleRequired={toggleRequiredKey}

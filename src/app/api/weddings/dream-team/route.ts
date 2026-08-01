@@ -21,12 +21,13 @@ export async function GET() {
   if (!wedding) return NextResponse.json({ weddingId: null, team: [] });
 
   // Group by category: keep only the first (primary) vendor per category
-  const byCategory: Record<string, { vendorId: string; name: string; category: string; photoKey: string | null }> = {};
+  const byCategory: Record<string, { vendorId: string; wvId: string; name: string; category: string; photoKey: string | null }> = {};
   for (const wv of wedding.vendors) {
     const cat = wv.vendor.category;
     if (!byCategory[cat]) {
       byCategory[cat] = {
         vendorId: wv.vendor.id,
+        wvId: wv.id,
         name: wv.vendor.name,
         category: cat,
         photoKey: wv.vendor.emblemPhoto ?? wv.vendor.coverPhoto ?? null,
@@ -37,6 +38,7 @@ export async function GET() {
   const entries = Object.values(byCategory);
   const team = await Promise.all(entries.map(async (e) => ({
     vendorId: e.vendorId,
+    wvId: e.wvId,
     name: e.name,
     category: e.category,
     photo: e.photoKey ? await getDownloadUrl(e.photoKey, 3600).catch(() => null) : null,

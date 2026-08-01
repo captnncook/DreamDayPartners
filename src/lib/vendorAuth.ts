@@ -18,8 +18,8 @@ export async function getOwnVendorId(userId: string): Promise<string | null> {
 /**
  * Checks whether a user may access a WeddingVendor record.
  *
- * - Planners / admins / team members: always allowed
- * - Couple / guest roles: denied
+ * - Planners / admins / team members / bruidspaar (couple): always allowed
+ * - Guest roles: denied
  * - Vendor role: only allowed when their Vendor.id matches wv.vendorId
  *
  * Returns the WeddingVendor record on success, or a NextResponse 403/404 on failure.
@@ -41,7 +41,7 @@ export async function authorizeWeddingVendor(
     return { ok: false, response: NextResponse.json({ error: "Niet gevonden" }, { status: 404 }) };
   }
 
-  if (["admin", "planner", "team_member"].includes(user.role)) {
+  if (["admin", "planner", "team_member", "couple"].includes(user.role)) {
     return { ok: true, wv };
   }
 

@@ -22,7 +22,7 @@ const SLOTS = [
   { category: "verhuur",        label: "Verhuur" },
 ];
 
-type TeamMember = { vendorId: string; name: string; category: string; photo: string | null };
+type TeamMember = { vendorId: string; wvId: string; name: string; category: string; photo: string | null };
 
 function initials(name: string) {
   return name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
@@ -33,13 +33,20 @@ const SHIELD_PATH = "M50 4 L92 20 L92 62 C92 88 72 108 50 118 C28 108 8 88 8 62 
 function ShieldCard({
   slot,
   member,
+  weddingId,
   onRemove,
 }: {
   slot: typeof SLOTS[number];
   member: TeamMember | undefined;
+  weddingId: string | null;
   onRemove: (m: TeamMember) => void;
 }) {
-  const href = member ? `/leveranciers/${member.vendorId}` : `/leveranciers?category=${slot.category}`;
+  // Bij een bevestigde leverancier gaan we naar het bruiloft-specifieke
+  // dashboard (waar je bijv. de DJ-playlist of bloemist-inspiratie invult),
+  // niet naar het algemene, publieke leveranciersprofiel.
+  const href = member
+    ? (weddingId ? `/weddings/${weddingId}/vendors/${member.wvId}` : `/leveranciers/${member.vendorId}`)
+    : `/leveranciers?category=${slot.category}`;
   const label = member ? member.name : slot.label;
   const [firstName, ...rest] = label.split(" ");
 
@@ -181,6 +188,7 @@ export default function DreamTeamPage() {
               key={slot.category}
               slot={slot}
               member={team.find(m => m.category === slot.category)}
+              weddingId={weddingId}
               onRemove={setConfirmMember}
             />
           ))}
