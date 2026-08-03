@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ClipboardList, Plus, Printer } from "lucide-react";
+import { CalendarPlus, ClipboardList, Plus, Printer } from "lucide-react";
 import DraaiboekGrid, { type GridItem, type WeddingVendorRef } from "./DraaiboekGrid";
 import { eachDay, sameDay } from "@/lib/dateRange";
 
@@ -70,6 +70,22 @@ export default function DraaiboekClient({
   const [showDateEditor, setShowDateEditor] = useState(false);
   const [endDateDraft, setEndDateDraft] = useState(weddingEndDate ? weddingEndDate.split("T")[0] : "");
   const [savingEndDate, setSavingEndDate] = useState(false);
+  const [showCalendarLink, setShowCalendarLink] = useState(false);
+  const [calendarLink, setCalendarLink] = useState<{ httpsUrl: string; webcalUrl: string } | null>(null);
+  const [loadingCalendarLink, setLoadingCalendarLink] = useState(false);
+  const [calendarLinkCopied, setCalendarLinkCopied] = useState(false);
+
+  async function openCalendarLink() {
+    setShowCalendarLink(true);
+    if (calendarLink) return;
+    setLoadingCalendarLink(true);
+    try {
+      const res = await fetch(`/api/me/calendar-link?weddingId=${weddingId}`);
+      if (res.ok) setCalendarLink(await res.json());
+    } finally {
+      setLoadingCalendarLink(false);
+    }
+  }
 
   // Einddatum instellen/aanpassen (meerdaagse bruiloft) — kan ook later nog.
   async function saveEndDate(clear = false) {
@@ -227,6 +243,9 @@ export default function DraaiboekClient({
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
           <div className="flex gap-2">
+            <button onClick={openCalendarLink} className="ddp-btn-secondary">
+              <CalendarPlus className="inline w-3.5 h-3.5 mr-1" />Koppel aan agenda
+            </button>
             <button onClick={exportPdf} disabled={exporting || !activeDraaiboekId} className="ddp-btn-secondary">
               <Printer className="inline w-3.5 h-3.5 mr-1" />{exporting ? "Bezig…" : "Exporteren als pdf"}
             </button>
@@ -367,6 +386,54 @@ export default function DraaiboekClient({
                 onDragStateChange={dragging => { draggingRef.current = dragging; }}
               />
             )}
+          </div>
+        </div>
+      )}
+
+      {showCalendarLink && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}
+          onClick={() => setShowCalendarLink(false)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: "var(--background)", borderRadius: "16px", padding: "1.75rem", maxWidth: "460px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
+          >
+            <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "0.5rem" }}>Koppel aan agenda</h2>
+            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.5 }}>
+              Abonneer je op dit draaiboek in Google Calendar, Apple Kalender of Outlook. Nieuwe of gewijzigde onderdelen verschijnen automatisch — de agenda-app bepaalt zelf hoe vaak hij ververst.
+            </p>
+            {loadingCalendarLink ? (
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Bezig…</p>
+            ) : calendarLink ? (
+              <>
+                <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+                  <input readOnly value={calendarLink.httpsUrl} style={{ ...INPUT_STYLE, fontSize: "0.75rem" }} onFocus={e => e.target.select()} />
+                  <button
+                    className="ddp-btn-secondary"
+                    style={{ flexShrink: 0 }}
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(calendarLink.httpsUrl);
+                      setCalendarLinkCopied(true);
+                      setTimeout(() => setCalendarLinkCopied(false), 2000);
+                    }}
+                  >
+                    {calendarLinkCopied ? "Gekopieerd" : "Kopiëren"}
+                  </button>
+                </div>
+                <a href={calendarLink.webcalUrl} className="ddp-btn-primary" style={{ display: "inline-block", marginBottom: "1rem", textDecoration: "none" }}>
+                  Direct openen in agenda-app
+                </a>
+                <p style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.6 }}>
+                  <strong>Google Calendar:</strong> Instellingen → Agenda toevoegen → Op URL → plak de link.<br />
+                  <strong>Apple Kalender:</strong> Archief → Nieuw agenda-abonnement → plak de link.<br />
+                  <strong>Outlook:</strong> Agenda toevoegen → Abonneren via internet → plak de link.
+                </p>
+              </>
+            ) : (
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Kon de link niet ophalen.</p>
+            )}
+            <button onClick={() => setShowCalendarLink(false)} className="ddp-btn-secondary mt-4">Sluiten</button>
           </div>
         </div>
       )}

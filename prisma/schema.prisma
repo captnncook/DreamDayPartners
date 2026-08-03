@@ -14,6 +14,7 @@ model User {
   role       String   // admin | planner | team_member | couple | vendor
   vendorType String?  // bloemist | dj | catering | fotograaf | etc.
   avatar     String?
+  calendarToken        String?  @unique // token voor de agenda-abonnement (.ics) feed
   passwordHash         String?
   emailNewMessage      Boolean  @default(true)
   emailNewTask         Boolean  @default(true)

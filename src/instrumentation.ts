@@ -39,6 +39,9 @@ export async function register() {
       `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "phase" TEXT`,
       `ALTER TABLE "draaiboek_items" ADD COLUMN IF NOT EXISTS "assignedUserId" TEXT`,
 
+      `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "calendarToken" TEXT`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS "users_calendarToken_key" ON "users" ("calendarToken")`,
+
       `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
       `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "sourceFieldKey" TEXT`,
       `ALTER TABLE "documents" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
