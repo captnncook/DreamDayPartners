@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Upload, Trash2, Save, Check, Star } from "lucide-react";
+import ShieldPhotoCropper from "@/components/ShieldPhotoCropper";
 import { getVendorProfileSection, type ProfileField } from "@/lib/vendorProfileSections";
 
 const CATEGORIES = [
@@ -271,6 +272,7 @@ function VendorEditPage() {
   const [saved, setSaved] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingEmblem, setUploadingEmblem] = useState(false);
+  const [emblemCropFile, setEmblemCropFile] = useState<File | null>(null);
   const [emblemUrl, setEmblemUrl] = useState<string | null>(null);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [error, setError] = useState("");
@@ -468,9 +470,13 @@ function VendorEditPage() {
     void coverKey;
   }
 
-  async function handleEmblemUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleEmblemFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setEmblemCropFile(file);
+  }
+
+  async function uploadEmblemFile(file: File) {
     setUploadingEmblem(true);
     setError("");
     try {
@@ -487,6 +493,16 @@ function VendorEditPage() {
       setUploadingEmblem(false);
       if (emblemInputRef.current) emblemInputRef.current.value = "";
     }
+  }
+
+  function handleEmblemCropped(blob: Blob) {
+    setEmblemCropFile(null);
+    void uploadEmblemFile(new File([blob], "embleem.jpg", { type: "image/jpeg" }));
+  }
+
+  function handleEmblemCropCancel() {
+    setEmblemCropFile(null);
+    if (emblemInputRef.current) emblemInputRef.current.value = "";
   }
 
   async function handleDeleteEmblem() {
@@ -769,11 +785,11 @@ function VendorEditPage() {
                   </clipPath>
                 </defs>
                 <path d="M60 4 L108 22 L108 72 C108 100 84 124 60 136 C36 124 12 100 12 72 L12 22 Z"
-                  fill={emblemUrl ? "var(--ink)" : "var(--sand)"} stroke="var(--border)" strokeWidth="2" />
+                  fill={emblemUrl ? "var(--ink)" : "#1a1a1a"} stroke="var(--border)" strokeWidth="2" />
                 {emblemUrl ? (
                   <image href={emblemUrl} x="12" y="4" width="96" height="132" clipPath="url(#shield-clip-edit)" preserveAspectRatio="xMidYMid slice" />
                 ) : (
-                  <text x="60" y="80" textAnchor="middle" fill="var(--muted)" fontSize="32" fontWeight="300">+</text>
+                  <image href="/images/logo-wit.svg" x="45" y="55" width="30" height="30" opacity={0.85} />
                 )}
               </svg>
             </div>
@@ -792,7 +808,10 @@ function VendorEditPage() {
               <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Max 10 MB · JPG, PNG, WebP</p>
             </div>
           </div>
-          <input ref={emblemInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEmblemUpload} />
+          <input ref={emblemInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEmblemFileSelected} />
+          {emblemCropFile && (
+            <ShieldPhotoCropper file={emblemCropFile} onCancel={handleEmblemCropCancel} onCropped={handleEmblemCropped} />
+          )}
         </section>
 
         {/* Galerij */}

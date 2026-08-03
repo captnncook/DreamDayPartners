@@ -25,10 +25,6 @@ const SLOTS = [
 
 type TeamMember = { vendorId: string; wvId: string; name: string; category: string; photo: string | null };
 
-function initials(name: string) {
-  return name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
-}
-
 const SHIELD_PATH = "M50 4 L92 20 L92 62 C92 88 72 108 50 118 C28 108 8 88 8 62 L8 20 Z";
 
 function ShieldCard({
@@ -99,10 +95,11 @@ function ShieldCard({
                   preserveAspectRatio="xMidYMid slice"
                 />
               ) : (
-                <text x="50" y="68" textAnchor="middle" dominantBaseline="middle"
-                  fill="white" fontSize="22" fontWeight="700" fontFamily="system-ui, sans-serif">
-                  {initials(member.name)}
-                </text>
+                <image
+                  href="/images/logo-wit.svg"
+                  x="35" y="48" width="30" height="30"
+                  opacity={0.85}
+                />
               )
             ) : (
               <>
