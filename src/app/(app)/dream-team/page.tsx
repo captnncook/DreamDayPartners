@@ -12,14 +12,15 @@ const SLOTS = [
   { category: "catering",       label: "Catering" },
   { category: "bloemist",       label: "Bloemist" },
   { category: "dj",             label: "DJ / Muziek" },
-  { category: "liveband",       label: "Liveband" },
-  { category: "haarstylist",    label: "Haarstylist" },
-  { category: "visagist",       label: "Visagist" },
+  { category: "liveband",       label: "Liveband & Entertainment" },
+  { category: "haarstylist",    label: "Haar & Make-up" },
   { category: "bakker",         label: "Bruidstaart" },
   { category: "vervoer",        label: "Vervoer" },
+  { category: "decoratie",      label: "Decoratie & Styling" },
   { category: "fotocabine",     label: "Fotocabine" },
-  { category: "bar",            label: "Bar / Cocktails" },
-  { category: "verhuur",        label: "Verhuur" },
+  { category: "bruidsmode",     label: "Bruidsmode" },
+  { category: "herenmode",      label: "Herenmode" },
+  { category: "juwelier",       label: "Juwelier" },
 ];
 
 type TeamMember = { vendorId: string; wvId: string; name: string; category: string; photo: string | null };

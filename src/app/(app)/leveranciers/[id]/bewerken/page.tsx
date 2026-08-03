@@ -15,13 +15,16 @@ const CATEGORIES = [
   { value: "catering", label: "Catering" },
   { value: "bakker", label: "Bruidstaart & Bakker" },
   { value: "dj", label: "DJ" },
-  { value: "liveband", label: "Liveband & Muziek" },
+  { value: "liveband", label: "Liveband & Entertainment" },
   { value: "ceremoniespreker", label: "Ceremoniespreker" },
   { value: "trouwlocatie", label: "Trouwlocatie" },
   { value: "haarstylist", label: "Haar & Make-up" },
   { value: "vervoer", label: "Vervoer" },
   { value: "decoratie", label: "Decoratie & Styling" },
   { value: "fotocabine", label: "Fotocabine" },
+  { value: "bruidsmode", label: "Bruidsmode" },
+  { value: "herenmode", label: "Herenmode" },
+  { value: "juwelier", label: "Juwelier" },
   { value: "overig", label: "Overig" },
 ];
 

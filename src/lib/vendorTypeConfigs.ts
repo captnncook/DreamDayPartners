@@ -157,6 +157,9 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   // ── Planning & Coördinatie ───────────────────────────────
 
   {
+    // Omvat ook de rol van ceremoniemeester (dagcoördinatie, aankondigingen) —
+    // die is als los type samengevoegd omdat de behoeftes (tijdlijn, checklist)
+    // identiek zijn aan die van de weddingplanner.
     type: "weddingplanner",
     label: "Weddingplanner",
     modules: ["checklistDeadlines", "timelinePlanner"],
@@ -164,13 +167,20 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "scope", label: "Scope van opdracht", type: "text", placeholder: "Volledig, dag-van, advies..." },
       { key: "budget", label: "Totaalbudget (€)", type: "number", placeholder: "Bijv. 25000" },
       { key: "beslisbevoegdheid", label: "Beslisbevoegdheid", type: "text", placeholder: "Wie mag akkoord geven?" },
+      { key: "rolafbakening", label: "Rolafbakening (indien ook ceremoniemeester)", type: "longtext", placeholder: "Dagcoördinatie, aankondigingen, gasten begeleiden..." },
+      { key: "sprekers", label: "Sprekers & volgorde", type: "longtext", placeholder: "Naam, onderwerp, duur per spreker" },
+      { key: "verrassingen", label: "Verrassingen & speciale momenten", type: "longtext", placeholder: "Flash mob, surprise optreden, etc." },
     ],
     deliverables: [
       { key: "projectplan", label: "Projectplan" },
       { key: "leveranciersoverzicht", label: "Leveranciersoverzicht" },
+      { key: "draaiboek", label: "Draaiboek dag-van" },
+      { key: "aankondigingen", label: "Aankondigingsteksten" },
     ],
     timelineTemplate: [
       { key: "regie-overzicht", label: "Regie & overzicht alle blokken", phase: "custom", defaultDuration: 480 },
+      { key: "aankomst-cmc", label: "Aankomst ceremoniemeester", phase: "arrival", defaultDuration: 30 },
+      { key: "aankondigingen", label: "Aankondigingen & cues", phase: "perform", defaultDuration: 360 },
     ],
     logisticsFields: [],
   },
@@ -197,26 +207,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "repetitie", label: "Repetitie", phase: "setup", defaultDuration: 30 },
       { key: "start-ceremonie", label: "Start ceremonie", phase: "perform", defaultDuration: 5 },
       { key: "duur-ceremonie", label: "Duur ceremonie", phase: "perform", defaultDuration: 30 },
-    ],
-    logisticsFields: [],
-  },
-
-  {
-    type: "ceremoniemeester",
-    label: "Ceremoniemeester",
-    modules: ["timelinePlanner", "checklistDeadlines"],
-    intakeFields: [
-      { key: "rolafbakening", label: "Rolafbakening", type: "longtext", placeholder: "Dagcoördinatie, aankondigingen, gasten begeleiden..." },
-      { key: "sprekers", label: "Sprekers & volgorde", type: "longtext", placeholder: "Naam, onderwerp, duur per spreker" },
-      { key: "verrassingen", label: "Verrassingen & speciale momenten", type: "longtext", placeholder: "Flash mob, surprise optreden, etc." },
-    ],
-    deliverables: [
-      { key: "draaiboek", label: "Draaiboek dag-van" },
-      { key: "aankondigingen", label: "Aankondigingsteksten" },
-    ],
-    timelineTemplate: [
-      { key: "aankomst-cmc", label: "Aankomst ceremoniemeester", phase: "arrival", defaultDuration: 30 },
-      { key: "aankondigingen", label: "Aankondigingen & cues", phase: "perform", defaultDuration: 360 },
     ],
     logisticsFields: [],
   },
@@ -255,6 +245,8 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   },
 
   {
+    // Omvat ook Content Creator (social-mediacontent) — zelfde soort
+    // deliverable-cyclus (opnemen → korte clips → definitief) als video.
     type: "videograaf",
     label: "Videograaf",
     modules: ["deliverablesTracker", "timelinePlanner", "videoDelivery"],
@@ -269,12 +261,17 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "audioGeloften", label: "Aparte audio geloften opnemen?", type: "boolean" },
       { key: "muziekstijl", label: "Favoriete muziekstijl voor de film", type: "text", placeholder: "Bijv. klassiek, emotioneel, jaren 80..." },
       { key: "muziekNummers", label: "Specifieke nummers voor de film", type: "longtext", placeholder: "Geef nummers op die je wil verwerken..." },
+      { key: "contentstijl", label: "Contentstijl & feed-esthetiek (indien ook social content)", type: "longtext", placeholder: "Warm, licht, donker, kleurrijk..." },
+      { key: "hashtag", label: "Bruiloft hashtag", type: "text", placeholder: "#VanDenBergTrauwt2026" },
+      { key: "sameDayEdit", label: "Same-day edit gewenst?", type: "boolean" },
     ],
     deliverables: [
       { key: "ceremonie-audio", label: "Ceremonie-audio (ruwe cut)" },
       { key: "speeches", label: "Speeches compilatie" },
       { key: "teaser", label: "Teaser (1–2 min)", approvalRequired: false },
       { key: "trouwfilm", label: "Trouwfilm (definitief)", approvalRequired: true },
+      { key: "stories", label: "Stories (dag-van)" },
+      { key: "reels", label: "Reels / korte video" },
     ],
     timelineTemplate: [
       { key: "voorbereiding", label: "Voorbereiding / getting ready", phase: "arrival", defaultDuration: 60 },
@@ -297,28 +294,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   },
 
   {
-    type: "contentcreator",
-    label: "Content Creator",
-    modules: ["deliverablesTracker", "timelinePlanner"],
-    intakeFields: [
-      { key: "stijl", label: "Contentstijl & feed-esthetiek", type: "longtext", placeholder: "Warm, licht, donker, kleurrijk..." },
-      { key: "hashtag", label: "Bruiloft hashtag", type: "text", placeholder: "#VanDenBergTrauwt2026" },
-      { key: "sameDayEdit", label: "Same-day edit gewenst?", type: "boolean" },
-    ],
-    deliverables: [
-      { key: "stories", label: "Stories (dag-van)" },
-      { key: "reels", label: "Reels / korte video" },
-      { key: "highlights", label: "Highlights compilatie", approvalRequired: true },
-    ],
-    timelineTemplate: [
-      { key: "getting-ready-content", label: "Content getting ready", phase: "arrival", defaultDuration: 60 },
-      { key: "ceremonie-content", label: "Content ceremonie", phase: "perform", defaultDuration: 45 },
-      { key: "feest-content", label: "Content feest", phase: "perform", defaultDuration: 120 },
-    ],
-    logisticsFields: [],
-  },
-
-  {
     type: "fotocabine",
     label: "Fotocabine",
     modules: ["timelinePlanner"],
@@ -327,7 +302,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
         key: "type",
         label: "Type cabine",
         type: "select",
-        options: ["open", "gesloten", "spiegel"],
+        options: ["open", "gesloten", "spiegel", "360-graden", "neon"],
       },
       { key: "props", label: "Props & accessoires", type: "text", placeholder: "Hoeden, brillen, borden..." },
       { key: "branding", label: "Branding / personalisatie", type: "text", placeholder: "Logo, namen, datum op de strip" },
@@ -341,36 +316,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "opbouw-cabine", label: "Opbouw fotocabine", phase: "setup", defaultDuration: 60 },
       { key: "cabine-actief", label: "Fotocabine actief tijdens feest", phase: "perform", defaultDuration: 240 },
       { key: "afbouw-cabine", label: "Afbouw fotocabine", phase: "teardown", defaultDuration: 45 },
-    ],
-    logisticsFields: [
-      { key: "stroomaansluiting", label: "Stroomaansluiting vereist (230V)", type: "boolean" },
-      { key: "ruimte-afmeting", label: "Benodigde ruimte (m²)", type: "text" },
-    ],
-  },
-
-  {
-    type: "fotoboothspeciaal",
-    label: "Fotoboothspeciaal",
-    modules: ["timelinePlanner"],
-    intakeFields: [
-      {
-        key: "type",
-        label: "Type fotobooth",
-        type: "select",
-        options: ["open", "gesloten", "spiegel", "360-graden", "neon"],
-      },
-      { key: "props", label: "Props & accessoires", type: "text", placeholder: "Hoeden, brillen, borden..." },
-      { key: "branding", label: "Branding / personalisatie", type: "text", placeholder: "Logo, namen, datum op de strip" },
-    ],
-    deliverables: [
-      { key: "proppenlijst", label: "Proppenlijst" },
-      { key: "branded-prints", label: "Branded prints template", approvalRequired: true },
-      { key: "fotostrip", label: "Digitale fotostrip bezoekers" },
-    ],
-    timelineTemplate: [
-      { key: "opbouw-booth", label: "Opbouw fotobooth", phase: "setup", defaultDuration: 90 },
-      { key: "booth-actief", label: "Fotobooth actief tijdens feest", phase: "perform", defaultDuration: 240 },
-      { key: "afbouw-booth", label: "Afbouw fotobooth", phase: "teardown", defaultDuration: 60 },
     ],
     logisticsFields: [
       { key: "stroomaansluiting", label: "Stroomaansluiting vereist (230V)", type: "boolean" },
@@ -411,8 +356,11 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   },
 
   {
+    // Omvat ook overige entertainment-acts (goochelaar, acrobaat, etc.) —
+    // die hebben dezelfde kerninformatie nodig (tijdschema, technische rider,
+    // stroom/ruimte) als een liveband.
     type: "liveband",
-    label: "Liveband & Muziek",
+    label: "Liveband & Entertainment",
     modules: ["setlistPlanner", "timelinePlanner", "deliverablesTracker", "logisticsPanel", "documentUpload"],
     intakeFields: [
       {
@@ -423,11 +371,15 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "setlist", label: "Setlist wensen", type: "longtext", placeholder: "Genres of specifieke nummers per moment van de dag" },
       { key: "mcRole", label: "MC-rol gewenst?", type: "boolean" },
       { key: "covers", label: "Specifieke covers / verzoeken", type: "longtext", placeholder: "Verzoekjes van het bruidspaar" },
+      { key: "typeAct", label: "Type act (indien geen band maar bijv. goochelaar, acrobaat)", type: "text", placeholder: "Goochelaar, acrobaat, caricaturist..." },
+      { key: "duur", label: "Duur optreden (minuten)", type: "number" },
+      { key: "rider", label: "Technische rider / vereisten", type: "longtext", placeholder: "Ruimte, licht, geluid, kleedkamer..." },
     ],
     deliverables: [
       { key: "setlist", label: "Setlist (definitief)", approvalRequired: true },
       { key: "technische-rider", label: "Technische rider" },
       { key: "soundcheck-tijden", label: "Soundcheck tijdschema" },
+      { key: "programmaomschrijving", label: "Programmaomschrijving" },
     ],
     timelineTemplate: [
       { key: "opbouw-apparatuur", label: "Opbouw apparatuur", phase: "setup", defaultDuration: 90 },
@@ -448,29 +400,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "geluidsgrens-db", label: "Geluidsgrens locatie (dB)", type: "number" },
       { key: "podium-afmeting", label: "Podiumafmeting (m²)", type: "text" },
       { key: "kleedkamer", label: "Kleedkamer / backstage vereist?", type: "boolean" },
-    ],
-  },
-
-  {
-    type: "entertainment",
-    label: "Entertainment / Acts",
-    modules: ["timelinePlanner"],
-    intakeFields: [
-      { key: "typeAct", label: "Type act", type: "text", placeholder: "Goochelaar, acrobaat, caricaturist..." },
-      { key: "duur", label: "Duur optreden (minuten)", type: "number" },
-      { key: "rider", label: "Technische rider / vereisten", type: "longtext", placeholder: "Ruimte, licht, geluid, kleedkamer..." },
-    ],
-    deliverables: [
-      { key: "programmaomschrijving", label: "Programmaomschrijving" },
-      { key: "technische-rider", label: "Technische rider" },
-    ],
-    timelineTemplate: [
-      { key: "soundcheck-act", label: "Soundcheck / voorbereiding act", phase: "setup", defaultDuration: 30 },
-      { key: "timing-draaiboek", label: "Optreden in draaiboek", phase: "perform", defaultDuration: 45 },
-    ],
-    logisticsFields: [
-      { key: "ruimtevereiste", label: "Benodigde ruimte (m²)", type: "text" },
-      { key: "stroomaansluiting", label: "Stroomaansluiting vereist?", type: "boolean" },
+      { key: "ruimtevereiste", label: "Benodigde ruimte (m²), indien geen podium", type: "text" },
     ],
   },
 
@@ -526,57 +456,66 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   },
 
   {
+    // Omvat ook Verlichting, Verhuur, Tentverhuur en Drukwerk — allemaal
+    // leveranciers die de fysieke aankleding/opbouw van de bruiloft
+    // verzorgen, met grotendeels dezelfde soort tijdlijn- en logistiek-
+    // behoeftes als decoratie & styling.
     type: "decoratie",
     label: "Decoratie & Styling",
-    modules: ["moodboardUploader", "timelinePlanner", "deliverablesTracker"],
+    modules: ["moodboardUploader", "timelinePlanner", "deliverablesTracker", "approvalButton"],
     intakeFields: [
       { key: "thema", label: "Thema & stijl", type: "text", placeholder: "Boho, klassiek, modern, romantisch..." },
       { key: "palette", label: "Kleurenpalet", type: "color-multi" },
       { key: "planPerRuimte", label: "Inrichtingsplan per ruimte", type: "longtext", placeholder: "Foyer, ceremonie, diner, dance floor..." },
+      { key: "lichtplanPerZone", label: "Lichtplan per zone (indien ook verlichting)", type: "longtext", placeholder: "Ceremonie, diner, dance floor, exterieur..." },
+      { key: "dansvloerEffect", label: "Dance floor lichteffect", type: "text", placeholder: "Moving heads, LED-strip, gobo..." },
+      { key: "itemlijst", label: "Itemlijst (indien ook verhuur)", type: "longtext", placeholder: "Tafels, stoelen, servies, linnengoed..." },
+      { key: "aantallen", label: "Aantallen per item", type: "longtext" },
+      { key: "plattegrond", label: "Plaatsingsplattegrond gewenst?", type: "boolean" },
+      { key: "typeTent", label: "Type tent (indien ook tentverhuur)", type: "text", placeholder: "Partytent, tipi, glazen paviljoen, feesttent..." },
+      { key: "ondergrond", label: "Ondergrond locatie", type: "text", placeholder: "Gras, klinkers, zand..." },
+      { key: "weerplan", label: "Weerplan / plan-B", type: "longtext", placeholder: "Zijwanden, verwarming, vloer bij regen..." },
+      { key: "huisstijl", label: "Huisstijl / thema drukwerk (indien ook drukwerk)", type: "text", placeholder: "Kleuren, lettertype, stijl..." },
+      { key: "teksten", label: "Benodigde teksten", type: "longtext", placeholder: "Uitnodiging, menukaart, programma, bordje..." },
+      { key: "oplage", label: "Oplage per item", type: "longtext", placeholder: "Uitnodiging: 120x, menukaart: 80x..." },
     ],
     deliverables: [
       { key: "moodboard", label: "Moodboard", approvalRequired: true },
       { key: "inrichtingsplan", label: "Inrichtingsplan (definitief)", approvalRequired: true },
       { key: "ceremonie-decor", label: "Ceremonie decor opgeleverd" },
       { key: "diner-decor", label: "Diner decor opgeleverd" },
+      { key: "lichtplan", label: "Lichtplan (definitief)" },
+      { key: "verhuurlijst", label: "Verhuurlijst (definitief)", approvalRequired: true },
+      { key: "tentplan", label: "Tentplan & plattegrond", approvalRequired: true },
+      { key: "uitnodiging-proof", label: "Uitnodiging drukproef", approvalRequired: true },
+      { key: "menukaart-proof", label: "Menukaart drukproef", approvalRequired: true },
+      { key: "programmaboekje", label: "Programmaboekje", approvalRequired: true },
     ],
     timelineTemplate: [
       { key: "opbouw-decoratie", label: "Opbouw decoratie", phase: "setup", defaultDuration: 180 },
       { key: "omzetten-decor", label: "Ceremonie → diner omzetten", phase: "custom", defaultDuration: 45 },
       { key: "afbouw-decoratie", label: "Afbouw decoratie", phase: "teardown", defaultDuration: 120 },
+      { key: "opbouw-tent", label: "Opbouw tent (indien van toepassing, dagen vooraf)", phase: "setup", defaultDuration: 480 },
+      { key: "afbouw-tent", label: "Afbouw tent", phase: "teardown", defaultDuration: 480 },
     ],
     logisticsFields: [
       { key: "toegang-venue", label: "Toegangstijd venue voor opbouw", type: "time" },
       { key: "huurmateriaal-retour", label: "Huurmateriaal retour datum", type: "text" },
-    ],
-  },
-
-  {
-    type: "verlichting",
-    label: "Verlichting",
-    modules: ["timelinePlanner"],
-    intakeFields: [
-      { key: "lichtplanPerZone", label: "Lichtplan per zone", type: "longtext", placeholder: "Ceremonie, diner, dance floor, exterieur..." },
-      { key: "dansvloerEffect", label: "Dance floor lichteffect", type: "text", placeholder: "Moving heads, LED-strip, gobo..." },
-    ],
-    deliverables: [
-      { key: "lichtplan", label: "Lichtplan (definitief)" },
-      { key: "technische-rider", label: "Technische rider verlichting" },
-    ],
-    timelineTemplate: [
-      { key: "opbouw-licht", label: "Opbouw verlichting", phase: "setup", defaultDuration: 120 },
-      { key: "scenewissels", label: "Scènewissels tijdens dag", phase: "perform", defaultDuration: 0 },
-      { key: "afbouw-licht", label: "Afbouw verlichting", phase: "teardown", defaultDuration: 60 },
-    ],
-    logisticsFields: [
       { key: "stroomvereiste", label: "Stroomvereiste (Watt)", type: "number" },
       { key: "aansluitpunten", label: "Aantal benodigde aansluitpunten", type: "number" },
+      { key: "retouradres", label: "Retouradres / -datum verhuurmateriaal", type: "text" },
+      { key: "schadebeleid", label: "Schadebeleid", type: "text" },
+      { key: "stroomaansluitingTent", label: "Stroomaansluiting tent", type: "boolean" },
+      { key: "verwarming", label: "Verwarmingselement aanwezig?", type: "boolean" },
+      { key: "vloerNodig", label: "Tentbodem / vloer vereist?", type: "boolean" },
     ],
   },
 
   // ── Eten & Drinken ───────────────────────────────────────
 
   {
+    // Omvat ook Bar/Cocktails en Koffiebar/Foodtruck — allemaal
+    // eten-en-drinken-leveranciers met dezelfde gastenaantal-behoefte.
     type: "catering",
     label: "Catering",
     modules: ["menuBuilder", "couvertCalculator", "guestDataPanel", "deliverablesTracker", "timelinePlanner"],
@@ -586,11 +525,17 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "proeverijDatum", label: "Datum proeverij", type: "date" },
       { key: "drankarrangement", label: "Drankarrangement", type: "text", placeholder: "Wijn, bier, frisdrank, open bar..." },
       { key: "kindermaaltijden", label: "Kindermaaltijden gewenst?", type: "boolean" },
+      { key: "drankenkaart", label: "Drankenkaart / bar-aanbod (indien ook bar)", type: "longtext", placeholder: "Wijn, bier, cocktails, non-alcoholisch..." },
+      { key: "signatureCocktail", label: "Signature cocktail wens", type: "text", placeholder: "Naam en beschrijving" },
+      { key: "aanbodFoodtruck", label: "Aanbod koffiebar/foodtruck (indien van toepassing)", type: "longtext", placeholder: "Koffiedranken, thee, foodtruckgerechten..." },
+      { key: "serveermoment", label: "Serveermomenten", type: "text", placeholder: "Na ceremonie, bij avondbuffet, doorlopend..." },
     ],
     deliverables: [
       { key: "menukaart", label: "Menukaart (ontwerp)", approvalRequired: true },
       { key: "proeverijverslag", label: "Proeverijverslag" },
       { key: "definitief-menu", label: "Definitief menu", approvalRequired: true },
+      { key: "drankenkaart", label: "Drankenkaart (definitief)", approvalRequired: true },
+      { key: "benodigde-materialen", label: "Materialen & glaswerk overzicht" },
     ],
     timelineTemplate: [
       { key: "borrel", label: "Borrel / ontvangst", phase: "perform", defaultDuration: 60 },
@@ -598,11 +543,15 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "diner-gang-2", label: "Diner – hoofdgerecht", phase: "perform", defaultDuration: 45 },
       { key: "diner-gang-3", label: "Diner – dessert", phase: "perform", defaultDuration: 30 },
       { key: "avondhap", label: "Avondhap", phase: "perform", defaultDuration: 30 },
+      { key: "bar-open", label: "Bar open (indien van toepassing)", phase: "perform", defaultDuration: 360 },
     ],
     logisticsFields: [
       { key: "keukenvoorziening", label: "Keukenvoorzieningen venue", type: "longtext" },
       { key: "serveeroppervlak", label: "Serveerpunten / buffetruimte", type: "text" },
       { key: "personeelsaantal", label: "Aantal servicemedewerkers", type: "number" },
+      { key: "stroomaansluiting", label: "Stroomaansluiting (voor koeling/bar/truck)", type: "boolean" },
+      { key: "wateraansluiting", label: "Wateraansluiting aanwezig?", type: "boolean" },
+      { key: "parkeerplaatsTruck", label: "Parkeerplaats foodtruck geregeld?", type: "boolean" },
     ],
   },
 
@@ -634,54 +583,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "bezorgmoment", label: "Bezorg- of ophaalmoment", type: "text", placeholder: "bv. zaterdag 10:00 bij de venue" },
       { key: "afleveradres", label: "Afleveradres venue", type: "text", placeholder: "Straatnaam + huisnummer, Stad" },
       { key: "contactVenue", label: "Contactpersoon op de venue", type: "text", placeholder: "Naam + telefoonnummer" },
-    ],
-  },
-
-  {
-    type: "bar",
-    label: "Bar / Cocktails",
-    modules: ["guestDataPanel", "timelinePlanner"],
-    readsGuestData: ["counts"],
-    intakeFields: [
-      { key: "drankenkaart", label: "Drankenkaart / aanbod", type: "longtext", placeholder: "Wijn, bier, cocktails, non-alcoholisch..." },
-      { key: "signatureCocktail", label: "Signature cocktail wens", type: "text", placeholder: "Naam en beschrijving" },
-    ],
-    deliverables: [
-      { key: "drankenkaart", label: "Drankenkaart (definitief)", approvalRequired: true },
-      { key: "benodigde-materialen", label: "Materialen & glaswerk overzicht" },
-    ],
-    timelineTemplate: [
-      { key: "bar-opbouw", label: "Opbouw bar", phase: "setup", defaultDuration: 60 },
-      { key: "bar-open", label: "Bar open", phase: "perform", defaultDuration: 360 },
-      { key: "bar-dicht", label: "Bar gesloten / afbouw", phase: "teardown", defaultDuration: 45 },
-    ],
-    logisticsFields: [
-      { key: "stroomaansluiting", label: "Stroomaansluiting voor koeling", type: "boolean" },
-      { key: "wateraansluiting", label: "Wateraansluiting aanwezig?", type: "boolean" },
-    ],
-  },
-
-  {
-    type: "koffiebar",
-    label: "Koffiebar / Foodtruck",
-    modules: ["guestDataPanel", "timelinePlanner"],
-    readsGuestData: ["counts"],
-    intakeFields: [
-      { key: "aanbod", label: "Aanbod & menukaart", type: "longtext", placeholder: "Koffiedranken, thee, foodtruckgerechten..." },
-      { key: "serveermoment", label: "Serveermomenten", type: "text", placeholder: "Na ceremonie, bij avondbuffet, doorlopend..." },
-    ],
-    deliverables: [
-      { key: "menukaart", label: "Menukaart (definitief)", approvalRequired: true },
-    ],
-    timelineTemplate: [
-      { key: "opbouw-foodstation", label: "Opbouw koffiebar / foodtruck", phase: "setup", defaultDuration: 60 },
-      { key: "serveervenster", label: "Serveervenster actief", phase: "perform", defaultDuration: 180 },
-      { key: "afbouw-foodstation", label: "Afbouw", phase: "teardown", defaultDuration: 45 },
-    ],
-    logisticsFields: [
-      { key: "stroomaansluiting", label: "Stroomaansluiting (230V/stroom)", type: "boolean" },
-      { key: "wateraansluiting", label: "Wateraansluiting vereist?", type: "boolean" },
-      { key: "parkeerplaats-truck", label: "Parkeerplaats foodtruck geregeld?", type: "boolean" },
     ],
   },
 
@@ -724,60 +625,15 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     ],
   },
 
-  {
-    type: "verhuur",
-    label: "Verhuur",
-    modules: ["timelinePlanner", "deliverablesTracker"],
-    intakeFields: [
-      { key: "itemlijst", label: "Itemlijst", type: "longtext", placeholder: "Tafels, stoelen, servies, linnengoed..." },
-      { key: "aantallen", label: "Aantallen per item", type: "longtext" },
-      { key: "plattegrond", label: "Plaatsingsplattegrond gewenst?", type: "boolean" },
-    ],
-    deliverables: [
-      { key: "verhuurlijst", label: "Verhuurlijst (definitief)", approvalRequired: true },
-      { key: "bezorging", label: "Bezorging & plaatsing" },
-      { key: "retourcheck", label: "Retourcheck na event" },
-    ],
-    timelineTemplate: [
-      { key: "bezorging-verhuur", label: "Bezorging huurmaterialen", phase: "arrival", defaultDuration: 120 },
-      { key: "ophalen-verhuur", label: "Ophalen huurmaterialen", phase: "teardown", defaultDuration: 120 },
-    ],
-    logisticsFields: [
-      { key: "retouradres", label: "Retouradres / -datum", type: "text" },
-      { key: "schadebeleid", label: "Schadebeleid", type: "text" },
-    ],
-  },
-
-  {
-    type: "tentverhuur",
-    label: "Tentverhuur",
-    modules: ["timelinePlanner", "logisticsPanel"],
-    intakeFields: [
-      { key: "type", label: "Type tent", type: "text", placeholder: "Partytent, tipi, glazen paviljoen, feesttent..." },
-      { key: "ondergrond", label: "Ondergrond locatie", type: "text", placeholder: "Gras, klinkers, zand..." },
-      { key: "weerplan", label: "Weerplan / plan-B", type: "longtext", placeholder: "Zijwanden, verwarming, vloer bij regen..." },
-    ],
-    deliverables: [
-      { key: "tentplan", label: "Tentplan & plattegrond", approvalRequired: true },
-      { key: "oplevering-tent", label: "Oplevering tent na plaatsing" },
-    ],
-    timelineTemplate: [
-      { key: "opbouw-tent", label: "Opbouw tent (dagen vooraf)", phase: "setup", defaultDuration: 480 },
-      { key: "afbouw-tent", label: "Afbouw tent", phase: "teardown", defaultDuration: 480 },
-    ],
-    logisticsFields: [
-      { key: "stroomaansluiting", label: "Stroomaansluiting tent", type: "boolean" },
-      { key: "verwarming", label: "Verwarmingselement aanwezig?", type: "boolean" },
-      { key: "vloer-nodig", label: "Tentbodem / vloer vereist?", type: "boolean" },
-    ],
-  },
-
   // ── Vervoer ──────────────────────────────────────────────
 
   {
+    // Omvat ook Trouwauto (subset van dit type) en Gastenvervoer
+    // (groepsvervoer met opstap-/afzetpunten i.p.v. individuele adressen).
     type: "vervoer",
     label: "Vervoer",
-    modules: ["timelinePlanner", "rittenPlanner", "chauffeurInfo", "logisticsPanel"],
+    modules: ["timelinePlanner", "rittenPlanner", "chauffeurInfo", "logisticsPanel", "guestDataPanel"],
+    readsGuestData: ["counts"],
     intakeFields: [
       {
         key: "type",
@@ -793,11 +649,14 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "ceremoniepunt", label: "Adres ceremonie", type: "text", placeholder: "Naam locatie, Straat, Stad" },
       { key: "receptieLocatie", label: "Adres receptie / feest", type: "text", placeholder: "Naam locatie, Straat, Stad" },
       { key: "eindpunt", label: "Eindbestemming (hotel / thuis)", type: "text", placeholder: "Straatnaam + huisnummer, Stad" },
+      { key: "opstappunten", label: "Opstappunten (indien groepsvervoer gasten)", type: "longtext", placeholder: "Station, hotel, parkeerplaats..." },
+      { key: "afzetpunten", label: "Afzetpunten / terugrit", type: "longtext", placeholder: "Na feest: hotels, stations..." },
     ],
     deliverables: [
       { key: "rittenplan", label: "Rittenplan (definitief)", approvalRequired: true },
       { key: "adressen", label: "Bevestigde adressen & tijden" },
       { key: "boekingsbevestiging", label: "Boekingsbevestiging / contract" },
+      { key: "routeplan", label: "Routeplan & tijdschema (groepsvervoer)" },
     ],
     timelineTemplate: [
       { key: "vertrek-naar-bruid", label: "Vertrek richting ophaaladres bruid", phase: "arrival", defaultDuration: 30 },
@@ -815,59 +674,14 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "verzekering", label: "Verzekerd voor personenvervoer?", type: "boolean" },
       { key: "bijzonderheden-route", label: "Bijzonderheden rijroute", type: "text", placeholder: "Wegwerkzaamheden, omleidingen, brug..." },
       { key: "alternatief-bij-pech", label: "Alternatief voertuig bij pech?", type: "boolean" },
-    ],
-  },
-
-  {
-    type: "trouwauto",
-    label: "Trouwauto",
-    modules: ["timelinePlanner"],
-    intakeFields: [
-      {
-        key: "type",
-        label: "Type trouwauto",
-        type: "select",
-        options: ["oldtimer", "limousine", "cabriolet", "klassiek", "elektrisch"],
-      },
-      { key: "passagiers", label: "Aantal passagiers", type: "number" },
-      { key: "decoratie", label: "Decoratiewensen", type: "text", placeholder: "Linten, bloemen, nummerbord..." },
-    ],
-    deliverables: [
-      { key: "rittenplan", label: "Rittenplan (definitief)" },
-      { key: "adressen", label: "Adressen & tijdstip bevestigd" },
-    ],
-    timelineTemplate: [
-      { key: "ophaal-bruid", label: "Ophalen bruid/bruidegom", phase: "perform", defaultDuration: 30 },
-      { key: "rit-per-rit", label: "Ritten op dag", phase: "perform", defaultDuration: 60 },
-    ],
-    logisticsFields: [],
-  },
-
-  {
-    type: "gastenvervoer",
-    label: "Gastenvervoer",
-    modules: ["timelinePlanner", "guestDataPanel"],
-    readsGuestData: ["counts"],
-    intakeFields: [
-      { key: "opstappunten", label: "Opstappunten", type: "longtext", placeholder: "Station, hotel, parkeerplaats..." },
-      { key: "afzetpunten", label: "Afzetpunten / terugrit", type: "longtext", placeholder: "Na feest: hotels, stations..." },
-    ],
-    deliverables: [
-      { key: "routeplan", label: "Routeplan & tijdschema" },
-      { key: "communicatie-gasten", label: "Communicatie naar gasten" },
-    ],
-    timelineTemplate: [
-      { key: "heen-rit", label: "Heenrit gasten naar locatie", phase: "arrival", defaultDuration: 45 },
-      { key: "terug-rit", label: "Terugrit gasten", phase: "teardown", defaultDuration: 45 },
-    ],
-    logisticsFields: [
-      { key: "chauffeur-contact", label: "Chauffeur contactnummer", type: "text" },
+      { key: "chauffeurContact", label: "Chauffeur contactnummer", type: "text" },
     ],
   },
 
   // ── Beauty ───────────────────────────────────────────────
 
   {
+    // Omvat ook Visagist — vrijwel identieke behoeftes (proefsessie, allergieën, look).
     type: "haarstylist",
     label: "Haar & Make-up",
     modules: ["moodboardUploader", "timelinePlanner", "bruidsteamBuilder", "materialChecklist"],
@@ -876,6 +690,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "allergies", label: "Productallergieën", type: "text", placeholder: "Bijv. latex, parfum, specifieke ingrediënten" },
       { key: "aantalPersonen", label: "Aantal personen", type: "number" },
       { key: "behandeltijdPerPersoon", label: "Behandeltijd per persoon (minuten)", type: "number", placeholder: "Bijv. 45" },
+      { key: "look", label: "Gewenste make-up look", type: "longtext", placeholder: "Natural, dramatic, smoky eye, no-make-up look..." },
     ],
     deliverables: [
       { key: "trial-resultaat", label: "Trial resultaat (foto's)", approvalRequired: true },
@@ -891,28 +706,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     logisticsFields: [
       { key: "locatie-sessie", label: "Locatie sessie (thuis / hotel / venue)", type: "text" },
       { key: "parkeer-mogelijkheid", label: "Parkeermogelijkheid aanwezig?", type: "boolean" },
-    ],
-  },
-
-  {
-    type: "visagist",
-    label: "Visagist",
-    modules: ["moodboardUploader", "timelinePlanner"],
-    intakeFields: [
-      { key: "trialDatum", label: "Datum proefsessie", type: "date" },
-      { key: "look", label: "Gewenste make-up look", type: "longtext", placeholder: "Natural, dramatic, smoky eye, no-make-up look..." },
-      { key: "allergies", label: "Productallergieën", type: "text", placeholder: "Bijv. latex, parfum, specifieke ingrediënten" },
-    ],
-    deliverables: [
-      { key: "trial-resultaat", label: "Trial resultaat (foto's)", approvalRequired: true },
-      { key: "definitieve-look", label: "Definitieve make-up look bevestigd" },
-    ],
-    timelineTemplate: [
-      { key: "ochtend-tijdschema", label: "Ochtend make-up schema", phase: "setup", defaultDuration: 120 },
-      { key: "touch-up", label: "Touch-up voor ceremonie", phase: "custom", defaultDuration: 15 },
-    ],
-    logisticsFields: [
-      { key: "locatie-sessie", label: "Locatie sessie", type: "text" },
     ],
   },
 
@@ -967,26 +760,6 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "ringen", label: "Ringen gereed & goedgekeurd", approvalRequired: true },
       { key: "levering", label: "Levering / ophaalmoment" },
       { key: "overdracht-getuige", label: "Overdracht aan getuige geregeld" },
-    ],
-    timelineTemplate: [],
-    logisticsFields: [],
-  },
-
-  // ── Drukwerk & Communicatie ──────────────────────────────
-
-  {
-    type: "drukwerk",
-    label: "Drukwerk",
-    modules: ["approvalButton", "deliverablesTracker", "checklistDeadlines"],
-    intakeFields: [
-      { key: "huisstijl", label: "Huisstijl / thema", type: "text", placeholder: "Kleuren, lettertype, stijl..." },
-      { key: "teksten", label: "Benodigde teksten", type: "longtext", placeholder: "Uitnodiging, menukaart, programma, bordje..." },
-      { key: "oplage", label: "Oplage per item", type: "longtext", placeholder: "Uitnodiging: 120x, menukaart: 80x..." },
-    ],
-    deliverables: [
-      { key: "uitnodiging-proof", label: "Uitnodiging drukproef", approvalRequired: true },
-      { key: "menukaart-proof", label: "Menukaart drukproef", approvalRequired: true },
-      { key: "programmaboekje", label: "Programmaboekje", approvalRequired: true },
     ],
     timelineTemplate: [],
     logisticsFields: [],

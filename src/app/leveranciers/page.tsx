@@ -18,11 +18,14 @@ const CATEGORIES: { value: string; label: string }[] = [
   { value: "weddingplanner",  label: "Wedding planners" },
   { value: "haarstylist",     label: "Hair & make-up" },
   { value: "dj",              label: "Muziek & DJ" },
-  { value: "liveband",        label: "Liveband" },
+  { value: "liveband",        label: "Liveband & Entertainment" },
   { value: "ceremoniespreker",label: "Ceremoniesprekers" },
   { value: "decoratie",       label: "Decoratie & Styling" },
   { value: "vervoer",         label: "Vervoer" },
   { value: "fotocabine",      label: "Fotocabine" },
+  { value: "bruidsmode",      label: "Bruidsmode" },
+  { value: "herenmode",       label: "Herenmode" },
+  { value: "juwelier",        label: "Juwelier" },
   { value: "overig",          label: "Overig" },
 ];
 
