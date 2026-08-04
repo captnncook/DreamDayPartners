@@ -76,6 +76,7 @@ const STATEMENTS = [
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "setupTime" TEXT`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "teardownTime" TEXT`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "badWeatherPlan" TEXT`,
+  `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "outdoorSoundRule" TEXT`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "isOfficialCeremonyLocation" BOOLEAN NOT NULL DEFAULT false`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "outdoorCeremonyPossible" BOOLEAN NOT NULL DEFAULT false`,
   `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "accessibility" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[]`,

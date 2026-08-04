@@ -55,7 +55,7 @@ type Vendor = {
   partyMinGuests?: number | null; partyMaxGuests?: number | null;
   hotelRooms?: number | null;
   closingTime?: string | null; soundLimit?: string | null;
-  setupTime?: string | null; teardownTime?: string | null; badWeatherPlan?: string | null;
+  setupTime?: string | null; teardownTime?: string | null; badWeatherPlan?: string | null; outdoorSoundRule?: string | null;
   isOfficialCeremonyLocation?: boolean; outdoorCeremonyPossible?: boolean;
   accessibility?: string[]; venueFacilities?: string[]; cateringOptions?: string[];
   barOptions?: string[]; environment?: string[];
@@ -391,7 +391,7 @@ function VendorEditPage() {
     averageWeddingPrice: "",
     ceremonyMinGuests: "", ceremonyMaxGuests: "", receptionMinGuests: "", receptionMaxGuests: "",
     dinnerMinGuests: "", dinnerMaxGuests: "", partyMinGuests: "", partyMaxGuests: "",
-    hotelRooms: "", closingTime: "", soundLimit: "", setupTime: "", teardownTime: "", badWeatherPlan: "",
+    hotelRooms: "", closingTime: "", soundLimit: "", setupTime: "", teardownTime: "", badWeatherPlan: "", outdoorSoundRule: "",
   });
   const [isOfficialCeremonyLocation, setIsOfficialCeremonyLocation] = useState(false);
   const [outdoorCeremonyPossible, setOutdoorCeremonyPossible] = useState(false);
@@ -454,6 +454,7 @@ function VendorEditPage() {
       setupTime: v.setupTime ?? "",
       teardownTime: v.teardownTime ?? "",
       badWeatherPlan: v.badWeatherPlan ?? "",
+      outdoorSoundRule: v.outdoorSoundRule ?? "",
     });
     setBusyDates(v.busyDates ?? []);
     setIsOfficialCeremonyLocation(Boolean(v.isOfficialCeremonyLocation));
@@ -1278,6 +1279,16 @@ function VendorEditPage() {
                   <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Standaard afbouwtijd</label>
                   <input type="time" value={form.teardownTime} onChange={(e) => setForm({ ...form, teardownTime: e.target.value })} className="ddp-input" />
                   <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.25rem" }}>Tot hoelaat er standaard afgebouwd mag worden.</p>
+                </div>
+                <div className="col-span-2">
+                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Geluid buiten</label>
+                  <input
+                    type="text"
+                    value={form.outdoorSoundRule}
+                    onChange={(e) => setForm({ ...form, outdoorSoundRule: e.target.value })}
+                    placeholder="bijv. Tot 22:00 buiten geluid toegestaan, daarna alleen binnen — of: Geen geluid buiten toegestaan"
+                    className="ddp-input"
+                  />
                 </div>
                 <div className="col-span-2">
                   <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Slechtweer-scenario</label>

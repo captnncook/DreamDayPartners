@@ -185,6 +185,7 @@ model Vendor {
   setupTime          String? // standaard vanaf hoelaat opbouwen (per bruiloft te overschrijven via intakeData.setupTimeOverride)
   teardownTime       String? // standaard afbouwtijd (per bruiloft te overschrijven via intakeData.teardownTimeOverride)
   badWeatherPlan     String? // korte tekst: wat is het slechtweer-scenario van deze locatie
+  outdoorSoundRule   String? // tijdslimiet voor geluid buiten, of "geen geluid buiten toegestaan"
   isOfficialCeremonyLocation Boolean @default(false)
   outdoorCeremonyPossible    Boolean @default(false)
   accessibility    String[]

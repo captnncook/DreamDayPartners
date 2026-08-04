@@ -12,6 +12,7 @@ export type VenueInfoData = {
   setupTime: string | null;
   teardownTime: string | null;
   badWeatherPlan: string | null;
+  outdoorSoundRule: string | null;
 };
 
 // Alleen-lezen: deze gegevens vult de trouwlocatie zelf één keer in op hun
@@ -19,7 +20,7 @@ export type VenueInfoData = {
 // andere leveranciers van dezelfde bruiloft (DJ, band, cateraar...) zien
 // ze hier zonder er apart naar te hoeven vragen.
 export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
-  const hasFacts = venue.closingTime || venue.soundLimit || venue.setupTime || venue.teardownTime || venue.badWeatherPlan || venue.venueFacilities.length > 0 || venue.accessibility.length > 0;
+  const hasFacts = venue.closingTime || venue.soundLimit || venue.setupTime || venue.teardownTime || venue.badWeatherPlan || venue.outdoorSoundRule || venue.venueFacilities.length > 0 || venue.accessibility.length > 0;
 
   return (
     <div className="ddp-card">
@@ -44,6 +45,9 @@ export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
           )}
           {venue.soundLimit && (
             <div><span style={{ color: "var(--muted)" }}>Geluidslimiet:</span> {venue.soundLimit}</div>
+          )}
+          {venue.outdoorSoundRule && (
+            <div className="sm:col-span-2"><span style={{ color: "var(--muted)" }}>Geluid buiten:</span> {venue.outdoorSoundRule}</div>
           )}
           <div><span style={{ color: "var(--muted)" }}>Buitenceremonie mogelijk:</span> {venue.outdoorCeremonyPossible ? "Ja" : "Nee"}</div>
           {venue.venueFacilities.length > 0 && (

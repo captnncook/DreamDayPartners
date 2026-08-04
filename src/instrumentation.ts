@@ -83,6 +83,7 @@ export async function register() {
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "setupTime" TEXT`,
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "teardownTime" TEXT`,
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "badWeatherPlan" TEXT`,
+      `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "outdoorSoundRule" TEXT`,
 
       `CREATE TABLE IF NOT EXISTS "deliverables" (
         "id" TEXT NOT NULL,

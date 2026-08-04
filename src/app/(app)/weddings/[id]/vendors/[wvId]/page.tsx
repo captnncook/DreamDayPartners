@@ -57,7 +57,7 @@ export default async function VendorBookingPage({
   let venueInfo: {
     name: string; closingTime: string | null; soundLimit: string | null;
     venueFacilities: string[]; accessibility: string[]; outdoorCeremonyPossible: boolean;
-    setupTime: string | null; teardownTime: string | null; badWeatherPlan: string | null;
+    setupTime: string | null; teardownTime: string | null; badWeatherPlan: string | null; outdoorSoundRule: string | null;
   } | null = null;
   if (booking.vendor.category !== "trouwlocatie") {
     const venueBooking = await prisma.weddingVendor.findFirst({
@@ -66,7 +66,7 @@ export default async function VendorBookingPage({
         vendor: {
           select: {
             name: true, closingTime: true, soundLimit: true, venueFacilities: true, accessibility: true,
-            outdoorCeremonyPossible: true, setupTime: true, teardownTime: true, badWeatherPlan: true,
+            outdoorCeremonyPossible: true, setupTime: true, teardownTime: true, badWeatherPlan: true, outdoorSoundRule: true,
           },
         },
       },
