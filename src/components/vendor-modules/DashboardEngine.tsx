@@ -25,6 +25,7 @@ import DayOfContact from "./DayOfContact";
 import RittenPlanner from "./RittenPlanner";
 import ChauffeurInfo from "./ChauffeurInfo";
 import PortieCalculator from "./PortieCalculator";
+import VenueInfo, { type VenueInfoData } from "./VenueInfo";
 
 interface Props {
   weddingId: string;
@@ -53,12 +54,13 @@ interface Props {
   vendorIsPremium?: boolean;
   vendorDisabledModules?: string[];
   vendorExtraModules?: string[];
+  venueInfo?: VenueInfoData | null;
 }
 
 export default function DashboardEngine({
   weddingId, wvId, vendorType, initialBooking,
   documents, timelineBlocks, tasks, guests, totalGuests, userRole, userId, vendorUserId,
-  vendorIsPremium, vendorDisabledModules, vendorExtraModules,
+  vendorIsPremium, vendorDisabledModules, vendorExtraModules, venueInfo,
 }: Props) {
   const config = getVendorTypeConfig(vendorType);
   const [booking, setBooking] = useState(initialBooking);
@@ -124,6 +126,8 @@ export default function DashboardEngine({
 
   return (
     <div style={{ display: "grid", gap: "1rem" }}>
+      {venueInfo && <VenueInfo venue={venueInfo} />}
+
       <ContractPayment
         weddingId={weddingId}
         wvId={wvId}

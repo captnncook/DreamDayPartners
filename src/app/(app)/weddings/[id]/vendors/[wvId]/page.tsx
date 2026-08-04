@@ -50,6 +50,24 @@ export default async function VendorBookingPage({
     select: { id: true, name: true, dietary: true, rsvpStatus: true, side: true },
   });
 
+  // Gegevens van de gekoppelde trouwlocatie (vermogen, water, sluitingstijd,
+  // etc.) staan één keer op het locatieprofiel — andere leveranciers van
+  // deze bruiloft (DJ, band, cateraar...) hoeven er dan niet los naar te
+  // vragen, ze zien het gewoon in hun eigen dashboard.
+  let venueInfo: {
+    name: string; closingTime: string | null; soundLimit: string | null;
+    venueFacilities: string[]; accessibility: string[]; outdoorCeremonyPossible: boolean;
+  } | null = null;
+  if (booking.vendor.category !== "trouwlocatie") {
+    const venueBooking = await prisma.weddingVendor.findFirst({
+      where: { weddingId, vendor: { category: "trouwlocatie" } },
+      include: { vendor: { select: { name: true, closingTime: true, soundLimit: true, venueFacilities: true, accessibility: true, outdoorCeremonyPossible: true } } },
+    });
+    if (venueBooking) {
+      venueInfo = venueBooking.vendor;
+    }
+  }
+
   const totalGuests = guests.length;
 
   const isBookingSerializer = (b: typeof booking) => ({
@@ -145,6 +163,7 @@ export default async function VendorBookingPage({
         vendorIsPremium={booking.vendor.isPremium}
         vendorDisabledModules={booking.vendor.disabledModules}
         vendorExtraModules={booking.vendor.extraModules}
+        venueInfo={venueInfo}
       />
     </div>
   );

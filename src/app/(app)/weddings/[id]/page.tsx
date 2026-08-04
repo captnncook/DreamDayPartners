@@ -137,9 +137,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             <h1 className="font-serif" style={{ fontSize: "clamp(1.25rem, 4.5vw, 1.625rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
               {wedding.title}
             </h1>
-            {wedding.isPremium && (
-              <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--gold)" }}>Premium</span>
-            )}
           </div>
           <div className="text-sm mt-1" style={{ color: "var(--ink-muted)" }}>
             {formatDateRange(new Date(wedding.date), wedding.endDate ? new Date(wedding.endDate) : null, lang === "en" ? "en-GB" : "nl-NL")}{wedding.venue ? ` · ${wedding.venue}` : ""}
@@ -352,26 +349,6 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
 
         {/* Sidebar */}
         <div>
-
-          {/* Team */}
-          <section className="mb-8">
-            <h3 className="dash-section-title mb-1">{tw.team}</h3>
-            <div style={{ borderTop: "1px solid var(--border)" }}>
-              {wedding.teamMembers.map((m) => (
-                <div key={m.id} className="dash-row" style={{ padding: "0.6rem 0.25rem" }}>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0" style={{ background: "var(--gold)", color: "var(--ink)" }}>
-                    {m.user.name.charAt(0)}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{m.user.name}</div>
-                    <div className="text-xs" style={{ color: "var(--muted)" }}>
-                      {tw.roles[m.role as keyof typeof tw.roles] ?? m.role}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
 
           {/* Locatie — alleen voor het bruidspaar zelf, stuurt de sortering
               op de leverancierscatalogus (dichtstbijzijnde eerst). */}

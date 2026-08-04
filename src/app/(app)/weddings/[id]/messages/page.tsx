@@ -9,7 +9,7 @@ export default async function MessagesPage({ params }: { params: Promise<{ id: s
 
   const { id } = await params;
 
-  const wedding = await prisma.wedding.findUnique({ where: { id }, select: { id: true, title: true, isPremium: true } });
+  const wedding = await prisma.wedding.findUnique({ where: { id }, select: { id: true, title: true } });
   if (!wedding) notFound();
 
   let threadFilter: object = { weddingId: id };
@@ -38,7 +38,6 @@ export default async function MessagesPage({ params }: { params: Promise<{ id: s
       weddingTitle={wedding.title}
       threads={JSON.parse(JSON.stringify(threads))}
       currentUser={JSON.parse(JSON.stringify(user))}
-      isPremium={wedding.isPremium}
     />
   );
 }

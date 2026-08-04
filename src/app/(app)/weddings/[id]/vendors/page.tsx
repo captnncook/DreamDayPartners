@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { User, Mail, Phone, Star, X, CheckCircle2 } from "lucide-react";
+import { User, Mail, Phone, X, CheckCircle2 } from "lucide-react";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = {
@@ -19,7 +19,6 @@ export default function VendorsPage() {
   const { id } = useParams<{ id: string }>();
   const [weddingVendors, setWeddingVendors] = useState<WeddingVendor[]>([]);
   const [allVendors, setAllVendors] = useState<Vendor[]>([]);
-  const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [selectedVendorId, setSelectedVendorId] = useState("");
@@ -27,15 +26,13 @@ export default function VendorsPage() {
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
-    const [wvRes, vRes, wRes] = await Promise.all([
+    const [wvRes, vRes] = await Promise.all([
       fetch(`/api/weddings/${id}/vendors`),
       fetch("/api/vendors"),
-      fetch(`/api/weddings/${id}`),
     ]);
-    const [wvData, vData, wData] = await Promise.all([wvRes.json(), vRes.json(), wRes.json()]);
+    const [wvData, vData] = await Promise.all([wvRes.json(), vRes.json()]);
     setWeddingVendors(wvData.vendors ?? []);
     setAllVendors(vData.vendors ?? []);
-    setIsPremium(wData.wedding?.isPremium ?? false);
     setLoading(false);
   }, [id]);
 
@@ -97,24 +94,6 @@ export default function VendorsPage() {
           </button>
         </div>
       </div>
-
-      {!isPremium && (
-        <div className="ddp-card mb-6 flex items-center gap-4" style={{ background: "#fef9ec", border: "1px solid #f5d080" }}>
-          <Star className="w-5 h-5 flex-shrink-0" style={{ color: "var(--gold)" }} />
-          <div>
-            <div className="font-semibold text-sm">Leveranciersportaal is een Premium functie</div>
-            <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-              Met Premium kunnen leveranciers inloggen en hun eigen draaiboek-items bekijken.
-            </div>
-          </div>
-          <button
-            onClick={() => alert("Premium upgrade: neem contact op met DreamDay Platform.")}
-            className="ddp-btn-primary ml-auto flex-shrink-0 text-sm"
-          >
-            Upgrade naar Premium
-          </button>
-        </div>
-      )}
 
       {showAdd && (
         <form onSubmit={handleAdd} className="ddp-card mb-6 space-y-4">
@@ -210,18 +189,16 @@ export default function VendorsPage() {
                 >
                   Dashboard →
                 </Link>
-                {isPremium && (
-                  <button
-                    onClick={() => togglePortal(wv)}
-                    className="text-xs px-2 py-1 rounded-md transition-colors flex-shrink-0"
-                    style={{
-                      background: wv.portalAccess ? "#fde8e8" : "var(--accent)",
-                      color: wv.portalAccess ? "var(--danger)" : "var(--primary)",
-                    }}
-                  >
-                    {wv.portalAccess ? "Toegang intrekken" : "Portal"}
-                  </button>
-                )}
+                <button
+                  onClick={() => togglePortal(wv)}
+                  className="text-xs px-2 py-1 rounded-md transition-colors flex-shrink-0"
+                  style={{
+                    background: wv.portalAccess ? "#fde8e8" : "var(--accent)",
+                    color: wv.portalAccess ? "var(--danger)" : "var(--primary)",
+                  }}
+                >
+                  {wv.portalAccess ? "Toegang intrekken" : "Portal"}
+                </button>
               </div>
             </div>
           ))}

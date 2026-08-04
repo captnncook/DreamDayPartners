@@ -51,9 +51,6 @@ export default async function AdminPage() {
                 <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{w.title}</div>
                 <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
                   {w.weddingCode} · {w.owner.name}
-                  {w.isPremium && (
-                    <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)", marginLeft: "0.5rem" }}>Premium</span>
-                  )}
                 </div>
               </div>
               <div className="text-xs text-right flex-shrink-0" style={{ color: "var(--muted)" }}>

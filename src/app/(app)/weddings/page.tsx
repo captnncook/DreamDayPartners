@@ -71,9 +71,6 @@ export default async function WeddingsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-0.5">
                     <h3 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</h3>
-                    {w.isPremium && (
-                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Premium</span>
-                    )}
                     <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: status.color }}>
                       {status.label}
                     </span>

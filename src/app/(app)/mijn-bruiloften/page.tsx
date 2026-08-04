@@ -47,21 +47,14 @@ export default function MijnBruiloftenPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [form, setForm] = useState({ email1: "", email2: "", weddingDate: "", weddingTitle: "", notes: "" });
-  const [vendorType, setVendorType] = useState<string | null>(null);
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 5000);
-    Promise.all([
-      fetch("/api/vendor/weddings").then(r => r.json()),
-      fetch("/api/me").then(r => r.json()),
-    ]).then(([wData, meData]) => {
+    fetch("/api/vendor/weddings").then(r => r.json()).then((wData) => {
       clearTimeout(timeout);
       setInvites(wData.invites ?? []);
-      setVendorType(meData.user?.vendorType ?? null);
     }).catch(() => { clearTimeout(timeout); }).finally(() => setLoading(false));
   }, []);
-
-  const canRegisterWedding = vendorType === "weddingplanner";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -105,14 +98,12 @@ export default function MijnBruiloftenPage() {
             Registreer een bruiloft zodat je automatisch wordt gekoppeld zodra het bruidspaar aanmeldt.
           </p>
         </div>
-        {canRegisterWedding && (
-          <button
-            onClick={() => { setShowForm(!showForm); setSuccess(""); }}
-            className="ddp-btn-primary inline-flex items-center gap-1.5"
-          >
-            <Plus className="w-3.5 h-3.5" /> Bruiloft registreren
-          </button>
-        )}
+        <button
+          onClick={() => { setShowForm(!showForm); setSuccess(""); }}
+          className="ddp-btn-primary inline-flex items-center gap-1.5"
+        >
+          <Plus className="w-3.5 h-3.5" /> Bruiloft registreren
+        </button>
       </div>
 
       {success && (

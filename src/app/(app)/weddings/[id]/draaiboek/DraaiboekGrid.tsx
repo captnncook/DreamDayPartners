@@ -24,6 +24,7 @@ export type GridItem = {
   startTime: string;
   duration: number;
   title: string;
+  sortOrder: number;
   description?: string;
   location?: string;
   vendorId?: string | null;

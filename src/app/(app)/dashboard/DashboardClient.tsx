@@ -20,7 +20,7 @@ function formatDateShort(iso: string) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(new Date(iso));
 }
 
-type Wedding = { id: string; title: string; venue?: string | null; date: string; endDate?: string | null; status: string; isPremium: boolean; days: number };
+type Wedding = { id: string; title: string; venue?: string | null; date: string; endDate?: string | null; status: string; days: number };
 type Task = { id: string; title: string; priority: string; dueDate?: string; weddingId: string; weddingTitle: string };
 type Stats = { total: number; upcoming30: number; thisYear: number };
 type VendorRequest = { id: string; weddingTitle: string; weddingVenue?: string | null; weddingDate: string };

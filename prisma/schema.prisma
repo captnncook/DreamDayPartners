@@ -91,7 +91,6 @@ model Wedding {
   coupleEmail1 String
   coupleEmail2 String
   ownerId      String
-  isPremium    Boolean  @default(false)
   notes        String?
   locationCity String?  // plaats van het bruidspaar, voor "leveranciers bij jou in de buurt"
   province     String?

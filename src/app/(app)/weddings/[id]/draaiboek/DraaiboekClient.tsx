@@ -30,8 +30,30 @@ interface Props {
   teamMembers: TeamMember[];
   vendors: WeddingVendor[];
   currentUser: { id: string; role: string; name: string };
-  isPremium: boolean;
   ownVendorId?: string | null;
+}
+
+// Standaard trouwdag-tijdlijn die het bruidspaar met één klik kan invoegen
+// als startpunt — tijden zijn daarna gewoon aan te passen. "Einde feest"
+// staat op 23:59 i.p.v. 00:00: het draaiboek is per dag opgebouwd en een
+// item om 00:00 zou als eerste (in plaats van laatste) in de tijdlijn komen.
+const DRAAIBOEK_TEMPLATE: { startTime: string; title: string }[] = [
+  { startTime: "09:00", title: "Aankleding / make-up bruid en bruidegom" },
+  { startTime: "12:00", title: "First look" },
+  { startTime: "12:30", title: "Bruidspaar shoot" },
+  { startTime: "14:30", title: "Ceremonie" },
+  { startTime: "15:15", title: "Felicitaties / taart / bubbels" },
+  { startTime: "16:00", title: "Groepsfoto's" },
+  { startTime: "17:00", title: "Diner" },
+  { startTime: "19:00", title: "Speeches" },
+  { startTime: "20:00", title: "Avondfeest start" },
+  { startTime: "20:30", title: "Openingsdans" },
+  { startTime: "23:59", title: "Einde feest" },
+];
+
+function toMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
 }
 
 const INPUT_STYLE: React.CSSProperties = {
@@ -187,6 +209,38 @@ export default function DraaiboekClient({
           ? { ...d, items: [...d.items, data.item].sort((a, b) => a.sortOrder - b.sortOrder) }
           : d)
       );
+    }
+  }
+
+  const [insertingTemplate, setInsertingTemplate] = useState(false);
+
+  async function insertTemplate() {
+    if (!activeDraaiboekId) return;
+    if (!confirm("Standaardtijdlijn invoegen? Je kunt elk onderdeel daarna aanpassen of verwijderen.")) return;
+    setInsertingTemplate(true);
+    try {
+      const sorted = [...DRAAIBOEK_TEMPLATE].sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
+      const created: GridItem[] = [];
+      let sortOrder = activeDraaiboek?.items.length ?? 0;
+      for (let i = 0; i < sorted.length; i++) {
+        const entry = sorted[i];
+        const next = sorted[i + 1];
+        const duration = next ? Math.max(15, toMinutes(next.startTime) - toMinutes(entry.startTime)) : 30;
+        sortOrder += 1;
+        const res = await fetch(`/api/weddings/${weddingId}/draaiboek/${activeDraaiboekId}/items`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ startTime: entry.startTime, duration, title: entry.title, sortOrder }),
+        });
+        const data = await res.json();
+        if (data.item) created.push(data.item);
+      }
+      setDraaiboeken(prev =>
+        prev.map(d => d.id === activeDraaiboekId
+          ? { ...d, items: [...d.items, ...created].sort((a, b) => a.sortOrder - b.sortOrder) }
+          : d)
+      );
+    } finally {
+      setInsertingTemplate(false);
     }
   }
 
@@ -374,6 +428,17 @@ export default function DraaiboekClient({
 
           {/* Grid */}
           <div style={{ flex: 1, minWidth: 0 }}>
+            {isPlanner && activeDraaiboek && activeDraaiboek.items.length === 0 && (
+              <div className="mb-4" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", padding: "1rem 1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--sand)" }}>
+                <div>
+                  <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)" }}>Nog leeg</div>
+                  <div style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Begin met een standaard trouwdag-tijdlijn — je past daarna zelf alles aan.</div>
+                </div>
+                <button onClick={insertTemplate} disabled={insertingTemplate} className="ddp-btn-secondary" style={{ flexShrink: 0 }}>
+                  {insertingTemplate ? "Bezig…" : "Standaardtijdlijn invoegen"}
+                </button>
+              </div>
+            )}
             {activeDraaiboek && (
               <DraaiboekGrid
                 items={activeDraaiboek.items}

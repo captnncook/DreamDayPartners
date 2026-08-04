@@ -18,7 +18,7 @@ export default async function DraaiboekPage({ params }: { params: Promise<{ id: 
 
   const wedding = await prisma.wedding.findFirst({
     where: accessWhere,
-    select: { id: true, title: true, date: true, endDate: true, isPremium: true },
+    select: { id: true, title: true, date: true, endDate: true },
   });
   if (!wedding) notFound();
 
@@ -66,7 +66,6 @@ export default async function DraaiboekPage({ params }: { params: Promise<{ id: 
       teamMembers={JSON.parse(JSON.stringify(teamMembers))}
       vendors={JSON.parse(JSON.stringify(vendors))}
       currentUser={JSON.parse(JSON.stringify(user))}
-      isPremium={wedding.isPremium}
       ownVendorId={ownVendorId}
     />
   );

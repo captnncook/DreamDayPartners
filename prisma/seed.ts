@@ -112,7 +112,6 @@ async function main() {
       coupleEmail1: "emma@example.nl",
       coupleEmail2: "thomas@example.nl",
       ownerId: couple1.id,
-      isPremium: true,
       notes: "Thema: Romantisch Garden Party",
     },
   });

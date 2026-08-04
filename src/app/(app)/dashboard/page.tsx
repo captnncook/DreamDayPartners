@@ -89,7 +89,6 @@ export default async function DashboardPage() {
     date: w.date.toISOString(),
     endDate: w.endDate ? w.endDate.toISOString() : null,
     status: w.status,
-    isPremium: w.isPremium,
     days: daysUntil(w.date),
   }));
 

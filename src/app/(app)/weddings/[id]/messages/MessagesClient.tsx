@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Lock, Heart, Handshake, MessageCircle, Star } from "lucide-react";
+import { Lock, Heart, Handshake, MessageCircle } from "lucide-react";
 
 type Message = {
   id: string;
@@ -25,7 +25,6 @@ interface Props {
   weddingTitle: string;
   threads: Thread[];
   currentUser: { id: string; name: string; role: string };
-  isPremium: boolean;
 }
 
 const THREAD_ICONS: Record<string, React.ElementType> = { internal: Lock, couple: Heart, vendor: Handshake };
@@ -35,7 +34,7 @@ function formatTime(iso: string) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
-export default function MessagesClient({ weddingId, weddingTitle, threads: initial, currentUser, isPremium }: Props) {
+export default function MessagesClient({ weddingId, weddingTitle, threads: initial, currentUser }: Props) {
   const [threads, setThreads] = useState<Thread[]>(initial);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(initial[0]?.id ?? null);
   const [message, setMessage] = useState("");
@@ -124,7 +123,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                 >
                   <option value="internal">Intern team</option>
                   <option value="couple">Bruidspaar</option>
-                  {isPremium && <option value="vendor">Leverancier</option>}
+                  <option value="vendor">Leverancier</option>
                 </select>
                 <button type="submit" className="w-full text-xs py-1.5 rounded-lg" style={{ background: "var(--accent)", color: "var(--primary)" }}>
                   Aanmaken
@@ -155,13 +154,6 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
               );
             })}
           </div>
-
-          {!isPremium && currentUser.role === "planner" && (
-            <div className="mx-4 mb-4 p-3 rounded-lg" style={{ background: "var(--accent)" }}>
-              <p className="text-xs font-medium mb-1 flex items-center gap-1"><Star className="w-3 h-3" style={{ color: "var(--gold)" }} /> Premium</p>
-              <p className="text-xs" style={{ color: "var(--muted)" }}>Upgrade naar Premium voor leverancierscommunicatie.</p>
-            </div>
-          )}
         </div>
 
         <div className="flex-1 flex flex-col min-h-0">
