@@ -14,6 +14,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       email: true,
       phone: true,
       website: true,
+      reviewLinkUrl: true,
       description: true,
       isPremium: true,
       coverPhoto: true,
@@ -78,7 +79,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const body = await req.json();
   const {
-    description, city, contactPerson, phone, website, priceFrom, priceTo, priceUnit, specializations,
+    description, city, contactPerson, phone, website, reviewLinkUrl, priceFrom, priceTo, priceUnit, specializations,
     averageWeddingPrice,
     ceremonyMinGuests, ceremonyMaxGuests, receptionMinGuests, receptionMaxGuests,
     dinnerMinGuests, dinnerMaxGuests, partyMinGuests, partyMaxGuests, hotelRooms,
@@ -114,6 +115,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(contactPerson !== undefined ? { contactPerson } : {}),
       ...(phone !== undefined ? { phone } : {}),
       ...(website !== undefined ? { website } : {}),
+      ...(reviewLinkUrl !== undefined ? { reviewLinkUrl: reviewLinkUrl || null } : {}),
       ...(priceFrom !== undefined ? { priceFrom: priceFrom ? Number(priceFrom) : null } : {}),
       ...(priceTo !== undefined ? { priceTo: priceTo ? Number(priceTo) : null } : {}),
       ...(priceUnit !== undefined ? { priceUnit: priceUnit || null } : {}),

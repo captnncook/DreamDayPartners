@@ -53,7 +53,11 @@ function GuestRange({ label, min, max }: { label: string; min?: number | null; m
     </div>
   );
 }
-type Review = { id: string; rating: number; text?: string; createdAt: string; author: { name: string } };
+type Review = {
+  id: string; text?: string; createdAt: string; author: { name: string };
+  ratingQuality: number; ratingCommunication: number; ratingReliability: number; ratingValue: number;
+  wouldRecommend: boolean;
+};
 type Wedding = { id: string; title: string; date: string };
 type CurrentUser = { id: string; role: string; name: string };
 
@@ -490,22 +494,55 @@ export default function VendorProfilePage() {
             </section>
 
             {/* Reviews */}
-            {reviews.length > 0 && (
-              <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
-                <h2 className="dash-section-title mb-3">Beoordelingen</h2>
-                <div>
-                  {reviews.map(r => (
-                    <div key={r.id} className="dash-row" style={{ flexDirection: "column", alignItems: "flex-start", gap: "0.25rem" }}>
-                      <div className="flex items-center gap-2">
-                        <span style={{ color: "var(--gold)", fontSize: "0.9375rem", letterSpacing: "2px" }}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
-                        <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{r.author.name}</span>
-                      </div>
-                      {r.text && <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6 }}>{r.text}</p>}
+            {reviews.length > 0 && (() => {
+              const avg = (r: Review) => (r.ratingQuality + r.ratingCommunication + r.ratingReliability + r.ratingValue) / 4;
+              const overall = reviews.reduce((s, r) => s + avg(r), 0) / reviews.length;
+              const recommendPct = Math.round((reviews.filter(r => r.wouldRecommend).length / reviews.length) * 100);
+              const categoryAvg = (key: "ratingQuality" | "ratingCommunication" | "ratingReliability" | "ratingValue") =>
+                reviews.reduce((s, r) => s + r[key], 0) / reviews.length;
+              const categories: { key: "ratingQuality" | "ratingCommunication" | "ratingReliability" | "ratingValue"; label: string }[] = [
+                { key: "ratingQuality", label: "Kwaliteit" },
+                { key: "ratingCommunication", label: "Communicatie" },
+                { key: "ratingReliability", label: "Afspraken nakomen" },
+                { key: "ratingValue", label: "Prijs / kwaliteit" },
+              ];
+              return (
+                <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+                  <h2 className="dash-section-title mb-3">Beoordelingen</h2>
+                  <div className="flex items-center gap-6 flex-wrap mb-5">
+                    <div>
+                      <span className="font-serif" style={{ fontSize: "2rem", fontWeight: 700, color: "var(--foreground)" }}>{overall.toFixed(1)}</span>
+                      <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}> / 5</span>
+                      <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{reviews.length} {reviews.length === 1 ? "review" : "reviews"}</div>
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
+                    <div>
+                      <span className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--gold-deep)" }}>{recommendPct}%</span>
+                      <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>zou aanraden</div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      {categories.map(c => (
+                        <div key={c.key} className="flex items-center gap-2">
+                          <span style={{ fontSize: "0.75rem", color: "var(--muted)", width: "120px" }}>{c.label}</span>
+                          <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>{categoryAvg(c.key).toFixed(1)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    {reviews.map(r => (
+                      <div key={r.id} className="dash-row" style={{ flexDirection: "column", alignItems: "flex-start", gap: "0.25rem" }}>
+                        <div className="flex items-center gap-2">
+                          <span style={{ color: "var(--gold)", fontSize: "0.9375rem", letterSpacing: "2px" }}>{"★".repeat(Math.round(avg(r)))}{"☆".repeat(5 - Math.round(avg(r)))}</span>
+                          <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{r.author.name}</span>
+                          {r.wouldRecommend && <span style={{ fontSize: "0.6875rem", color: "var(--gold-deep)", fontWeight: 600 }}>Beveelt aan</span>}
+                        </div>
+                        {r.text && <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6 }}>{r.text}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })()}
 
             {/* Claim profile */}
             {!vendor.userId && (

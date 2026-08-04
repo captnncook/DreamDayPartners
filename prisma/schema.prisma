@@ -139,6 +139,7 @@ model Vendor {
   email         String?
   phone         String?
   website       String?
+  reviewLinkUrl String? // externe reviewlink (bijv. Google) — alleen zichtbaar als ingevuld
   notes         String?
   userId        String?
   description   String?
@@ -305,13 +306,17 @@ model VendorContactRequest {
 }
 
 model VendorReview {
-  id        String   @id @default(uuid())
-  vendorId  String
-  weddingId String
-  authorId  String
-  rating    Int
-  text      String?
-  createdAt DateTime @default(now())
+  id                  String   @id @default(uuid())
+  vendorId            String
+  weddingId           String
+  authorId            String
+  ratingQuality       Int
+  ratingCommunication Int
+  ratingReliability   Int
+  ratingValue         Int
+  wouldRecommend      Boolean  @default(true)
+  text                String?
+  createdAt           DateTime @default(now())
 
   vendor  Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)

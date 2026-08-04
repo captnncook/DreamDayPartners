@@ -33,6 +33,8 @@ type CoupleSetup = {
   hasDraaiboek: boolean;
 } | null;
 type PaymentDeadline = { wvId: string; weddingId: string; vendorName: string; label: string; due: string; days: number };
+type MyReview = { ratingQuality: number; ratingCommunication: number; ratingReliability: number; ratingValue: number; wouldRecommend: boolean; text: string | null };
+type PastWeddingVendor = { wvId: string; vendorId: string; name: string; category: string; reviewLinkUrl: string | null; myReview: MyReview | null };
 
 interface Props {
   user: { id: string; name: string; role: string };
@@ -44,9 +46,10 @@ interface Props {
   taskProgress?: { total: number; done: number };
   coupleSetup?: CoupleSetup;
   paymentDeadlines?: PaymentDeadline[];
+  pastWeddingVendors?: PastWeddingVendor[];
 }
 
-export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress, coupleSetup, paymentDeadlines = [] }: Props) {
+export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress, coupleSetup, paymentDeadlines = [], pastWeddingVendors = [] }: Props) {
   const router = useRouter();
   const [requests, setRequests] = useState(vendorRequests);
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
@@ -58,6 +61,8 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskWedding, setNewTaskWedding] = useState(weddings[0]?.id ?? "");
   const [savingTask, setSavingTask] = useState(false);
+  const [reviewVendors, setReviewVendors] = useState(pastWeddingVendors);
+  const [reviewTarget, setReviewTarget] = useState<PastWeddingVendor | null>(null);
 
   async function respondToRequest(wvId: string, action: "accept" | "decline") {
     setProcessingRequest(wvId);
@@ -303,15 +308,45 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
       )}
 
       {/* Setup-checklist (bruidspaar) — verdwijnt zodra alles is gestart */}
-      {user.role === "couple" && coupleSetup && (
+      {user.role === "couple" && coupleSetup && weddings[0] && weddings[0].days >= 0 && (
         <CoupleSetupChecklist setup={coupleSetup} onSeeded={() => router.refresh()} />
+      )}
+
+      {/* Reviews (bruidspaar) — verschijnt zodra de bruiloft achter de rug is */}
+      {user.role === "couple" && weddings[0] && weddings[0].days < 0 && reviewVendors.length > 0 && (
+        <section className="mb-8">
+          <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
+            Bij jullie trouwdag waren de volgende leveranciers aanwezig, die elk met liefde en passie voor jullie veel hebben gedaan.
+            Vergeet ze niet te waarderen — schrijf een review via DreamDay, en als je hun werk ook elders wilt delen, staat de link daarvoor erbij.
+          </p>
+          <div style={{ borderTop: "1px solid var(--border)" }}>
+            {reviewVendors.map((v) => (
+              <div key={v.wvId} className="dash-row">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="font-serif" style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--foreground)" }}>{v.name}</div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "capitalize" }}>{v.category}</div>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  {v.reviewLinkUrl && (
+                    <a href={v.reviewLinkUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.8125rem", color: "var(--muted)", textDecoration: "underline" }}>
+                      Review elders
+                    </a>
+                  )}
+                  <button onClick={() => setReviewTarget(v)} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
+                    {v.myReview ? "Bewerk je review" : "Schrijf een review"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Vendor tasks */}
       {user.role === "vendor" && <VendorTasksSection weddings={weddings} />}
 
-      {/* Taken */}
-      {user.role !== "vendor" && user.role !== "admin" && (
+      {/* Taken — voor het bruidspaar niet meer relevant zodra de bruiloft achter de rug is */}
+      {user.role !== "vendor" && user.role !== "admin" && !(user.role === "couple" && weddings[0] && weddings[0].days < 0) && (
         <section>
           <div className="flex items-center justify-between mb-2">
             <div>
@@ -414,6 +449,18 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             </div>
           )}
         </section>
+      )}
+
+      {reviewTarget && weddings[0] && (
+        <ReviewModal
+          target={reviewTarget}
+          weddingId={weddings[0].id}
+          onClose={() => setReviewTarget(null)}
+          onSaved={(myReview) => {
+            setReviewVendors((prev) => prev.map((v) => (v.vendorId === reviewTarget.vendorId ? { ...v, myReview } : v)));
+            setReviewTarget(null);
+          }}
+        />
       )}
     </div>
   );
@@ -586,6 +633,114 @@ function WeddingRow({ wedding }: { wedding: Wedding }) {
         </div>
       </div>
     </Link>
+  );
+}
+
+const REVIEW_CATEGORIES: { key: keyof Pick<MyReview, "ratingQuality" | "ratingCommunication" | "ratingReliability" | "ratingValue">; label: string }[] = [
+  { key: "ratingQuality", label: "Kwaliteit" },
+  { key: "ratingCommunication", label: "Communicatie" },
+  { key: "ratingReliability", label: "Afspraken nakomen" },
+  { key: "ratingValue", label: "Prijs / kwaliteit" },
+];
+
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  return (
+    <div style={{ display: "flex", gap: "2px" }}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          key={n}
+          type="button"
+          onClick={() => onChange(n)}
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "1.25rem", lineHeight: 1, color: "var(--gold)" }}
+          aria-label={`${n} sterren`}
+        >
+          {n <= value ? "★" : "☆"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ReviewModal({
+  target, weddingId, onClose, onSaved,
+}: {
+  target: PastWeddingVendor;
+  weddingId: string;
+  onClose: () => void;
+  onSaved: (review: MyReview) => void;
+}) {
+  const [ratings, setRatings] = useState({
+    ratingQuality: target.myReview?.ratingQuality ?? 5,
+    ratingCommunication: target.myReview?.ratingCommunication ?? 5,
+    ratingReliability: target.myReview?.ratingReliability ?? 5,
+    ratingValue: target.myReview?.ratingValue ?? 5,
+  });
+  const [wouldRecommend, setWouldRecommend] = useState(target.myReview?.wouldRecommend ?? true);
+  const [text, setText] = useState(target.myReview?.text ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSave() {
+    setSaving(true);
+    setError("");
+    const res = await fetch(`/api/catalogus/${target.vendorId}/reviews`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ weddingId, ...ratings, wouldRecommend, text: text.trim() || null }),
+    });
+    if (res.ok) {
+      onSaved({ ...ratings, wouldRecommend, text: text.trim() || null });
+    } else {
+      const d = await res.json().catch(() => ({}));
+      setError(d.error ?? "Opslaan mislukt");
+    }
+    setSaving(false);
+  }
+
+  return (
+    <div
+      style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "var(--background)", borderRadius: "16px", padding: "1.75rem", maxWidth: "420px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
+      >
+        <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "0.25rem" }}>Review voor {target.name}</h2>
+        <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1.25rem" }}>Zichtbaar op het openbare profiel van deze leverancier.</p>
+
+        <div className="flex flex-col gap-3 mb-4">
+          {REVIEW_CATEGORIES.map(({ key, label }) => (
+            <div key={key} className="flex items-center justify-between">
+              <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>{label}</span>
+              <StarPicker value={ratings[key]} onChange={(v) => setRatings((r) => ({ ...r, [key]: v }))} />
+            </div>
+          ))}
+        </div>
+
+        <label className="flex items-center gap-2 mb-4" style={{ cursor: "pointer" }}>
+          <input type="checkbox" checked={wouldRecommend} onChange={(e) => setWouldRecommend(e.target.checked)} />
+          <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>Ik zou deze leverancier aanraden bij andere bruidsparen</span>
+        </label>
+
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={4}
+          placeholder="Vertel iets over jullie ervaring… (optioneel)"
+          className="ddp-input resize-none mb-4"
+        />
+
+        {error && <p style={{ fontSize: "0.8125rem", color: "var(--danger)", marginBottom: "0.75rem" }}>{error}</p>}
+
+        <div className="flex gap-2">
+          <button onClick={handleSave} disabled={saving} className="ddp-btn-primary">
+            {saving ? "Opslaan…" : "Review plaatsen"}
+          </button>
+          <button onClick={onClose} className="ddp-btn-secondary">Annuleren</button>
+        </div>
+      </div>
+    </div>
   );
 }
 

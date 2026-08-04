@@ -152,6 +152,41 @@ export default async function DashboardPage() {
     };
   }
 
+  // Voor het bruidspaar: als de eerste bruiloft al is geweest, tonen we de
+  // leveranciers die eraan meewerkten met een review-uitnodiging.
+  let pastWeddingVendors: { wvId: string; vendorId: string; name: string; category: string; reviewLinkUrl: string | null; myReview: { ratingQuality: number; ratingCommunication: number; ratingReliability: number; ratingValue: number; wouldRecommend: boolean; text: string | null } | null }[] = [];
+  if (user.role === "couple" && weddings[0] && daysUntil(weddings[0].date) < 0) {
+    const weddingId = weddings[0].id;
+    const bookings = await prisma.weddingVendor.findMany({
+      where: { weddingId, status: "confirmed" },
+      include: {
+        vendor: {
+          select: {
+            id: true, name: true, category: true, reviewLinkUrl: true,
+            reviews: { where: { weddingId, authorId: user.id } },
+          },
+        },
+      },
+    });
+    pastWeddingVendors = bookings.map((b) => ({
+      wvId: b.id,
+      vendorId: b.vendor.id,
+      name: b.vendor.name,
+      category: b.vendor.category,
+      reviewLinkUrl: b.vendor.reviewLinkUrl,
+      myReview: b.vendor.reviews[0]
+        ? {
+            ratingQuality: b.vendor.reviews[0].ratingQuality,
+            ratingCommunication: b.vendor.reviews[0].ratingCommunication,
+            ratingReliability: b.vendor.reviews[0].ratingReliability,
+            ratingValue: b.vendor.reviews[0].ratingValue,
+            wouldRecommend: b.vendor.reviews[0].wouldRecommend,
+            text: b.vendor.reviews[0].text,
+          }
+        : null,
+    }));
+  }
+
   return (
     <DashboardClient
       user={{ id: user.id, name: user.name, role: user.role }}
@@ -163,6 +198,7 @@ export default async function DashboardPage() {
       vendorRequests={requestsData}
       coupleSetup={coupleSetup}
       paymentDeadlines={paymentDeadlines}
+      pastWeddingVendors={pastWeddingVendors}
     />
   );
 }

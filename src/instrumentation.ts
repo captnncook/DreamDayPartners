@@ -63,11 +63,22 @@ export async function register() {
         "vendorId" TEXT NOT NULL,
         "weddingId" TEXT NOT NULL,
         "authorId" TEXT NOT NULL,
-        "rating" INTEGER NOT NULL,
+        "ratingQuality" INTEGER NOT NULL DEFAULT 5,
+        "ratingCommunication" INTEGER NOT NULL DEFAULT 5,
+        "ratingReliability" INTEGER NOT NULL DEFAULT 5,
+        "ratingValue" INTEGER NOT NULL DEFAULT 5,
+        "wouldRecommend" BOOLEAN NOT NULL DEFAULT true,
         "text" TEXT,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "vendor_reviews_pkey" PRIMARY KEY ("id")
       )`,
+      `ALTER TABLE "vendor_reviews" ADD COLUMN IF NOT EXISTS "ratingQuality" INTEGER NOT NULL DEFAULT 5`,
+      `ALTER TABLE "vendor_reviews" ADD COLUMN IF NOT EXISTS "ratingCommunication" INTEGER NOT NULL DEFAULT 5`,
+      `ALTER TABLE "vendor_reviews" ADD COLUMN IF NOT EXISTS "ratingReliability" INTEGER NOT NULL DEFAULT 5`,
+      `ALTER TABLE "vendor_reviews" ADD COLUMN IF NOT EXISTS "ratingValue" INTEGER NOT NULL DEFAULT 5`,
+      `ALTER TABLE "vendor_reviews" ADD COLUMN IF NOT EXISTS "wouldRecommend" BOOLEAN NOT NULL DEFAULT true`,
+      `ALTER TABLE "vendor_reviews" DROP COLUMN IF EXISTS "rating"`,
+      `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "reviewLinkUrl" TEXT`,
 
       `CREATE TABLE IF NOT EXISTS "deliverables" (
         "id" TEXT NOT NULL,

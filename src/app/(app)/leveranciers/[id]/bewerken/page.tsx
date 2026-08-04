@@ -284,7 +284,7 @@ function VendorEditPage() {
   const [profileViews, setProfileViews] = useState<number | null>(null);
 
   const [form, setForm] = useState({
-    description: "", city: "", contactPerson: "", phone: "", website: "",
+    description: "", city: "", contactPerson: "", phone: "", website: "", reviewLinkUrl: "",
     priceFrom: "", priceTo: "", priceUnit: "", specializations: "",
     averageWeddingPrice: "",
     ceremonyMinGuests: "", ceremonyMaxGuests: "", receptionMinGuests: "", receptionMaxGuests: "",
@@ -326,6 +326,7 @@ function VendorEditPage() {
       contactPerson: v.contactPerson ?? "",
       phone: v.phone ?? "",
       website: v.website ?? "",
+      reviewLinkUrl: v.reviewLinkUrl ?? "",
       priceFrom: v.priceFrom != null ? String(v.priceFrom) : "",
       priceTo: v.priceTo != null ? String(v.priceTo) : "",
       priceUnit: v.priceUnit ?? "",
@@ -882,6 +883,7 @@ function VendorEditPage() {
                 { key: "contactPerson", label: "Contactpersoon", placeholder: "Voornaam achternaam" },
                 { key: "phone", label: "Telefoonnummer", placeholder: "+31 6 12345678" },
                 { key: "website", label: "Website", placeholder: "https://www.example.nl" },
+                { key: "reviewLinkUrl", label: "Externe reviewlink (bijv. Google)", placeholder: "https://g.page/r/...../review" },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
                   <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>
