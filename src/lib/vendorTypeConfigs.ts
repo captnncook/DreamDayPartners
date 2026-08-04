@@ -622,6 +622,8 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "toegankelijkheid-mindervalide-toilet", label: "Mindervalidentoilet aanwezig?", type: "boolean" },
       { key: "catering-beleid", label: "Cateringbeleid", type: "select", options: ["Eigen catering verplicht", "Externe catering toegestaan", "Externe catering mits gecertificeerd", "Vrije keuze"] },
       { key: "geluidsgrens", label: "Geluidsgrens (dB)", type: "text" },
+      { key: "setupTimeOverride", label: "Opbouwtijd — alleen voor deze bruiloft (leeg = standaard)", type: "time" },
+      { key: "teardownTimeOverride", label: "Afbouwtijd — alleen voor deze bruiloft (leeg = standaard)", type: "time" },
     ],
   },
 

@@ -182,6 +182,9 @@ model Vendor {
   hotelRooms         Int?
   closingTime        String?
   soundLimit         String?
+  setupTime          String? // standaard vanaf hoelaat opbouwen (per bruiloft te overschrijven via intakeData.setupTimeOverride)
+  teardownTime       String? // standaard afbouwtijd (per bruiloft te overschrijven via intakeData.teardownTimeOverride)
+  badWeatherPlan     String? // korte tekst: wat is het slechtweer-scenario van deze locatie
   isOfficialCeremonyLocation Boolean @default(false)
   outdoorCeremonyPossible    Boolean @default(false)
   accessibility    String[]

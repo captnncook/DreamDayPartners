@@ -9,13 +9,17 @@ export type VenueInfoData = {
   venueFacilities: string[];
   accessibility: string[];
   outdoorCeremonyPossible: boolean;
+  setupTime: string | null;
+  teardownTime: string | null;
+  badWeatherPlan: string | null;
 };
 
 // Alleen-lezen: deze gegevens vult de trouwlocatie zelf één keer in op hun
-// eigen profiel — andere leveranciers van dezelfde bruiloft (DJ, band,
-// cateraar...) zien ze hier zonder er apart naar te hoeven vragen.
+// eigen profiel (met evt. een per-bruiloft afwijkende op-/afbouwtijd) —
+// andere leveranciers van dezelfde bruiloft (DJ, band, cateraar...) zien
+// ze hier zonder er apart naar te hoeven vragen.
 export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
-  const hasFacts = venue.closingTime || venue.soundLimit || venue.venueFacilities.length > 0 || venue.accessibility.length > 0;
+  const hasFacts = venue.closingTime || venue.soundLimit || venue.setupTime || venue.teardownTime || venue.badWeatherPlan || venue.venueFacilities.length > 0 || venue.accessibility.length > 0;
 
   return (
     <div className="ddp-card">
@@ -29,6 +33,12 @@ export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
 
       {hasFacts ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2" style={{ fontSize: "0.875rem" }}>
+          {venue.setupTime && (
+            <div><span style={{ color: "var(--muted)" }}>Opbouwen vanaf:</span> {venue.setupTime}</div>
+          )}
+          {venue.teardownTime && (
+            <div><span style={{ color: "var(--muted)" }}>Afbouwen tot:</span> {venue.teardownTime}</div>
+          )}
           {venue.closingTime && (
             <div><span style={{ color: "var(--muted)" }}>Sluitingstijd:</span> {venue.closingTime}</div>
           )}
@@ -41,6 +51,9 @@ export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
           )}
           {venue.accessibility.length > 0 && (
             <div className="sm:col-span-2"><span style={{ color: "var(--muted)" }}>Toegankelijkheid:</span> {venue.accessibility.join(", ")}</div>
+          )}
+          {venue.badWeatherPlan && (
+            <div className="sm:col-span-2"><span style={{ color: "var(--muted)" }}>Slechtweer-scenario:</span> {venue.badWeatherPlan}</div>
           )}
         </div>
       ) : (

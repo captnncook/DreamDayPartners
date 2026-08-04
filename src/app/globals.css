@@ -412,10 +412,10 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
 }
 
-/* Op brede schermen is er ruimte genoeg om alle categorieën in één keer te
-   tonen — dan wikkelt de rij i.p.v. horizontaal te scrollen, zodat niets
-   buiten beeld verdwijnt. */
-@media (min-width: 1100px) {
+/* Vanaf tablet-breedte is er ruimte genoeg om de categorieën te laten
+   wikkelen i.p.v. horizontaal te scrollen, zodat niets buiten beeld
+   verdwijnt. Op telefoonformaat (kleiner dan dit) blijft scrollen. */
+@media (min-width: 640px) {
   .ddp-cat-tabs-scroll {
     overflow-x: visible;
     flex-wrap: wrap;

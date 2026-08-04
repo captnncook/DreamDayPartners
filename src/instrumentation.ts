@@ -80,6 +80,9 @@ export async function register() {
       `ALTER TABLE "vendor_reviews" ADD COLUMN IF NOT EXISTS "wouldRecommend" BOOLEAN NOT NULL DEFAULT true`,
       `ALTER TABLE "vendor_reviews" DROP COLUMN IF EXISTS "rating"`,
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "reviewLinkUrl" TEXT`,
+      `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "setupTime" TEXT`,
+      `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "teardownTime" TEXT`,
+      `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "badWeatherPlan" TEXT`,
 
       `CREATE TABLE IF NOT EXISTS "deliverables" (
         "id" TEXT NOT NULL,

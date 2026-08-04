@@ -57,14 +57,29 @@ export default async function VendorBookingPage({
   let venueInfo: {
     name: string; closingTime: string | null; soundLimit: string | null;
     venueFacilities: string[]; accessibility: string[]; outdoorCeremonyPossible: boolean;
+    setupTime: string | null; teardownTime: string | null; badWeatherPlan: string | null;
   } | null = null;
   if (booking.vendor.category !== "trouwlocatie") {
     const venueBooking = await prisma.weddingVendor.findFirst({
       where: { weddingId, vendor: { category: "trouwlocatie" } },
-      include: { vendor: { select: { name: true, closingTime: true, soundLimit: true, venueFacilities: true, accessibility: true, outdoorCeremonyPossible: true } } },
+      include: {
+        vendor: {
+          select: {
+            name: true, closingTime: true, soundLimit: true, venueFacilities: true, accessibility: true,
+            outdoorCeremonyPossible: true, setupTime: true, teardownTime: true, badWeatherPlan: true,
+          },
+        },
+      },
     });
     if (venueBooking) {
-      venueInfo = venueBooking.vendor;
+      const overrides = (venueBooking.intakeData ?? {}) as Record<string, unknown>;
+      const setupOverride = typeof overrides.setupTimeOverride === "string" ? overrides.setupTimeOverride : "";
+      const teardownOverride = typeof overrides.teardownTimeOverride === "string" ? overrides.teardownTimeOverride : "";
+      venueInfo = {
+        ...venueBooking.vendor,
+        setupTime: setupOverride || venueBooking.vendor.setupTime,
+        teardownTime: teardownOverride || venueBooking.vendor.teardownTime,
+      };
     }
   }
 
