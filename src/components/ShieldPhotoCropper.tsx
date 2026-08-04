@@ -157,7 +157,8 @@ export default function ShieldPhotoCropper({
         <input
           type="range" min={1} max={3} step={0.01} value={zoom}
           onChange={(e) => handleZoom(parseFloat(e.target.value))}
-          style={{ width: "100%", marginTop: "1.25rem" }}
+          className="ddp-range"
+          style={{ marginTop: "1.25rem" }}
         />
 
         <div className="flex gap-2 mt-4">

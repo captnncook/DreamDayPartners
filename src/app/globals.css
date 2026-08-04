@@ -576,6 +576,53 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
+/* Native range-inputs (schuifregelaars): standaard browserstyling is
+   blauw — dit overschrijft dat consistent naar het goud-accent. */
+.ddp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+.ddp-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+}
+.ddp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--ink);
+  margin-top: -7px;
+  cursor: pointer;
+}
+.ddp-range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+}
+.ddp-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid var(--ink);
+  cursor: pointer;
+}
+.ddp-range--dark {
+  background: rgba(255,255,255,0.25);
+}
+.ddp-range--dark::-webkit-slider-runnable-track { background: rgba(255,255,255,0.25); }
+.ddp-range--dark::-moz-range-track { background: rgba(255,255,255,0.25); }
+
 .dash-row {
   display: flex;
   align-items: center;

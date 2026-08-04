@@ -63,7 +63,7 @@ type Vendor = {
 };
 
 function TierSlider({
-  selectedTierIndex, setSelectedTierIndex, billingInterval, setBillingInterval, actionLabel, onAction, disabled,
+  selectedTierIndex, setSelectedTierIndex, billingInterval, setBillingInterval, actionLabel, onAction, disabled, dark = false,
 }: {
   selectedTierIndex: number;
   setSelectedTierIndex: (i: number) => void;
@@ -72,6 +72,7 @@ function TierSlider({
   actionLabel: string;
   onAction: () => void;
   disabled: boolean;
+  dark?: boolean;
 }) {
   const tier = WEDDING_TIERS[selectedTierIndex];
   const monthly = tierMonthlyPriceEur(tier);
@@ -79,14 +80,18 @@ function TierSlider({
   const perWedding = tierPricePerWeddingEur(tier);
   const hoursPerMonth = HOURS_SAVED_PER_WEDDING * tier;
 
+  const textColor = dark ? "var(--ink-text)" : "var(--foreground)";
+  const mutedColor = dark ? "var(--ink-muted)" : "var(--muted)";
+  const mutedLightColor = dark ? "var(--ink-muted)" : "var(--muted-light)";
+
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>
+        <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: textColor }}>
           Tot {tierLabel(tier)} bruiloften tegelijk
         </span>
-        <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--gold-deep)" }}>
-          €{price}<span style={{ fontSize: "0.75rem", fontWeight: 500, color: "var(--muted)" }}>/{billingInterval === "year" ? "jaar" : "maand"} ex btw</span>
+        <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--gold)" }}>
+          €{price}<span style={{ fontSize: "0.75rem", fontWeight: 500, color: mutedColor }}>/{billingInterval === "year" ? "jaar" : "maand"} ex btw</span>
         </span>
       </div>
       <input
@@ -96,29 +101,29 @@ function TierSlider({
         step={1}
         value={selectedTierIndex}
         onChange={(e) => setSelectedTierIndex(parseInt(e.target.value, 10))}
-        style={{ width: "100%" }}
+        className={`ddp-range${dark ? " ddp-range--dark" : ""}`}
       />
-      <div className="flex justify-between" style={{ fontSize: "0.6875rem", color: "var(--muted-light)", marginBottom: "0.75rem" }}>
+      <div className="flex justify-between" style={{ fontSize: "0.6875rem", color: mutedLightColor, marginBottom: "0.75rem" }}>
         <span>10</span>
         <span>100+</span>
       </div>
 
-      <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem" }}>
+      <p style={{ fontSize: "0.75rem", color: mutedColor, marginBottom: "0.25rem" }}>
         Dat is €{perWedding.toFixed(2).replace(".", ",")} per bruiloft.
       </p>
-      <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "1rem" }}>
-        Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft — bij {tierLabel(tier)} bruiloften per maand is dat <strong>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
+      <p style={{ fontSize: "0.75rem", color: mutedColor, marginBottom: "1rem" }}>
+        Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft — bij {tierLabel(tier)} bruiloften per maand is dat <strong style={{ color: textColor }}>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
       </p>
 
-      <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.75rem", maxWidth: "260px" }}>
+      <div style={{ display: "flex", border: `1px solid ${dark ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.75rem", maxWidth: "260px" }}>
         <button
           type="button"
           onClick={() => setBillingInterval("month")}
           style={{
             flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
             fontSize: "0.75rem", fontWeight: billingInterval === "month" ? 700 : 500,
-            background: billingInterval === "month" ? "var(--ink)" : "transparent",
-            color: billingInterval === "month" ? "white" : "var(--muted)",
+            background: billingInterval === "month" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
+            color: billingInterval === "month" ? (dark ? "var(--ink-text)" : "white") : mutedColor,
           }}
         >
           Maandelijks
@@ -129,8 +134,8 @@ function TierSlider({
           style={{
             flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
             fontSize: "0.75rem", fontWeight: billingInterval === "year" ? 700 : 500,
-            background: billingInterval === "year" ? "var(--ink)" : "transparent",
-            color: billingInterval === "year" ? "var(--gold)" : "var(--muted)",
+            background: billingInterval === "year" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
+            color: billingInterval === "year" ? "var(--gold)" : mutedColor,
           }}
         >
           Jaarlijks · 2 maanden gratis
@@ -1349,6 +1354,7 @@ function VendorEditPage() {
                 actionLabel={billingLoading ? "Laden…" : "Upgrade"}
                 onAction={() => handleUpgrade(billingInterval, WEDDING_TIERS[selectedTierIndex])}
                 disabled={billingLoading}
+                dark
               />
             </>
           )}
