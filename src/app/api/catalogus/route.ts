@@ -55,6 +55,7 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get("category");
   const search = searchParams.get("search");
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
+  const all = searchParams.get("all") === "1";
 
   const where = {
     archivedAt: null, // gearchiveerde (vertrokken) leveranciers niet tonen
@@ -69,6 +70,18 @@ export async function GET(req: NextRequest) {
         }
       : {}),
   };
+
+  // Kaartweergave: alle matches over alle pagina's heen tonen, niet slechts
+  // de huidige pagina. Lichte payload (geen foto's/omschrijving) omdat dit
+  // in één keer honderden/duizenden leveranciers kan zijn.
+  if (all) {
+    const allVendors = await prisma.vendor.findMany({
+      where,
+      select: { id: true, name: true, category: true, city: true, latitude: true, longitude: true, isPremium: true },
+      orderBy: [{ isPremium: "desc" }, { name: "asc" }],
+    });
+    return NextResponse.json({ vendors: allVendors, total: allVendors.length });
+  }
 
   // Bewust géén contactPerson/email/phone/website in de lijst-response:
   // dit endpoint is publiek en zou anders in bulk (60 per pagina) de complete

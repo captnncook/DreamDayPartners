@@ -57,6 +57,8 @@ function LeveranciersContent() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [view, setView] = useState<"list" | "map">("list");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [mapVendors, setMapVendors] = useState<Vendor[]>([]);
+  const [mapLoading, setMapLoading] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 350);
@@ -88,6 +90,21 @@ function LeveranciersContent() {
   }, [category, debouncedSearch, page]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Kaartweergave toont alle matches over elke pagina heen, niet alleen de
+  // huidige pagina van 60 — daarom een apart, ongepagineerd verzoek.
+  useEffect(() => {
+    if (view !== "map") return;
+    setMapLoading(true);
+    const params = new URLSearchParams();
+    if (category) params.set("category", category);
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    params.set("all", "1");
+    fetch(`/api/catalogus?${params}`)
+      .then((r) => r.json())
+      .then((data) => setMapVendors(data.vendors ?? []))
+      .finally(() => setMapLoading(false));
+  }, [view, category, debouncedSearch]);
 
   const hasFilter = !!category || !!search;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -222,13 +239,19 @@ function LeveranciersContent() {
             </button>
           </div>
         ) : view === "map" ? (
-          <Suspense fallback={
+          mapLoading ? (
             <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--sand)", borderRadius: "var(--radius-lg)" }}>
               <p style={{ color: "var(--muted)" }}>Kaart laden…</p>
             </div>
-          }>
-            <VendorMap vendors={vendors} />
-          </Suspense>
+          ) : (
+            <Suspense fallback={
+              <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--sand)", borderRadius: "var(--radius-lg)" }}>
+                <p style={{ color: "var(--muted)" }}>Kaart laden…</p>
+              </div>
+            }>
+              <VendorMap vendors={mapVendors} />
+            </Suspense>
+          )
         ) : (
           <>
             <div style={{ borderTop: "1px solid var(--border)" }}>
