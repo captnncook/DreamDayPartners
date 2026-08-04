@@ -32,7 +32,7 @@ export default function VoorwaardenPage() {
       <h2>3. Gratis voor bruidsparen, premium voor leveranciers</h2>
       <ul>
         <li>Voor bruidsparen is DreamDay gratis. Geen proefperiode, geen verborgen kosten.</li>
-        <li>Leveranciers kunnen een premium-abonnement afsluiten (€29 per maand) met extra functies, zoals een uitgebreid profiel in de catalogus, dashboard-aanpassingen en een analytisch overzicht.</li>
+        <li>Een gratis leveranciersaccount beheert maximaal 2 bruiloften tegelijk. Leveranciers kunnen een premium-abonnement afsluiten (vanaf €15 per maand ex btw, oplopend tot €99 voor 100+ bruiloften, zelf te kiezen) met extra functies, zoals meer bruiloften tegelijk, een uitgebreid profiel in de catalogus, dashboard-aanpassingen en een analytisch overzicht.</li>
         <li>Het abonnement loopt per maand en is <strong>maandelijks opzegbaar</strong> via het facturatieportaal in je profiel. Na opzegging blijft premium actief tot het einde van de betaalde periode; er vindt geen restitutie plaats over de lopende maand.</li>
         <li>Prijswijzigingen kondigen we minimaal 30 dagen van tevoren aan. Ben je het er niet mee eens, dan kun je opzeggen voordat de nieuwe prijs ingaat.</li>
         <li>Betalingen verlopen via Stripe. Bij een mislukte betaling proberen we het opnieuw; blijft betaling uit, dan kunnen we het premium-abonnement pauzeren.</li>

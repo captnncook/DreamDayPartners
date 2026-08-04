@@ -111,7 +111,7 @@ const HOW_IT_WORKS = [
 const FAQS = [
   { q: "Is DreamDay Platform gratis voor bruidsparen?", a: "Ja, volledig. Bruidsparen betalen nooit iets: geen proefperiode, geen verborgen kosten. Het platform is voor altijd gratis voor jullie." },
   { q: "Hoe vind ik leveranciers?", a: "Via de leveranciersdatabase zoek je op categorie, van fotograaf tot caterer. Je voegt ze toe aan jullie bruiloft en communiceert direct via de app." },
-  { q: "Wat zit er in premium voor leveranciers?", a: "Met het premium abonnement beheer je onbeperkt bruiloften, bewerk je het draaiboek, upload je documenten, heb je toegang tot een analytisch dashboard en profiteer je van prioriteit support." },
+  { q: "Wat zit er in premium voor leveranciers?", a: "Gratis accounts beheren maximaal 2 bruiloften tegelijk. Met Premium kies je zelf hoeveel bruiloften je tegelijk beheert — van 10 tot 100+ — vanaf €15 per maand ex btw, en bewerk je daarnaast het draaiboek, upload je documenten, heb je toegang tot een analytisch dashboard en profiteer je van prioriteit support. Jaarlijks betalen levert 2 maanden gratis op." },
   { q: "Hoe werkt het contact met leveranciers?", a: "Alles loopt via de ingebouwde chat. Geen losse apps, geen mailtjes kwijt: alle gesprekken staan in je account." },
   { q: "Wat is een draaiboek?", a: "Het draaiboek is een minuut-voor-minuut tijdlijn van jullie trouwdag. Je vult het samen met je planner in en deelt het met alle leveranciers." },
   { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Ja. DreamDay Platform is zo gebouwd dat bruidsparen zelf de regie kunnen houden, met of zonder professionele planner." },
@@ -725,7 +725,7 @@ export default function LandingPage() {
                 <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>€0</div>
                 <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1.5rem" }}>Per maand</div>
                 <ul className="space-y-3 mb-7">
-                  {["Portaaltoegang (1 bruiloft)", "Draaiboek inzien", "Bestanden ontvangen", "Chatten met planner", "Basisprofiel"].map((item) => (
+                  {["Portaaltoegang (2 bruiloften)", "Draaiboek inzien", "Bestanden ontvangen", "Chatten met planner", "Basisprofiel"].map((item) => (
                     <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "0.875rem" }}>
                       <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
                       {item}
@@ -743,11 +743,11 @@ export default function LandingPage() {
                 <div style={{ position: "absolute", top: "1.25rem", right: "1.25rem", background: "var(--gradient-primary)", borderRadius: "999px", color: "white", fontSize: "0.625rem", fontWeight: 700, padding: "3px 10px", letterSpacing: "0.05em" }}>
                   POPULAIRST
                 </div>
-                <div className="ddp-badge badge-premium mb-5">Dream Day Pro</div>
-                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white", lineHeight: 1, marginBottom: "4px" }}>€29</div>
-                <div style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", marginBottom: "1.5rem" }}>Per maand · Maandelijks opzegbaar</div>
+                <div className="ddp-badge badge-premium mb-5">Dream Day Premium</div>
+                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white", lineHeight: 1, marginBottom: "4px" }}>Vanaf €15</div>
+                <div style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", marginBottom: "1.5rem" }}>Per maand ex btw · 10 t/m 100+ bruiloften, zelf te kiezen · maandelijks opzegbaar</div>
                 <ul className="space-y-3 mb-7">
-                  {["Onbeperkt bruiloften", "Draaiboek bewerken", "Volledig bestandsbeheer", "Geavanceerde chat", "Premium profiel", "Analytisch dashboard", "Prioriteit support"].map((item) => (
+                  {["10 tot 100+ bruiloften tegelijk", "Draaiboek bewerken", "Volledig bestandsbeheer", "Geavanceerde chat", "Premium profiel", "Analytisch dashboard", "Prioriteit support"].map((item) => (
                     <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.85)" }}>
                       <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--primary-light)" }} />
                       {item}
@@ -755,7 +755,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                  Pro starten
+                  Premium starten
                 </Link>
               </div>
             </ScrollReveal>

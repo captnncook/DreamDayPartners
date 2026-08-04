@@ -170,7 +170,7 @@ const PREMIUM_BENEFITS: Record<string, string[]> = {
   dj:              ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
   liveband:        ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
   trouwlocatie:    ["Uitgelicht profiel bovenaan zoekresultaten", "Kaartweergave met prominente pin", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  weddingplanner:  ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkt bruiloften beheren", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+  weddingplanner:  ["Uitgelicht profiel bovenaan zoekresultaten", "10 tot 100+ bruiloften tegelijk beheren", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
   default:         ["Uitgelicht profiel bovenaan zoekresultaten", "Directe aanvraagknop voor bruidsparen", "Beschikbaarheidskalender zichtbaar", "Statistieken & profielbezoeken"],
 };
 
