@@ -114,6 +114,7 @@ const STATEMENTS = [
   `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "stripeCurrentPeriodEnd" TIMESTAMP(3)`,
   `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "calendarToken" TEXT`,
   `CREATE UNIQUE INDEX IF NOT EXISTS "users_calendarToken_key" ON "users" ("calendarToken")`,
+  `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "premiumWeddingLimit" INTEGER`,
 
   `CREATE TABLE IF NOT EXISTS "admin_events" (
     "id" TEXT NOT NULL,

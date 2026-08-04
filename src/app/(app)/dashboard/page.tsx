@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import DashboardClient from "./DashboardClient";
+import { FREE_WEDDING_LIMIT } from "@/lib/pricing";
 
 function daysUntil(date: Date) {
   const now = new Date();
@@ -104,6 +105,15 @@ export default async function DashboardPage() {
   const totalTasks = taskCounts.reduce((s, g) => s + g._count, 0);
   const doneTasks = taskCounts.find(g => g.status === "done")?._count ?? 0;
 
+  // Gratis leveranciersaccounts mogen maximaal FREE_WEDDING_LIMIT bruiloften
+  // tegelijk in hun dashboard hebben — daarna tonen we een permanente
+  // upgrade-melding i.p.v. ze zomaar te laten groeien.
+  let vendorWeddingLimitInfo: { atLimit: boolean; count: number; limit: number } | null = null;
+  if (user.role === "vendor" && !user.isPremium) {
+    const count = weddings.length; // al gefilterd op portalAccess: true hierboven
+    vendorWeddingLimitInfo = { atLimit: count >= FREE_WEDDING_LIMIT, count, limit: FREE_WEDDING_LIMIT };
+  }
+
   // Naderende betaaldeadlines (feitelijk, uit echte boekingsdata):
   // onbetaalde aanbetalingen/eindbetalingen die binnen 14 dagen vervallen of al
   // verlopen zijn. Alleen voor rollen die betalingen beheren.
@@ -199,6 +209,7 @@ export default async function DashboardPage() {
       coupleSetup={coupleSetup}
       paymentDeadlines={paymentDeadlines}
       pastWeddingVendors={pastWeddingVendors}
+      vendorWeddingLimitInfo={vendorWeddingLimitInfo}
     />
   );
 }

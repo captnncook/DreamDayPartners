@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { FREE_WEDDING_LIMIT } from "@/lib/stripe";
 
 export type SessionUser = { id: string; role: string };
 
@@ -13,6 +14,41 @@ export async function getOwnVendorId(userId: string): Promise<string | null> {
     select: { id: true },
   });
   return vendor?.id ?? null;
+}
+
+/**
+ * Telt het aantal unieke bruiloften waar deze leverancier actieve
+ * dashboardtoegang toe heeft (portalAccess: true).
+ */
+export async function countActiveVendorWeddings(vendorId: string): Promise<number> {
+  const rows = await prisma.weddingVendor.findMany({
+    where: { vendorId, portalAccess: true },
+    distinct: ["weddingId"],
+    select: { weddingId: true },
+  });
+  return rows.length;
+}
+
+/**
+ * Bepaalt of deze leverancier (op basis van userId) nog een extra bruiloft
+ * mag koppelen: gratis accounts op basis van FREE_WEDDING_LIMIT, premium op
+ * basis van het gekozen tier (null = onbeperkt, het 100+ tier).
+ */
+export async function canGrantVendorPortalAccess(vendorId: string): Promise<boolean> {
+  const vendor = await prisma.vendor.findUnique({ where: { id: vendorId }, select: { userId: true } });
+  if (!vendor?.userId) return true;
+
+  const owner = await prisma.user.findUnique({
+    where: { id: vendor.userId },
+    select: { isPremium: true, premiumWeddingLimit: true },
+  });
+  if (!owner) return true;
+
+  const limit = owner.isPremium ? owner.premiumWeddingLimit : FREE_WEDDING_LIMIT;
+  if (limit === null || limit === undefined) return true; // onbeperkt
+
+  const count = await countActiveVendorWeddings(vendorId);
+  return count < limit;
 }
 
 /**

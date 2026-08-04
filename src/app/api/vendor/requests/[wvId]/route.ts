@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { canGrantVendorPortalAccess } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ wvId: string }> };
 
@@ -30,6 +31,10 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   const accepted = action === "accept";
+
+  if (accepted && !(await canGrantVendorPortalAccess(booking.vendorId))) {
+    return NextResponse.json({ error: "Je hebt het maximum aantal bruiloften voor je account bereikt. Upgrade naar Premium om meer bruiloften te accepteren.", code: "wedding_limit_reached" }, { status: 403 });
+  }
 
   const updated = await prisma.weddingVendor.update({
     where: { id: wvId },

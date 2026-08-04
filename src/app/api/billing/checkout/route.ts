@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { getStripe, proPriceData, type BillingInterval } from "@/lib/stripe";
+import { getStripe, tierPriceData, isWeddingTier, tierToWeddingLimit, type BillingInterval, type WeddingTier } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   const user = await getSession();
@@ -17,6 +17,11 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const interval: BillingInterval = body.interval === "year" ? "year" : "month";
+  const tierRaw = Number(body.tier);
+  if (!isWeddingTier(tierRaw)) {
+    return NextResponse.json({ error: "Ongeldig aantal bruiloften" }, { status: 400 });
+  }
+  const tier: WeddingTier = tierRaw;
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://dreamdaypartners-production.up.railway.app";
 
@@ -32,15 +37,18 @@ export async function POST(req: NextRequest) {
     await prisma.user.update({ where: { id: dbUser.id }, data: { stripeCustomerId: customerId } });
   }
 
+  const weddingLimit = tierToWeddingLimit(tier);
+
   const session = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
-    line_items: [{ price_data: proPriceData(interval), quantity: 1 }],
+    line_items: [{ price_data: tierPriceData(tier, interval), quantity: 1 }],
     success_url: `${appUrl}/leveranciers/mijn-profiel?upgrade=success`,
     cancel_url: `${appUrl}/leveranciers/mijn-profiel?upgrade=cancelled`,
     allow_promotion_codes: true,
+    metadata: { userId: dbUser.id, weddingLimit: weddingLimit === null ? "unlimited" : String(weddingLimit) },
     subscription_data: {
-      metadata: { userId: dbUser.id },
+      metadata: { userId: dbUser.id, weddingLimit: weddingLimit === null ? "unlimited" : String(weddingLimit) },
     },
   });
 

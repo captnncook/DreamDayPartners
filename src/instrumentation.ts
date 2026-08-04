@@ -41,6 +41,7 @@ export async function register() {
 
       `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "calendarToken" TEXT`,
       `CREATE UNIQUE INDEX IF NOT EXISTS "users_calendarToken_key" ON "users" ("calendarToken")`,
+      `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "premiumWeddingLimit" INTEGER`,
 
       `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "vendorBookingId" TEXT`,
       `ALTER TABLE "tasks" ADD COLUMN IF NOT EXISTS "sourceFieldKey" TEXT`,

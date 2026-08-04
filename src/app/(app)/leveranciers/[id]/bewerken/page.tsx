@@ -7,6 +7,10 @@ import Image from "next/image";
 import { Upload, Trash2, Save, Check, Star } from "lucide-react";
 import ShieldPhotoCropper from "@/components/ShieldPhotoCropper";
 import { getVendorProfileSection, type ProfileField } from "@/lib/vendorProfileSections";
+import {
+  WEDDING_TIERS, HOURS_SAVED_PER_WEDDING, tierMonthlyPriceEur, tierAnnualPriceEur, tierPricePerWeddingEur,
+  tierLabel, FREE_WEDDING_LIMIT, type WeddingTier,
+} from "@/lib/pricing";
 
 const CATEGORIES = [
   { value: "weddingplanner", label: "Weddingplanner" },
@@ -57,6 +61,93 @@ type Vendor = {
   venueRooms?: VenueRoom[];
   profileDetails?: Record<string, unknown>;
 };
+
+function TierSlider({
+  selectedTierIndex, setSelectedTierIndex, billingInterval, setBillingInterval, actionLabel, onAction, disabled,
+}: {
+  selectedTierIndex: number;
+  setSelectedTierIndex: (i: number) => void;
+  billingInterval: "month" | "year";
+  setBillingInterval: (i: "month" | "year") => void;
+  actionLabel: string;
+  onAction: () => void;
+  disabled: boolean;
+}) {
+  const tier = WEDDING_TIERS[selectedTierIndex];
+  const monthly = tierMonthlyPriceEur(tier);
+  const price = billingInterval === "year" ? tierAnnualPriceEur(tier) : monthly;
+  const perWedding = tierPricePerWeddingEur(tier);
+  const hoursPerMonth = HOURS_SAVED_PER_WEDDING * tier;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>
+          Tot {tierLabel(tier)} bruiloften tegelijk
+        </span>
+        <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--gold-deep)" }}>
+          €{price}<span style={{ fontSize: "0.75rem", fontWeight: 500, color: "var(--muted)" }}>/{billingInterval === "year" ? "jaar" : "maand"} ex btw</span>
+        </span>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={WEDDING_TIERS.length - 1}
+        step={1}
+        value={selectedTierIndex}
+        onChange={(e) => setSelectedTierIndex(parseInt(e.target.value, 10))}
+        style={{ width: "100%" }}
+      />
+      <div className="flex justify-between" style={{ fontSize: "0.6875rem", color: "var(--muted-light)", marginBottom: "0.75rem" }}>
+        <span>10</span>
+        <span>100+</span>
+      </div>
+
+      <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem" }}>
+        Dat is €{perWedding.toFixed(2).replace(".", ",")} per bruiloft.
+      </p>
+      <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "1rem" }}>
+        Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft — bij {tierLabel(tier)} bruiloften per maand is dat <strong>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
+      </p>
+
+      <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.75rem", maxWidth: "260px" }}>
+        <button
+          type="button"
+          onClick={() => setBillingInterval("month")}
+          style={{
+            flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
+            fontSize: "0.75rem", fontWeight: billingInterval === "month" ? 700 : 500,
+            background: billingInterval === "month" ? "var(--ink)" : "transparent",
+            color: billingInterval === "month" ? "white" : "var(--muted)",
+          }}
+        >
+          Maandelijks
+        </button>
+        <button
+          type="button"
+          onClick={() => setBillingInterval("year")}
+          style={{
+            flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
+            fontSize: "0.75rem", fontWeight: billingInterval === "year" ? 700 : 500,
+            background: billingInterval === "year" ? "var(--ink)" : "transparent",
+            color: billingInterval === "year" ? "var(--gold)" : "var(--muted)",
+          }}
+        >
+          Jaarlijks · 2 maanden gratis
+        </button>
+      </div>
+
+      <button
+        onClick={onAction}
+        disabled={disabled}
+        className="ddp-btn-gold"
+        style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: disabled ? "not-allowed" : "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", opacity: disabled ? 0.6 : 1 }}
+      >
+        {actionLabel}
+      </button>
+    </div>
+  );
+}
 
 const ACCESSIBILITY_OPTIONS = ["Rolstoeltoegankelijk", "Gratis parkeerplaatsen", "Invalidentoilet", "Oplaadpunt elektrische auto's", "Valetparking", "Shuttleservice/P&R"];
 const VENUE_FACILITIES_OPTIONS = ["(Dak)terras", "Tuin", "Zwembad", "Omkleedruimte", "Bruidssuite", "Wellness", "Overdekte buitenlocatie"];
@@ -263,6 +354,8 @@ function VendorEditPage() {
   const [billingInterval, setBillingInterval] = useState<"month" | "year">("year");
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+  const [currentWeddingLimit, setCurrentWeddingLimit] = useState<number | null>(null);
+  const [selectedTierIndex, setSelectedTierIndex] = useState(0); // index in WEDDING_TIERS, default = 10 bruiloften
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [coverKey, setCoverKey] = useState<string | null>(null);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
@@ -320,6 +413,12 @@ function VendorEditPage() {
     setIsUserPremium(meData.user?.isPremium ?? false);
     setCancelAtPeriodEnd(meData.user?.stripeCancelAtPeriodEnd ?? false);
     setCurrentPeriodEnd(meData.user?.stripeCurrentPeriodEnd ?? null);
+    const limit: number | null = meData.user?.premiumWeddingLimit ?? null;
+    setCurrentWeddingLimit(meData.user?.isPremium ? limit : null);
+    if (meData.user?.isPremium) {
+      const idx = limit === null ? WEDDING_TIERS.length - 1 : WEDDING_TIERS.indexOf(limit as WeddingTier);
+      setSelectedTierIndex(idx === -1 ? 0 : idx);
+    }
     setForm({
       description: v.description ?? "",
       city: v.city ?? "",
@@ -548,13 +647,13 @@ function VendorEditPage() {
     }
   }
 
-  async function handleUpgrade(interval: "month" | "year") {
+  async function handleUpgrade(interval: "month" | "year", tier: WeddingTier) {
     setBillingLoading(true);
     try {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interval }),
+        body: JSON.stringify({ interval, tier }),
       });
       const data = await res.json().catch(() => ({}));
       if (data.url) { window.location.href = data.url; return; }
@@ -563,6 +662,28 @@ function VendorEditPage() {
       setError("Kan niet verbinden met betaalservice");
     }
     setBillingLoading(false);
+  }
+
+  async function handleChangePlan(interval: "month" | "year", tier: WeddingTier) {
+    setBillingLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/billing/change-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval, tier }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setCurrentWeddingLimit(data.weddingLimit ?? null);
+      } else {
+        setError(data.error ?? "Wijzigen mislukt");
+      }
+    } catch {
+      setError("Wijzigen mislukt");
+    } finally {
+      setBillingLoading(false);
+    }
   }
 
   async function handlePortal() {
@@ -1148,57 +1269,42 @@ function VendorEditPage() {
         </section>
 
         <section className={isUserPremium ? "" : "dash-hero"} style={isUserPremium ? { background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem", marginBottom: "2rem" } : { padding: "1.5rem", marginBottom: "2rem" }}>
-          <div style={{ display: "flex", alignItems: isUserPremium ? "center" : "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
-            <div style={{ flex: "1 1 300px", minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
-                <Star className="w-4 h-4" style={{ color: "var(--gold)", flexShrink: 0 }} />
-                <span className="font-serif" style={{ fontWeight: 700, fontSize: "1.0625rem", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
-                  {isUserPremium ? (cancelAtPeriodEnd ? "Premium opgezegd" : "Premium actief") : "Upgrade naar Premium"}
-                </span>
-              </div>
-              {isUserPremium ? (
-                <p style={{ fontSize: "0.8125rem", color: "var(--muted)", maxWidth: "360px" }}>
-                  {cancelAtPeriodEnd
-                    ? `Je blijft Premium tot ${currentPeriodEnd ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(currentPeriodEnd)) : "het einde van je huidige periode"}. Daarna wordt je profiel niet meer verlengd.`
-                    : "Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen."}
-                </p>
-              ) : (
-                <>
-                  {profileViews !== null && profileViews > 0 && (
-                    <p style={{ fontSize: "0.8125rem", color: "var(--gold)", fontWeight: 600, marginBottom: "0.375rem" }}>
-                      Je profiel is al {profileViews}× bekeken door bruidsparen.
-                    </p>
-                  )}
-                  <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "0.3rem" }}>
-                    {[
-                      "Bovenaan de zoekresultaten in jouw categorie",
-                      "Aanbevolen-label op je profiel",
-                      "Dashboard zelf inrichten + extra functies aanvragen",
-                      "Analytisch overzicht van weergaven en boekingen",
-                    ].map((b) => (
-                      <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "0.8125rem", color: "var(--ink-muted)" }}>
-                        <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--gold)", marginTop: "2px" }} />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                </>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
+            <Star className="w-4 h-4" style={{ color: "var(--gold)", flexShrink: 0 }} />
+            <span className="font-serif" style={{ fontWeight: 700, fontSize: "1.0625rem", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
+              {isUserPremium ? (cancelAtPeriodEnd ? "Premium opgezegd" : "Premium actief") : "Upgrade naar Premium"}
+            </span>
+          </div>
+
+          {isUserPremium ? (
+            <>
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", maxWidth: "440px", marginBottom: "1rem" }}>
+                {cancelAtPeriodEnd
+                  ? `Je blijft Premium tot ${currentPeriodEnd ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(currentPeriodEnd)) : "het einde van je huidige periode"}. Daarna wordt je profiel niet meer verlengd.`
+                  : `Je huidige plan: tot ${tierLabel((currentWeddingLimit ?? 100) as WeddingTier)} bruiloften. Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen.`}
+              </p>
+
+              {!cancelAtPeriodEnd && (
+                <TierSlider
+                  selectedTierIndex={selectedTierIndex}
+                  setSelectedTierIndex={setSelectedTierIndex}
+                  billingInterval={billingInterval}
+                  setBillingInterval={setBillingInterval}
+                  actionLabel={billingLoading ? "Bezig…" : "Plan wijzigen"}
+                  onAction={() => handleChangePlan(billingInterval, WEDDING_TIERS[selectedTierIndex])}
+                  disabled={billingLoading || WEDDING_TIERS[selectedTierIndex] === currentWeddingLimit || (currentWeddingLimit === null && WEDDING_TIERS[selectedTierIndex] === 100)}
+                />
               )}
-            </div>
-            {isUserPremium ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", alignItems: "flex-end" }}>
-                <button
-                  onClick={handlePortal}
-                  disabled={billingLoading}
-                  className="ddp-btn-secondary"
-                >
+
+              <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.25rem", flexWrap: "wrap" }}>
+                <button onClick={handlePortal} disabled={billingLoading} className="ddp-btn-secondary">
                   {billingLoading ? "Laden…" : "Betaalgegevens beheren"}
                 </button>
                 {cancelAtPeriodEnd ? (
                   <button
                     onClick={handleResumeSubscription}
                     disabled={billingLoading}
-                    style={{ fontSize: "0.75rem", color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                    style={{ fontSize: "0.75rem", color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, alignSelf: "center" }}
                   >
                     Opzegging ongedaan maken
                   </button>
@@ -1206,54 +1312,46 @@ function VendorEditPage() {
                   <button
                     onClick={handleCancelSubscription}
                     disabled={billingLoading}
-                    style={{ fontSize: "0.75rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                    style={{ fontSize: "0.75rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline", alignSelf: "center" }}
                   >
                     Abonnement opzeggen
                   </button>
                 )}
               </div>
-            ) : (
-              <div style={{ flexShrink: 0, minWidth: "220px" }}>
-                <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.625rem" }}>
-                  <button
-                    type="button"
-                    onClick={() => setBillingInterval("month")}
-                    style={{
-                      flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
-                      fontSize: "0.75rem", fontWeight: billingInterval === "month" ? 700 : 500,
-                      background: billingInterval === "month" ? "var(--ink)" : "transparent",
-                      color: billingInterval === "month" ? "white" : "var(--muted)",
-                    }}
-                  >
-                    Maandelijks
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setBillingInterval("year")}
-                    style={{
-                      flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
-                      fontSize: "0.75rem", fontWeight: billingInterval === "year" ? 700 : 500,
-                      background: billingInterval === "year" ? "var(--ink)" : "transparent",
-                      color: billingInterval === "year" ? "var(--gold)" : "var(--muted)",
-                    }}
-                  >
-                    Jaarlijks · 10% korting
-                  </button>
-                </div>
-                <button
-                  onClick={() => handleUpgrade(billingInterval)}
-                  disabled={billingLoading}
-                  className="ddp-btn-gold"
-                  style={{ width: "100%", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap" }}
-                >
-                  {billingLoading ? "Laden…" : billingInterval === "year" ? "Upgrade: €313/jaar" : "Upgrade: €29/maand"}
-                </button>
-                <p style={{ fontSize: "0.6875rem", color: "var(--ink-muted)", marginTop: "0.375rem", textAlign: "center" }}>
-                  {billingInterval === "year" ? "Eenmalig per jaar · bespaart €35 t.o.v. maandelijks" : "Maandelijks opzegbaar · nog geen €1 per dag"}
+            </>
+          ) : (
+            <>
+              {profileViews !== null && profileViews > 0 && (
+                <p style={{ fontSize: "0.8125rem", color: "var(--gold)", fontWeight: 600, marginBottom: "0.375rem" }}>
+                  Je profiel is al {profileViews}× bekeken door bruidsparen.
                 </p>
-              </div>
-            )}
-          </div>
+              )}
+              <ul style={{ margin: "0 0 1.25rem", padding: 0, listStyle: "none", display: "grid", gap: "0.3rem" }}>
+                {[
+                  `Meer dan ${FREE_WEDDING_LIMIT} bruiloften tegelijk in je dashboard`,
+                  "Bovenaan de zoekresultaten in jouw categorie",
+                  "Aanbevolen-label op je profiel",
+                  "Dashboard zelf inrichten + extra functies aanvragen",
+                  "Analytisch overzicht van weergaven en boekingen",
+                ].map((b) => (
+                  <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "0.8125rem", color: "var(--ink-muted)" }}>
+                    <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--gold)", marginTop: "2px" }} />
+                    {b}
+                  </li>
+                ))}
+              </ul>
+
+              <TierSlider
+                selectedTierIndex={selectedTierIndex}
+                setSelectedTierIndex={setSelectedTierIndex}
+                billingInterval={billingInterval}
+                setBillingInterval={setBillingInterval}
+                actionLabel={billingLoading ? "Laden…" : "Upgrade"}
+                onAction={() => handleUpgrade(billingInterval, WEDDING_TIERS[selectedTierIndex])}
+                disabled={billingLoading}
+              />
+            </>
+          )}
         </section>
 
         <div className="flex gap-3 justify-end">

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { getOwnVendorId } from "@/lib/vendorAuth";
+import { getOwnVendorId, canGrantVendorPortalAccess } from "@/lib/vendorAuth";
 import { generateWeddingCode } from "@/lib/wedding-id";
 
 export async function GET() {
@@ -109,7 +109,16 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Link vendor to the wedding
+  // Link vendor to the wedding — alleen blokkeren als dit een nieuwe bruiloft is
+  // (een al gekoppelde bruiloft opnieuw doorgeven mag altijd).
+  const existingLink = await prisma.weddingVendor.findUnique({
+    where: { weddingId_vendorId: { weddingId: wedding.id, vendorId } },
+    select: { portalAccess: true },
+  });
+  if (!existingLink?.portalAccess && !(await canGrantVendorPortalAccess(vendorId))) {
+    return NextResponse.json({ error: "Je hebt het maximum aantal bruiloften voor je account bereikt. Upgrade naar Premium om meer bruiloften toe te voegen.", code: "wedding_limit_reached" }, { status: 403 });
+  }
+
   await prisma.weddingVendor.upsert({
     where: { weddingId_vendorId: { weddingId: wedding.id, vendorId } },
     update: { portalAccess: true },

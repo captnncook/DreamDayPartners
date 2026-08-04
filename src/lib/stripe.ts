@@ -1,4 +1,7 @@
 import Stripe from "stripe";
+import { tierMonthlyPriceEur, tierAnnualPriceEur, tierLabel, type BillingInterval, type WeddingTier } from "@/lib/pricing";
+
+export * from "@/lib/pricing";
 
 let _stripe: Stripe | null = null;
 
@@ -12,22 +15,17 @@ export function getStripe(): Stripe {
 
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 
-// Eén bron van waarheid voor de Pro-prijs. Bij jaarlijks vooraf betalen krijgt
-// de leverancier 10% korting op het jaarbedrag (12 maanden voor de prijs van ~10,8).
-export const PRO_MONTHLY_PRICE_EUR = 29;
-export const PRO_ANNUAL_DISCOUNT = 0.10;
-export const PRO_ANNUAL_PRICE_EUR = Math.round(PRO_MONTHLY_PRICE_EUR * 12 * (1 - PRO_ANNUAL_DISCOUNT));
-
-export type BillingInterval = "month" | "year";
-
-export function proPriceData(interval: BillingInterval) {
-  const amountEur = interval === "year" ? PRO_ANNUAL_PRICE_EUR : PRO_MONTHLY_PRICE_EUR;
+export function tierPriceData(tier: WeddingTier, interval: BillingInterval) {
+  const amountEur = interval === "year" ? tierAnnualPriceEur(tier) : tierMonthlyPriceEur(tier);
+  const label = tierLabel(tier);
   return {
     currency: "eur",
     unit_amount: amountEur * 100,
     recurring: { interval },
     product_data: {
-      name: interval === "year" ? "DreamDay Platform Pro (jaarlijks, 10% korting)" : "DreamDay Platform Pro (maandelijks)",
+      name: interval === "year"
+        ? `DreamDay Premium — tot ${label} bruiloften (jaarlijks, 2 maanden gratis)`
+        : `DreamDay Premium — tot ${label} bruiloften (maandelijks)`,
     },
   };
 }

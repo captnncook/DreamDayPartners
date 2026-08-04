@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { generateWeddingCode } from "@/lib/wedding-id";
+import { canGrantVendorPortalAccess } from "@/lib/vendorAuth";
 
 export async function GET() {
   const user = await getSession();
@@ -139,10 +140,14 @@ export async function POST(req: NextRequest) {
   });
 
   for (const invite of unlinkedInvites) {
+    // Als de leverancier zijn limiet al heeft bereikt, koppelen we de bruiloft
+    // wel (zodat matching later klopt) maar zonder dashboardtoegang te geven —
+    // de bruiloft van het bruidspaar mag hier nooit door mislukken.
+    const canGrant = await canGrantVendorPortalAccess(invite.vendorId);
     await prisma.weddingVendor.upsert({
       where: { weddingId_vendorId: { weddingId: wedding.id, vendorId: invite.vendorId } },
-      update: { portalAccess: true },
-      create: { weddingId: wedding.id, vendorId: invite.vendorId, status: "lead", portalAccess: true },
+      update: canGrant ? { portalAccess: true } : {},
+      create: { weddingId: wedding.id, vendorId: invite.vendorId, status: "lead", portalAccess: canGrant },
     });
     await prisma.vendorWeddingInvite.update({ where: { id: invite.id }, data: { weddingId: wedding.id } });
   }

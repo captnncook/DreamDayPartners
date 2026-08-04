@@ -15,6 +15,7 @@ model User {
   vendorType String?  // bloemist | dj | catering | fotograaf | etc.
   avatar     String?
   calendarToken        String?  @unique // token voor de agenda-abonnement (.ics) feed
+  premiumWeddingLimit  Int?     // gekozen tier (aantal bruiloften); null bij gratis account of het onbeperkte 100+ tier
   passwordHash         String?
   emailNewMessage      Boolean  @default(true)
   emailNewTask         Boolean  @default(true)

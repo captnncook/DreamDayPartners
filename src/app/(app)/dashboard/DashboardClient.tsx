@@ -47,9 +47,10 @@ interface Props {
   coupleSetup?: CoupleSetup;
   paymentDeadlines?: PaymentDeadline[];
   pastWeddingVendors?: PastWeddingVendor[];
+  vendorWeddingLimitInfo?: { atLimit: boolean; count: number; limit: number } | null;
 }
 
-export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress, coupleSetup, paymentDeadlines = [], pastWeddingVendors = [] }: Props) {
+export default function DashboardClient({ user, greeting, stats, weddings, tasks: initialTasks, vendorRequests = [], taskProgress, coupleSetup, paymentDeadlines = [], pastWeddingVendors = [], vendorWeddingLimitInfo = null }: Props) {
   const router = useRouter();
   const [requests, setRequests] = useState(vendorRequests);
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
@@ -138,6 +139,25 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
 
       {/* Admin: accountverzoeken & platformactiviteit */}
       {user.role === "admin" && <AdminOverview />}
+
+      {/* Gratis-limiet bereikt (leverancier) — blijft zichtbaar tot upgrade */}
+      {user.role === "vendor" && vendorWeddingLimitInfo?.atLimit && (
+        <section className="mb-8" style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem" }}>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <div className="font-serif" style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)" }}>
+                Je hebt het maximum van {vendorWeddingLimitInfo.limit} bruiloften bereikt
+              </div>
+              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "2px" }}>
+                Upgrade naar Premium om meer bruiloften tegelijk in je dashboard te beheren.
+              </p>
+            </div>
+            <Link href="/leveranciers/mijn-profiel" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.6rem 1.25rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}>
+              Upgrade naar Premium
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Dream Team-uitnodigingen (leverancier) */}
       {user.role === "vendor" && requests.length > 0 && (

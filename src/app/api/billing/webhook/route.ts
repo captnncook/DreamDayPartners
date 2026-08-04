@@ -10,6 +10,14 @@ function periodEndOf(sub: Stripe.Subscription): Date | null {
   return ts ? new Date(ts * 1000) : null;
 }
 
+function weddingLimitOf(metadata: Stripe.Metadata | null | undefined): number | null | undefined {
+  const raw = metadata?.weddingLimit;
+  if (raw === undefined) return undefined; // geen info meegegeven, niet aanpassen
+  if (raw === "unlimited") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -30,6 +38,7 @@ export async function POST(req: NextRequest) {
       const userId = session.metadata?.userId;
       if (!userId) break;
       const sub = await getStripe().subscriptions.retrieve(session.subscription as string);
+      const weddingLimit = weddingLimitOf(session.metadata ?? sub.metadata);
       await prisma.user.update({
         where: { id: userId },
         data: {
@@ -37,6 +46,7 @@ export async function POST(req: NextRequest) {
           stripeSubscriptionId: sub.id,
           stripeCancelAtPeriodEnd: sub.cancel_at_period_end,
           stripeCurrentPeriodEnd: periodEndOf(sub),
+          ...(weddingLimit !== undefined ? { premiumWeddingLimit: weddingLimit } : {}),
         },
       });
       // Also mark the vendor profile as premium
@@ -49,11 +59,13 @@ export async function POST(req: NextRequest) {
       const sub = event.data.object as Stripe.Subscription;
       const userId = sub.metadata?.userId;
       const where = userId ? { id: userId } : { stripeSubscriptionId: sub.id };
+      const weddingLimit = weddingLimitOf(sub.metadata);
       await prisma.user.updateMany({
         where,
         data: {
           stripeCancelAtPeriodEnd: sub.cancel_at_period_end,
           stripeCurrentPeriodEnd: periodEndOf(sub),
+          ...(weddingLimit !== undefined ? { premiumWeddingLimit: weddingLimit } : {}),
         },
       });
       break;
