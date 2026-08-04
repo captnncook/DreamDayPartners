@@ -154,11 +154,12 @@ function LeveranciersContent() {
         </div>
       </div>
 
-      {/* ── Category tabs ───────────────────────────── */}
+      {/* ── Category tabs — over de volle breedte van het scherm, i.p.v.
+           binnen dezelfde kolom als de inhoud eronder ─────────────────── */}
       <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)", padding: "0 1.25rem" }}>
         <div
           className="flex overflow-x-auto ddp-cat-tabs-scroll"
-          style={{ maxWidth: "1040px", margin: "0 auto", scrollbarWidth: "none", paddingRight: "2rem" }}
+          style={{ width: "100%", scrollbarWidth: "none", paddingRight: "2rem" }}
         >
           <button onClick={() => setCategory("")} className={`ddp-cat-tab${!category ? " active" : ""}`}>
             Alles
