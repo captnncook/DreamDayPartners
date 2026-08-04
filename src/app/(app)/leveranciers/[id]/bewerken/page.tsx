@@ -8,7 +8,7 @@ import { Upload, Trash2, Save, Check, Star } from "lucide-react";
 import ShieldPhotoCropper from "@/components/ShieldPhotoCropper";
 import { getVendorProfileSection, type ProfileField } from "@/lib/vendorProfileSections";
 import {
-  WEDDING_TIERS, HOURS_SAVED_PER_WEDDING, tierMonthlyPriceEur, tierAnnualPriceEur, tierPricePerWeddingEur,
+  WEDDING_TIERS, HOURS_SAVED_PER_WEDDING, tierMonthlyPriceEur, tierAnnualPriceEur,
   tierLabel, FREE_WEDDING_LIMIT, type WeddingTier,
 } from "@/lib/pricing";
 
@@ -77,7 +77,7 @@ function TierSlider({
   const tier = WEDDING_TIERS[selectedTierIndex];
   const monthly = tierMonthlyPriceEur(tier);
   const price = billingInterval === "year" ? tierAnnualPriceEur(tier) : monthly;
-  const perWedding = tierPricePerWeddingEur(tier);
+  const perWedding = price / tier;
   const hoursPerMonth = HOURS_SAVED_PER_WEDDING * tier;
 
   const textColor = dark ? "var(--ink-text)" : "var(--foreground)";
@@ -109,7 +109,7 @@ function TierSlider({
       </div>
 
       <p style={{ fontSize: "0.75rem", color: mutedColor, marginBottom: "0.25rem" }}>
-        Dat is €{perWedding.toFixed(2).replace(".", ",")} per bruiloft.
+        Dat is €{perWedding.toFixed(2).replace(".", ",")} per bruiloft {billingInterval === "year" ? "per jaar" : "per maand"}.
       </p>
       <p style={{ fontSize: "0.75rem", color: mutedColor, marginBottom: "1rem" }}>
         Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft — bij {tierLabel(tier)} bruiloften per maand is dat <strong style={{ color: textColor }}>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
