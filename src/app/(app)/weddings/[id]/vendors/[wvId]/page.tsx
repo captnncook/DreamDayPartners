@@ -1,9 +1,11 @@
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import DashboardEngine from "@/components/vendor-modules/DashboardEngine";
+import { syncIntakeTasks } from "@/lib/intakeTasks";
 
 export default async function VendorBookingPage({
   params,
@@ -80,6 +82,23 @@ export default async function VendorBookingPage({
         setupTime: setupOverride || venueBooking.vendor.setupTime,
         teardownTime: teardownOverride || venueBooking.vendor.teardownTime,
       };
+
+      // Wat de trouwlocatie al heeft ingevuld (water/koeling/toegangstijd)
+      // hoeft deze leverancier niet nog eens apart te beantwoorden — schrijf
+      // het automatisch in hun eigen intakegegevens zodra dat nog leeg is,
+      // zodat eventuele bijbehorende taken ook meteen worden afgevinkt.
+      const currentIntake = (booking.intakeData ?? {}) as Record<string, unknown>;
+      const autoFill: Record<string, unknown> = {};
+      if (venueInfo.venueFacilities.includes("Water aanwezig") && !currentIntake["water-venue"]) autoFill["water-venue"] = true;
+      if (venueInfo.venueFacilities.includes("Koeling aanwezig") && !currentIntake["koeling-venue"]) autoFill["koeling-venue"] = true;
+      if (venueInfo.setupTime && !currentIntake["toegang-venue"]) autoFill["toegang-venue"] = venueInfo.setupTime;
+
+      if (Object.keys(autoFill).length > 0) {
+        const merged = { ...currentIntake, ...autoFill };
+        await prisma.weddingVendor.update({ where: { id: wvId }, data: { intakeData: merged as Prisma.InputJsonValue } });
+        booking.intakeData = merged as Prisma.JsonValue;
+        await syncIntakeTasks(wvId);
+      }
     }
   }
 
@@ -166,6 +185,7 @@ export default async function VendorBookingPage({
         weddingId={weddingId}
         wvId={wvId}
         vendorType={booking.vendor.category}
+        vendorName={booking.vendor.name}
         initialBooking={isBookingSerializer(booking)}
         documents={serializedDocuments}
         timelineBlocks={serializedBlocks}

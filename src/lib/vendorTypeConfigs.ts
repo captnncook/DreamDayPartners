@@ -438,6 +438,12 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "palette", label: "Kleurenpalet", type: "color-multi" },
       { key: "flowers", label: "Gewenste bloemen & stijl", type: "text", placeholder: "Rozen, pioenrozen, wild/romantisch..." },
       { key: "allergies", label: "Allergieën (bruidspaar of gasten)", type: "longtext", placeholder: "Bijv. stuifmeelgevoelig, vermijd bepaalde bloemen..." },
+      {
+        key: "strooibloemenBeleid",
+        label: "Strooibloemen-beleid van de locatie",
+        type: "select",
+        options: ["Biologische strooibloemen toegestaan", "Zijde strooibloemen toegestaan", "Strooien niet toegestaan"],
+      },
     ],
     deliverables: [],
     timelineTemplate: [

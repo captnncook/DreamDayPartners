@@ -31,6 +31,7 @@ interface Props {
   weddingId: string;
   wvId: string;
   vendorType: string;
+  vendorName: string;
   initialBooking: {
     status: string;
     depositAmount?: number | null;
@@ -58,7 +59,7 @@ interface Props {
 }
 
 export default function DashboardEngine({
-  weddingId, wvId, vendorType, initialBooking,
+  weddingId, wvId, vendorType, vendorName, initialBooking,
   documents, timelineBlocks, tasks, guests, totalGuests, userRole, userId, vendorUserId,
   vendorIsPremium, vendorDisabledModules, vendorExtraModules, venueInfo,
 }: Props) {
@@ -131,6 +132,7 @@ export default function DashboardEngine({
       <ContractPayment
         weddingId={weddingId}
         wvId={wvId}
+        vendorName={vendorName}
         depositAmount={booking.depositAmount}
         depositDue={booking.depositDue}
         depositPaid={booking.depositPaid}
@@ -140,6 +142,8 @@ export default function DashboardEngine({
         contractUrl={booking.contractUrl}
         onUpdate={patchBooking}
         isPlanner={isPlanner}
+        isVendor={isVendor}
+        isCouple={userRole === "couple"}
       />
 
 

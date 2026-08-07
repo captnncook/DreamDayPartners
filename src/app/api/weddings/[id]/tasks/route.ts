@@ -34,6 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       assignedTo: body.assignedTo || null,
       status: body.status ?? "open",
       priority: body.priority ?? "medium",
+      vendorBookingId: body.vendorBookingId || null,
     },
     include: { assignedUser: true },
   });

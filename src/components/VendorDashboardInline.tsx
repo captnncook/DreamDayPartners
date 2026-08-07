@@ -75,6 +75,7 @@ export default function VendorDashboardInline({ weddingId, wvId, vendorName, ven
             weddingId={weddingId}
             wvId={wvId}
             vendorType={vendorCategory}
+            vendorName={vendorName}
             initialBooking={data.booking}
             documents={data.documents}
             timelineBlocks={data.timelineBlocks}

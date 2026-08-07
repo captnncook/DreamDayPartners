@@ -159,7 +159,7 @@ function TierSlider({
 }
 
 const ACCESSIBILITY_OPTIONS = ["Rolstoeltoegankelijk", "Gratis parkeerplaatsen", "Invalidentoilet", "Oplaadpunt elektrische auto's", "Valetparking", "Shuttleservice/P&R"];
-const VENUE_FACILITIES_OPTIONS = ["(Dak)terras", "Tuin", "Zwembad", "Omkleedruimte", "Bruidssuite", "Wellness", "Overdekte buitenlocatie"];
+const VENUE_FACILITIES_OPTIONS = ["(Dak)terras", "Tuin", "Zwembad", "Omkleedruimte", "Bruidssuite", "Wellness", "Overdekte buitenlocatie", "Water aanwezig", "Koeling aanwezig"];
 const CATERING_OPTIONS_LIST = ["Eigen catering toegestaan", "Halal/koosjer mogelijk", "Eigen taart toegestaan", "Buiten eten mogelijk", "Buffet", "Walking dinner", "Shared dining", "BBQ"];
 const BAR_OPTIONS_LIST = ["Eigen drank toegestaan", "Afkoop mogelijk", "Buitenbar aanwezig", "Champagnetoren mogelijk", "Speciaalbier", "Cocktails"];
 const ENVIRONMENT_OPTIONS = ["Aan het water", "In het bos", "Op het platteland", "In de stad", "Aan het strand", "In het park"];

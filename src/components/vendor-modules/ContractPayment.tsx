@@ -4,6 +4,7 @@ import { useState } from "react";
 interface Props {
   weddingId: string;
   wvId: string;
+  vendorName: string;
   depositAmount?: number | null;
   depositDue?: string | null;
   depositPaid: boolean;
@@ -13,6 +14,8 @@ interface Props {
   contractUrl?: string | null;
   onUpdate: (patch: Record<string, unknown>) => void;
   isPlanner: boolean;
+  isVendor: boolean;
+  isCouple: boolean;
 }
 
 function fmt(d?: string | null) {
@@ -25,8 +28,16 @@ function fmtEur(v?: number | null) {
   return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(v);
 }
 
-export default function ContractPayment({ depositAmount, depositDue, depositPaid, finalAmount, finalDue, finalPaid, contractUrl, onUpdate, isPlanner }: Props) {
+export default function ContractPayment({
+  weddingId, wvId, vendorName, depositAmount, depositDue, depositPaid, finalAmount, finalDue, finalPaid, contractUrl, onUpdate,
+  isPlanner, isVendor, isCouple,
+}: Props) {
+  // Bedrag/datum invullen mag door planner, leverancier zelf (weet wat ze
+  // rekenen) én bruidspaar — niet alleen door de planner.
+  const canEdit = isPlanner || isVendor || isCouple;
   const [editing, setEditing] = useState(false);
+  const [creatingTaskFor, setCreatingTaskFor] = useState<string | null>(null);
+  const [taskCreated, setTaskCreated] = useState<Set<string>>(new Set());
   const [form, setForm] = useState({
     depositAmount: depositAmount ?? "",
     depositDue: depositDue ? depositDue.split("T")[0] : "",
@@ -46,6 +57,26 @@ export default function ContractPayment({ depositAmount, depositDue, depositPaid
     setEditing(false);
   }
 
+  async function makeTask(label: string, due?: string | null) {
+    setCreatingTaskFor(label);
+    try {
+      await fetch(`/api/weddings/${weddingId}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `${label} betalen aan ${vendorName}`,
+          dueDate: due || null,
+          category: "budget",
+          priority: "medium",
+          vendorBookingId: wvId,
+        }),
+      });
+      setTaskCreated(prev => new Set(prev).add(label));
+    } finally {
+      setCreatingTaskFor(null);
+    }
+  }
+
   const inputStyle = {
     width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem",
     border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--charcoal)",
@@ -61,7 +92,7 @@ export default function ContractPayment({ depositAmount, depositDue, depositPaid
     <div className="card" style={{ padding: "1.5rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
         <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Betaling</h3>
-        {isPlanner && (
+        {canEdit && (
           <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             {editing ? "Annuleren" : "Bewerken"}
           </button>
@@ -75,7 +106,7 @@ export default function ContractPayment({ depositAmount, depositDue, depositPaid
         </a>
       )}
 
-      {editing && isPlanner ? (
+      {editing && canEdit ? (
         <div style={{ display: "grid", gap: "0.75rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
             <div>
@@ -96,8 +127,8 @@ export default function ContractPayment({ depositAmount, depositDue, depositPaid
             </div>
           </div>
           <div>
-            <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Contract URL</label>
-            <input type="url" value={form.contractUrl} onChange={e => setForm(f => ({ ...f, contractUrl: e.target.value }))} style={inputStyle} placeholder="https://..." />
+            <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Contract/offerte/factuur-link</label>
+            <input type="url" value={form.contractUrl} onChange={e => setForm(f => ({ ...f, contractUrl: e.target.value }))} style={inputStyle} placeholder="https://... (of upload het bestand hieronder bij Bestanden)" />
           </div>
           <button onClick={save} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
             Opslaan
@@ -106,30 +137,45 @@ export default function ContractPayment({ depositAmount, depositDue, depositPaid
       ) : (
         <div style={{ display: "grid", gap: "0.625rem" }}>
           {rows.map(row => (
-            <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.625rem" }}>
+            <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.625rem", gap: "0.75rem", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--charcoal)" }}>{row.label}</div>
-                {(fmtEur(row.amount) || fmt(row.due)) && (
+                {(fmtEur(row.amount) || fmt(row.due)) ? (
                   <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.125rem" }}>
                     {[fmtEur(row.amount), fmt(row.due) ? `vervalt ${fmt(row.due)}` : null].filter(Boolean).join(" · ")}
                   </div>
+                ) : canEdit && (
+                  <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.125rem", fontStyle: "italic" }}>
+                    Nog geen bedrag ingevuld
+                  </div>
                 )}
               </div>
-              <button
-                onClick={() => onUpdate({ [row.paidKey]: !row.paid })}
-                style={{
-                  padding: "0.375rem 0.875rem",
-                  borderRadius: "9999px",
-                  fontSize: "0.8125rem",
-                  fontWeight: 600,
-                  border: "none",
-                  background: row.paid ? "#22c55e20" : "rgba(0,0,0,0.06)",
-                  color: row.paid ? "#16a34a" : "var(--muted)",
-                  cursor: "pointer",
-                }}
-              >
-                {row.paid ? "Betaald" : "Nog niet betaald"}
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                {!row.paid && (
+                  <button
+                    onClick={() => makeTask(row.label, row.due)}
+                    disabled={creatingTaskFor === row.label || taskCreated.has(row.label)}
+                    style={{ fontSize: "0.75rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    {taskCreated.has(row.label) ? "Taak aangemaakt" : creatingTaskFor === row.label ? "Bezig…" : "Maak taak"}
+                  </button>
+                )}
+                <button
+                  onClick={() => onUpdate({ [row.paidKey]: !row.paid })}
+                  style={{
+                    padding: "0.375rem 0.875rem",
+                    borderRadius: "9999px",
+                    fontSize: "0.8125rem",
+                    fontWeight: 600,
+                    border: "none",
+                    background: row.paid ? "#22c55e20" : "rgba(0,0,0,0.06)",
+                    color: row.paid ? "#16a34a" : "var(--muted)",
+                    cursor: "pointer",
+                  }}
+                >
+                  {row.paid ? "Betaald" : "Nog niet betaald"}
+                </button>
+              </div>
             </div>
           ))}
         </div>
