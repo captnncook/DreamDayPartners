@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-const STATUS_LABELS: Record<string, string> = { open: "Open", in_progress: "Bezig", done: "Afgerond" };
+const STATUS_LABELS: Record<string, string> = { open: "Open", in_progress: "Bezig", done: "Klaar" };
 const PRIORITY_META: Record<string, { label: string; color: string; weight: number }> = {
   high:   { label: "Urgent", color: "var(--gold-deep)",   weight: 700 },
   medium: { label: "Middel", color: "var(--muted)",       weight: 500 },
@@ -19,8 +19,15 @@ export default async function MyTasksPage() {
   const user = await getSession();
   if (!user) redirect("/login");
 
+  // Bruidspaar ziet alle taken van hun bruiloft(en), niet alleen de taken die
+  // letterlijk aan henzelf zijn toegewezen — zelfde aanpak als het dashboard,
+  // anders lijkt deze pagina onterecht bijna leeg.
+  const where = user.role === "couple"
+    ? { wedding: { teamMembers: { some: { userId: user.id } } } }
+    : { assignedTo: user.id };
+
   const tasks = await prisma.task.findMany({
-    where: { assignedTo: user.id },
+    where,
     include: { wedding: true },
     orderBy: [{ status: "asc" }, { dueDate: "asc" }],
   });
