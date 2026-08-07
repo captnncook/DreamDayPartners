@@ -85,7 +85,7 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
           }
 
           const display = value == null || value === ""
-            ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>—</span>
+            ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>Niet ingevuld</span>
             : typeof value === "boolean"
             ? (value ? "Ja" : "Nee")
             : String(value);

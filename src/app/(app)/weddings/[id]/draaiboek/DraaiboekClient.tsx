@@ -432,7 +432,7 @@ export default function DraaiboekClient({
               <div className="mb-4" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", padding: "1rem 1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--sand)" }}>
                 <div>
                   <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)" }}>Nog leeg</div>
-                  <div style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Begin met een standaard trouwdag-tijdlijn — je past daarna zelf alles aan.</div>
+                  <div style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Begin met een standaard trouwdag-tijdlijn, je past daarna zelf alles aan.</div>
                 </div>
                 <button onClick={insertTemplate} disabled={insertingTemplate} className="ddp-btn-secondary" style={{ flexShrink: 0 }}>
                   {insertingTemplate ? "Bezig…" : "Standaardtijdlijn invoegen"}
@@ -466,7 +466,7 @@ export default function DraaiboekClient({
           >
             <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "0.5rem" }}>Koppel aan agenda</h2>
             <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.5 }}>
-              Abonneer je op dit draaiboek in Google Calendar, Apple Kalender of Outlook. Nieuwe of gewijzigde onderdelen verschijnen automatisch — de agenda-app bepaalt zelf hoe vaak hij ververst.
+              Abonneer je op dit draaiboek in Google Calendar, Apple Kalender of Outlook. Nieuwe of gewijzigde onderdelen verschijnen automatisch; de agenda-app bepaalt zelf hoe vaak hij ververst.
             </p>
             {loadingCalendarLink ? (
               <p style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Bezig…</p>

@@ -80,7 +80,7 @@ export default function AdminVendorsPage() {
         setCleanupMsg(
           data.cleared === 0
             ? "Geen gedeelde stockfoto's gevonden."
-            : `${data.cleared} leverancier${data.cleared === 1 ? "" : "s"} met een gedeelde stockfoto opgeschoond — toont nu het DreamDay-logo.`
+            : `${data.cleared} leverancier${data.cleared === 1 ? "" : "s"} met een gedeelde stockfoto opgeschoond. Toont nu het DreamDay-logo.`
         );
         load();
       } else {
@@ -110,7 +110,7 @@ export default function AdminVendorsPage() {
         </button>
         <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
           Leveranciers uit een bulkimport delen soms dezelfde standaardfoto per categorie. Deze actie wist die gedeelde
-          foto's (unieke, echt geüploade foto's blijven staan) — de leverancier toont daarna het DreamDay-logo.
+          foto's (unieke, echt geüploade foto's blijven staan). De leverancier toont daarna het DreamDay-logo.
         </p>
         {cleanupMsg && <p className="text-xs mt-1.5" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{cleanupMsg}</p>}
       </div>

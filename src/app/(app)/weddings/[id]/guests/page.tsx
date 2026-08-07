@@ -264,7 +264,7 @@ export default function GuestsPage() {
                     {Object.entries(RSVP_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: "var(--muted)" }}>{guest.dietary ?? "—"}</td>
+                <td className="px-4 py-3 text-xs" style={{ color: "var(--muted)" }}>{guest.dietary ?? ""}</td>
                 <td className="px-4 py-3">
                   <button onClick={() => deleteGuest(guest.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-3.5 h-3.5" /></button>
                 </td>

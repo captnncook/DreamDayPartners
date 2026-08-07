@@ -181,7 +181,7 @@ export function premiumGrantedEmail(name: string, vendorType: string | null): { 
     .join("");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
   return {
-    subject: "Gefeliciteerd — je hebt nu Premium toegang op DreamDay Platform!",
+    subject: "Gefeliciteerd, je hebt nu Premium toegang op DreamDay Platform!",
     html: emailLayout({
       heading: "Welkom bij Premium",
       body: `

@@ -284,13 +284,13 @@ export default function WeddingWizardPage() {
                 <div className="flex justify-between text-sm">
                   <span style={{ color: "var(--muted)" }}>Bruidspaar</span>
                   <span className="font-medium">
-                    {form.partner1 && form.partner2 ? `${form.partner1} & ${form.partner2}` : "—"}
+                    {form.partner1 && form.partner2 ? `${form.partner1} & ${form.partner2}` : "Nog niet ingevuld"}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span style={{ color: "var(--muted)" }}>Datum</span>
                   <span className="font-medium">
-                    {form.date ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(form.date)) : "—"}
+                    {form.date ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(form.date)) : "Nog niet ingevuld"}
                   </span>
                 </div>
                 {form.venue && (

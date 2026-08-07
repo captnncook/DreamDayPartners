@@ -116,7 +116,7 @@ function TierSlider({
         Dat is €{perWeddingPerMonth.toFixed(2).replace(".", ",")} per bruiloft per maand.
       </p>
       <p style={{ fontSize: "0.75rem", color: mutedColor, marginBottom: "1rem" }}>
-        Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft — bij {tierLabel(tier)} bruiloften per maand is dat <strong style={{ color: textColor }}>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
+        Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft. Bij {tierLabel(tier)} bruiloften per maand is dat <strong style={{ color: textColor }}>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
       </p>
 
       <div style={{ display: "flex", border: `1px solid ${dark ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.75rem", maxWidth: "260px" }}>
@@ -218,7 +218,7 @@ function ProfileDetailField({ field, value, onChange }: {
       <div>
         <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{field.label}</label>
         <select value={typeof value === "string" ? value : ""} onChange={(e) => onChange(e.target.value)} className="ddp-select">
-          <option value="">— kies —</option>
+          <option value="">Kies…</option>
           {(field.options ?? []).map((opt) => <option key={opt} value={opt}>{opt}</option>)}
         </select>
       </div>
@@ -1286,7 +1286,7 @@ function VendorEditPage() {
                     type="text"
                     value={form.outdoorSoundRule}
                     onChange={(e) => setForm({ ...form, outdoorSoundRule: e.target.value })}
-                    placeholder="bijv. Tot 22:00 buiten geluid toegestaan, daarna alleen binnen — of: Geen geluid buiten toegestaan"
+                    placeholder="bijv. Tot 22:00 buiten geluid toegestaan, daarna alleen binnen (of: geen geluid buiten toegestaan)"
                     className="ddp-input"
                   />
                 </div>

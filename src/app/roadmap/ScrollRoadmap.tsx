@@ -110,7 +110,7 @@ export default function ScrollRoadmap() {
             <div key={m.title} style={{ position: "relative", padding: "0 0 2rem 1.75rem" }}>
               <span style={{ position: "absolute", left: "-9px", top: "2px", width: 16, height: 16, borderRadius: "50%", background: dotColor(m.status), border: "2px solid var(--ink)" }} />
               <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: m.status === "upcoming" ? "rgba(255,255,255,0.4)" : "var(--gold)" }}>
-                {String(i + 1).padStart(2, "0")} — {m.period}
+                {String(i + 1).padStart(2, "0")} · {m.period}
               </span>
               <h3 className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "white", marginTop: "2px" }}>{m.title}</h3>
               <div className="flex flex-col sm:flex-row gap-3 mt-2 items-start">

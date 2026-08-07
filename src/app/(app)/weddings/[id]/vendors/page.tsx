@@ -113,7 +113,7 @@ export default function VendorsPage() {
                 >
                   <option value="">Kies een leverancier...</option>
                   {available.map((v) => (
-                    <option key={v.id} value={v.id}>{v.name} — {v.category}</option>
+                    <option key={v.id} value={v.id}>{v.name} · {v.category}</option>
                   ))}
                 </select>
               </div>

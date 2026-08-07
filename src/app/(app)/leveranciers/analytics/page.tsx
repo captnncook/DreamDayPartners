@@ -70,9 +70,10 @@ export default function VendorAnalyticsPage() {
             {/* Bruiloften per maand */}
             <section className="mb-8">
               <h2 className="dash-section-title mb-4">Bruiloften per maand</h2>
-              <div className="flex items-end gap-1.5" style={{ height: "120px" }}>
+              <div className="flex items-end gap-1.5" style={{ height: "140px" }}>
                 {data.monthsData.map(m => (
-                  <div key={m.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                  <div key={m.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: "4px", height: "100%" }}>
+                    <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: m.count > 0 ? "var(--foreground)" : "var(--muted-light)" }}>{m.count}</span>
                     <div style={{
                       width: "100%", borderRadius: "3px 3px 0 0",
                       height: `${Math.max(4, (m.count / maxMonth) * 100)}px`,
@@ -89,9 +90,10 @@ export default function VendorAnalyticsPage() {
             {data.monthsData.some(m => m.revenue > 0) && (
               <section className="mb-8">
                 <h2 className="dash-section-title mb-4">Omzet per maand</h2>
-                <div className="flex items-end gap-1.5" style={{ height: "120px" }}>
+                <div className="flex items-end gap-1.5" style={{ height: "140px" }}>
                   {data.monthsData.map(m => (
-                    <div key={m.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                    <div key={m.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: "4px", height: "100%" }}>
+                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: m.revenue > 0 ? "var(--foreground)" : "var(--muted-light)" }}>{m.revenue > 0 ? euro(m.revenue) : ""}</span>
                       <div style={{
                         width: "100%", borderRadius: "3px 3px 0 0",
                         height: `${Math.max(4, (m.revenue / maxMonthRevenue) * 100)}px`,

@@ -70,7 +70,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (body.vendorType !== undefined && target.vendorType !== updated.vendorType) {
-    await logAdminEvent("vendor_type_change", `Leverancierstype van ${updated.name} gewijzigd: ${target.vendorType ?? "—"} → ${updated.vendorType ?? "—"}`, updated.email);
+    await logAdminEvent("vendor_type_change", `Leverancierstype van ${updated.name} gewijzigd: ${target.vendorType ?? "geen"} → ${updated.vendorType ?? "geen"}`, updated.email);
   }
 
   return NextResponse.json({ user: updated });

@@ -4,7 +4,7 @@ import Image from "next/image";
 import ScrollRoadmap from "./ScrollRoadmap";
 
 export const metadata: Metadata = {
-  title: "Roadmap — DreamDay Platform",
+  title: "Roadmap · DreamDay Platform",
   description: "Hoever staan we met DreamDay Platform, welke mijlpalen komen er nog, en wanneer verwachten we live te gaan.",
 };
 
@@ -30,7 +30,7 @@ export default function RoadmapPage() {
           Roadmap
         </h1>
         <p className="mt-3 text-base" style={{ color: "var(--muted)", lineHeight: 1.65, maxWidth: "640px" }}>
-          Hoever staan we, welke stappen komen er nog en wanneer gaan we live? Scroll naar beneden —
+          Hoever staan we, welke stappen komen er nog en wanneer gaan we live? Scroll naar beneden:
           hoe verder je komt, hoe verder we in het proces zijn.
         </p>
       </div>

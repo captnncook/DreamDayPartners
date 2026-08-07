@@ -367,7 +367,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
         key: "genre", label: "Genre & stijl", type: "select",
         options: ["Jazz", "Pop", "Soul / R&B", "Funk", "Rock", "Klassiek / Orkest", "Folk / Akoestisch", "Latin", "Motown", "Gemengd repertoire"],
       },
-      { key: "eersteDans", label: "Eerste dans nummer", type: "text", placeholder: "Artiest — Titel" },
+      { key: "eersteDans", label: "Eerste dans nummer", type: "text", placeholder: "Artiest, titel" },
       { key: "setlist", label: "Setlist wensen", type: "longtext", placeholder: "Genres of specifieke nummers per moment van de dag" },
       { key: "mcRole", label: "MC-rol gewenst?", type: "boolean" },
       { key: "covers", label: "Specifieke covers / verzoeken", type: "longtext", placeholder: "Verzoekjes van het bruidspaar" },
@@ -628,8 +628,8 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "toegankelijkheid-mindervalide-toilet", label: "Mindervalidentoilet aanwezig?", type: "boolean" },
       { key: "catering-beleid", label: "Cateringbeleid", type: "select", options: ["Eigen catering verplicht", "Externe catering toegestaan", "Externe catering mits gecertificeerd", "Vrije keuze"] },
       { key: "geluidsgrens", label: "Geluidsgrens (dB)", type: "text" },
-      { key: "setupTimeOverride", label: "Opbouwtijd — alleen voor deze bruiloft (leeg = standaard)", type: "time" },
-      { key: "teardownTimeOverride", label: "Afbouwtijd — alleen voor deze bruiloft (leeg = standaard)", type: "time" },
+      { key: "setupTimeOverride", label: "Opbouwtijd (alleen voor deze bruiloft, leeg = standaard)", type: "time" },
+      { key: "teardownTimeOverride", label: "Afbouwtijd (alleen voor deze bruiloft, leeg = standaard)", type: "time" },
     ],
   },
 
@@ -706,7 +706,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     ],
     timelineTemplate: [
       { key: "aankomst-opbouw", label: "Aankomst & opbouw materiaal", phase: "arrival", defaultDuration: 30 },
-      { key: "bruid-haar-makeup", label: "Bruid — haar & make-up", phase: "perform", defaultDuration: 90 },
+      { key: "bruid-haar-makeup", label: "Bruid: haar & make-up", phase: "perform", defaultDuration: 90 },
       { key: "bruidsmeisjes", label: "Bruidsmeisjes & moeder", phase: "perform", defaultDuration: 120 },
       { key: "check-touchup", label: "Check & touch-ups voor ceremonie", phase: "custom", defaultDuration: 15 },
       { key: "einde-sessie", label: "Einde sessie & opruimen", phase: "teardown", defaultDuration: 20 },

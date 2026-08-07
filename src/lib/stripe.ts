@@ -24,8 +24,8 @@ export function tierPriceData(tier: WeddingTier, interval: BillingInterval) {
     recurring: { interval },
     product_data: {
       name: interval === "year"
-        ? `DreamDay Premium — tot ${label} bruiloften (jaarlijks, 2 maanden gratis)`
-        : `DreamDay Premium — tot ${label} bruiloften (maandelijks)`,
+        ? `DreamDay Premium (tot ${label} bruiloften, jaarlijks, 2 maanden gratis)`
+        : `DreamDay Premium (tot ${label} bruiloften, maandelijks)`,
     },
   };
 }

@@ -342,7 +342,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
         <section className="mb-8">
           <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
             Bij jullie trouwdag waren de volgende leveranciers aanwezig, die elk met liefde en passie voor jullie veel hebben gedaan.
-            Vergeet ze niet te waarderen — schrijf een review via DreamDay, en als je hun werk ook elders wilt delen, staat de link daarvoor erbij.
+            Vergeet ze niet te waarderen: schrijf een review via DreamDay, en als je hun werk ook elders wilt delen, staat de link daarvoor erbij.
           </p>
           <div style={{ borderTop: "1px solid var(--border)" }}>
             {reviewVendors.map((v) => (

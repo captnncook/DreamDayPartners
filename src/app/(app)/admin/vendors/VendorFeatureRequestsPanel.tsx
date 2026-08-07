@@ -79,7 +79,7 @@ export default function VendorFeatureRequestsPanel() {
             {decided.map((r) => (
               <div key={r.id} className="dash-row">
                 <div className="flex-1 min-w-0 text-sm">
-                  {r.vendor.name} — {MODULE_LABELS[r.moduleKey as ModuleKey] ?? r.moduleKey}
+                  {r.vendor.name} · {MODULE_LABELS[r.moduleKey as ModuleKey] ?? r.moduleKey}
                 </div>
                 <span className="text-xs flex-shrink-0" style={{ fontWeight: 700, color: r.status === "approved" ? "var(--gold-deep)" : "var(--muted)" }}>
                   {r.status === "approved" ? "Goedgekeurd" : "Afgewezen"}

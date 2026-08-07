@@ -55,9 +55,9 @@ export const MILESTONES: Milestone[] = [
   {
     period: "Doel: Q4 2026",
     title: "Publieke lancering",
-    description: "De website en het dashboard gaan open voor iedereen — bruidsparen, weddingplanners en leveranciers.",
+    description: "De website en het dashboard gaan open voor iedereen: bruidsparen, weddingplanners en leveranciers.",
     status: "upcoming",
     image: "/images/future-planning.png",
-    imageAlt: "The Future of Wedding Planning — DreamDay merkbeeld",
+    imageAlt: "The Future of Wedding Planning, DreamDay merkbeeld",
   },
 ];

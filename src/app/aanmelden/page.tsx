@@ -378,7 +378,7 @@ function AanmeldenForm() {
                         </div>
                         {m.hasAccount ? (
                           <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>
-                            Heeft al een account —{" "}
+                            Heeft al een account,{" "}
                             <Link href="/login" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>inloggen</Link>
                           </span>
                         ) : (

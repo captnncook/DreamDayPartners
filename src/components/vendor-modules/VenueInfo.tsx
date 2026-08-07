@@ -27,7 +27,7 @@ export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
       <div className="flex items-center gap-2 mb-3">
         <MapPin className="w-4 h-4" style={{ color: "var(--primary)" }} />
         <div>
-          <h3 className="font-semibold text-sm">Locatiegegevens — {venue.name}</h3>
+          <h3 className="font-semibold text-sm">Locatiegegevens van {venue.name}</h3>
           <p style={{ fontSize: "0.7rem", color: "var(--muted)", marginTop: "1px" }}>Ingevuld door de trouwlocatie, geldt voor alle leveranciers</p>
         </div>
       </div>

@@ -56,7 +56,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
   }
 
-  const ics = buildIcsCalendar(`Draaiboek — ${wedding.title}`, events);
+  const ics = buildIcsCalendar(`Draaiboek: ${wedding.title}`, events);
 
   return new NextResponse(ics, {
     headers: {

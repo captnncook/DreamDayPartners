@@ -141,7 +141,7 @@ export default function TasksPage() {
             <div>
               <label className="block text-xs font-medium mb-1">Toewijzen aan</label>
               <select value={form.assignedTo} onChange={(e) => setForm((p) => ({ ...p, assignedTo: e.target.value }))} className="ddp-select">
-                <option value="">— Niemand —</option>
+                <option value="">Niemand</option>
                 {members.map((m) => (
                   <option key={m.id} value={m.id}>{m.name} ({m.label})</option>
                 ))}

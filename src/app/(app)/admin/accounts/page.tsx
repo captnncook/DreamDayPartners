@@ -308,7 +308,7 @@ export default function AccountsPage() {
                         className="ddp-input py-0.5 text-xs"
                         style={{ display: "inline-block", width: "auto", marginLeft: "0.5rem" }}
                       >
-                        <option value="">— Kies —</option>
+                        <option value="">Kies…</option>
                         {Object.entries(VENDOR_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
                     ) : (
