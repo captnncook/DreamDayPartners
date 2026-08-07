@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getOwnVendorId } from "@/lib/vendorAuth";
+import { getDownloadUrl } from "@/lib/r2";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
@@ -25,7 +26,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     orderBy: { createdAt: "asc" },
   });
 
-  return NextResponse.json({ vendors });
+  // Schildfoto (zelfde bron als Dream Team) meesturen als gesigned URL.
+  const vendorsWithPhoto = await Promise.all(
+    vendors.map(async (wv) => {
+      const photoKey = wv.vendor.emblemPhoto ?? wv.vendor.coverPhoto ?? null;
+      const photoUrl = photoKey ? await getDownloadUrl(photoKey, 3600).catch(() => null) : null;
+      return { ...wv, vendor: { ...wv.vendor, photoUrl } };
+    })
+  );
+
+  return NextResponse.json({ vendors: vendorsWithPhoto });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

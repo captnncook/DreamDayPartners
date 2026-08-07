@@ -6,8 +6,9 @@ import Link from "next/link";
 import { useLang } from "@/components/LangProvider";
 import { User, Mail, Phone, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ShieldAvatar from "@/components/ShieldAvatar";
 
-type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string; userId?: string | null };
+type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string; userId?: string | null; photoUrl?: string | null };
 type WeddingVendor = { id: string; status: string; portalAccess: boolean; notes?: string; vendor: Vendor };
 type WeddingMember = { id: string; name: string; email: string; role: string };
 
@@ -138,9 +139,7 @@ export default function TeamPage() {
               <>
                 {/* Top: icon + name */}
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 font-serif" style={{ background: "var(--sand)", color: "var(--ink)", fontWeight: 700, fontSize: "1.25rem" }}>
-                    {wv.vendor.name.charAt(0)}
-                  </div>
+                  <ShieldAvatar photoUrl={wv.vendor.photoUrl} clipId={wv.vendor.id} size={44} />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-serif text-base truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>
                       {wv.vendor.name}
