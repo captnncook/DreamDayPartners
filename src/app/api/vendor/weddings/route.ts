@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getOwnVendorId, canGrantVendorPortalAccess } from "@/lib/vendorAuth";
-import { generateWeddingCode } from "@/lib/wedding-id";
+import { generateWeddingCode, generateRsvpSlug } from "@/lib/wedding-id";
 
 export async function GET() {
   const user = await getSession();
@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
       wedding = await prisma.wedding.create({
         data: {
           weddingCode,
+          rsvpToken: generateRsvpSlug(title),
           title,
           date,
           coupleEmail1: e1,

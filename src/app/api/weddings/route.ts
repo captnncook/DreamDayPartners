@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { generateWeddingCode } from "@/lib/wedding-id";
+import { generateWeddingCode, generateRsvpSlug } from "@/lib/wedding-id";
 import { canGrantVendorPortalAccess } from "@/lib/vendorAuth";
 
 export async function GET() {
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     if (coupleUser?.role === "couple") ownerId = coupleUser.id;
 
     wedding = await prisma.wedding.create({
-      data: { weddingCode, title, date: new Date(date),
+      data: { weddingCode, rsvpToken: generateRsvpSlug(title), title, date: new Date(date),
       endDate: endDate ? new Date(endDate) : null, venue, coupleEmail1: e1, coupleEmail2: e2, ownerId, notes },
     });
 

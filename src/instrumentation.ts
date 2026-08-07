@@ -3,6 +3,7 @@ export async function register() {
     const { Pool } = await import("pg");
 
     const STATEMENTS = [
+      `ALTER TABLE "guests" ADD COLUMN IF NOT EXISTS "isChild" BOOLEAN NOT NULL DEFAULT false`,
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "description" TEXT`,
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "isPremium" BOOLEAN NOT NULL DEFAULT false`,
       `ALTER TABLE "vendors" ADD COLUMN IF NOT EXISTS "coverPhoto" TEXT`,

@@ -387,6 +387,7 @@ model Guest {
   rsvpStatus String   @default("invited")
   dietary    String?
   plusOne    Boolean  @default(false)
+  isChild    Boolean  @default(false)
   tableId    String?
   rsvpToken  String   @unique @default(uuid())
   createdAt  DateTime @default(now())

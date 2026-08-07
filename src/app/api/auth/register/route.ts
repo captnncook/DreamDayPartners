@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
-import { generateWeddingCode } from "@/lib/wedding-id";
+import { generateWeddingCode, generateRsvpSlug } from "@/lib/wedding-id";
 import { hash } from "bcryptjs";
 import { sendMail, claimWelcomeEmail } from "@/lib/mail";
 import { geocodeCity } from "@/lib/geocode";
@@ -72,10 +72,12 @@ export async function POST(req: NextRequest) {
     const title = partner1 && partner2 ? `Bruiloft ${partner1} & ${partner2}` : "Mijn Bruiloft";
     const email2 = `partner-${user.id.slice(0, 8)}@dreamday.local`;
     const weddingCode = generateWeddingCode(pending.email, email2, weddingDate.toISOString().split("T")[0]);
+    const rsvpToken = generateRsvpSlug(partner1 || coupleName, partner2);
 
     const wedding = await prisma.wedding.create({
       data: {
         weddingCode,
+        rsvpToken,
         title,
         date: weddingDate,
         venue: venue || null,

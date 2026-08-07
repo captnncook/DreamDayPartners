@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Heart, Check } from "lucide-react";
+import { Check, Plus, X } from "lucide-react";
 
 type WeddingInfo = { id: string; title: string; date: string; venue?: string | null };
+type GuestRow = { name: string; isChild: boolean; dietary: string };
+
+const EMPTY_GUEST: GuestRow = { name: "", isChild: false, dietary: "" };
 
 export default function RsvpPage() {
   const { token } = useParams<{ token: string }>();
@@ -13,7 +16,9 @@ export default function RsvpPage() {
   const [notFound, setNotFound] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", rsvpStatus: "confirmed", dietary: "", plusOne: false });
+  const [email, setEmail] = useState("");
+  const [rsvpStatus, setRsvpStatus] = useState("confirmed");
+  const [guests, setGuests] = useState<GuestRow[]>([{ ...EMPTY_GUEST }]);
 
   useEffect(() => {
     fetch(`/api/rsvp/${token}`)
@@ -22,13 +27,27 @@ export default function RsvpPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
+  function updateGuest(i: number, patch: Partial<GuestRow>) {
+    setGuests(prev => prev.map((g, idx) => (idx === i ? { ...g, ...patch } : g)));
+  }
+  function addGuest() {
+    setGuests(prev => [...prev, { ...EMPTY_GUEST }]);
+  }
+  function removeGuest(i: number) {
+    setGuests(prev => prev.filter((_, idx) => idx !== i));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     await fetch(`/api/rsvp/${token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        email,
+        rsvpStatus,
+        guests: rsvpStatus === "confirmed" ? guests.filter(g => g.name.trim()) : [],
+      }),
     });
     setSaving(false);
     setSubmitted(true);
@@ -36,71 +55,109 @@ export default function RsvpPage() {
 
   const weddingDate = wedding ? new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(wedding.date)) : "";
 
+  const INPUT: React.CSSProperties = {
+    width: "100%", padding: "0.625rem 0.875rem", border: "1px solid var(--border)",
+    borderRadius: "10px", fontSize: "0.9rem", outline: "none", background: "white", color: "var(--foreground)",
+    boxSizing: "border-box",
+  };
+
   if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--background, #faf9f7)" }}>
-      <p style={{ color: "#888" }}>Laden…</p>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--background)" }}>
+      <p style={{ color: "var(--muted)" }}>Laden…</p>
     </div>
   );
 
   if (notFound) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--background, #faf9f7)" }}>
-      <p style={{ color: "#888" }}>Uitnodiging niet gevonden.</p>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--background)" }}>
+      <p style={{ color: "var(--muted)" }}>Uitnodiging niet gevonden.</p>
     </div>
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #fff5f7 0%, #faf9f7 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
-      <div style={{ maxWidth: "480px", width: "100%", background: "white", borderRadius: "20px", boxShadow: "0 4px 32px rgba(0,0,0,0.08)", padding: "2.5rem 2rem", textAlign: "center" }}>
-        <Heart style={{ width: "2.5rem", height: "2.5rem", color: "#e05252", margin: "0 auto 1rem", fill: "#e05252" }} />
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>{wedding?.title}</h1>
-        <p style={{ color: "#888", marginBottom: "0.25rem", textTransform: "capitalize" }}>{weddingDate}</p>
-        {wedding?.venue && <p style={{ color: "#aaa", fontSize: "0.875rem", marginBottom: "2rem" }}>{wedding.venue}</p>}
+    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
+      <div style={{ maxWidth: "480px", width: "100%", background: "white", borderRadius: "20px", boxShadow: "0 4px 32px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+        <div style={{ background: "linear-gradient(150deg, var(--ink) 0%, var(--ink-mid) 100%)", padding: "2rem 2rem 1.75rem", textAlign: "center" }}>
+          <h1 className="font-serif" style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--ink-text)", marginBottom: "0.375rem" }}>{wedding?.title}</h1>
+          <p style={{ color: "var(--gold)", marginBottom: "0.125rem", textTransform: "capitalize", fontSize: "0.875rem", fontWeight: 600 }}>{weddingDate}</p>
+          {wedding?.venue && <p style={{ color: "var(--ink-muted)", fontSize: "0.8125rem" }}>{wedding.venue}</p>}
+        </div>
 
-        {submitted ? (
-          <div style={{ padding: "2rem", textAlign: "center" }}>
-            <Check style={{ width: "3rem", height: "3rem", color: "#22c55e", margin: "0 auto 1rem" }} />
-            <h2 style={{ fontSize: "1.25rem", fontWeight: 700 }}>Bedankt!</h2>
-            <p style={{ color: "#888", marginTop: "0.5rem" }}>Je aanmelding is ontvangen.</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>Naam *</label>
-              <input required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                placeholder="Jouw volledige naam"
-                style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "0.625rem 0.875rem", fontSize: "0.9rem", outline: "none" }} />
+        <div style={{ padding: "2rem" }}>
+          {submitted ? (
+            <div style={{ padding: "1.5rem 0", textAlign: "center" }}>
+              <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", background: "var(--sand)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+                <Check style={{ width: "1.5rem", height: "1.5rem", color: "var(--gold-deep)" }} />
+              </div>
+              <h2 className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--foreground)" }}>Bedankt!</h2>
+              <p style={{ color: "var(--muted)", marginTop: "0.5rem", fontSize: "0.9rem" }}>
+                {email ? "Je ontvangt zo een bevestiging per e-mail." : "Je reactie is ontvangen."}
+              </p>
             </div>
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>E-mailadres</label>
-              <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                placeholder="email@voorbeeld.nl"
-                style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "0.625rem 0.875rem", fontSize: "0.9rem", outline: "none" }} />
-            </div>
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>Aanwezigheid</label>
-              <select value={form.rsvpStatus} onChange={e => setForm(p => ({ ...p, rsvpStatus: e.target.value }))}
-                style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "0.625rem 0.875rem", fontSize: "0.9rem", outline: "none", background: "white" }}>
-                <option value="confirmed">Ik kom!</option>
-                <option value="declined">Ik kan helaas niet</option>
-              </select>
-            </div>
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>Dieetwensen</label>
-              <input value={form.dietary} onChange={e => setForm(p => ({ ...p, dietary: e.target.value }))}
-                placeholder="Vegetarisch, glutenvrij, etc."
-                style={{ width: "100%", border: "1px solid #e5e7eb", borderRadius: "10px", padding: "0.625rem 0.875rem", fontSize: "0.9rem", outline: "none" }} />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
-              <input type="checkbox" id="plusOne" checked={form.plusOne} onChange={e => setForm(p => ({ ...p, plusOne: e.target.checked }))}
-                style={{ width: "1rem", height: "1rem" }} />
-              <label htmlFor="plusOne" style={{ fontSize: "0.875rem" }}>Ik breng een partner mee (+1)</label>
-            </div>
-            <button type="submit" disabled={saving} className="ddp-btn-gold"
-              style={{ width: "100%", background: "linear-gradient(135deg, #e8567a, #c4404f)", color: "white", border: "none", borderRadius: "12px", padding: "0.875rem", fontSize: "1rem", fontWeight: 700, cursor: saving ? "wait" : "pointer" }}>
-              {saving ? "Versturen…" : "RSVP versturen"}
-            </button>
-          </form>
-        )}
+          ) : (
+            <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
+              <div style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>E-mailadres</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="voor een bevestiging per mail" style={INPUT} />
+              </div>
+
+              <div style={{ marginBottom: "1.25rem" }}>
+                <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>Aanwezigheid</label>
+                <select value={rsvpStatus} onChange={e => setRsvpStatus(e.target.value)} style={{ ...INPUT, cursor: "pointer" }}>
+                  <option value="confirmed">Ik kom!</option>
+                  <option value="declined">Ik kan helaas niet</option>
+                </select>
+              </div>
+
+              {rsvpStatus === "confirmed" && (
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <div className="ddp-section-label" style={{ marginBottom: "0.625rem" }}>Wie komen er?</div>
+                  {guests.map((g, i) => (
+                    <div key={i} style={{ border: "1px solid var(--border)", borderRadius: "12px", padding: "0.875rem", marginBottom: "0.625rem" }}>
+                      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                        <input
+                          value={g.name}
+                          onChange={e => updateGuest(i, { name: e.target.value })}
+                          placeholder={i === 0 ? "Jouw naam" : "Naam"}
+                          style={{ ...INPUT, flex: 1 }}
+                        />
+                        {guests.length > 1 && (
+                          <button type="button" onClick={() => removeGuest(i)}
+                            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex", padding: "0.25rem" }}>
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                        <select value={g.isChild ? "child" : "adult"} onChange={e => updateGuest(i, { isChild: e.target.value === "child" })}
+                          style={{ ...INPUT, width: "auto", flexShrink: 0, cursor: "pointer" }}>
+                          <option value="adult">Volwassene</option>
+                          <option value="child">Kind</option>
+                        </select>
+                        <input
+                          value={g.dietary}
+                          onChange={e => updateGuest(i, { dietary: e.target.value })}
+                          placeholder="Dieetwensen (optioneel)"
+                          style={{ ...INPUT, flex: 1 }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <button type="button" onClick={addGuest}
+                    className="inline-flex items-center gap-1.5"
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--gold-deep)", fontSize: "0.8125rem", fontWeight: 600, padding: "0.25rem 0" }}>
+                    <Plus className="w-3.5 h-3.5" /> Nog iemand toevoegen
+                  </button>
+                </div>
+              )}
+
+              <button type="submit" disabled={saving} className="ddp-btn-gold"
+                style={{ width: "100%", background: "var(--gold)", color: "var(--ink)", border: "none", borderRadius: "var(--radius-full)", padding: "0.875rem", fontSize: "1rem", fontWeight: 700, cursor: saving ? "wait" : "pointer" }}>
+                {saving ? "Versturen…" : "RSVP versturen"}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );

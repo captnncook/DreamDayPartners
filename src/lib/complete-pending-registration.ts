@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
-import { generateWeddingCode } from "@/lib/wedding-id";
+import { generateWeddingCode, generateRsvpSlug } from "@/lib/wedding-id";
 import { sendMail, claimWelcomeEmail } from "@/lib/mail";
 import { geocodeCity } from "@/lib/geocode";
 
@@ -42,14 +42,31 @@ export async function completePendingRegistrationViaOAuth(
     });
     await setSession(user.id);
 
+    // Als een leverancier deze bruiloft al zelf had geregistreerd bestaat er
+    // al een Wedding op dit e-mailadres — koppelen i.p.v. dupliceren.
+    const existingWedding = await prisma.wedding.findFirst({
+      where: { OR: [{ coupleEmail1: pending.email }, { coupleEmail2: pending.email }] },
+    });
+    if (existingWedding) {
+      await prisma.wedding.update({ where: { id: existingWedding.id }, data: { ownerId: user.id } });
+      await prisma.weddingTeamMember.upsert({
+        where: { weddingId_userId: { weddingId: existingWedding.id, userId: user.id } },
+        update: {},
+        create: { weddingId: existingWedding.id, userId: user.id, role: "couple" },
+      });
+      return { ok: true, redirect: `${appUrl}/weddings/${existingWedding.id}` };
+    }
+
     const weddingDate = date ? new Date(date) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
     const title = partner1 && partner2 ? `Bruiloft ${partner1} & ${partner2}` : "Mijn Bruiloft";
     const email2 = `partner-${user.id.slice(0, 8)}@dreamday.local`;
     const weddingCode = generateWeddingCode(pending.email, email2, weddingDate.toISOString().split("T")[0]);
+    const rsvpToken = generateRsvpSlug(partner1 || coupleName, partner2);
 
     const wedding = await prisma.wedding.create({
       data: {
         weddingCode,
+        rsvpToken,
         title,
         date: weddingDate,
         endDate: endDate ? new Date(endDate) : null,

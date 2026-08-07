@@ -240,6 +240,26 @@ export function accountActivationEmail(name: string, activateUrl: string): { sub
   };
 }
 
+export function rsvpConfirmationEmail(
+  weddingTitle: string, weddingDate: Date, venue: string | null, attending: boolean, guestNames: string[]
+): { subject: string; html: string } {
+  const dateStr = new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(weddingDate);
+  const namesList = guestNames.filter(Boolean).map((n) => `<li style="margin:2px 0;">${n}</li>`).join("");
+  return {
+    subject: attending ? `Aanmelding ontvangen voor ${weddingTitle}` : `Afmelding ontvangen voor ${weddingTitle}`,
+    html: emailLayout({
+      heading: attending ? "Bedankt voor je aanmelding!" : "Bedankt voor je reactie",
+      body: `
+        <p style="margin:0 0 12px;">Jullie reactie voor <strong>${weddingTitle}</strong> (${dateStr}${venue ? `, ${venue}` : ""}) is ontvangen.</p>
+        ${attending
+          ? `<p style="margin:0 0 8px;">Je hebt je aangemeld met:</p><ul style="margin:0 0 12px;padding-left:20px;">${namesList}</ul><p style="margin:0;">We kijken ernaar uit jullie te zien!</p>`
+          : `<p style="margin:0;">Jammer dat je er niet bij kunt zijn. Bedankt voor het laten weten.</p>`
+        }
+      `,
+    }),
+  };
+}
+
 export function coupleWeddingInviteEmail(vendorName: string, weddingTitle: string, inviteUrl: string): { subject: string; html: string } {
   return {
     subject: `${vendorName} heeft jullie bruiloft al klaargezet op DreamDay`,
