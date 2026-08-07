@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { resolveParticipantBadges } from "@/lib/participantBadge";
 
 // GET /api/dm/conversations — list all DM conversations for current user
 export async function GET(_req: NextRequest) {
@@ -16,7 +17,18 @@ export async function GET(_req: NextRequest) {
     orderBy: { updatedAt: "desc" },
   });
 
-  return NextResponse.json({ conversations: convs });
+  const allUserIds = convs.flatMap((c) => c.participants.map((p) => p.user.id));
+  const badges = await resolveParticipantBadges(allUserIds);
+
+  const enriched = convs.map((c) => ({
+    ...c,
+    participants: c.participants.map((p) => ({
+      ...p,
+      user: { ...p.user, ...(badges.get(p.user.id) ?? {}) },
+    })),
+  }));
+
+  return NextResponse.json({ conversations: enriched });
 }
 
 // POST /api/dm/conversations — get or create a DM conversation with another user

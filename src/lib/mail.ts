@@ -240,6 +240,21 @@ export function accountActivationEmail(name: string, activateUrl: string): { sub
   };
 }
 
+export function coupleWeddingInviteEmail(vendorName: string, weddingTitle: string, inviteUrl: string): { subject: string; html: string } {
+  return {
+    subject: `${vendorName} heeft jullie bruiloft al klaargezet op DreamDay`,
+    html: emailLayout({
+      heading: "Jullie bruiloft staat klaar",
+      body: `
+        <p style="margin:0 0 12px;">${vendorName} werkt met DreamDay Platform en heeft alvast een plek voor <strong>${weddingTitle}</strong> aangemaakt.</p>
+        <p style="margin:0;">Maak gratis een eigen account aan om alles te bekijken en te beheren: draaiboek, gastenlijst, budget en al jullie leveranciers op één plek.</p>
+      `,
+      cta: { label: "Account aanmaken", url: inviteUrl },
+      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${inviteUrl}" style="color:#C49A6E;word-break:break-all;">${inviteUrl}</a>`,
+    }),
+  };
+}
+
 export function passwordResetEmail(resetUrl: string): { subject: string; html: string } {
   return {
     subject: "Wachtwoord opnieuw instellen",

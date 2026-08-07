@@ -52,6 +52,22 @@ export async function POST(req: NextRequest) {
     });
     await setSession(user.id);
 
+    // Als een leverancier deze bruiloft al zelf had geregistreerd (via "Mijn
+    // bruiloften") bestaat er al een Wedding op dit e-mailadres — dan koppelen
+    // we het nieuwe account daaraan i.p.v. een dubbele bruiloft aan te maken.
+    const existingWedding = await prisma.wedding.findFirst({
+      where: { OR: [{ coupleEmail1: pending.email }, { coupleEmail2: pending.email }] },
+    });
+    if (existingWedding) {
+      await prisma.wedding.update({ where: { id: existingWedding.id }, data: { ownerId: user.id } });
+      await prisma.weddingTeamMember.upsert({
+        where: { weddingId_userId: { weddingId: existingWedding.id, userId: user.id } },
+        update: {},
+        create: { weddingId: existingWedding.id, userId: user.id, role: "couple" },
+      });
+      return NextResponse.json({ redirect: `/weddings/${existingWedding.id}` }, { status: 201 });
+    }
+
     const weddingDate = date ? new Date(date) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
     const title = partner1 && partner2 ? `Bruiloft ${partner1} & ${partner2}` : "Mijn Bruiloft";
     const email2 = `partner-${user.id.slice(0, 8)}@dreamday.local`;

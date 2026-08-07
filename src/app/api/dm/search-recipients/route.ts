@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { getDownloadUrl } from "@/lib/r2";
+import { getVendorTypeConfig } from "@/lib/vendorTypeConfigs";
 
 // GET /api/dm/search-recipients?q=... — search vendors and planners by name
 export async function GET(req: NextRequest) {
@@ -33,15 +35,20 @@ export async function GET(req: NextRequest) {
         { city: { contains: q, mode: "insensitive" } },
       ],
     },
-    select: { userId: true, name: true, category: true },
+    select: { userId: true, name: true, category: true, emblemPhoto: true, coverPhoto: true },
     take: 10,
   });
 
   // Merge: vendor profile info takes precedence for display name/category
   const vendorByUserId = new Map(vendors.filter(v => v.userId).map(v => [v.userId!, v]));
 
+  async function photoUrlFor(v: { emblemPhoto: string | null; coverPhoto: string | null } | undefined) {
+    const key = v?.emblemPhoto ?? v?.coverPhoto ?? null;
+    return key ? await getDownloadUrl(key, 3600).catch(() => null) : null;
+  }
+
   const seen = new Set<string>();
-  const recipients: { userId: string; name: string; role: string; category?: string }[] = [];
+  const recipients: { userId: string; name: string; role: string; category?: string; photoUrl?: string | null }[] = [];
 
   for (const u of users) {
     if (seen.has(u.id)) continue;
@@ -51,7 +58,8 @@ export async function GET(req: NextRequest) {
       userId: u.id,
       name: vProfile?.name ?? u.name,
       role: u.role,
-      category: vProfile?.category,
+      category: vProfile ? getVendorTypeConfig(vProfile.category).label : undefined,
+      photoUrl: await photoUrlFor(vProfile),
     });
   }
 
@@ -59,7 +67,11 @@ export async function GET(req: NextRequest) {
   for (const v of vendors) {
     if (!v.userId || seen.has(v.userId)) continue;
     seen.add(v.userId);
-    recipients.push({ userId: v.userId, name: v.name, role: "vendor", category: v.category });
+    recipients.push({
+      userId: v.userId, name: v.name, role: "vendor",
+      category: getVendorTypeConfig(v.category).label,
+      photoUrl: await photoUrlFor(v),
+    });
   }
 
   return NextResponse.json({ recipients });

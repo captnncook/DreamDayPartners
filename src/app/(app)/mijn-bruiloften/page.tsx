@@ -47,6 +47,8 @@ export default function MijnBruiloftenPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [form, setForm] = useState({ email1: "", email2: "", weddingDate: "", weddingTitle: "", notes: "" });
+  const [invitingId, setInvitingId] = useState<string | null>(null);
+  const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 5000);
@@ -79,6 +81,17 @@ export default function MijnBruiloftenPage() {
       );
     }
     setSaving(false);
+  }
+
+  async function handleInvite(weddingId: string) {
+    setInvitingId(weddingId);
+    try {
+      const res = await fetch(`/api/vendor/weddings/wedding/${weddingId}/invite`, { method: "POST" });
+      if (res.ok) setInvitedIds(prev => new Set(prev).add(weddingId));
+      else { const d = await res.json().catch(() => ({})); alert(d.error ?? "Uitnodigen mislukt"); }
+    } finally {
+      setInvitingId(null);
+    }
   }
 
   async function handleDelete(id: string) {
@@ -195,7 +208,7 @@ export default function MijnBruiloftenPage() {
                       )}
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexShrink: 0 }}>
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
                     {invite.weddingId && (
                       <Link
                         href={`/weddings/${invite.weddingId}`}
@@ -203,6 +216,15 @@ export default function MijnBruiloftenPage() {
                       >
                         Dashboard
                       </Link>
+                    )}
+                    {invite.weddingId && (
+                      <button
+                        onClick={() => handleInvite(invite.weddingId!)}
+                        disabled={invitingId === invite.weddingId || invitedIds.has(invite.weddingId)}
+                        style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
+                      >
+                        {invitedIds.has(invite.weddingId) ? "Uitnodiging verstuurd" : invitingId === invite.weddingId ? "Bezig…" : "Uitnodigen"}
+                      </button>
                     )}
                     <button onClick={() => handleDelete(invite.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: "4px", display: "flex" }}>
                       <Trash2 className="w-4 h-4" />

@@ -2,11 +2,18 @@
 
 import { useState, useEffect, useRef } from "react";
 import { MessageCircle, Pencil, Search, X, ArrowLeft, Send, Check, Calendar } from "lucide-react";
+import ShieldAvatar from "@/components/ShieldAvatar";
+
+const ROLE_LABELS: Record<string, string> = {
+  couple: "Bruidspaar", planner: "Trouwplanner", admin: "Beheerder", team_member: "Teamlid", vendor: "Leverancier",
+};
+
+type BadgedUser = { id: string; name: string; role: string; label?: string; photoUrl?: string | null };
 
 type Conv = {
   id: string;
   updatedAt: string;
-  participants: { userId: string; user: { id: string; name: string; role: string } }[];
+  participants: { userId: string; user: BadgedUser }[];
   messages: { content: string; createdAt: string; sender: { id: string; name: string } }[];
 };
 
@@ -19,7 +26,7 @@ type DmMessage = {
   sender: { id: string; name: string; avatar?: string | null };
 };
 
-type Recipient = { userId: string; name: string; role: string; category?: string };
+type Recipient = { userId: string; name: string; role: string; category?: string; photoUrl?: string | null };
 
 type VendorRequestItem = {
   id: string;
@@ -123,7 +130,7 @@ function formatTime(iso: string) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(d);
 }
 
-function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conversationId: string; currentUserId: string; otherUser: { id: string; name: string; role: string }; onBack: () => void }) {
+function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conversationId: string; currentUserId: string; otherUser: BadgedUser; onBack: () => void }) {
   const [messages, setMessages] = useState<DmMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -208,12 +215,16 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "50%", background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9375rem", fontWeight: 700, color: "var(--primary)", flexShrink: 0 }}>
-          {otherUser.name.charAt(0)}
-        </div>
+        {otherUser.role === "vendor" ? (
+          <ShieldAvatar photoUrl={otherUser.photoUrl} clipId={otherUser.id} size={30} />
+        ) : (
+          <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "50%", background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9375rem", fontWeight: 700, color: "var(--primary)", flexShrink: 0 }}>
+            {otherUser.name.charAt(0)}
+          </div>
+        )}
         <div>
           <div style={{ fontWeight: 700, fontSize: "0.9375rem" }}>{otherUser.name}</div>
-          <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "capitalize" }}>{otherUser.role}</div>
+          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{otherUser.label ?? ROLE_LABELS[otherUser.role] ?? otherUser.role}</div>
         </div>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.5rem", background: "var(--background)" }}>
@@ -380,11 +391,16 @@ export default function DmPage() {
             return (
               <button key={conv.id} onClick={() => setActiveConvId(conv.id)}
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.875rem 1rem", border: "none", textAlign: "left", cursor: "pointer", background: isActive ? "var(--color-blush-soft)" : "transparent", borderLeft: isActive ? "3px solid var(--primary)" : "3px solid transparent", transition: "background 0.1s" }}>
-                <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, color: "var(--ink)", flexShrink: 0 }}>
-                  {other?.name?.charAt(0) ?? "?"}
-                </div>
+                {other?.role === "vendor" ? (
+                  <ShieldAvatar photoUrl={other.photoUrl} clipId={other.id} size={34} />
+                ) : (
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, color: "var(--ink)", flexShrink: 0 }}>
+                    {other?.name?.charAt(0) ?? "?"}
+                  </div>
+                )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: "0.875rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{other?.name ?? "Onbekend"}</div>
+                  <div style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>{other ? (other.label ?? ROLE_LABELS[other.role] ?? other.role) : ""}</div>
                   {lastMsg && <div style={{ fontSize: "0.75rem", color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{lastMsg.sender.id === currentUserId ? "Jij: " : ""}{lastMsg.content}</div>}
                 </div>
                 {lastMsg && <div style={{ fontSize: "0.6875rem", color: "var(--muted)", flexShrink: 0 }}>{timeAgo(lastMsg.createdAt)}</div>}
@@ -435,10 +451,14 @@ export default function DmPage() {
                   <button key={r.userId} onClick={() => !creating && startConversation(r.userId)} disabled={creating}
                     className="ddp-dm-result-row"
                     style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.875rem 1.25rem", border: "none", background: "none", cursor: "pointer", textAlign: "left", borderBottom: "1px solid var(--border)" }}>
-                    <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.9375rem", color: "var(--primary)", flexShrink: 0 }}>{r.name.charAt(0).toUpperCase()}</div>
+                    {r.role === "vendor" ? (
+                      <ShieldAvatar photoUrl={r.photoUrl} clipId={r.userId} size={34} />
+                    ) : (
+                      <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "var(--color-blush-soft)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.9375rem", color: "var(--primary)", flexShrink: 0 }}>{r.name.charAt(0).toUpperCase()}</div>
+                    )}
                     <div>
                       <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--charcoal)" }}>{r.name}</div>
-                      <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "capitalize" }}>{r.category ?? r.role}</div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{r.category ?? ROLE_LABELS[r.role] ?? r.role}</div>
                     </div>
                   </button>
                 ))

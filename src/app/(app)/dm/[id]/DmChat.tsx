@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
+import ShieldAvatar from "@/components/ShieldAvatar";
 
 interface DmMessage {
   id: string;
@@ -15,9 +16,13 @@ interface DmMessage {
 interface Props {
   conversationId: string;
   currentUserId: string;
-  otherUser: { id: string; name: string; role: string };
+  otherUser: { id: string; name: string; role: string; label?: string; photoUrl?: string | null };
   initialMessages: DmMessage[];
 }
+
+const ROLE_LABELS: Record<string, string> = {
+  couple: "Bruidspaar", planner: "Trouwplanner", admin: "Beheerder", team_member: "Teamlid", vendor: "Leverancier",
+};
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -117,16 +122,20 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
         <Link href="/dm" style={{ color: "var(--muted)", display: "flex", alignItems: "center" }}>
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <div style={{
-          width: "2.25rem", height: "2.25rem", borderRadius: "50%",
-          background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "0.9375rem", fontWeight: 700, color: "var(--primary)",
-        }}>
-          {otherUser.name.charAt(0)}
-        </div>
+        {otherUser.role === "vendor" ? (
+          <ShieldAvatar photoUrl={otherUser.photoUrl} clipId={otherUser.id} size={30} />
+        ) : (
+          <div style={{
+            width: "2.25rem", height: "2.25rem", borderRadius: "50%",
+            background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "0.9375rem", fontWeight: 700, color: "var(--primary)",
+          }}>
+            {otherUser.name.charAt(0)}
+          </div>
+        )}
         <div>
           <div style={{ fontWeight: 700, fontSize: "0.9375rem", letterSpacing: "-0.01em" }}>{otherUser.name}</div>
-          <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "capitalize" }}>{otherUser.role}</div>
+          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{otherUser.label ?? ROLE_LABELS[otherUser.role] ?? otherUser.role}</div>
         </div>
       </div>
 

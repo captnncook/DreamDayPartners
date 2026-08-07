@@ -73,13 +73,20 @@ function AanmeldenForm() {
     const email = searchParams.get("email");
     const name = searchParams.get("name") ?? "";
     const provider = searchParams.get("provider");
+    const date = searchParams.get("date");
+    const type = searchParams.get("type");
     if (email && provider) {
       setCouple(c => ({ ...c, email, partner1: name }));
       setAccount("couple");
       setFormStep(1);
+    } else if (email && type === "couple") {
+      // Vanuit de "1-klik uitnodigen"-mail van een leverancier: e-mail (en
+      // evt. datum) staan al vast, alleen de rest van het formulier nog in.
+      setCouple(c => ({ ...c, email, date: date ?? c.date }));
+      setAccount("couple");
+      setFormStep(1);
     }
     // ?type=vendor|couple slaat de keuzestap over (bijv. vanaf de prijzensectie)
-    const type = searchParams.get("type");
     if (!email && (type === "vendor" || type === "couple")) {
       setAccount(type);
       setFormStep(1);

@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import DmChat from "./DmChat";
+import { resolveParticipantBadges } from "@/lib/participantBadge";
 
 export default async function DmConversationPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
@@ -26,6 +27,8 @@ export default async function DmConversationPage({ params }: { params: Promise<{
   if (!isParticipant) notFound();
 
   const other = conv.participants.find(p => p.userId !== user.id)?.user;
+  const badges = other ? await resolveParticipantBadges([other.id]) : new Map();
+  const otherWithBadge = other ? { ...other, ...(badges.get(other.id) ?? {}) } : other;
 
   const serializedMessages = conv.messages.map(m => ({
     ...m,
@@ -36,7 +39,7 @@ export default async function DmConversationPage({ params }: { params: Promise<{
     <DmChat
       conversationId={id}
       currentUserId={user.id}
-      otherUser={other ?? { id: "", name: "Onbekend", role: "" }}
+      otherUser={otherWithBadge ?? { id: "", name: "Onbekend", role: "" }}
       initialMessages={serializedMessages}
     />
   );

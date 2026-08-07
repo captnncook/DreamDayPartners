@@ -135,6 +135,11 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             <StatInline value={stats.upcoming30} label="komende 30 dagen" />
           </div>
         )}
+        {user.role === "vendor" && !vendorWeddingLimitInfo?.atLimit && (
+          <Link href="/mijn-bruiloften" className="ddp-btn-secondary" style={{ textDecoration: "none", whiteSpace: "nowrap" }}>
+            <Plus className="w-3.5 h-3.5" /> Bruiloft toevoegen
+          </Link>
+        )}
       </div>
 
       {/* Admin: accountverzoeken & platformactiviteit */}
