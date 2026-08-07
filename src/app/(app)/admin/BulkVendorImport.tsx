@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, FileSpreadsheet, Check, AlertCircle } from "lucide-react";
+import { Upload, FileSpreadsheet, Check, AlertCircle, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 
 // Toegestane categorieën (zelfde set als het bewerk-formulier)
 const CATEGORIES = [
@@ -31,39 +32,30 @@ const HEADER_MAP: Record<string, keyof ParsedVendor> = {
   foto: "imageUrl", afbeelding: "imageUrl", image: "imageUrl", photo: "imageUrl", imageurl: "imageUrl",
 };
 
-// Eenvoudige CSV-parser met ondersteuning voor quotes, komma's en puntkomma's
-function parseCSV(text: string): string[][] {
-  text = text.replace(/^﻿/, ""); // BOM weg
-  const firstLine = text.split(/\r?\n/)[0] ?? "";
-  const delimiter = (firstLine.match(/;/g)?.length ?? 0) > (firstLine.match(/,/g)?.length ?? 0) ? ";" : ",";
-  const rows: string[][] = [];
-  let field = "", row: string[] = [], inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; }
-        else inQuotes = false;
-      } else field += c;
-    } else if (c === '"') inQuotes = true;
-    else if (c === delimiter) { row.push(field); field = ""; }
-    else if (c === "\n") { row.push(field); rows.push(row); field = ""; row = []; }
-    else if (c === "\r") { /* skip */ }
-    else field += c;
-  }
-  if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
-  return rows.filter((r) => r.some((cell) => cell.trim() !== ""));
+const TEMPLATE_HEADERS = ["naam", "categorie", "contactpersoon", "email", "telefoon", "website", "stad", "beschrijving", "premium", "foto"];
+const TEMPLATE_EXAMPLE = [
+  "Bloemenwinkel Roos", "bloemist", "Roos Janssen", "info@bloemenwinkelroos.nl",
+  "06-12345678", "https://bloemenwinkelroos.nl", "Utrecht",
+  "Boeketten en bruidsbloemen met een romantische, natuurlijke stijl.", "nee", "",
+];
+
+function downloadTemplate() {
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([TEMPLATE_HEADERS, TEMPLATE_EXAMPLE]);
+  ws["!cols"] = TEMPLATE_HEADERS.map((h) => ({ wch: Math.max(14, h.length + 4) }));
+  XLSX.utils.book_append_sheet(wb, ws, "Leveranciers");
+  XLSX.writeFile(wb, "dreamday-leveranciers-import.xlsx");
 }
 
 function rowsToVendors(rows: string[][]): { vendors: ParsedVendor[]; unmapped: string[] } {
   if (rows.length === 0) return { vendors: [], unmapped: [] };
-  const header = rows[0].map((h) => h.trim().toLowerCase());
+  const header = rows[0].map((h) => String(h ?? "").trim().toLowerCase());
   const fields = header.map((h) => HEADER_MAP[h]);
-  const unmapped = header.filter((h, i) => !fields[i]);
+  const unmapped = header.filter((h, i) => h && !fields[i]);
   const empty: ParsedVendor = { name: "", category: "", contactPerson: "", email: "", phone: "", website: "", city: "", description: "", isPremium: "", imageUrl: "" };
   const vendors = rows.slice(1).map((cells) => {
     const v: ParsedVendor = { ...empty };
-    fields.forEach((f, i) => { if (f) v[f] = (cells[i] ?? "").trim(); });
+    fields.forEach((f, i) => { if (f) v[f] = String(cells[i] ?? "").trim(); });
     return v;
   });
   return { vendors, unmapped };
@@ -95,11 +87,18 @@ export default function BulkVendorImport() {
     setFileName(file.name);
     const reader = new FileReader();
     reader.onload = () => {
-      const { vendors, unmapped } = rowsToVendors(parseCSV(String(reader.result ?? "")));
-      setVendors(vendors);
-      setUnmapped(unmapped);
+      try {
+        const wb = XLSX.read(reader.result, { type: "binary" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: "", raw: false });
+        const { vendors, unmapped } = rowsToVendors(rows.map((r) => r.map((c) => String(c ?? ""))));
+        setVendors(vendors);
+        setUnmapped(unmapped);
+      } catch {
+        setError("Kon het bestand niet lezen. Gebruik een .xlsx-bestand (bijv. de gedownloade template).");
+      }
     };
-    reader.readAsText(file);
+    reader.readAsBinaryString(file);
   }
 
   async function handleImport() {
@@ -138,20 +137,26 @@ export default function BulkVendorImport() {
       </div>
 
       <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
-        Upload een CSV-bestand. Excel? Sla op als <strong>CSV (UTF-8)</strong>. Kolommen: <code>naam</code>, <code>categorie</code> (verplicht),
+        Upload een Excel-bestand (.xlsx). Kolommen: <code>naam</code>, <code>categorie</code> (verplicht),
         en optioneel <code>contactpersoon, email, telefoon, website, stad, beschrijving, premium, foto</code> (link naar profielfoto). Maximaal 2000 rijen per upload.
       </p>
 
-      <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: "none" }} onChange={handleFile} />
-
-      {vendors.length === 0 ? (
-        <button
-          onClick={() => fileRef.current?.click()}
-          className="ddp-btn-secondary inline-flex items-center gap-2"
-        >
-          <Upload className="w-4 h-4" /> CSV kiezen
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <button onClick={downloadTemplate} className="ddp-btn-secondary inline-flex items-center gap-2">
+          <Download className="w-4 h-4" /> Template downloaden
         </button>
-      ) : (
+        <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" style={{ display: "none" }} onChange={handleFile} />
+        {vendors.length === 0 && (
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="ddp-btn-primary inline-flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" /> Excel-bestand kiezen
+          </button>
+        )}
+      </div>
+
+      {vendors.length > 0 && (
         <>
           <div className="text-xs mb-3" style={{ color: "var(--muted)" }}>
             <strong>{fileName}</strong> · {vendors.length} rijen ingelezen
