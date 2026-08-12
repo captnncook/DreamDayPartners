@@ -1140,3 +1140,71 @@ h1, h2, h3, h4, h5, h6 {
     width: 100% !important;
   }
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   AANMELDEN — blade-overgang tussen de keuze (leverancier/bruidspaar)
+   en de eerste formulierstap. Eén geskewde balk veegt over de kaart:
+   dekt volledig af (het moment waarop React de content wisselt), en
+   veegt door naar de andere kant om de nieuwe stap te onthullen.
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.auth-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.auth-blade {
+  position: absolute;
+  inset: -15% -25%;
+  transition: transform 460ms cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.auth-blade--vendor {
+  background: linear-gradient(150deg, var(--ink) 0%, var(--ink-mid) 100%);
+}
+.auth-blade--couple {
+  background: linear-gradient(150deg, var(--gold) 0%, var(--gold-deep) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-blade { transition: none; }
+}
+
+/* Keuzescherm: gesplitst in een donkere (leverancier) en lichte
+   (bruidspaar) helft, zodat de kleur van de balk hierboven al de kleur
+   "aankondigt" die zo meteen over het scherm veegt. */
+.auth-choice-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 340px;
+}
+@media (max-width: 560px) {
+  .auth-choice-split { grid-template-columns: 1fr; min-height: unset; }
+}
+
+.auth-choice-pane {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2.25rem 1.75rem;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: filter 160ms var(--ease-out);
+}
+.auth-choice-pane:hover { filter: brightness(1.04); }
+.auth-choice-pane:active { filter: brightness(0.97); }
+
+.auth-choice-pane--vendor {
+  background: linear-gradient(150deg, var(--ink) 0%, var(--ink-mid) 100%);
+  color: var(--ink-text);
+}
+.auth-choice-pane--couple {
+  background: var(--surface);
+  color: var(--foreground);
+}

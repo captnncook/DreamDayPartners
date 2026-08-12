@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -69,6 +69,69 @@ function AanmeldenForm() {
   const [nameMatches, setNameMatches] = useState<NameMatch[] | null>(null);
   const [checkingName, setCheckingName] = useState(false);
 
+  // Blade-overgang tussen de keuzestap en de eerste formulierstap — een
+  // geskewde balk (kleur = gekozen pad) veegt over de kaart, dekt hem
+  // volledig af (het moment waarop we de content wisselen) en veegt door
+  // om de nieuwe stap te onthullen. Zie ook prevFormStep() voor de
+  // omgekeerde beweging bij "terug".
+  //
+  // "armed" bepaalt of de balk op zijn start- of eindpositie staat voor de
+  // huidige fase. We renderen eerst ongewapend (startpositie, geen
+  // transition) zodat de browser die daadwerkelijk schildert, en wapenen
+  // hem pas een paar frames later — anders wordt de eerste klassewissel in
+  // dezelfde render nooit als een "verandering" herkend en start er nooit
+  // een transition (en vuurt transitionend dus ook nooit).
+  const [blade, setBlade] = useState<null | { color: "vendor" | "couple"; stage: "cover" | "reveal" }>(null);
+  const [bladeArmed, setBladeArmed] = useState(false);
+  const bladeTargetRef = useRef<{ toAccount: Account; toFormStep: number } | null>(null);
+  const reducedMotionRef = useRef(false);
+  useEffect(() => {
+    reducedMotionRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+
+  useEffect(() => {
+    if (!blade || bladeArmed) return;
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setBladeArmed(true));
+    });
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
+  }, [blade, bladeArmed]);
+
+  function runBladeTransition(color: "vendor" | "couple", target: { toAccount: Account; toFormStep: number }) {
+    if (reducedMotionRef.current) {
+      setAccount(target.toAccount);
+      setFormStep(target.toFormStep);
+      setError("");
+      return;
+    }
+    bladeTargetRef.current = target;
+    setBladeArmed(false);
+    setBlade({ color, stage: "cover" });
+  }
+
+  function onBladeTransitionEnd() {
+    if (!blade) return;
+    if (blade.stage === "cover") {
+      const target = bladeTargetRef.current;
+      if (target) {
+        setAccount(target.toAccount);
+        setFormStep(target.toFormStep);
+        setError("");
+        setNameMatches(null);
+      }
+      setBladeArmed(false);
+      setBlade((b) => (b ? { ...b, stage: "reveal" } : null));
+    } else {
+      setBlade(null);
+      bladeTargetRef.current = null;
+    }
+  }
+
+  // translateX per fase: "cover" gaat van buiten beeld naar het midden
+  // (0%), "reveal" gaat van het midden verder naar de andere kant (140%).
+  const bladeX = !blade ? "-140%" : blade.stage === "cover" ? (bladeArmed ? "0%" : "-140%") : (bladeArmed ? "140%" : "0%");
+
   useEffect(() => {
     const email = searchParams.get("email");
     const name = searchParams.get("name") ?? "";
@@ -100,9 +163,7 @@ function AanmeldenForm() {
   const vendorFormSteps = 3;
 
   function chooseAccount(a: Account) {
-    setAccount(a);
-    setFormStep(1);
-    setError("");
+    runBladeTransition(a === "vendor" ? "vendor" : "couple", { toAccount: a, toFormStep: 1 });
   }
 
   async function nextFormStep() {
@@ -134,7 +195,10 @@ function AanmeldenForm() {
   function prevFormStep() {
     setError("");
     setNameMatches(null);
-    if (formStep === 1) { setAccount(null); setFormStep(0); return; }
+    if (formStep === 1) {
+      runBladeTransition(account === "vendor" ? "vendor" : "couple", { toAccount: null, toFormStep: 0 });
+      return;
+    }
     setFormStep(s => s - 1);
   }
 
@@ -246,27 +310,37 @@ function AanmeldenForm() {
             </div>
           )}
 
-          <div className="ddp-card shadow-lg">
+          <div className="ddp-card shadow-lg auth-stage" style={{ padding: formStep === 0 ? 0 : undefined }}>
+            {blade && (
+              <div
+                className={`auth-blade auth-blade--${blade.color}`}
+                style={{ transform: `skewX(-8deg) translateX(${bladeX})` }}
+                onTransitionEnd={onBladeTransitionEnd}
+              />
+            )}
             {/* ── STAP 0: Keuze ── */}
             {formStep === 0 && (
-              <div>
-                <button onClick={() => chooseAccount("couple")} className="dash-row w-full text-left flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.05rem" }}>Wij zijn een bruidspaar</div>
-                    <div className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>Plan jullie bruiloft, gratis, voor altijd.</div>
-                  </div>
-                  <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: "var(--gold-deep)" }} />
+              <div className="auth-choice-split">
+                <button onClick={() => chooseAccount("vendor")} className="auth-choice-pane auth-choice-pane--vendor">
+                  <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>Ik ben een leverancier</div>
+                  <div className="text-sm" style={{ color: "var(--ink-muted)" }}>Presenteer je bedrijf en beheer je bruiloften.</div>
+                  <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold)", fontWeight: 600, marginTop: "0.25rem" }}>
+                    Kiezen <ArrowRight className="w-4 h-4" />
+                  </span>
                 </button>
 
-                <button onClick={() => chooseAccount("vendor")} className="dash-row w-full text-left flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.05rem" }}>Ik ben een leverancier</div>
-                    <div className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>Presenteer je bedrijf en beheer je bruiloften.</div>
-                  </div>
-                  <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: "var(--gold-deep)" }} />
+                <button onClick={() => chooseAccount("couple")} className="auth-choice-pane auth-choice-pane--couple">
+                  <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>Wij zijn een bruidspaar</div>
+                  <div className="text-sm" style={{ color: "var(--muted)" }}>Plan jullie bruiloft, gratis, voor altijd.</div>
+                  <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600, marginTop: "0.25rem" }}>
+                    Kiezen <ArrowRight className="w-4 h-4" />
+                  </span>
                 </button>
               </div>
             )}
+
+            {formStep !== 0 && (
+              <div style={{ padding: "1.75rem" }}>
 
             {/* ── BRUIDSPAAR stap 1 ── */}
             {account === "couple" && authStep === "form" && formStep === 1 && (
@@ -608,6 +682,8 @@ function AanmeldenForm() {
                     {sendingCode ? "Code versturen…" : "Code versturen →"}
                   </button>
                 )}
+              </div>
+            )}
               </div>
             )}
           </div>
