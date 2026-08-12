@@ -70,6 +70,40 @@ function AanmeldenForm() {
   const [nameMatches, setNameMatches] = useState<NameMatch[] | null>(null);
   const [checkingName, setCheckingName] = useState(false);
 
+  // Trouwlocatie-autocomplete: zoekt terwijl je typt naar bestaande
+  // trouwlocaties in de catalogus. Vindt niets? Dan blijft het gewoon een
+  // vrij tekstveld, want niet elke bruiloft is op een geregistreerde locatie
+  // (huisadres, tuinfeest, tentfeest ...).
+  type VenueMatch = { id: string; name: string; city: string | null };
+  const [venueMatches, setVenueMatches] = useState<VenueMatch[]>([]);
+  const [venueOpen, setVenueOpen] = useState(false);
+  const venueWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const q = couple.venue.trim();
+    if (q.length < 2) { setVenueMatches([]); return; }
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/catalogus?category=trouwlocatie&search=${encodeURIComponent(q)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setVenueMatches(((data.vendors ?? []) as VenueMatch[]).slice(0, 5));
+        }
+      } catch {
+        // best-effort autocomplete, negeer netwerkfouten stil
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [couple.venue]);
+
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (venueWrapRef.current && !venueWrapRef.current.contains(e.target as Node)) setVenueOpen(false);
+    }
+    if (venueOpen) document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [venueOpen]);
+
   // Blade-overgang tussen de keuzestap en de eerste formulierstap — een
   // geskewde balk (kleur = gekozen pad) veegt over de kaart, dekt hem
   // volledig af (het moment waarop we de content wisselen) en veegt door
@@ -387,8 +421,35 @@ function AanmeldenForm() {
                     <DatePicker value={couple.endDate} onChange={v => setCouple({ ...couple, endDate: v })} min={couple.date || new Date().toISOString().split("T")[0]} />
                   </Field>
                 )}
-                <Field label="Locatie / Trouwzaal">
-                  <input value={couple.venue} onChange={e => setCouple({ ...couple, venue: e.target.value })} placeholder="bijv. Kasteel de Haar, Utrecht" className="ddp-input" />
+                <Field label="Trouwlocatie / Andere locatie">
+                  <div ref={venueWrapRef} style={{ position: "relative" }}>
+                    <input
+                      value={couple.venue}
+                      onChange={e => { setCouple({ ...couple, venue: e.target.value }); setVenueOpen(true); }}
+                      onFocus={() => setVenueOpen(true)}
+                      placeholder="bijv. Kasteel de Haar, Utrecht"
+                      className="ddp-input"
+                      autoComplete="off"
+                    />
+                    {venueOpen && venueMatches.length > 0 && (
+                      <div className="ddp-suggest-panel">
+                        {venueMatches.map(v => (
+                          <button
+                            key={v.id}
+                            type="button"
+                            className="ddp-suggest-row"
+                            onClick={() => { setCouple(c => ({ ...c, venue: v.city ? `${v.name}, ${v.city}` : v.name })); setVenueOpen(false); }}
+                          >
+                            <span style={{ fontWeight: 600 }}>{v.name}</span>
+                            {v.city && <span style={{ color: "var(--muted)" }}>, {v.city}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
+                    Staat jullie locatie er niet tussen? Typ gewoon een eigen naam of adres, bijvoorbeeld bij een huisadres of tuinfeest.
+                  </p>
                 </Field>
                 <Field label="Verwacht aantal gasten">
                   <input type="number" min={1} value={couple.guestCount} onChange={e => setCouple({ ...couple, guestCount: e.target.value })} placeholder="bijv. 80" className="ddp-input" />
