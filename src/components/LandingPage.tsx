@@ -264,7 +264,7 @@ export default function LandingPage() {
       <nav
         className="sticky top-0 z-50 flex items-center px-5 md:px-10"
         style={{
-          height: "56px",
+          height: "68px",
           gap: "1rem",
           background: scrolled ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.80)",
           backdropFilter: "blur(24px) saturate(200%)",
