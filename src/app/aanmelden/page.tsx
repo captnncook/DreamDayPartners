@@ -82,18 +82,21 @@ function AanmeldenForm() {
   useEffect(() => {
     const q = couple.venue.trim();
     if (q.length < 2) { setVenueMatches([]); return; }
+    let cancelled = false;
     const t = setTimeout(async () => {
       try {
         const res = await fetch(`/api/catalogus/search-venues?search=${encodeURIComponent(q)}`);
-        if (res.ok) {
-          const data = await res.json();
-          setVenueMatches(((data.vendors ?? []) as VenueMatch[]).slice(0, 5));
-        }
+        if (cancelled) return;
+        const data = res.ok ? await res.json() : null;
+        if (cancelled) return;
+        // Bij een fout of lege respons de lijst leegmaken i.p.v. de resultaten
+        // van een eerdere (inmiddels irrelevante) zoekopdracht te laten staan.
+        setVenueMatches(((data?.vendors ?? []) as VenueMatch[]).slice(0, 5));
       } catch {
-        // best-effort autocomplete, negeer netwerkfouten stil
+        if (!cancelled) setVenueMatches([]);
       }
     }, 300);
-    return () => clearTimeout(t);
+    return () => { cancelled = true; clearTimeout(t); };
   }, [couple.venue]);
 
   useEffect(() => {

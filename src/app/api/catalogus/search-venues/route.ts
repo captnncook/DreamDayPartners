@@ -36,6 +36,12 @@ function levenshtein(a: string, b: string): number {
 
 function wordMatches(queryWord: string, candidateWord: string): boolean {
   if (!queryWord || !candidateWord) return false;
+  // Woorden van 1-2 tekens (cijfers, lidwoorden als "s") zijn te kort om
+  // betrouwbaar fuzzy te matchen (elke letter ligt dan al binnen 1 fout van
+  // toevallig een ander kort woord) — daar staat alleen exact of prefix toe.
+  if (queryWord.length <= 2 || candidateWord.length <= 2) {
+    return candidateWord.startsWith(queryWord) || queryWord.startsWith(candidateWord);
+  }
   if (candidateWord.startsWith(queryWord) || queryWord.startsWith(candidateWord)) return true;
   const maxDistance = queryWord.length > 5 ? 2 : 1;
   return levenshtein(queryWord, candidateWord) <= maxDistance;
