@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import DatePicker from "@/components/DatePicker";
 
 interface Props {
   weddingId: string;
@@ -115,7 +116,7 @@ export default function ContractPayment({
             </div>
             <div>
               <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Vervaldatum aanbetaling</label>
-              <input type="date" value={form.depositDue} onChange={e => setForm(f => ({ ...f, depositDue: e.target.value }))} style={inputStyle} />
+              <DatePicker value={form.depositDue} onChange={v => setForm(f => ({ ...f, depositDue: v }))} className="" style={inputStyle} />
             </div>
             <div>
               <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Eindbedrag (€)</label>
@@ -123,7 +124,7 @@ export default function ContractPayment({
             </div>
             <div>
               <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Vervaldatum eindbetaling</label>
-              <input type="date" value={form.finalDue} onChange={e => setForm(f => ({ ...f, finalDue: e.target.value }))} style={inputStyle} />
+              <DatePicker value={form.finalDue} onChange={v => setForm(f => ({ ...f, finalDue: v }))} className="" style={inputStyle} />
             </div>
           </div>
           <div>

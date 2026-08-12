@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Film, ExternalLink } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 const FILM_PHASES = ["Opnames", "Rough cut", "Final cut", "Geleverd"] as const;
 
@@ -81,7 +82,7 @@ export default function VideoDelivery({ intakeData, onUpdate, isVendor, isPlanne
           </div>
           <div>
             <label className="block text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Verwachte leverdatum film</label>
-            <input type="date" value={deliveryDate} onChange={e => setDeliveryDate(e.target.value)}
+            <DatePicker value={deliveryDate} onChange={v => setDeliveryDate(v)}
               className="w-full border rounded-lg px-3 py-2 text-sm bg-white" style={{ borderColor: "var(--border)" }} />
           </div>
           <div>

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, RefreshCw, Circle, X } from "lucide-react";
 import { SkeletonCard } from "@/components/Skeleton";
+import DatePicker from "@/components/DatePicker";
 
 type Task = {
   id: string;
@@ -136,7 +137,7 @@ export default function TasksPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium mb-1">Deadline</label>
-              <input type="date" value={form.dueDate} onChange={(e) => setForm((p) => ({ ...p, dueDate: e.target.value }))} className="ddp-input" />
+              <DatePicker value={form.dueDate} onChange={(v) => setForm((p) => ({ ...p, dueDate: v }))} />
             </div>
             <div>
               <label className="block text-xs font-medium mb-1">Toewijzen aan</label>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import DatePicker from "@/components/DatePicker";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -163,10 +164,9 @@ export default function WeddingWizardPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1.5">Trouwdatum *</label>
-                <input
-                  type="date"
+                <DatePicker
                   value={form.date}
-                  onChange={(e) => set("date", e.target.value)}
+                  onChange={(v) => set("date", v)}
                   min={new Date().toISOString().split("T")[0]}
                   className="w-full border rounded-xl px-4 py-3 text-sm"
                   style={{ borderColor: "var(--border)" }}
@@ -184,10 +184,9 @@ export default function WeddingWizardPage() {
               {multiDay && (
                 <div>
                   <label className="block text-sm font-medium mb-1.5">Laatste dag</label>
-                  <input
-                    type="date"
+                  <DatePicker
                     value={form.endDate}
-                    onChange={(e) => set("endDate", e.target.value)}
+                    onChange={(v) => set("endDate", v)}
                     min={form.date || new Date().toISOString().split("T")[0]}
                     className="w-full border rounded-xl px-4 py-3 text-sm"
                     style={{ borderColor: "var(--border)" }}

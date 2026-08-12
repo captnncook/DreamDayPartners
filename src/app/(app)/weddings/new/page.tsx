@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import DatePicker from "@/components/DatePicker";
 
 export default function NewWeddingPage() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function NewWeddingPage() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1.5">Trouwdatum *</label>
-            <input name="date" type="date" value={form.date} onChange={handleChange} required
+            <DatePicker value={form.date} onChange={(v) => setForm((prev) => ({ ...prev, date: v }))}
               className="w-full border rounded-lg px-3 py-2.5 text-sm" style={{ borderColor: "var(--border)" }} />
           </div>
           <div>

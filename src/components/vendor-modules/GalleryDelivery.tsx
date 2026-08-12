@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ImageIcon, ExternalLink } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 interface Props {
   intakeData: Record<string, unknown>;
@@ -42,7 +43,7 @@ export default function GalleryDelivery({ intakeData, onUpdate, isVendor, isPlan
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Verwachte leverdatum foto&apos;s</label>
-            <input type="date" value={deliveryDate} onChange={e => setDeliveryDate(e.target.value)}
+            <DatePicker value={deliveryDate} onChange={v => setDeliveryDate(v)}
               className="w-full border rounded-lg px-3 py-2 text-sm bg-white" style={{ borderColor: "var(--border)" }} />
           </div>
           <div>

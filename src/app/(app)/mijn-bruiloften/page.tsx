@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 type Invite = {
   id: string;
@@ -143,7 +144,7 @@ export default function MijnBruiloftenPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
               <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
                 Trouwdatum *<br />
-                <input type="date" required value={form.weddingDate} onChange={e => set("weddingDate", e.target.value)} style={{ ...INP, marginTop: "0.3rem" }} />
+                <DatePicker value={form.weddingDate} onChange={v => set("weddingDate", v)} className="" style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
               <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
                 Naam bruiloft (optioneel)<br />

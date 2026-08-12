@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Plus, Trash2, ChevronRight, Check, X } from "lucide-react";
 import ClaimRequests from "@/components/admin/ClaimRequests";
 import { formatDateRange } from "@/lib/dateRange";
+import DatePicker from "@/components/DatePicker";
 
 const PRIORITY_META: Record<string, { label: string; color: string; weight: number }> = {
   high:   { label: "Urgent", color: "var(--gold-deep)",   weight: 700 },
@@ -829,7 +830,7 @@ function VendorTasksSection({ weddings }: { weddings: Wedding[] }) {
                 {weddings.map(w => <option key={w.id} value={w.id}>{w.title}</option>)}
               </select>
             )}
-            <input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} className="ddp-input" />
+            <DatePicker value={form.dueDate} onChange={v => setForm(f => ({ ...f, dueDate: v }))} />
           </div>
           <div className="flex gap-2">
             <button type="submit" disabled={saving || !form.title.trim()} className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>

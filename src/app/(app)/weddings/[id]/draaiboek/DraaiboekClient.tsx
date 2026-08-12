@@ -6,6 +6,7 @@ import Link from "next/link";
 import { CalendarPlus, ClipboardList, Plus, Printer } from "lucide-react";
 import DraaiboekGrid, { type GridItem, type WeddingVendorRef } from "./DraaiboekGrid";
 import { eachDay, sameDay } from "@/lib/dateRange";
+import DatePicker from "@/components/DatePicker";
 
 type DraaiboekItem = GridItem;
 
@@ -317,11 +318,11 @@ export default function DraaiboekClient({
         <div className="mb-4">
           {showDateEditor ? (
             <div className="flex items-center gap-2 flex-wrap">
-              <input
-                type="date"
+              <DatePicker
                 value={endDateDraft}
                 min={weddingDate.split("T")[0]}
-                onChange={e => setEndDateDraft(e.target.value)}
+                onChange={v => setEndDateDraft(v)}
+                className=""
                 style={{ ...INPUT_STYLE, width: "auto" }}
               />
               <button onClick={() => saveEndDate(false)} disabled={savingEndDate || !endDateDraft} className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem" }}>

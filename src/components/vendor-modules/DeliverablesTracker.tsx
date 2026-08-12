@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { DeliverableConfig } from "@/lib/vendorTypeConfigs";
+import DatePicker from "@/components/DatePicker";
 
 interface Deliverable {
   id: string;
@@ -77,7 +78,7 @@ export default function DeliverablesTracker({ weddingId, wvId, deliverables, con
       {adding && (
         <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
           <input placeholder="Label" value={newLabel} onChange={e => setNewLabel(e.target.value)} style={{ ...inputStyle, flex: 1, minWidth: "140px" }} />
-          <input type="date" value={newDue} onChange={e => setNewDue(e.target.value)} style={{ ...inputStyle, width: "140px" }} />
+          <DatePicker value={newDue} onChange={v => setNewDue(v)} className="" style={{ ...inputStyle, width: "140px" }} />
           <button onClick={addDeliverable} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem" }}>
             Toevoegen
           </button>

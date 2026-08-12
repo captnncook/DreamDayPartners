@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ArrowLeft, Check, Eye, EyeOff } from "lucide-react";
 import { APPLE_LOGIN_ENABLED } from "@/lib/featureFlags";
+import DatePicker from "@/components/DatePicker";
 
 type Account = "couple" | "vendor" | null;
 type AuthStep = "form" | "send-code" | "verify-code" | "choose-auth" | "password";
@@ -370,7 +371,7 @@ function AanmeldenForm() {
                   <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Wanneer en waar is de bruiloft?</p>
                 </div>
                 <Field label="Trouwdatum">
-                  <input type="date" value={couple.date} onChange={e => setCouple({ ...couple, date: e.target.value })} min={new Date().toISOString().split("T")[0]} className="ddp-input" />
+                  <DatePicker value={couple.date} onChange={v => setCouple({ ...couple, date: v })} min={new Date().toISOString().split("T")[0]} />
                 </Field>
                 <label className="flex items-center gap-2.5 text-sm cursor-pointer" style={{ fontWeight: 500 }}>
                   <input
@@ -383,7 +384,7 @@ function AanmeldenForm() {
                 </label>
                 {multiDay && (
                   <Field label="Laatste dag">
-                    <input type="date" value={couple.endDate} onChange={e => setCouple({ ...couple, endDate: e.target.value })} min={couple.date || new Date().toISOString().split("T")[0]} className="ddp-input" />
+                    <DatePicker value={couple.endDate} onChange={v => setCouple({ ...couple, endDate: v })} min={couple.date || new Date().toISOString().split("T")[0]} />
                   </Field>
                 )}
                 <Field label="Locatie / Trouwzaal">
