@@ -234,7 +234,7 @@ export default function FilesPage() {
           )}
 
           {uploadError && (
-            <div className="mb-4 p-3 rounded-lg text-sm flex items-center gap-2" style={{ background: "#fde8e8", color: "var(--danger)" }}>
+            <div className="mb-4 p-3 rounded-lg text-sm flex items-center gap-2" style={{ background: "var(--danger-bg)", color: "var(--danger)" }}>
               <AlertCircle className="w-4 h-4 flex-shrink-0" /> {uploadError}
             </div>
           )}
@@ -339,7 +339,7 @@ export default function FilesPage() {
                       <button
                         onClick={() => handleDelete(doc)}
                         className="text-xs px-2 py-1 rounded-md transition-colors hover:opacity-80"
-                        style={{ background: "#fde8e8", color: "var(--danger)" }}
+                        style={{ background: "var(--danger-bg)", color: "var(--danger)" }}
                         title="Verwijderen"
                       >
                         <X className="w-3.5 h-3.5" />

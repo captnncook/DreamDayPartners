@@ -20,9 +20,9 @@
   --primary:      #C9A75D;        /* gold — accents, icons, labels */
   --primary-dark: #a8863d;
   --primary-light:#dfc07e;
-  --accent:       #F7D9D9;        /* blush */
-  --accent-soft:  #FFF1F1;        /* blush-soft */
-  --accent-dark:  #e8c5c5;
+  --accent:       #F5F0E8;        /* sand — subtle tint voor rijen/chips/panelen */
+  --accent-soft:  #FAF6EF;        /* sand-soft */
+  --accent-dark:  #C9A75D;        /* gold — voor iconen op sand-achtergrond */
   --surface:      #ffffff;
   --surface-2:    #FFF8F5;        /* warm off-white */
   --border:       #E8E1D8;        /* warm */

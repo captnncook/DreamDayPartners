@@ -193,7 +193,7 @@ export default function VendorsPage() {
                   onClick={() => togglePortal(wv)}
                   className="text-xs px-2 py-1 rounded-md transition-colors flex-shrink-0"
                   style={{
-                    background: wv.portalAccess ? "#fde8e8" : "var(--accent)",
+                    background: wv.portalAccess ? "var(--danger-bg)" : "var(--accent)",
                     color: wv.portalAccess ? "var(--danger)" : "var(--primary)",
                   }}
                 >

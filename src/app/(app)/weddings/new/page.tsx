@@ -82,7 +82,7 @@ export default function NewWeddingPage() {
           <textarea name="notes" value={form.notes} onChange={handleChange} rows={3} placeholder="Thema, speciale wensen, etc."
             className="w-full border rounded-lg px-3 py-2.5 text-sm resize-none" style={{ borderColor: "var(--border)" }} />
         </div>
-        {error && <div className="p-3 rounded-lg text-sm" style={{ background: "#fde8e8", color: "var(--danger)" }}>{error}</div>}
+        {error && <div className="p-3 rounded-lg text-sm" style={{ background: "var(--danger-bg)", color: "var(--danger)" }}>{error}</div>}
         <div className="flex gap-3 pt-2">
           <button type="submit" disabled={loading} className="ddp-btn-primary flex-1 py-2.5">{loading ? "Aanmaken..." : "Bruiloft aanmaken"}</button>
           <Link href="/weddings" className="ddp-btn-secondary px-6 py-2.5">Annuleren</Link>
