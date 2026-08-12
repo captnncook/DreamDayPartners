@@ -58,7 +58,7 @@ function AanmeldenForm() {
   const [saving, setSaving] = useState(false);
 
   const [couple, setCouple] = useState({
-    partner1: "", partner2: "", date: "", endDate: "", venue: "", guestCount: "", budget: "", email: "",
+    partner1: "", partner2: "", date: "", endDate: "", venue: "", guestCount: "", email: "",
   });
   const [multiDay, setMultiDay] = useState(false);
   const [vendor, setVendor] = useState({
@@ -460,12 +460,9 @@ function AanmeldenForm() {
             {account === "couple" && authStep === "form" && formStep === 3 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">Budget &amp; account</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Bijna klaar! Vul je e-mailadres in.</p>
+                  <h2 className="text-lg font-semibold">Bijna klaar</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Vul je e-mailadres in om je account aan te maken.</p>
                 </div>
-                <Field label="Totaalbudget (€)">
-                  <input type="number" min={0} step={500} value={couple.budget} onChange={e => setCouple({ ...couple, budget: e.target.value })} placeholder="15000" className="ddp-input" />
-                </Field>
                 <Field label="Jouw e-mailadres *">
                   <input type="email" value={couple.email} onChange={e => setCouple({ ...couple, email: e.target.value })} placeholder="jij@voorbeeld.nl" className="ddp-input" />
                 </Field>
