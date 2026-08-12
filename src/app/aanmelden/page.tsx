@@ -356,7 +356,7 @@ function AanmeldenForm() {
                   <input value={couple.partner2} onChange={e => setCouple({ ...couple, partner2: e.target.value })} placeholder="bijv. Thomas" className="ddp-input" />
                 </Field>
                 {couple.partner1 && couple.partner2 && (
-                  <div className="font-serif p-3 rounded-xl text-center text-sm" style={{ fontWeight: 700, background: "var(--accent)", color: "var(--primary)" }}>
+                  <div className="font-serif p-3 rounded-xl text-center text-sm" style={{ fontWeight: 700, background: "var(--sand)", color: "var(--gold-deep)" }}>
                     Bruiloft {couple.partner1} &amp; {couple.partner2}
                   </div>
                 )}
