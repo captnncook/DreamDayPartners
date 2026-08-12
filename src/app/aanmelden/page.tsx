@@ -84,7 +84,7 @@ function AanmeldenForm() {
     if (q.length < 2) { setVenueMatches([]); return; }
     const t = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/catalogus?category=trouwlocatie&search=${encodeURIComponent(q)}`);
+        const res = await fetch(`/api/catalogus/search-venues?search=${encodeURIComponent(q)}`);
         if (res.ok) {
           const data = await res.json();
           setVenueMatches(((data.vendors ?? []) as VenueMatch[]).slice(0, 5));
