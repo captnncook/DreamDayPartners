@@ -52,17 +52,24 @@ export default function GuestsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function handleAdd(e: React.FormEvent) {
+  async function handleAdd(e: React.FormEvent, confirmDuplicate = false) {
     e.preventDefault();
     setSaving(true);
-    await fetch(`/api/weddings/${id}/guests`, {
+    const res = await fetch(`/api/weddings/${id}/guests`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, confirmDuplicate }),
     });
+    setSaving(false);
+    if (res.status === 409) {
+      const data = await res.json().catch(() => null);
+      if (data?.error === "duplicate" && window.confirm(`${data.message} Toch nog een keer toevoegen?`)) {
+        return handleAdd(e, true);
+      }
+      return;
+    }
     setForm({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false });
     setShowForm(false);
-    setSaving(false);
     load();
   }
 

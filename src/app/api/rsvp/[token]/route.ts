@@ -26,20 +26,40 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
     ? guests
     : [{ name: "Gast", isChild: false, dietary: "" }];
 
-  const created = await Promise.all(
-    guestList.map((g, i) =>
-      prisma.guest.create({
-        data: {
-          weddingId: wedding.id,
-          name: g.name?.trim() || "Gast",
-          email: i === 0 ? (email || null) : null,
-          rsvpStatus: rsvpStatus ?? "confirmed",
-          dietary: g.dietary?.trim() || null,
-          isChild: Boolean(g.isChild),
-        },
-      })
-    )
-  );
+  // Bestaande gasten van deze bruiloft ophalen om te matchen op naam/e-mail
+  // i.p.v. blind nieuwe rijen aan te maken — anders ontstaat er een
+  // duplicaat zodra iemand die al op de gastenlijst staat zelf RSVP't.
+  const existingGuests = await prisma.guest.findMany({ where: { weddingId: wedding.id } });
+  function findMatch(name: string, isFirst: boolean) {
+    const normalized = name.trim().toLowerCase();
+    return existingGuests.find((g) => {
+      if (g.name.trim().toLowerCase() === normalized) return true;
+      if (isFirst && email && g.email && g.email.toLowerCase() === email.toLowerCase()) return true;
+      return false;
+    });
+  }
+
+  // Sequentieel (niet Promise.all) zodat matches binnen dezelfde aanvraag
+  // elkaar niet kunnen dubbel claimen bij twee gasten met dezelfde naam.
+  const created = [];
+  for (let i = 0; i < guestList.length; i++) {
+    const g = guestList[i];
+    const name = g.name?.trim() || "Gast";
+    const match = findMatch(name, i === 0);
+    const data = {
+      name,
+      email: i === 0 ? (email || null) : null,
+      rsvpStatus: rsvpStatus ?? "confirmed",
+      dietary: g.dietary?.trim() || null,
+      isChild: Boolean(g.isChild),
+    };
+    if (match) {
+      created.push(await prisma.guest.update({ where: { id: match.id }, data }));
+      existingGuests.splice(existingGuests.indexOf(match), 1);
+    } else {
+      created.push(await prisma.guest.create({ data: { ...data, weddingId: wedding.id } }));
+    }
+  }
 
   if (email) {
     const tpl = rsvpConfirmationEmail(wedding.title, new Date(wedding.date), wedding.venue, rsvpStatus === "confirmed", guestList.map((g) => g.name));

@@ -26,6 +26,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const body = await req.json();
 
+  // Waarschuw (blokkeer niet) bij een naam die al op de gastenlijst staat —
+  // twee mensen met dezelfde naam kan legitiem zijn, maar dit vangt de
+  // veelvoorkomende fout van per ongeluk twee keer dezelfde gast invoeren.
+  if (!body.confirmDuplicate) {
+    const existing = await prisma.guest.findFirst({
+      where: { weddingId: id, name: { equals: body.name?.trim(), mode: "insensitive" } },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "duplicate", message: `${body.name} staat al op de gastenlijst.`, existingGuestId: existing.id },
+        { status: 409 }
+      );
+    }
+  }
+
   const guest = await prisma.guest.create({
     data: {
       weddingId: id,
