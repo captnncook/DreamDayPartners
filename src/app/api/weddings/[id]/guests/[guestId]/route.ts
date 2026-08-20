@@ -19,6 +19,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       rsvpStatus: body.rsvpStatus,
       dietary: body.dietary,
       plusOne: body.plusOne,
+      isChild: body.isChild,
       tableId: body.tableId,
     },
   });

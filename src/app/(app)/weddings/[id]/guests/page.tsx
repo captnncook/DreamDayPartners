@@ -15,6 +15,7 @@ type Guest = {
   rsvpStatus: string;
   dietary?: string;
   plusOne: boolean;
+  isChild: boolean;
 };
 
 const RSVP_LABELS: Record<string, string> = {
@@ -29,7 +30,7 @@ export default function GuestsPage() {
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
   const [filterRsvp, setFilterRsvp] = useState("all");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false, isChild: false });
   const [saving, setSaving] = useState(false);
   const [csvImporting, setCsvImporting] = useState(false);
   const [rsvpToken, setRsvpToken] = useState<string | null>(null);
@@ -68,7 +69,7 @@ export default function GuestsPage() {
       }
       return;
     }
-    setForm({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false });
+    setForm({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false, isChild: false });
     setShowForm(false);
     load();
   }
@@ -218,6 +219,10 @@ export default function GuestsPage() {
               <input type="checkbox" id="plusOne" checked={form.plusOne} onChange={(e) => setForm((p) => ({ ...p, plusOne: e.target.checked }))} />
               <label htmlFor="plusOne" className="text-sm">Plus één meenemen</label>
             </div>
+            <div className="flex items-center gap-2 pt-5">
+              <input type="checkbox" id="isChild" checked={form.isChild} onChange={(e) => setForm((p) => ({ ...p, isChild: e.target.checked }))} />
+              <label htmlFor="isChild" className="text-sm">Kind</label>
+            </div>
           </div>
           <button type="submit" disabled={saving} className="ddp-btn-primary w-full">
             {saving ? "Opslaan..." : "Gast toevoegen"}
@@ -256,7 +261,10 @@ export default function GuestsPage() {
                     </div>
                     <div>
                       <div className="text-sm font-medium">{guest.name}</div>
-                      {guest.plusOne && <span className="text-xs" style={{ color: "var(--muted)" }}>+1</span>}
+                      <div className="flex gap-1.5">
+                        {guest.isChild && <span className="text-xs" style={{ color: "var(--muted)" }}>kind</span>}
+                        {guest.plusOne && <span className="text-xs" style={{ color: "var(--muted)" }}>+1</span>}
+                      </div>
                     </div>
                   </div>
                 </td>

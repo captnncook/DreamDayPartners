@@ -51,6 +51,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       rsvpStatus: body.rsvpStatus ?? "invited",
       dietary: body.dietary,
       plusOne: body.plusOne ?? false,
+      isChild: body.isChild ?? false,
     },
   });
 

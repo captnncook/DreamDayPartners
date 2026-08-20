@@ -168,7 +168,16 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
         if (!res.ok) return;
         const data = await res.json();
         if (data.messages?.length > 0) {
-          setMessages(prev => [...prev, ...data.messages]);
+          // Een eigen net-verzonden bericht kan via de optimistic update én
+          // via deze poll binnenkomen (race: de poll gebruikt "since" op
+          // basis van de client-tijd, die net vóór het echte servertijdstip
+          // kan liggen) — zonder dedup op id verscheen het bericht dan
+          // dubbel bij de afzender.
+          setMessages(prev => {
+            const existingIds = new Set(prev.map(m => m.id));
+            const fresh = data.messages.filter((m: DmMessage) => !existingIds.has(m.id));
+            return fresh.length > 0 ? [...prev, ...fresh] : prev;
+          });
           lastCreatedAt.current = data.messages[data.messages.length - 1].createdAt;
         }
       } catch { /* ignore */ }
