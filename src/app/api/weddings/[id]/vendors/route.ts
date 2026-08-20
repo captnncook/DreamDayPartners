@@ -42,12 +42,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  // Only planners/admins can link vendors to a wedding
-  if (!["admin", "planner", "team_member"].includes(user.role)) {
-    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
-  }
-
   const { id } = await params;
+
+  // Iedereen van het team van deze bruiloft mag een leverancier koppelen —
+  // dit sloot voorheen het bruidspaar zelf (rol "couple") uit, terwijl dat
+  // juist de meest voorkomende gebruiker van deze knop is.
+  const accessWhere =
+    user.role === "admin" ? { id } : { id, teamMembers: { some: { userId: user.id } } };
+  const wedding = await prisma.wedding.findFirst({ where: accessWhere, select: { id: true } });
+  if (!wedding) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+
   const { vendorId, notes } = await req.json();
 
   const existing = await prisma.weddingVendor.findFirst({ where: { weddingId: id, vendorId } });

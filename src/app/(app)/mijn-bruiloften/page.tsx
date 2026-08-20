@@ -109,7 +109,9 @@ export default function MijnBruiloftenPage() {
         <div>
           <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Mijn bruiloften</h1>
           <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>
-            Registreer een bruiloft zodat je automatisch wordt gekoppeld zodra het bruidspaar aanmeldt.
+            Vul het e-mailadres van het bruidspaar in: heeft het bruidspaar al een account, dan word je
+            direct gekoppeld. Nog geen account? Dan zetten we alvast een bruiloft voor je klaar en koppelen
+            we automatisch zodra ze zich aanmelden.
           </p>
         </div>
         <button

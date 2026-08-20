@@ -68,19 +68,19 @@ export async function POST(req: NextRequest) {
 
   const date = new Date(weddingDate);
   date.setUTCHours(0, 0, 0, 0);
-  const dayStart = new Date(date);
-  const dayEnd = new Date(date);
-  dayEnd.setUTCHours(23, 59, 59, 999);
 
-  // Check if a wedding already exists for these emails + date
+  // Matchen op e-mail alleen (niet ook op exacte datum): e-mail is de
+  // betrouwbare identifier, een datum die de leverancier iets anders heeft
+  // dan wat het bruidspaar zelf heeft geregistreerd (typfout, of nog niet
+  // zeker) mag geen aparte, duplicaat-bruiloft opleveren.
   let wedding = await prisma.wedding.findFirst({
     where: {
-      date: { gte: dayStart, lte: dayEnd },
       OR: [
         { coupleEmail1: e1 }, { coupleEmail2: e1 },
         ...(e2 ? [{ coupleEmail1: e2 }, { coupleEmail2: e2 }] : []),
       ],
     },
+    orderBy: { createdAt: "desc" },
   });
 
   const alreadyExisted = !!wedding;

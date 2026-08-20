@@ -24,6 +24,7 @@ export default function VendorsPage() {
   const [selectedVendorId, setSelectedVendorId] = useState("");
   const [addNotes, setAddNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [addError, setAddError] = useState("");
 
   const load = useCallback(async () => {
     const [wvRes, vRes] = await Promise.all([
@@ -45,15 +46,21 @@ export default function VendorsPage() {
     e.preventDefault();
     if (!selectedVendorId) return;
     setSaving(true);
-    await fetch(`/api/weddings/${id}/vendors`, {
+    setAddError("");
+    const res = await fetch(`/api/weddings/${id}/vendors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ vendorId: selectedVendorId, notes: addNotes }),
     });
+    setSaving(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setAddError(data?.error || "Koppelen is niet gelukt. Probeer het opnieuw.");
+      return;
+    }
     setSelectedVendorId("");
     setAddNotes("");
     setShowAdd(false);
-    setSaving(false);
     load();
   }
 
@@ -98,6 +105,15 @@ export default function VendorsPage() {
       {showAdd && (
         <form onSubmit={handleAdd} className="ddp-card mb-6 space-y-4">
           <h3 className="font-semibold">Leverancier koppelen</h3>
+          {addError && (
+            <p className="text-sm" style={{ color: "var(--danger)", background: "var(--danger-bg)", borderRadius: "8px", padding: "0.625rem 0.875rem" }}>
+              {addError}
+            </p>
+          )}
+          <p className="text-xs" style={{ color: "var(--muted)" }}>
+            Staat een leverancier hier niet tussen? Zoek en nodig ze uit vanaf hun profiel in de{" "}
+            <Link href="/leveranciers" className="underline" style={{ color: "var(--gold-deep)" }}>catalogus</Link>.
+          </p>
           {available.length === 0 ? (
             <p className="text-sm" style={{ color: "var(--muted)" }}>Alle leveranciers zijn al gekoppeld.</p>
           ) : (
