@@ -20,14 +20,47 @@ interface Props {
   onUpdate: (data: Record<string, unknown>) => void;
   isVendor: boolean;
   isPlanner: boolean;
+  vendorId?: string;
 }
 
-export default function VenueRooms({ intakeData, onUpdate, isVendor, isPlanner }: Props) {
+type ProfileRoom = {
+  id: string; name: string;
+  ceremonyMax: number | null; receptionMax: number | null; dinnerMax: number | null; partyMax: number | null;
+};
+
+export default function VenueRooms({ intakeData, onUpdate, isVendor, isPlanner, vendorId }: Props) {
   const canEdit = isVendor || isPlanner;
   const raw = intakeData.venueRooms as VenueRoom[] | undefined;
   const [rooms, setRooms] = useState<VenueRoom[]>(raw ?? []);
   const [editingId, setEditingId] = useState<string | "new" | null>(null);
   const [form, setForm] = useState(EMPTY);
+  const [importing, setImporting] = useState(false);
+
+  // Zalen die de trouwlocatie al op haar eigen profiel heeft ingericht
+  // (met capaciteit per functie) hoefde ze hier tot nu toe met minder
+  // detail opnieuw in te typen. Eén klik zet ze over i.p.v. dat.
+  async function importFromProfile() {
+    if (!vendorId) return;
+    setImporting(true);
+    try {
+      const res = await fetch(`/api/catalogus/${vendorId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const profileRooms: ProfileRoom[] = data.vendor?.venueRooms ?? [];
+      if (profileRooms.length === 0) return;
+      const imported: VenueRoom[] = profileRooms.map((r) => ({
+        id: `r-${r.id}`,
+        name: r.name,
+        function: "Overig",
+        capacity: r.partyMax ?? r.receptionMax ?? r.dinnerMax ?? r.ceremonyMax ?? "",
+        notes: "",
+      }));
+      const existingIds = new Set(rooms.map((r) => r.id));
+      save([...rooms, ...imported.filter((r) => !existingIds.has(r.id))]);
+    } finally {
+      setImporting(false);
+    }
+  }
 
   function save(updated: VenueRoom[]) {
     setRooms(updated);
@@ -63,11 +96,19 @@ export default function VenueRooms({ intakeData, onUpdate, isVendor, isPlanner }
             )}
           </div>
         </div>
-        {canEdit && (
-          <button onClick={startAdd} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
-            <Plus className="w-3.5 h-3.5" /> Ruimte toevoegen
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {canEdit && isVendor && vendorId && (
+            <button onClick={importFromProfile} disabled={importing} title="Zet de zalen van je eigen profiel hierheen over"
+              style={{ fontSize: "0.8125rem", color: "var(--muted)", background: "none", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
+              {importing ? "Overnemen…" : "Overnemen uit profiel"}
+            </button>
+          )}
+          {canEdit && (
+            <button onClick={startAdd} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+              <Plus className="w-3.5 h-3.5" /> Ruimte toevoegen
+            </button>
+          )}
+        </div>
       </div>
 
       {editingId === "new" && (

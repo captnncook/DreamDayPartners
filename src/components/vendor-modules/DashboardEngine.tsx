@@ -30,6 +30,7 @@ import VenueInfo, { type VenueInfoData } from "./VenueInfo";
 interface Props {
   weddingId: string;
   wvId: string;
+  vendorId?: string;
   vendorType: string;
   vendorName: string;
   initialBooking: {
@@ -56,12 +57,13 @@ interface Props {
   vendorDisabledModules?: string[];
   vendorExtraModules?: string[];
   venueInfo?: VenueInfoData | null;
+  logisticsDefaults?: Record<string, string | undefined>;
 }
 
 export default function DashboardEngine({
-  weddingId, wvId, vendorType, vendorName, initialBooking,
+  weddingId, wvId, vendorId, vendorType, vendorName, initialBooking,
   documents, timelineBlocks, tasks, guests, totalGuests, userRole, userId, vendorUserId,
-  vendorIsPremium, vendorDisabledModules, vendorExtraModules, venueInfo,
+  vendorIsPremium, vendorDisabledModules, vendorExtraModules, venueInfo, logisticsDefaults,
 }: Props) {
   const config = getVendorTypeConfig(vendorType);
   const [booking, setBooking] = useState(initialBooking);
@@ -180,7 +182,7 @@ export default function DashboardEngine({
       )}
 
       {modules.includes("venueRooms") && (
-        <VenueRooms intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+        <VenueRooms intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} vendorId={vendorId} />
       )}
 
       {modules.includes("vendorAccessTimes") && (
@@ -234,6 +236,7 @@ export default function DashboardEngine({
           isVendor={isVendor}
           requiredKeys={requiredIntakeKeys}
           onToggleRequired={toggleRequiredKey}
+          defaults={logisticsDefaults}
         />
       )}
 

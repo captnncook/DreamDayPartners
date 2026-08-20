@@ -28,11 +28,17 @@ export async function resolveParticipantBadges(userIds: string[]): Promise<Map<s
   for (const id of uniqueIds) {
     const vendor = vendorByUserId.get(id);
     if (vendor) {
-      const photoKey = vendor.emblemPhoto ?? vendor.coverPhoto ?? null;
-      badges.set(id, {
-        label: getVendorTypeConfig(vendor.category).label,
-        photoUrl: photoKey ? await getDownloadUrl(photoKey, 3600).catch(() => null) : null,
-      });
+      // Eén onvolledig/onverwacht leveranciersrecord mag nooit de hele
+      // DM-lijst/conversatie laten crashen — badge is puur cosmetisch.
+      try {
+        const photoKey = vendor.emblemPhoto ?? vendor.coverPhoto ?? null;
+        badges.set(id, {
+          label: getVendorTypeConfig(vendor.category).label,
+          photoUrl: photoKey ? await getDownloadUrl(photoKey, 3600).catch(() => null) : null,
+        });
+      } catch {
+        badges.set(id, { label: "Leverancier", photoUrl: null });
+      }
     }
   }
   return badges;

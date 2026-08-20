@@ -184,6 +184,7 @@ export default async function VendorBookingPage({
       <DashboardEngine
         weddingId={weddingId}
         wvId={wvId}
+        vendorId={booking.vendor.id}
         vendorType={booking.vendor.category}
         vendorName={booking.vendor.name}
         initialBooking={isBookingSerializer(booking)}
@@ -199,6 +200,14 @@ export default async function VendorBookingPage({
         vendorDisabledModules={booking.vendor.disabledModules}
         vendorExtraModules={booking.vendor.extraModules}
         venueInfo={venueInfo}
+        logisticsDefaults={
+          booking.vendor.category === "trouwlocatie"
+            ? {
+                setupTimeOverride: booking.vendor.setupTime ? `${booking.vendor.setupTime} (standaard)` : undefined,
+                teardownTimeOverride: booking.vendor.teardownTime ? `${booking.vendor.teardownTime} (standaard)` : undefined,
+              }
+            : undefined
+        }
       />
     </div>
   );

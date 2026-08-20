@@ -334,6 +334,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "firstDanceSong", label: "Openingsdansnummer", type: "text", placeholder: "Artiest - Titel" },
       { key: "ceremonyMusic", label: "Ceremoniemuziek wensen", type: "longtext", placeholder: "Inkomst, tekenen, uitgang..." },
       { key: "mcRole", label: "MC-rol gewenst?", type: "boolean" },
+      { key: "ceremonySpeakerContact", label: "Ceremoniespreker/MC (naam + contact)", type: "text", placeholder: "Naam en telefoonnummer, indien niet de DJ zelf" },
     ],
     deliverables: [
       { key: "must-play", label: "Must-play lijst" },
@@ -370,6 +371,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "eersteDans", label: "Eerste dans nummer", type: "text", placeholder: "Artiest, titel" },
       { key: "setlist", label: "Setlist wensen", type: "longtext", placeholder: "Genres of specifieke nummers per moment van de dag" },
       { key: "mcRole", label: "MC-rol gewenst?", type: "boolean" },
+      { key: "ceremonySpeakerContact", label: "Ceremoniespreker/MC (naam + contact)", type: "text", placeholder: "Naam en telefoonnummer, indien niet de act zelf" },
       { key: "covers", label: "Specifieke covers / verzoeken", type: "longtext", placeholder: "Verzoekjes van het bruidspaar" },
       { key: "typeAct", label: "Type act (indien geen band maar bijv. goochelaar, acrobaat)", type: "text", placeholder: "Goochelaar, acrobaat, caricaturist..." },
       { key: "duur", label: "Duur optreden (minuten)", type: "number" },
@@ -934,8 +936,8 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
 // Helper
 // ────────────────────────────────────────────────────────────
 
-export function getVendorTypeConfig(type: string): VendorTypeConfig {
-  const normalized = type.toLowerCase().trim();
+export function getVendorTypeConfig(type: string | null | undefined): VendorTypeConfig {
+  const normalized = (type ?? "").toLowerCase().trim();
   return (
     VENDOR_TYPE_CONFIGS.find((c) => c.type === normalized) ??
     VENDOR_TYPE_CONFIGS.find((c) => c.type === "overig")!

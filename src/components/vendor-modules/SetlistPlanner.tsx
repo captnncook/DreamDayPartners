@@ -23,7 +23,17 @@ export default function SetlistPlanner({ intakeData, onUpdate, isVendor, isPlann
 
   function save(updated: Song[]) {
     setSongs(updated);
-    onUpdate({ setlistSongs: updated });
+    // "Eerste dans" bestond dubbel: als tag hier in de setlist én als los
+    // vrij-tekstveld bij de intake ("Openingsdansnummer"/"Eerste dans
+    // nummer"), zonder dat ze elkaar bijwerkten. Bij het taggen van een
+    // nummer als "Eerste dans" synchroniseren we het meteen door naar
+    // beide mogelijke intake-veldnamen, zodat er één bron van waarheid is.
+    const firstDance = updated.find(s => s.moment === "Eerste dans" && !s.doNotPlay);
+    const firstDanceLabel = firstDance ? [firstDance.title, firstDance.artist].filter(Boolean).join(" - ") : "";
+    // Alleen meesturen als er echt een getagd nummer is — anders overschrijft
+    // dit een handmatig ingevulde intake-waarde met een lege string zodra er
+    // iets anders in de setlist wijzigt.
+    onUpdate({ setlistSongs: updated, ...(firstDanceLabel ? { firstDanceSong: firstDanceLabel, eersteDans: firstDanceLabel } : {}) });
   }
 
   function addSong(e: React.FormEvent) {

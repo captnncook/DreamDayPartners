@@ -113,6 +113,7 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
   const [saving, setSaving] = useState(false);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [showTemplateConfirm, setShowTemplateConfirm] = useState(false);
+  const [syncingDraaiboek, setSyncingDraaiboek] = useState(false);
 
   const canEdit = isPlanner || isVendor;
 
@@ -139,6 +140,52 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
     }
     setBlocks(created.sort((a, b) => a.startTime.localeCompare(b.startTime)));
     setLoadingTemplate(false);
+  }
+
+  // Deze tijdlijn was een eenmalige kopie zonder terugkoppeling naar het
+  // Draaiboek — wijzigt het bruidspaar later de tijden daar, dan liep de
+  // leverancier gewoon verouderd. Dit haalt de actuele (voor deze
+  // leverancier zichtbare) draaiboek-items op en werkt tijden bij op
+  // titel-match; items die alleen in de eigen tijdlijn staan blijven
+  // ongemoeid, en nieuwe draaiboek-items worden toegevoegd.
+  async function syncFromDraaiboek() {
+    setSyncingDraaiboek(true);
+    try {
+      const res = await fetch(`/api/weddings/${weddingId}/draaiboek`);
+      if (!res.ok) return;
+      const data = await res.json();
+      type DraaiboekItem = { title: string; startTime: string; duration: number; description?: string | null };
+      const items: DraaiboekItem[] = data.draaiboeken?.[0]?.items ?? [];
+      if (items.length === 0) return;
+
+      const next = [...blocks];
+      for (const di of items) {
+        const match = next.find(b => b.title.trim().toLowerCase() === di.title.trim().toLowerCase());
+        if (match) {
+          if (match.startTime !== di.startTime || match.duration !== di.duration) {
+            const r = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/schedule/${match.id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ startTime: di.startTime, duration: di.duration, title: match.title, notes: match.description }),
+            });
+            if (r.ok) { match.startTime = di.startTime; match.duration = di.duration; }
+          }
+        } else {
+          const r = await fetch(`/api/weddings/${weddingId}/vendors/${wvId}/schedule`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ startTime: di.startTime, duration: di.duration, title: di.title, notes: di.description }),
+          });
+          if (r.ok) {
+            const { item } = await r.json();
+            next.push({ id: item.id, startTime: item.startTime, duration: item.duration, title: item.title, description: item.notes ?? null, location: null, phase: null });
+          }
+        }
+      }
+      setBlocks(next.sort((a, b) => a.startTime.localeCompare(b.startTime)));
+    } finally {
+      setSyncingDraaiboek(false);
+    }
   }
 
   async function saveNew() {
@@ -203,6 +250,13 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
               title="Exporteer tijdlijn als CSV"
               style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>
               <Download className="w-3.5 h-3.5" /> Exporteren
+            </button>
+          )}
+          {canEdit && blocks.length > 0 && !adding && !editingId && (
+            <button onClick={syncFromDraaiboek} disabled={syncingDraaiboek}
+              title="Haalt de actuele tijden uit het Draaiboek en werkt overeenkomende items bij"
+              style={{ fontSize: "0.8125rem", color: "var(--muted)", background: "none", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
+              {syncingDraaiboek ? "Synchroniseren…" : "Vernieuwen vanuit draaiboek"}
             </button>
           )}
           {canEdit && templates && templates.length > 0 && blocks.length > 0 && !adding && !editingId && (

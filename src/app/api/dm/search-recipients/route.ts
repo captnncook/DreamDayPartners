@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getDownloadUrl } from "@/lib/r2";
 import { getVendorTypeConfig } from "@/lib/vendorTypeConfigs";
+import { getOwnVendorId } from "@/lib/vendorAuth";
 
 // GET /api/dm/search-recipients?q=... — search vendors and planners by name
 export async function GET(req: NextRequest) {
@@ -12,15 +13,43 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (!q) return NextResponse.json({ recipients: [] });
 
-  // Search users that are vendors or planners (not the current user)
+  // Wie mag een leverancier vinden en berichten? Iedereen kon voorheen
+  // vendors/planners/admins vinden, maar een leverancier kon nooit het
+  // bruidspaar terugvinden (rol "couple" ontbrak volledig) — scoped tot
+  // bruidsparen/teamleden van bruiloften waar deze leverancier ook echt
+  // aan gekoppeld is, om te voorkomen dat een leverancier zomaar elk
+  // willekeurig bruidspaar op het platform kan opzoeken.
+  let allowedIds: string[] | null = null;
+  if (user.role === "vendor") {
+    const vendorId = await getOwnVendorId(user.id);
+    if (vendorId) {
+      const bookings = await prisma.weddingVendor.findMany({
+        where: { vendorId },
+        select: { weddingId: true },
+      });
+      const weddingIds = bookings.map((b) => b.weddingId);
+      const teamMembers = await prisma.weddingTeamMember.findMany({
+        where: { weddingId: { in: weddingIds } },
+        select: { userId: true },
+      });
+      allowedIds = teamMembers.map((tm) => tm.userId);
+    } else {
+      allowedIds = [];
+    }
+  }
+
   const users = await prisma.user.findMany({
     where: {
       id: { not: user.id },
-      role: { in: ["vendor", "planner", "admin"] },
-      OR: [
-        { name: { contains: q, mode: "insensitive" } },
-        { email: { contains: q, mode: "insensitive" } },
-      ],
+      ...(allowedIds
+        ? { OR: [{ role: { in: ["planner", "admin"] } }, { id: { in: allowedIds } }] }
+        : { role: { in: ["vendor", "planner", "admin"] } }),
+      AND: {
+        OR: [
+          { name: { contains: q, mode: "insensitive" } },
+          { email: { contains: q, mode: "insensitive" } },
+        ],
+      },
     },
     select: { id: true, name: true, role: true },
     take: 10,

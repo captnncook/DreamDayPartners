@@ -11,9 +11,12 @@ interface Props {
   isVendor?: boolean;
   requiredKeys?: string[];
   onToggleRequired?: (key: string, next: boolean) => void;
+  // Toon een onderliggende standaardwaarde (bijv. uit het eigen profiel)
+  // i.p.v. kaal "Niet ingevuld" als een per-bruiloft veld leeg is.
+  defaults?: Record<string, string | undefined>;
 }
 
-export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner, isVendor, requiredKeys = [], onToggleRequired }: Props) {
+export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner, isVendor, requiredKeys = [], onToggleRequired, defaults }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, unknown>>(intakeData ?? {});
 
@@ -84,8 +87,11 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
             );
           }
 
+          const fallback = defaults?.[field.key];
           const display = value == null || value === ""
-            ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>Niet ingevuld</span>
+            ? fallback
+              ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>{fallback}</span>
+              : <span style={{ color: "var(--muted)", fontStyle: "italic" }}>Niet ingevuld</span>
             : typeof value === "boolean"
             ? (value ? "Ja" : "Nee")
             : String(value);
