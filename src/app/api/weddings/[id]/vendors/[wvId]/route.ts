@@ -54,15 +54,22 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   const body = await req.json();
 
-  // Status and amounts: planner/admin only
-  const isPlannerOnlyPatch =
-    body.status !== undefined ||
+  // Status wijzigen blijft aan het team van de bruiloft voorbehouden.
+  if (body.status !== undefined && !["admin", "planner", "team_member"].includes(user.role)) {
+    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
+  }
+
+  // Betaalbedragen: ContractPayment.tsx staat dit UI-zijdig expliciet toe aan
+  // vendor/couple/planner (canEdit = isPlanner || isVendor || isCouple) —
+  // deze check moet daarmee in de pas lopen, anders faalt de leverancier of
+  // het bruidspaar hier stil op een 403 zonder dat de UI dat meldt.
+  const isAmountPatch =
     body.depositAmount !== undefined ||
     body.depositDue !== undefined ||
     body.finalAmount !== undefined ||
     body.finalDue !== undefined;
 
-  if (isPlannerOnlyPatch && !["admin", "planner", "team_member"].includes(user.role)) {
+  if (isAmountPatch && !["admin", "planner", "team_member", "vendor", "couple"].includes(user.role)) {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
 
