@@ -36,10 +36,16 @@ function levenshtein(a: string, b: string): number {
 function isSimilar(input: string, candidate: string): boolean {
   if (!input || !candidate) return false;
   if (input === candidate) return true;
-  // "bloemenwinkelroosutrecht" bevat "bloemenwinkelroos" (en andersom)
-  if (input.length >= 6 && (candidate.includes(input) || input.includes(candidate))) return true;
+  const shorter = Math.min(input.length, candidate.length);
+  const longer = Math.max(input.length, candidate.length);
+  // "bloemenwinkelroosutrecht" bevat "bloemenwinkelroos" (en andersom) —
+  // maar alleen als het kortste woord een substantieel deel van het
+  // langste is. Zonder deze verhouding matchte bijv. een bestaand bedrijf
+  // "FotoG" toevallig als losse lettergreep ergens midden in een veel
+  // langere, verder onverwante naam, wat betekenisloze suggesties gaf.
+  if (shorter >= 6 && shorter / longer >= 0.6 && (candidate.includes(input) || input.includes(candidate))) return true;
   // kleine spelfouten: 1 fout bij korte namen, 2 bij langere
-  const maxDistance = Math.min(input.length, candidate.length) > 8 ? 2 : 1;
+  const maxDistance = shorter > 8 ? 2 : 1;
   return levenshtein(input, candidate) <= maxDistance;
 }
 

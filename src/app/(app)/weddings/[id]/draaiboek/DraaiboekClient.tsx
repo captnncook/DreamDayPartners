@@ -297,11 +297,11 @@ export default function DraaiboekClient({
             <h1 className="font-serif" style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.01em" }}>Draaiboek</h1>
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button onClick={openCalendarLink} className="ddp-btn-secondary">
               <CalendarPlus className="inline w-3.5 h-3.5 mr-1" />Koppel aan agenda
             </button>
-            <button onClick={exportPdf} disabled={exporting || !activeDraaiboekId} className="ddp-btn-secondary">
+            <button onClick={exportPdf} disabled={exporting || !activeDraaiboekId} className="ddp-btn-secondary" style={{ whiteSpace: "nowrap" }}>
               <Printer className="inline w-3.5 h-3.5 mr-1" />{exporting ? "Bezig…" : "Exporteren als pdf"}
             </button>
             {isPlanner && (

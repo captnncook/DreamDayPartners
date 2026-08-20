@@ -304,13 +304,13 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
       {/* Countdown (bruidspaar) */}
       {user.role === "couple" && weddings[0] && (
         <section className="mb-6">
-          <div className="ddp-card text-center" style={{ background: "var(--color-blush-soft)", borderColor: "var(--color-blush)" }}>
+          <div className="ddp-card text-center" style={{ background: "var(--sand)", borderColor: "var(--gold-light)" }}>
             <p className="font-serif text-sm mb-1" style={{ color: "var(--muted)" }}>Nog</p>
-            <div style={{ fontSize: "3.5rem", fontWeight: 700, letterSpacing: "-0.05em", lineHeight: 1, color: "var(--color-charcoal)", marginBottom: "4px" }}>
+            <div style={{ fontSize: "3.5rem", fontWeight: 700, letterSpacing: "-0.05em", lineHeight: 1, color: "var(--gold-deep)", marginBottom: "4px" }}>
               {Math.max(0, weddings[0].days)}
             </div>
             <div className="font-serif" style={{ fontSize: "0.9rem", color: "var(--muted)" }}>dagen tot jullie dream day</div>
-            <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--color-blush)" }}>
+            <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--gold-light)" }}>
               <div className="flex justify-between text-sm mb-2">
                 <span style={{ color: "var(--muted)" }}>Datum</span>
                 <span className="font-medium">{formatDateRange(new Date(weddings[0].date), weddings[0].endDate ? new Date(weddings[0].endDate) : null)}</span>

@@ -128,7 +128,7 @@ export default function RsvpPage() {
                           </button>
                         )}
                       </div>
-                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
                         <select value={g.isChild ? "child" : "adult"} onChange={e => updateGuest(i, { isChild: e.target.value === "child" })}
                           style={{ ...INPUT, width: "auto", flexShrink: 0, cursor: "pointer" }}>
                           <option value="adult">Volwassene</option>
@@ -138,7 +138,7 @@ export default function RsvpPage() {
                           value={g.dietary}
                           onChange={e => updateGuest(i, { dietary: e.target.value })}
                           placeholder="Dieetwensen (optioneel)"
-                          style={{ ...INPUT, flex: 1 }}
+                          style={{ ...INPUT, flex: 1, minWidth: "180px" }}
                         />
                       </div>
                     </div>

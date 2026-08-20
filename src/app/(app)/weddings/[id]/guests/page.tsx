@@ -20,7 +20,7 @@ type Guest = {
 const RSVP_LABELS: Record<string, string> = {
   confirmed: "Bevestigd", declined: "Afgemeld", invited: "Uitgenodigd", no_response: "Geen reactie",
 };
-const SIDE_LABELS: Record<string, string> = { bride: "Bruid", groom: "Bruidegom", both: "Beiden" };
+const SIDE_LABELS: Record<string, string> = { bride: "Partner 1", groom: "Partner 2", both: "Beiden" };
 
 export default function GuestsPage() {
   const { id } = useParams<{ id: string }>();
@@ -158,7 +158,7 @@ export default function GuestsPage() {
       {rsvpToken && (
         <div className="ddp-card mb-6 flex items-center gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold mb-0.5">RSVP-link voor gasten</p>
+            <p className="text-xs font-semibold mb-0.5">Aanmeldlink voor gasten (RSVP)</p>
             <p className="text-xs truncate" style={{ color: "var(--muted)" }}>{typeof window !== "undefined" ? `${window.location.origin}/rsvp/${rsvpToken}` : `/rsvp/${rsvpToken}`}</p>
           </div>
           <button onClick={copyRsvpLink} className="ddp-btn-secondary flex-shrink-0 text-xs">
@@ -205,8 +205,8 @@ export default function GuestsPage() {
               <select value={form.side} onChange={(e) => setForm((p) => ({ ...p, side: e.target.value }))}
                 className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
                 <option value="both">Beiden</option>
-                <option value="bride">Bruid</option>
-                <option value="groom">Bruidegom</option>
+                <option value="bride">Partner 1</option>
+                <option value="groom">Partner 2</option>
               </select>
             </div>
             <div>
@@ -236,11 +236,11 @@ export default function GuestsPage() {
         </select>
       </div>
 
-      <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflowX: "auto" }}>
+      <div className="ddp-scroll-fade ddp-scroll-fade--surface" style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflowX: "auto" }}>
         <table className="w-full" style={{ minWidth: "640px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
-              {["Naam", "Contact", "Kant", "RSVP", "Dieet", ""].map((h) => (
+              {["Naam", "Contact", "Kant", "Aanwezig", "Dieet", ""].map((h) => (
                 <th key={h} className="text-xs font-semibold text-left px-4 py-3" style={{ color: "var(--muted)" }}>{h}</th>
               ))}
             </tr>

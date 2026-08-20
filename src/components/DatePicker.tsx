@@ -104,14 +104,14 @@ export default function DatePicker({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
-            <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))}
+            <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} aria-label="Vorige maand"
               style={{ background: "none", border: "none", cursor: "pointer", padding: "0.25rem", color: "var(--muted)", display: "flex" }}>
               <ChevronLeft style={{ width: "16px", height: "16px" }} />
             </button>
             <span className="font-serif" style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--foreground)", textTransform: "capitalize" }}>
               {MAANDEN[month]} {year}
             </span>
-            <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))}
+            <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} aria-label="Volgende maand"
               style={{ background: "none", border: "none", cursor: "pointer", padding: "0.25rem", color: "var(--muted)", display: "flex" }}>
               <ChevronRight style={{ width: "16px", height: "16px" }} />
             </button>

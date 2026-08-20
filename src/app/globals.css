@@ -957,9 +957,12 @@ h1, h2, h3, h4, h5, h6 {
   .ddp-bottom-nav { display: none; }
 }
 
-/* Ruimte onder de content zodat de onderbalk niets overlapt (mobiel) */
+/* Ruimte onder de content zodat de onderbalk niets overlapt (mobiel).
+   Extra marge t.o.v. de kale hoogte van .ddp-bottom-nav, want content die
+   tot vlak boven de rand komt (bv. laatste rij van een checklist) oogde
+   in de praktijk toch overlappend. */
 .ddp-main-content {
-  padding-bottom: calc(58px + env(safe-area-inset-bottom, 0));
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0));
 }
 
 @media (min-width: 768px) {
@@ -1235,3 +1238,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 .ddp-suggest-row + .ddp-suggest-row { border-top: 1px solid var(--border); }
 .ddp-suggest-row:hover { background: var(--sand); }
+
+/* Zichtbare aanwijzing dat horizontaal scrollende content (tabs, brede
+   tabellen) verder gaat dan het scherm — anders lijkt het afgekapt i.p.v.
+   scrollbaar, vooral op mobiel waar de scrollbar zelf verborgen is. */
+.ddp-scroll-fade {
+  position: relative;
+}
+.ddp-scroll-fade::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  pointer-events: none;
+  background: linear-gradient(to right, transparent, var(--background));
+}
+.ddp-scroll-fade.ddp-scroll-fade--surface::after {
+  background: linear-gradient(to right, transparent, var(--surface));
+}

@@ -70,7 +70,14 @@ export default function GalleryDelivery({ intakeData, onUpdate, isVendor, isPlan
             <div className="flex justify-between text-sm" style={{ padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
               <span style={{ color: "var(--muted)" }}>Verwachte leverdatum</span>
               <span style={{ fontWeight: 600 }}>
-                {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(deliveryDate))}
+                {(() => {
+                  const parsed = new Date(deliveryDate);
+                  // Een ongeldige datumwaarde mag de rest van het scherm niet
+                  // laten crashen of het veld stil laten verdwijnen — toon dan
+                  // gewoon de ruwe waarde terug.
+                  if (Number.isNaN(parsed.getTime())) return deliveryDate;
+                  return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(parsed);
+                })()}
               </span>
             </div>
           )}
