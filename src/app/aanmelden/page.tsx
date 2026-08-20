@@ -36,34 +36,81 @@ export default function AanmeldenPage() {
   return <Suspense><AanmeldenForm /></Suspense>;
 }
 
+// Bewaart de voortgang van de aanmeldwizard over een page refresh heen —
+// wisselen naar de mailbox voor de verificatiecode en terugkomen zette
+// anders alles terug naar stap 1, ook als de e-mail server-side al
+// bevestigd was. Bewust geen wachtwoordvelden hierin (nooit onversleuteld
+// in sessionStorage zetten).
+const AANMELDEN_STORAGE_KEY = "dreamday-aanmelden-progress";
+
+type StoredProgress = {
+  account: Account;
+  formStep: number;
+  authStep: AuthStep;
+  pendingId: string;
+  verifiedToken: string;
+  couple: { partner1: string; partner2: string; date: string; endDate: string; venue: string; guestCount: string; email: string };
+  multiDay: boolean;
+  vendor: { businessName: string; category: string; contactPerson: string; phone: string; website: string; city: string; email: string };
+};
+
+function loadStoredProgress(): Partial<StoredProgress> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = sessionStorage.getItem(AANMELDEN_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
 function AanmeldenForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [account, setAccount] = useState<Account>(null);
-  const [formStep, setFormStep] = useState(0); // which data-entry step (0 = choose)
-  const [authStep, setAuthStep] = useState<AuthStep>("form"); // what phase we're in
+  const restored = useRef(loadStoredProgress()).current;
+  const [account, setAccount] = useState<Account>(restored.account ?? null);
+  const [formStep, setFormStep] = useState(restored.formStep ?? 0); // which data-entry step (0 = choose)
+  const [authStep, setAuthStep] = useState<AuthStep>(restored.authStep ?? "form"); // what phase we're in
   const [error, setError] = useState("");
 
   // Pending registration state
-  const [pendingId, setPendingId] = useState("");
-  const [verifiedToken, setVerifiedToken] = useState("");
+  const [pendingId, setPendingId] = useState(restored.pendingId ?? "");
+  const [verifiedToken, setVerifiedToken] = useState(restored.verifiedToken ?? "");
   const [code, setCode] = useState("");
   const [sendingCode, setSendingCode] = useState(false);
   const [verifyingCode, setVerifyingCode] = useState(false);
 
-  // Password state
+  // Password state — nooit bewaard over een refresh heen, moet opnieuw ingevuld worden.
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [couple, setCouple] = useState({
+  const [couple, setCouple] = useState(restored.couple ?? {
     partner1: "", partner2: "", date: "", endDate: "", venue: "", guestCount: "", email: "",
   });
-  const [multiDay, setMultiDay] = useState(false);
-  const [vendor, setVendor] = useState({
+  const [multiDay, setMultiDay] = useState(restored.multiDay ?? false);
+  const [vendor, setVendor] = useState(restored.vendor ?? {
     businessName: "", category: "", contactPerson: "", phone: "", website: "", city: "", email: "",
   });
+
+  // Voortgang bewaren bij elke relevante wijziging. authStep "password"
+  // slaan we op als "choose-auth" op — het wachtwoord zelf gaat nooit mee,
+  // dus na een refresh moet de gebruiker eerst weer "Account aanmaken met
+  // wachtwoord" kiezen i.p.v. op een leeg wachtwoordscherm te landen.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (account === null && formStep === 0) {
+      sessionStorage.removeItem(AANMELDEN_STORAGE_KEY);
+      return;
+    }
+    const toStore: StoredProgress = {
+      account, formStep,
+      authStep: authStep === "password" ? "choose-auth" : authStep,
+      pendingId, verifiedToken, couple, multiDay, vendor,
+    };
+    sessionStorage.setItem(AANMELDEN_STORAGE_KEY, JSON.stringify(toStore));
+  }, [account, formStep, authStep, pendingId, verifiedToken, couple, multiDay, vendor]);
 
   // Duplicaat-check op bedrijfsnaam (fuzzy): null = nog niet gecheckt
   type NameMatch = { id: string; name: string; city: string | null; category: string; hasAccount: boolean };
@@ -301,6 +348,7 @@ function AanmeldenForm() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Fout bij aanmaken"); return; }
+      sessionStorage.removeItem(AANMELDEN_STORAGE_KEY);
       router.push(data.redirect ?? "/dashboard");
       router.refresh();
     } finally {
