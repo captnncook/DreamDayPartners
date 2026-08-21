@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { sendMail, newDirectMessageEmail } from "@/lib/mail";
+import { getOwnVendorId } from "@/lib/vendorAuth";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -47,6 +48,37 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   const { content } = await req.json();
   if (!content?.trim()) return NextResponse.json({ error: "Leeg bericht" }, { status: 400 });
+
+  // Reactietijd-badge in de catalogus ("reageert meestal binnen...") komt
+  // van een rollend gemiddelde: als dit de leverancier's eerste reactie is
+  // op een nog onbeantwoord inkomend bericht, meten we hoe lang dat duurde.
+  if (user.role === "vendor") {
+    const vendorId = await getOwnVendorId(user.id);
+    if (vendorId) {
+      const lastIncoming = await prisma.directMessage.findFirst({
+        where: { conversationId: id, senderId: { not: user.id } },
+        orderBy: { createdAt: "desc" },
+      });
+      const lastOwn = await prisma.directMessage.findFirst({
+        where: { conversationId: id, senderId: user.id },
+        orderBy: { createdAt: "desc" },
+      });
+      if (lastIncoming && (!lastOwn || lastOwn.createdAt < lastIncoming.createdAt)) {
+        const elapsedMinutes = Math.max(0, Math.round((Date.now() - lastIncoming.createdAt.getTime()) / 60000));
+        const vendor = await prisma.vendor.findUnique({ where: { id: vendorId }, select: { avgResponseMinutes: true, responseSampleCount: true } });
+        if (vendor) {
+          const prevCount = vendor.responseSampleCount;
+          const prevAvg = vendor.avgResponseMinutes ?? elapsedMinutes;
+          const cappedCount = Math.min(prevCount, 49); // laat recente reacties blijven meetellen i.p.v. steeds trager convergeren
+          const nextAvg = Math.round((prevAvg * cappedCount + elapsedMinutes) / (cappedCount + 1));
+          await prisma.vendor.update({
+            where: { id: vendorId },
+            data: { avgResponseMinutes: nextAvg, responseSampleCount: prevCount + 1 },
+          });
+        }
+      }
+    }
+  }
 
   const [message] = await prisma.$transaction([
     prisma.directMessage.create({

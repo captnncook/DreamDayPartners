@@ -43,7 +43,18 @@ type Vendor = {
   longitude?: number | null;
   priceFrom?: number | null;
   specializations?: string[];
+  avgResponseMinutes?: number | null;
 };
+
+// Geen garantie op beschikbaarheid (die kan per moment wijzigen), wel een
+// indicatie hoe snel deze leverancier normaal reageert op een eerste bericht.
+function responseTimeLabel(minutes: number): string {
+  if (minutes < 60) return "Reageert meestal binnen een uur";
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `Reageert meestal binnen ${hours} uur`;
+  const days = Math.round(hours / 24);
+  return `Reageert meestal binnen ${days} ${days === 1 ? "dag" : "dagen"}`;
+}
 
 function LeveranciersContent() {
   const searchParams = useSearchParams();
@@ -313,6 +324,11 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
         {vendor.isPremium && vendor.specializations && vendor.specializations.length > 0 && (
           <div style={{ marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--gold-deep)" }}>
             {vendor.specializations.join(" · ")}
+          </div>
+        )}
+        {vendor.avgResponseMinutes != null && (
+          <div style={{ marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--muted)" }}>
+            {responseTimeLabel(vendor.avgResponseMinutes)}
           </div>
         )}
       </div>

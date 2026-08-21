@@ -165,6 +165,12 @@ model Vendor {
   disabledModules String[]
   extraModules    String[]
 
+  // Rollend gemiddelde reactietijd (in minuten) op een eerste DM-bericht van
+  // een bruidspaar — geen garantie op beschikbaarheid (die kan per moment
+  // wijzigen), wel een indicatie hoe snel deze leverancier normaal reageert.
+  avgResponseMinutes  Int?
+  responseSampleCount Int  @default(0)
+
   // Gezet wanneer de leverancier zijn account verwijderde terwijl hij nog
   // aan geplande bruiloften meewerkte: profiel verdwijnt uit de catalogus,
   // maar boekingen/draaiboek-items van die bruiloften blijven intact.

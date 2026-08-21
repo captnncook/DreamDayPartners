@@ -17,6 +17,7 @@ const VENDOR_LIST_SELECT = {
   longitude: true,
   priceFrom: true,
   specializations: true,
+  avgResponseMinutes: true,
 } satisfies Prisma.VendorSelect;
 
 type VendorListItem = Prisma.VendorGetPayload<{ select: typeof VENDOR_LIST_SELECT }>;
