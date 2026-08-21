@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, X } from "lucide-react";
+import { getVendorTypeConfig } from "@/lib/vendorTypeConfigs";
 
 const SLOTS = [
   { category: "weddingplanner", label: "Weddingplanner" },
@@ -192,6 +193,29 @@ export default function DreamTeamPage() {
           ))}
         </div>
       )}
+
+      {/* Leveranciers met een categorie buiten de vaste schild-set (bijv.
+          ceremoniespreker, of "overig") verdwenen anders volledig uit dit
+          overzicht ondanks dat ze wél gekoppeld zijn — hier alsnog tonen
+          i.p.v. stil negeren. */}
+      {!loading && (() => {
+        const slotCategories = new Set(SLOTS.map(s => s.category));
+        const extra = team.filter(m => !slotCategories.has(m.category));
+        if (extra.length === 0) return null;
+        return (
+          <div style={{ marginTop: "3rem" }}>
+            <p className="ddp-section-label" style={{ marginBottom: "0.5rem" }}>Overige gekoppelde leveranciers</p>
+            <div>
+              {extra.map(m => (
+                <Link key={m.vendorId} href={weddingId ? `/weddings/${weddingId}/vendors/${m.wvId}` : `/leveranciers/${m.vendorId}`} className="dash-row" style={{ textDecoration: "none", justifyContent: "space-between" }}>
+                  <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{m.name}</span>
+                  <span style={{ color: "var(--muted)", fontSize: "0.8125rem" }}>{getVendorTypeConfig(m.category).label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Confirmation dialog */}
       {confirmMember && (

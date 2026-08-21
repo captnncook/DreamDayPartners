@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   );
 
   if (pending.type === "couple") {
-    const { partner1, partner2, date, venue, budget, guestCount } = data;
+    const { partner1, partner2, date, endDate, venue, budget, guestCount } = data;
     const coupleName = partner1 && partner2 ? `${partner1} & ${partner2}` : partner1 || "Bruidspaar";
 
     const user = await prisma.user.create({
@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
         rsvpToken,
         title,
         date: weddingDate,
+        endDate: endDate ? new Date(endDate) : null,
         venue: venue || null,
         coupleEmail1: pending.email,
         coupleEmail2: email2,

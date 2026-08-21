@@ -20,7 +20,10 @@ export async function POST(req: NextRequest) {
 
   const pending = rows[0];
   if (!pending) {
-    return NextResponse.json({ error: "Aanvraag niet gevonden. Start opnieuw." }, { status: 404 });
+    // Kan gebeuren als deze aanvraag al eerder succesvol is afgerond (account
+    // bestaat al) en de client per ongeluk nogmaals dezelfde stap uitvoert —
+    // niet meteen alarmerend als "kapot", vandaar de zachtere tekst.
+    return NextResponse.json({ error: "Deze aanmelding is al verwerkt of verlopen. Probeer in te loggen, of start hieronder opnieuw." }, { status: 404 });
   }
   if (pending.verified) {
     return NextResponse.json({ error: "Al geverifieerd." }, { status: 409 });
