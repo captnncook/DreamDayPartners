@@ -57,8 +57,8 @@ export default function DatePicker({
     function onClick(e: MouseEvent) {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
     }
-    if (open) document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    if (open) document.addEventListener("pointerdown", onClick, true);
+    return () => document.removeEventListener("pointerdown", onClick, true);
   }, [open]);
 
   const year = viewDate.getFullYear();
