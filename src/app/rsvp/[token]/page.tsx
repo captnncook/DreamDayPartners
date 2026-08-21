@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Check, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 type WeddingInfo = { id: string; title: string; date: string; venue?: string | null };
 type GuestRow = { name: string; isChild: boolean; dietary: string };
@@ -57,7 +57,7 @@ export default function RsvpPage() {
 
   const INPUT: React.CSSProperties = {
     width: "100%", padding: "0.625rem 0.875rem", border: "1px solid var(--border)",
-    borderRadius: "10px", fontSize: "0.9rem", outline: "none", background: "white", color: "var(--foreground)",
+    borderRadius: "10px", fontSize: "0.9rem", background: "white", color: "var(--foreground)",
     boxSizing: "border-box",
   };
 
@@ -85,9 +85,6 @@ export default function RsvpPage() {
         <div style={{ padding: "2rem" }}>
           {submitted ? (
             <div style={{ padding: "1.5rem 0", textAlign: "center" }}>
-              <div style={{ width: "3rem", height: "3rem", borderRadius: "50%", background: "var(--sand)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
-                <Check style={{ width: "1.5rem", height: "1.5rem", color: "var(--gold-deep)" }} />
-              </div>
               <h2 className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--foreground)" }}>Bedankt!</h2>
               <p style={{ color: "var(--muted)", marginTop: "0.5rem", fontSize: "0.9rem" }}>
                 {email ? "Je ontvangt zo een bevestiging per e-mail." : "Je reactie is ontvangen."}
@@ -96,14 +93,14 @@ export default function RsvpPage() {
           ) : (
             <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
               <div style={{ marginBottom: "1rem" }}>
-                <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>E-mailadres</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                <label htmlFor="rsvp-email" style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>E-mailadres</label>
+                <input id="rsvp-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
                   placeholder="voor een bevestiging per mail" style={INPUT} />
               </div>
 
               <div style={{ marginBottom: "1.25rem" }}>
-                <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>Aanwezigheid</label>
-                <select value={rsvpStatus} onChange={e => setRsvpStatus(e.target.value)} style={{ ...INPUT, cursor: "pointer" }}>
+                <label htmlFor="rsvp-status" style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>Aanwezigheid</label>
+                <select id="rsvp-status" value={rsvpStatus} onChange={e => setRsvpStatus(e.target.value)} style={{ ...INPUT, cursor: "pointer" }}>
                   <option value="confirmed">Ik kom!</option>
                   <option value="declined">Ik kan helaas niet</option>
                 </select>
@@ -119,6 +116,7 @@ export default function RsvpPage() {
                           value={g.name}
                           onChange={e => updateGuest(i, { name: e.target.value })}
                           placeholder={i === 0 ? "Jouw naam" : "Naam"}
+                          aria-label={i === 0 ? "Jouw naam" : `Naam gast ${i + 1}`}
                           style={{ ...INPUT, flex: 1 }}
                         />
                         {guests.length > 1 && (
@@ -130,6 +128,7 @@ export default function RsvpPage() {
                       </div>
                       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
                         <select value={g.isChild ? "child" : "adult"} onChange={e => updateGuest(i, { isChild: e.target.value === "child" })}
+                          aria-label={`Volwassene of kind, gast ${i + 1}`}
                           style={{ ...INPUT, width: "auto", flexShrink: 0, cursor: "pointer" }}>
                           <option value="adult">Volwassene</option>
                           <option value="child">Kind</option>
@@ -138,6 +137,7 @@ export default function RsvpPage() {
                           value={g.dietary}
                           onChange={e => updateGuest(i, { dietary: e.target.value })}
                           placeholder="Dieetwensen (optioneel)"
+                          aria-label={`Dieetwensen, gast ${i + 1}`}
                           style={{ ...INPUT, flex: 1, minWidth: "180px" }}
                         />
                       </div>

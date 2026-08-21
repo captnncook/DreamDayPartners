@@ -270,10 +270,11 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
           value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
           placeholder="Bericht…" rows={1}
-          style={{ flex: 1, padding: "0.625rem 0.875rem", borderRadius: "1.25rem", border: "1px solid var(--border)", fontSize: "0.9375rem", resize: "none", background: "var(--accent)", color: "var(--foreground)", outline: "none", lineHeight: 1.4, maxHeight: "120px", overflowY: "auto" }}
+          aria-label="Bericht"
+          style={{ flex: 1, padding: "0.625rem 0.875rem", borderRadius: "1.25rem", border: "1px solid var(--border)", fontSize: "0.9375rem", resize: "none", background: "var(--accent)", color: "var(--foreground)", lineHeight: 1.4, maxHeight: "120px", overflowY: "auto" }}
           onInput={e => { const el = e.currentTarget; el.style.height = "auto"; el.style.height = `${el.scrollHeight}px`; }}
         />
-        <button onClick={send} disabled={!input.trim() || sending} style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: input.trim() ? "var(--primary)" : "var(--border)", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s", flexShrink: 0 }}>
+        <button onClick={send} disabled={!input.trim() || sending} aria-label="Verstuur bericht" style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: input.trim() ? "var(--primary)" : "var(--border)", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s", flexShrink: 0 }}>
           <Send className="w-4 h-4" style={{ color: "white" }} />
         </button>
       </div>

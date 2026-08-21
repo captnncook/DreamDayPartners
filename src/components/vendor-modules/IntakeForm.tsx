@@ -127,6 +127,7 @@ export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, is
                     type="button"
                     onClick={() => onToggleRequired(field.key, !isRequired)}
                     title={isRequired ? "Zet niet meer als taak bij bruidspaar/planner" : "Zet als taak bij bruidspaar/planner"}
+                    aria-label={isRequired ? `${field.label}: niet meer als taak zetten` : `${field.label}: als taak zetten bij bruidspaar/planner`}
                     style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}
                   >
                     <Flag className="w-3.5 h-3.5" style={{ color: isRequired ? "var(--gold-deep)" : "var(--muted-light)", fill: isRequired ? "var(--gold-deep)" : "none" }} />

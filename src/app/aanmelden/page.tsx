@@ -737,6 +737,7 @@ function AanmeldenForm() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(s => !s)}
+                      aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
                       className="absolute right-3 top-1/2 -translate-y-1/2"
                       style={{ color: "var(--muted)" }}
                     >

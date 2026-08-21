@@ -569,7 +569,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
   {
     type: "bakker",
     label: "Bruidstaart & Bakker",
-    modules: ["portieCalculator", "moodboardUploader", "timelinePlanner"],
+    modules: ["portieCalculator", "moodboardUploader", "timelinePlanner", "guestDataPanel"],
     readsGuestData: ["counts", "allergies"],
     intakeFields: [
       { key: "smaak", label: "Smaak(combinaties)", type: "text", placeholder: "Vanille/framboos, chocolade/salted caramel..." },
