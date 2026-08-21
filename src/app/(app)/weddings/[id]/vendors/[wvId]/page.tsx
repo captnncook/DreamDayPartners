@@ -92,6 +92,7 @@ export default async function VendorBookingPage({
       if (venueInfo.venueFacilities.includes("Water aanwezig") && !currentIntake["water-venue"]) autoFill["water-venue"] = true;
       if (venueInfo.venueFacilities.includes("Koeling aanwezig") && !currentIntake["koeling-venue"]) autoFill["koeling-venue"] = true;
       if (venueInfo.setupTime && !currentIntake["toegang-venue"]) autoFill["toegang-venue"] = venueInfo.setupTime;
+      if (venueInfo.badWeatherPlan && !currentIntake["weerplan-venue"]) autoFill["weerplan-venue"] = venueInfo.badWeatherPlan;
 
       if (Object.keys(autoFill).length > 0) {
         const merged = { ...currentIntake, ...autoFill };

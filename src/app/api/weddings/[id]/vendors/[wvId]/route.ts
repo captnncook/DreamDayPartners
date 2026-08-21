@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { authorizeWeddingVendor } from "@/lib/vendorAuth";
@@ -49,6 +50,33 @@ export async function GET(_req: NextRequest, { params }: Params) {
     where: { weddingId },
     select: { id: true, name: true, dietary: true, rsvpStatus: true, side: true },
   });
+
+  // Venue-gegevens (water/koeling/toegangstijd/weerplan) eenmalig invullen
+  // vanuit de gekoppelde trouwlocatie, zodat andere leveranciers dit niet
+  // los hoeven na te vragen — zelfde mechanisme als de losse /vendors/[wvId]
+  // paginaroute, hier ook toegepast omdat dit de route is die het inline
+  // dashboard op de hoofd-bruiloftspagina daadwerkelijk gebruikt.
+  if (wv && wv.vendor.category !== "trouwlocatie") {
+    const venueBooking = await prisma.weddingVendor.findFirst({
+      where: { weddingId, vendor: { category: "trouwlocatie" } },
+      include: { vendor: { select: { venueFacilities: true, setupTime: true, badWeatherPlan: true } } },
+    });
+    if (venueBooking) {
+      const currentIntake = (wv.intakeData ?? {}) as Record<string, unknown>;
+      const autoFill: Record<string, unknown> = {};
+      if (venueBooking.vendor.venueFacilities.includes("Water aanwezig") && !currentIntake["water-venue"]) autoFill["water-venue"] = true;
+      if (venueBooking.vendor.venueFacilities.includes("Koeling aanwezig") && !currentIntake["koeling-venue"]) autoFill["koeling-venue"] = true;
+      if (venueBooking.vendor.setupTime && !currentIntake["toegang-venue"]) autoFill["toegang-venue"] = venueBooking.vendor.setupTime;
+      if (venueBooking.vendor.badWeatherPlan && !currentIntake["weerplan-venue"]) autoFill["weerplan-venue"] = venueBooking.vendor.badWeatherPlan;
+
+      if (Object.keys(autoFill).length > 0) {
+        const merged = { ...currentIntake, ...autoFill };
+        await prisma.weddingVendor.update({ where: { id: wvId }, data: { intakeData: merged as Prisma.InputJsonValue } });
+        wv.intakeData = merged as Prisma.JsonValue;
+        await syncIntakeTasks(wvId);
+      }
+    }
+  }
 
   return NextResponse.json({
     booking: { ...wv, draaiboekItems: mergedItems },

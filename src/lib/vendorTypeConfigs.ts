@@ -203,12 +203,14 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "ceremoniescript", label: "Ceremoniescript (concept)" },
       { key: "definitieve-tekst", label: "Definitieve tekst", approvalRequired: true },
     ],
+    logisticsFields: [
+      { key: "weerplan-venue", label: "Weerplan / binnen-buiten locatie", type: "longtext" },
+    ],
     timelineTemplate: [
       { key: "repetitie", label: "Repetitie", phase: "setup", defaultDuration: 30 },
       { key: "start-ceremonie", label: "Start ceremonie", phase: "perform", defaultDuration: 5 },
       { key: "duur-ceremonie", label: "Duur ceremonie", phase: "perform", defaultDuration: 30 },
     ],
-    logisticsFields: [],
   },
 
   // ── Beeld & Video ────────────────────────────────────────
@@ -508,6 +510,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     ],
     logisticsFields: [
       { key: "toegang-venue", label: "Toegangstijd venue voor opbouw", type: "time" },
+      { key: "weerplan-venue", label: "Weerplan van de locatie (indien buiten)", type: "longtext" },
       { key: "huurmateriaal-retour", label: "Huurmateriaal retour datum", type: "text" },
       { key: "stroomvereiste", label: "Stroomvereiste (Watt)", type: "number" },
       { key: "aansluitpunten", label: "Aantal benodigde aansluitpunten", type: "number" },
