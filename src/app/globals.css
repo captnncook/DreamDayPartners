@@ -80,6 +80,35 @@
   --transition-fast: 140ms var(--ease-out);
   --transition-base: 180ms var(--ease-out);
   --transition-slow: 0.35s var(--ease-out);
+
+  /* ── Type-schaal ──
+     Vaste stappen i.p.v. losse fontSize-waarden per component (was tot nu
+     toe overal ad hoc ingevuld). Elke stap heeft een bijpassende leading —
+     kies de dichtstbijzijnde stap, verzin geen tussenmaten. */
+  --text-xs:   0.75rem;   --leading-xs:   1.4;
+  --text-sm:   0.8125rem; --leading-sm:   1.5;
+  --text-base: 0.9375rem; --leading-base: 1.6;
+  --text-md:   1.0625rem; --leading-md:   1.5;
+  --text-lg:   1.25rem;   --leading-lg:   1.35;
+  --text-xl:   1.5rem;    --leading-xl:   1.25;
+  --text-2xl:  1.875rem;  --leading-2xl:  1.15;
+  --text-3xl:  2.375rem;  --leading-3xl:  1.1;
+
+  /* ── Spacing-schaal ──
+     8pt-grid (met een 4px halve stap voor krappe gevallen zoals icoon-gaps).
+     Gebruik deze i.p.v. losse rem/px-waarden in nieuwe/bijgewerkte componenten. */
+  --space-1:  0.25rem;  /* 4px  */
+  --space-2:  0.5rem;   /* 8px  */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.5rem;   /* 24px */
+  --space-6:  2rem;     /* 32px */
+  --space-7:  3rem;     /* 48px */
+  --space-8:  4rem;     /* 64px */
+
+  /* Minimale aanraakgrootte voor icoon-only knoppen (Apple's 44pt-richtlijn) —
+     de knop mag er kleiner uitzien, maar de klikbare/tikbare zone niet. */
+  --tap-target-min: 44px;
 }
 
 @theme inline {
@@ -121,6 +150,28 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.03em;
   line-height: 1.1;
   font-weight: 700;
+}
+
+/* ── Focus & motion-discipline ──
+   Structurele, site-brede regel i.p.v. per-pagina losse outline:none zonder
+   vervanging (precies de bug die de RSVP-pagina had — toetsenbordgebruikers
+   zagen nergens waar ze waren). Alle interactieve elementen krijgen dit,
+   ook als een specifieke component zijn eigen :focus-stijl heeft (die wint
+   dan gewoon door cascade-specificiteit; dit is het vangnet). */
+:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 2px;
+}
+
+/* Respecteer de voorkeur voor minder beweging i.p.v. alle transities/animaties
+   te forceren — motion is optioneel, nooit de enige drager van informatie. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .font-serif {

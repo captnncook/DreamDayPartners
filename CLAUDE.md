@@ -32,6 +32,33 @@ Het volledige palet en de componentklassen staan in `src/app/globals.css`. Ident
 - Bruiloft-hero's (`.dash-hero`): toon elk gegeven maar **één keer** — naam (serif), datum + locatie op één regel eronder, aftellen rechts. Geen aparte datumring/medaillon meer (verwijderd — was redundant met de datum in de regel eronder).
 - Zoekvelden: gebruik `.ddp-search` wrapper (icoon + input) — nooit los een icoon absoluut positioneren over een `.ddp-input`, en nooit Tailwind `pl-*` combineren met `.ddp-input` (die overschrijft de padding).
 
+### Discipline-laag (Apple HIG-geïnspireerd, eigen vocabulaire)
+
+Geen visuele Apple-stijl (geen materialen/glassmorphism, geen tab bars, geen
+kleur-cirkel-iconen — dat botst met de verboden patronen hierboven), wel
+dezelfde onderliggende striktheid: vaste schalen i.p.v. losse ad-hoc
+waarden per component.
+
+- **Typografie**: gebruik `--text-xs` t/m `--text-3xl` (met bijpassende
+  `--leading-*`) i.p.v. losse `fontSize`-waarden. Kies de dichtstbijzijnde
+  stap, verzin geen tussenmaten.
+- **Spacing**: gebruik `--space-1` t/m `--space-8` (8pt-grid, `--space-1` =
+  4px halve stap) i.p.v. losse rem/px-getallen.
+- **Aanraakgrootte**: icoon-only knoppen minstens `--tap-target-min` (44px)
+  klikbaar/tikbaar gebied, ook als het icoon zelf kleiner oogt.
+- **Focus**: elk interactief element moet zichtbaar focusbaar zijn. De
+  globale `:focus-visible`-regel in `globals.css` is het vangnet — voeg
+  nooit `outline: none` toe zonder een eigen, minstens even zichtbare
+  vervanging (zie `.ddp-input:focus` als voorbeeld).
+- **Motion**: gebruik de bestaande `--transition-fast/base/slow` +
+  `--ease-out`/`--ease-in-out` tokens, nooit een losse duur/curve
+  verzinnen. De `prefers-reduced-motion`-regel in `globals.css` vangt dit
+  automatisch af — voeg geen animatie toe die als enige drager van
+  belangrijke informatie dient.
+- **Nieuwe componenten/pagina's**: gebruik deze tokens; bestaande code mag
+  bij een toch al geplande wijziging meegenomen worden, maar dit is geen
+  losstaande refactor-taak.
+
 ### Responsiviteit — geen uitzonderingen
 
 - Elke pagina moet kloppen van 360px (telefoon) tot desktop. Media queries in `globals.css` bij de componentklasse, niet inline (inline styles kunnen geen breakpoints).
