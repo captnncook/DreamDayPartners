@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Flag } from "lucide-react";
 import type { Field } from "@/lib/vendorTypeConfigs";
+import AddToCalendarButton from "@/components/AddToCalendarButton";
 
 interface Props {
   weddingId: string;
@@ -133,7 +134,12 @@ export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, is
                 )}
                 <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}>{field.label}</span>
               </span>
-              <span style={{ fontSize: "0.875rem", color: "var(--charcoal)", textAlign: "right" }}>{display}</span>
+              <span style={{ fontSize: "0.875rem", color: "var(--charcoal)", textAlign: "right", display: "flex", alignItems: "center", gap: "0.625rem", justifyContent: "flex-end" }}>
+                {display}
+                {field.type === "date" && typeof value === "string" && value && (
+                  <AddToCalendarButton title={field.label} date={value} />
+                )}
+              </span>
             </div>
           );
         })}
