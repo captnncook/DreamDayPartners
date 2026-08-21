@@ -5,6 +5,7 @@ import { generateWeddingCode, generateRsvpSlug } from "@/lib/wedding-id";
 import { hash } from "bcryptjs";
 import { sendMail, claimWelcomeEmail } from "@/lib/mail";
 import { geocodeCity } from "@/lib/geocode";
+import { seedStarterTasks } from "@/lib/starterTasks";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -95,6 +96,8 @@ export async function POST(req: NextRequest) {
     await prisma.budget.create({
       data: { weddingId: wedding.id, totalAmount: budget ? parseFloat(String(budget)) : 0 },
     });
+
+    await seedStarterTasks(wedding.id);
 
     if (guestCount) { /* stored in wedding notes if needed */ }
 
