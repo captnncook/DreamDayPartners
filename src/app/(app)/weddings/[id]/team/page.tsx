@@ -31,6 +31,13 @@ export default function TeamPage() {
   const [access, setAccess] = useState<AccessMode>("full");
   const [ownUserId, setOwnUserId] = useState<string | null>(null);
   const [startingWith, setStartingWith] = useState<string | null>(null);
+  const [canInvite, setCanInvite] = useState(false);
+  const [invites, setInvites] = useState<{ id: string; email: string; acceptedAt: string | null }[]>([]);
+  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteBusy, setInviteBusy] = useState(false);
+  const [inviteError, setInviteError] = useState("");
+  const [inviteSuccess, setInviteSuccess] = useState("");
 
   const load = useCallback(async () => {
     const [wvRes, wRes, meRes] = await Promise.all([
@@ -53,6 +60,10 @@ export default function TeamPage() {
       const ownBooking = vendors.find((wv) => wv.vendor.userId === me.id);
       setAccess(ownBooking?.status === "lead" ? "discovery" : "none");
     }
+    setCanInvite(!!me && ["couple", "planner", "admin"].includes(me.role));
+    if (me && ["couple", "planner", "admin"].includes(me.role)) {
+      fetch(`/api/weddings/${id}/team-invites`).then(r => r.json()).then(d => setInvites(d.invites ?? []));
+    }
     // Derive planner/couple members from wedding data
     const w = wData.wedding;
     if (w) {
@@ -67,6 +78,40 @@ export default function TeamPage() {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  async function handleInvite(e: React.FormEvent) {
+    e.preventDefault();
+    setInviteBusy(true);
+    setInviteError("");
+    setInviteSuccess("");
+    try {
+      const res = await fetch(`/api/weddings/${id}/team-invites`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: inviteEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setInviteError(data.error ?? "Uitnodigen mislukt"); return; }
+      setInviteSuccess(data.directlyLinked
+        ? "Deze persoon had al een account en is direct als teamlid gekoppeld."
+        : `Uitnodiging verstuurd naar ${inviteEmail}.`
+      );
+      setInviteEmail("");
+      setShowInviteForm(false);
+      load();
+    } finally {
+      setInviteBusy(false);
+    }
+  }
+
+  async function cancelInvite(inviteId: string) {
+    await fetch(`/api/weddings/${id}/team-invites`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inviteId }),
+    });
+    setInvites(prev => prev.filter(i => i.id !== inviteId));
+  }
 
   async function startConversation(vendorUserId: string) {
     if (startingWith) return;
@@ -211,9 +256,52 @@ export default function TeamPage() {
       )}
 
       {/* Planner / couple members — niet relevant voor de discovery-weergave van leveranciers */}
-      {access !== "discovery" && members.length > 0 && (
+      {access !== "discovery" && (members.length > 0 || canInvite) && (
         <div className="mt-8">
-          <h2 className="dash-section-title mb-3">Planningsteam</h2>
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h2 className="dash-section-title" style={{ marginBottom: 0 }}>Planningsteam</h2>
+            {canInvite && (
+              <button onClick={() => setShowInviteForm(v => !v)} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem", padding: "0.375rem 0.875rem" }}>
+                + Teamlid uitnodigen
+              </button>
+            )}
+          </div>
+
+          {canInvite && showInviteForm && (
+            <form onSubmit={handleInvite} className="ddp-card mb-4" style={{ padding: "1.25rem", display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "flex-end" }}>
+              <div style={{ flex: 1, minWidth: "220px" }}>
+                <label style={{ fontSize: "0.75rem", fontWeight: 600, display: "block", marginBottom: "0.3rem" }}>
+                  E-mailadres van het teamlid
+                </label>
+                <input
+                  type="email" required value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}
+                  placeholder="bijv. moeder@email.nl" className="ddp-input"
+                />
+              </div>
+              <button type="submit" disabled={inviteBusy} className="ddp-btn-primary" style={{ flexShrink: 0 }}>
+                {inviteBusy ? "Versturen…" : "Uitnodiging versturen"}
+              </button>
+              {inviteError && <p style={{ fontSize: "0.8125rem", color: "var(--danger, #b3261e)", width: "100%", margin: 0 }}>{inviteError}</p>}
+            </form>
+          )}
+          {inviteSuccess && !showInviteForm && (
+            <p style={{ fontSize: "0.8125rem", color: "var(--gold-deep)", marginBottom: "1rem" }}>{inviteSuccess}</p>
+          )}
+
+          {canInvite && invites.filter(i => !i.acceptedAt).length > 0 && (
+            <div className="mb-4">
+              <p className="ddp-section-label" style={{ marginBottom: "0.375rem" }}>Openstaande uitnodigingen</p>
+              {invites.filter(i => !i.acceptedAt).map(i => (
+                <div key={i.id} className="dash-row" style={{ justifyContent: "space-between" }}>
+                  <span>{i.email}</span>
+                  <button onClick={() => cancelInvite(i.id)} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "0.75rem" }}>
+                    Intrekken
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {members.map(m => {
               const roleLabel = m.role === "couple" ? "Bruidspaar" : m.role === "planner" ? "Trouwplanner" : m.role === "admin" ? "Beheerder" : "Teamlid";

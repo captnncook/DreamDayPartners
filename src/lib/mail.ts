@@ -275,6 +275,21 @@ export function coupleWeddingInviteEmail(vendorName: string, weddingTitle: strin
   };
 }
 
+export function teamInviteEmail(invitedByName: string, weddingTitle: string, acceptUrl: string): { subject: string; html: string } {
+  return {
+    subject: `${invitedByName} nodigt je uit om mee te helpen op DreamDay`,
+    html: emailLayout({
+      heading: "Je bent uitgenodigd als teamlid",
+      body: `
+        <p style="margin:0 0 12px;">${invitedByName} wil dat je meekijkt en meebeslist bij <strong>${weddingTitle}</strong> — met je eigen account, los van hun inloggegevens.</p>
+        <p style="margin:0;">Maak een eigen wachtwoord aan om direct mee te kunnen kijken in het draaiboek, de gastenlijst en de leveranciers.</p>
+      `,
+      cta: { label: "Uitnodiging accepteren", url: acceptUrl },
+      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${acceptUrl}" style="color:#C49A6E;word-break:break-all;">${acceptUrl}</a>`,
+    }),
+  };
+}
+
 export function passwordResetEmail(resetUrl: string): { subject: string; html: string } {
   return {
     subject: "Wachtwoord opnieuw instellen",

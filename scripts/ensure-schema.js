@@ -248,6 +248,19 @@ const STATEMENTS = [
     CONSTRAINT "vwi_wedding_fk" FOREIGN KEY ("weddingId") REFERENCES "weddings"("id") ON DELETE SET NULL
   )`,
 
+  `CREATE TABLE IF NOT EXISTS "wedding_team_invites" (
+    "id" TEXT NOT NULL,
+    "weddingId" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "invitedByName" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "acceptedAt" TIMESTAMP(3),
+    CONSTRAINT "wedding_team_invites_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "wedding_team_invites_token_key" UNIQUE ("token"),
+    CONSTRAINT "wti_wedding_fk" FOREIGN KEY ("weddingId") REFERENCES "weddings"("id") ON DELETE CASCADE
+  )`,
+
   `CREATE TABLE IF NOT EXISTS "deliverables" (
     "id" TEXT NOT NULL,
     "vendorBookingId" TEXT NOT NULL,

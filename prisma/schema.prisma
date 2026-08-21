@@ -113,8 +113,27 @@ model Wedding {
   seatTables      SeatingTable[]
   vendorInvites   VendorWeddingInvite[]
   vendorReviews   VendorReview[]
+  teamInvites     WeddingTeamInvite[]
 
   @@map("weddings")
+}
+
+// Losse uitnodiging voor een meeregelend teamlid (bijv. een ouder) die
+// zelfstandig moet kunnen meekijken/meebeslissen zonder het wachtwoord van
+// het bruidspaar te delen — dat kon voorheen helemaal niet, waardoor mensen
+// in de praktijk toch maar inloggegevens gingen delen.
+model WeddingTeamInvite {
+  id            String    @id @default(uuid())
+  weddingId     String
+  email         String
+  invitedByName String
+  token         String    @unique
+  createdAt     DateTime  @default(now())
+  acceptedAt    DateTime?
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@map("wedding_team_invites")
 }
 
 model WeddingTeamMember {

@@ -146,5 +146,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ redirect: "/leveranciers/mijn-profiel" }, { status: 201 });
   }
 
+  if (pending.type === "team_member") {
+    const { inviteToken, name } = data as { inviteToken: string; name: string };
+
+    const invite = await prisma.weddingTeamInvite.findUnique({ where: { token: inviteToken } });
+    if (!invite || invite.acceptedAt || invite.email !== pending.email) {
+      return NextResponse.json({ error: "Deze uitnodiging is niet meer geldig. Vraag een nieuwe uitnodiging aan." }, { status: 410 });
+    }
+
+    const user = await prisma.user.create({
+      data: { email: pending.email, name: name || "Teamlid", role: "team_member", isPremium: false, passwordHash },
+    });
+    await setSession(user.id);
+
+    await prisma.weddingTeamMember.upsert({
+      where: { weddingId_userId: { weddingId: invite.weddingId, userId: user.id } },
+      update: {},
+      create: { weddingId: invite.weddingId, userId: user.id, role: "team_member" },
+    });
+    await prisma.weddingTeamInvite.update({ where: { id: invite.id }, data: { acceptedAt: new Date() } });
+
+    return NextResponse.json({ redirect: `/weddings/${invite.weddingId}` }, { status: 201 });
+  }
+
   return NextResponse.json({ error: "Ongeldig type" }, { status: 400 });
 }
