@@ -113,7 +113,9 @@ export default function IntakeForm({ fields, intakeData, onUpdate, isPlanner, is
           }
 
           const display = value == null || value === "" ? <span style={{ color: "var(--muted)", fontStyle: "italic" }}>Niet ingevuld</span> :
-            typeof value === "boolean" ? (value ? "Ja" : "Nee") : String(value);
+            typeof value === "boolean" ? (value ? "Ja" : "Nee") :
+            field.type === "date" ? new Date(String(value)).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" }) :
+            String(value);
           const isRequired = requiredKeys.includes(field.key);
 
           return (

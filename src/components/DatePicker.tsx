@@ -24,6 +24,14 @@ function formatDisplay(s: string) {
   if (!d) return "";
   return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 }
+function parseTyped(s: string): string | null {
+  const m = s.trim().match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (!m) return null;
+  const [, dd, mm, yyyy] = m;
+  const d = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  if (d.getFullYear() !== Number(yyyy) || d.getMonth() !== Number(mm) - 1 || d.getDate() !== Number(dd)) return null;
+  return toIso(d);
+}
 
 export default function DatePicker({
   value,
@@ -48,6 +56,12 @@ export default function DatePicker({
   const maxDate = fromIso(max ?? "");
   const [viewDate, setViewDate] = useState(() => selected ?? new Date());
   const wrapRef = useRef<HTMLDivElement>(null);
+  const [typedValue, setTypedValue] = useState(formatDisplay(value));
+  const [typedFocused, setTypedFocused] = useState(false);
+
+  useEffect(() => {
+    if (!typedFocused) setTypedValue(formatDisplay(value));
+  }, [value, typedFocused]);
 
   useEffect(() => {
     if (open) setViewDate(selected ?? new Date());
@@ -84,17 +98,36 @@ export default function DatePicker({
 
   return (
     <div ref={wrapRef} style={{ position: "relative" }}>
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className={className}
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", cursor: "pointer", textAlign: "left", ...style }}
-      >
-        <span style={{ color: value ? "var(--foreground)" : "var(--muted-light)" }}>
-          {value ? formatDisplay(value) : placeholder}
-        </span>
-        <Calendar style={{ width: "15px", height: "15px", color: "var(--muted-light)", flexShrink: 0 }} />
-      </button>
+      <div className={className} style={{ display: "flex", alignItems: "center", gap: "0.5rem", ...style }}>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={typedValue}
+          placeholder={placeholder}
+          onFocus={() => setTypedFocused(true)}
+          onChange={(e) => setTypedValue(e.target.value)}
+          onBlur={() => {
+            setTypedFocused(false);
+            const iso = parseTyped(typedValue);
+            if (iso) {
+              const d = fromIso(iso)!;
+              if (!isDisabled(d)) { onChange(iso); return; }
+            }
+            // Ongeldige of buiten-bereik invoer: terug naar de laatst geldige waarde
+            // i.p.v. de bruidspaar/leverancier stil op een foute datum te laten staan.
+            setTypedValue(formatDisplay(value));
+          }}
+          style={{ border: "none", outline: "none", background: "transparent", flex: 1, minWidth: 0, color: value || typedFocused ? "var(--foreground)" : "var(--muted-light)" }}
+        />
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-label="Kalender openen"
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexShrink: 0 }}
+        >
+          <Calendar style={{ width: "15px", height: "15px", color: "var(--muted-light)" }} />
+        </button>
+      </div>
 
       {open && (
         <div

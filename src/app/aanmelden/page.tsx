@@ -218,6 +218,14 @@ function AanmeldenForm() {
   const bladeX = !blade ? "-140%" : blade.stage === "cover" ? (bladeArmed ? "0%" : "-140%") : (bladeArmed ? "140%" : "0%");
 
   useEffect(() => {
+    // Als er al opgeslagen voortgang is (sessionStorage, bijv. na e-mailverificatie),
+    // mag een ?type=vendor/couple deep-link die niet zomaar terugzetten naar stap 1 —
+    // anders verliest iemand die de wizard-link met querystring opnieuw opent alsnog
+    // alles, ook al is het exact hetzelfde probleem dat de sessionStorage-restore
+    // net had moeten oplossen.
+    const hasRestoredProgress = restored.authStep !== undefined && restored.authStep !== "form" || (restored.formStep ?? 0) > 0;
+    if (hasRestoredProgress) return;
+
     const email = searchParams.get("email");
     const name = searchParams.get("name") ?? "";
     const provider = searchParams.get("provider");
