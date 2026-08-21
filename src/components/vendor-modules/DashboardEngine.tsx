@@ -255,7 +255,7 @@ export default function DashboardEngine({
       )}
 
       {modules.includes("moodboardUploader") && (
-        <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} />
+        <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} weddingId={weddingId} />
       )}
 
       {modules.includes("portieCalculator") && (

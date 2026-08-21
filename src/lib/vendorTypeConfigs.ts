@@ -746,12 +746,15 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     intakeFields: [
       { key: "stijl", label: "Pak-stijl & kleur", type: "text", placeholder: "Donkerblauw, grijs, krijtstreep, smoking..." },
       { key: "huurOfKoop", label: "Huur of koop?", type: "select", options: ["huur", "koop", "op maat"] },
+      { key: "aantalPersonen", label: "Aantal te kleden personen", type: "number", placeholder: "Bruidegom, getuigen, vader..." },
+      { key: "retourdatum", label: "Retour-/inleverdatum (bij huur)", type: "date" },
       { key: "accessoires", label: "Accessoires", type: "longtext", placeholder: "Stropdas, pochet, manchetknopen, schoenen..." },
     ],
     deliverables: [
-      { key: "pak", label: "Pak gereed / opgehaald" },
+      { key: "pak", label: "Pak(ken) gereed / opgehaald" },
       { key: "accessoires", label: "Accessoires compleet" },
       { key: "aankleden", label: "Aankledinstructies dag-van" },
+      { key: "retour", label: "Pak(ken) geretourneerd" },
     ],
     timelineTemplate: [],
     logisticsFields: [],
