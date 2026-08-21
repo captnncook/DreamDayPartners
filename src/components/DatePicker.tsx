@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 
 const MAANDEN = [
@@ -136,7 +137,7 @@ export default function DatePicker({
                   key={i}
                   type="button"
                   disabled={disabled}
-                  onClick={() => { onChange(toIso(d)); setOpen(false); }}
+                  onClick={() => { flushSync(() => { onChange(toIso(d)); setOpen(false); }); }}
                   style={{
                     aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center",
                     borderRadius: "8px", border: "none", fontSize: "0.8125rem", cursor: disabled ? "default" : "pointer",
@@ -153,11 +154,11 @@ export default function DatePicker({
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid var(--border)" }}>
-            <button type="button" onClick={() => { onChange(""); setOpen(false); }}
+            <button type="button" onClick={() => { flushSync(() => { onChange(""); setOpen(false); }); }}
               style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600, color: "var(--muted)", padding: 0 }}>
               Wissen
             </button>
-            <button type="button" onClick={() => { const t = new Date(); t.setHours(0, 0, 0, 0); if (!isDisabled(t)) { onChange(toIso(t)); setOpen(false); } }}
+            <button type="button" onClick={() => { const t = new Date(); t.setHours(0, 0, 0, 0); if (!isDisabled(t)) { flushSync(() => { onChange(toIso(t)); setOpen(false); }); } }}
               style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600, color: "var(--gold-deep)", padding: 0 }}>
               Vandaag
             </button>
