@@ -21,7 +21,7 @@ export default async function AllVendorsPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Onze leveranciers</h1>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Onze leveranciers</h1>
         <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{total} leverancier{total !== 1 ? "s" : ""} over {weddings.length} bruiloft{weddings.length !== 1 ? "en" : ""}</p>
       </div>
 
@@ -43,8 +43,8 @@ export default async function AllVendorsPage() {
                 {w.vendors.map((wv) => (
                   <div key={wv.id} className="dash-row">
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <span className="font-serif" style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--foreground)" }}>{wv.vendor.name}</span>
-                      <span className="capitalize" style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted)", marginLeft: "0.625rem" }}>
+                      <span className="font-serif" style={{ fontSize: "var(--text-lg)", fontWeight: 700, color: "var(--foreground)" }}>{wv.vendor.name}</span>
+                      <span className="capitalize" style={{ fontSize: "var(--text-xs)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted)", marginLeft: "var(--space-4)" }}>
                         {wv.vendor.category}
                       </span>
                     </div>

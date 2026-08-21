@@ -171,7 +171,7 @@ export default function AccountsPage() {
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Accountbeheer</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Accountbeheer</h1>
           <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>{users.length} accounts gevonden</p>
         </div>
         <button
@@ -295,7 +295,7 @@ export default function AccountsPage() {
                   {feedback[u.id] && <span className="text-xs block mt-0.5" style={{ color: feedback[u.id].startsWith("✓") ? "var(--success)" : "var(--danger)" }}>{feedback[u.id]}</span>}
                 </td>
                 <td className="px-4 py-3">
-                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: ROLE_COLOR[u.role] ?? "var(--muted)" }}>
+                  <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: ROLE_COLOR[u.role] ?? "var(--muted)" }}>
                     {ROLE_LABELS[u.role] ?? u.role}
                   </span>
                   {u.role === "vendor" && (
@@ -306,7 +306,7 @@ export default function AccountsPage() {
                         onChange={e => handleSaveVendorType(u, e.target.value)}
                         onBlur={() => setEditVendorTypeId(null)}
                         className="ddp-input py-0.5 text-xs"
-                        style={{ display: "inline-block", width: "auto", marginLeft: "0.5rem" }}
+                        style={{ display: "inline-block", width: "auto", marginLeft: "var(--space-3)" }}
                       >
                         <option value="">Kies…</option>
                         {Object.entries(VENDOR_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -315,7 +315,7 @@ export default function AccountsPage() {
                       <button
                         onClick={() => setEditVendorTypeId(u.id)}
                         className="capitalize"
-                        style={{ fontSize: "0.6875rem", color: "var(--muted-light)", marginLeft: "0.5rem", background: "none", border: "none", cursor: "pointer", textDecoration: "underline dotted" }}
+                        style={{ fontSize: "var(--text-xs)", color: "var(--muted-light)", marginLeft: "var(--space-3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline dotted" }}
                         title="Leverancierstype wijzigen"
                       >
                         {u.vendorType ? (VENDOR_TYPE_LABELS[u.vendorType] ?? u.vendorType) : "Type instellen"}

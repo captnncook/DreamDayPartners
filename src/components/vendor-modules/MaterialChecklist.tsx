@@ -62,7 +62,7 @@ export default function MaterialChecklist({ intakeData, onUpdate, isVendor, isPl
           <h3 className="font-semibold text-sm">Materiaalchecklist</h3>
         </div>
         {items.length > 0 && (
-          <span style={{ fontSize: "0.75rem", color: "var(--muted)", background: "var(--accent)", borderRadius: "9999px", padding: "0.125rem 0.625rem" }}>
+          <span style={{ fontSize: "var(--text-sm)", color: "var(--muted)", background: "var(--accent)", borderRadius: "9999px", padding: "0.125rem 0.625rem" }}>
             {done}/{items.length} klaar
           </span>
         )}
@@ -70,11 +70,11 @@ export default function MaterialChecklist({ intakeData, onUpdate, isVendor, isPl
 
       {items.length === 0 ? (
         <div>
-          <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic", marginBottom: "0.75rem" }}>
+          <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic", marginBottom: "var(--space-5)" }}>
             {canEdit ? "Stel een checklist in van materialen om mee te nemen." : "Nog geen checklist aangemaakt."}
           </p>
           {canEdit && (
-            <button onClick={addDefaults} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.375rem 0.75rem", cursor: "pointer", fontWeight: 600 }}>
+            <button onClick={addDefaults} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.375rem 0.75rem", cursor: "pointer", fontWeight: 600 }}>
               + Standaard materialen toevoegen
             </button>
           )}
@@ -101,7 +101,7 @@ export default function MaterialChecklist({ intakeData, onUpdate, isVendor, isPl
       )}
 
       {canEdit && (
-        <div style={{ marginTop: "0.75rem" }}>
+        <div style={{ marginTop: "var(--space-5)" }}>
           {showAdd ? (
             <div className="flex gap-2">
               <input autoFocus value={newItem} onChange={e => setNewItem(e.target.value)}
@@ -116,7 +116,7 @@ export default function MaterialChecklist({ intakeData, onUpdate, isVendor, isPl
               </button>
             </div>
           ) : (
-            <button onClick={() => setShowAdd(true)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+            <button onClick={() => setShowAdd(true)} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
               <Plus className="w-3.5 h-3.5" /> Materiaal toevoegen
             </button>
           )}

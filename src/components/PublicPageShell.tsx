@@ -42,7 +42,7 @@ export default function PublicPageShell({
         <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "1040px", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
             <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={24} height={24} />
-            <span style={{ fontWeight: 600, fontSize: "0.875rem", color: "rgba(255,255,255,0.8)" }}>DreamDay Platform</span>
+            <span style={{ fontWeight: 600, fontSize: "var(--text-md)", color: "rgba(255,255,255,0.8)" }}>DreamDay Platform</span>
           </div>
           <div className="flex flex-wrap justify-center gap-5">
             {[
@@ -52,10 +52,10 @@ export default function PublicPageShell({
               { href: "/voorwaarden", label: "Algemene voorwaarden" },
               { href: "/leveranciers", label: "Vind leveranciers" },
             ].map((l) => (
-              <Link key={l.href} href={l.href} style={{ fontSize: "0.8125rem", color: "rgba(255,255,255,0.45)", textDecoration: "none" }}>{l.label}</Link>
+              <Link key={l.href} href={l.href} style={{ fontSize: "var(--text-base)", color: "rgba(255,255,255,0.45)", textDecoration: "none" }}>{l.label}</Link>
             ))}
           </div>
-          <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)" }}>© 2026 DreamDay Platform</p>
+          <p style={{ fontSize: "var(--text-sm)", color: "rgba(255,255,255,0.25)" }}>© 2026 DreamDay Platform</p>
         </div>
       </footer>
     </div>

@@ -56,7 +56,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <Link
           href="/aanmelden"
           className="ddp-btn-gold"
-          style={{ display: "inline-flex", background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none" }}
+          style={{ display: "inline-flex", background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none" }}
         >
           Begin gratis
         </Link>

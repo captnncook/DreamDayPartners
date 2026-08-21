@@ -39,7 +39,7 @@ export default async function MyTasksPage() {
     <div className="p-8 max-w-3xl mx-auto">
       <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
         <div>
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Mijn taken</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Mijn taken</h1>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{open.length} open · {done.length} afgerond</p>
         </div>
       </div>
@@ -58,7 +58,7 @@ export default async function MyTasksPage() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <span
                     className={isDone ? "line-through" : ""}
-                    style={{ fontSize: "0.9375rem", fontWeight: isDone ? 400 : meta.weight, color: isDone ? "var(--muted-light)" : "var(--foreground)" }}
+                    style={{ fontSize: "var(--text-lg)", fontWeight: isDone ? 400 : meta.weight, color: isDone ? "var(--muted-light)" : "var(--foreground)" }}
                   >
                     {task.title}
                   </span>
@@ -67,11 +67,11 @@ export default async function MyTasksPage() {
                       {task.wedding.title}
                     </Link>
                     {!isDone && (
-                      <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>
+                      <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>
                         {meta.label}
                       </span>
                     )}
-                    <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
+                    <span style={{ fontSize: "var(--text-xs)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
                       {STATUS_LABELS[task.status] ?? task.status}
                     </span>
                     {task.dueDate && <span>{formatDate(task.dueDate)}</span>}

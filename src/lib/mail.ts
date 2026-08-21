@@ -45,6 +45,11 @@ export async function sendMail(opts: {
 // Shared layout
 // ---------------------------------------------------------------------------
 
+// Lettergroottes hier zijn hardcoded px (Outlook ondersteunt geen CSS
+// var()), maar bewust gekozen op dezelfde stappen als de --text-* schaal
+// in globals.css (12=sm, 13=base, 14=md, 15=lg, 17=2xl, 20=3xl, 24=5xl) —
+// zo blijft e-mail en site visueel consistent zonder dat de token hier
+// letterlijk herbruikt kan worden.
 function emailLayout(opts: {
   heading: string;
   body: string;

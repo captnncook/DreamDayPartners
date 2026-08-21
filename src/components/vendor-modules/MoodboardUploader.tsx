@@ -89,22 +89,22 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPl
 
   return (
     <div className="ddp-card" style={{ padding: "1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
           <Palette className="w-4 h-4" style={{ color: "var(--primary)" }} />
           <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Moodboard & Stijl</h3>
         </div>
         {canEdit && (
-          <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => setEditing(!editing)} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             {editing ? "Annuleren" : hasContent ? "Bewerken" : "Toevoegen"}
           </button>
         )}
       </div>
 
       {editing ? (
-        <div style={{ display: "grid", gap: "0.75rem" }}>
+        <div style={{ display: "grid", gap: "var(--space-5)" }}>
           <div>
-            <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>
+            <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>
               Link naar moodboard (Pinterest, Canva, Google Foto&apos;s…)
             </label>
             <input
@@ -112,11 +112,11 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPl
               value={url}
               onChange={e => setUrl(e.target.value)}
               placeholder="https://www.pinterest.com/…"
-              style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)" }}
+              style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--foreground)" }}
             />
           </div>
           <div>
-            <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>
+            <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>
               Notities / stijlomschrijving
             </label>
             <textarea
@@ -124,38 +124,38 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPl
               onChange={e => setNotes(e.target.value)}
               rows={3}
               placeholder="Bijv. romantisch, luchtig, veel bloemen, blush tinten…"
-              style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)", resize: "vertical" }}
+              style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--foreground)", resize: "vertical" }}
             />
           </div>
           <div>
-            <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.375rem" }}>
+            <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-2)" }}>
               Losse foto&apos;s
             </label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: "0.5rem", marginBottom: "0.5rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
               {photos.map(p => (
                 <MoodboardPhotoCard key={p.id} photo={p} canEdit onRemove={() => removePhoto(p.id)} />
               ))}
             </div>
             <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--surface-2, #f5f3ee)", color: "var(--primary)", border: "1px solid var(--border)", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+              style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--surface-2, #f5f3ee)", color: "var(--primary)", border: "1px solid var(--border)", cursor: "pointer", fontSize: "var(--text-base)", fontWeight: 600 }}>
               <Upload size={14} /> {uploading ? "Uploaden…" : "Foto uploaden"}
             </button>
             <input ref={fileRef} type="file" accept="image/*" onChange={handleUpload} style={{ display: "none" }} />
           </div>
-          <p style={{ fontSize: "0.6875rem", color: "var(--muted)" }}>
+          <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>
             Wordt ingevuld door het bruidspaar of de planner, ter voorbereiding voor deze leverancier.
           </p>
           <button
             onClick={save}
-            style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600, width: "fit-content" }}
+            style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-md)", fontWeight: 600, width: "fit-content" }}
           >
             Opslaan
           </button>
         </div>
       ) : hasContent ? (
-        <div style={{ display: "grid", gap: "0.75rem" }}>
+        <div style={{ display: "grid", gap: "var(--space-5)" }}>
           {photos.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: "0.5rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: "var(--space-3)" }}>
               {photos.map(p => (
                 <MoodboardPhotoCard key={p.id} photo={p} canEdit={false} onRemove={() => {}} />
               ))}
@@ -163,18 +163,18 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPl
           )}
           {moodboardUrl && (
             <a href={moodboardUrl} target="_blank" rel="noopener noreferrer"
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "0.875rem", color: "var(--primary)", fontWeight: 600 }}>
+              style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", fontSize: "var(--text-md)", color: "var(--primary)", fontWeight: 600 }}>
               <ExternalLink className="w-4 h-4" /> Moodboard bekijken
             </a>
           )}
           {moodboardNotes && (
-            <p style={{ fontSize: "0.875rem", color: "var(--foreground)", lineHeight: 1.6, background: "var(--color-blush-soft)", padding: "0.75rem", borderRadius: "0.5rem", margin: 0 }}>
+            <p style={{ fontSize: "var(--text-md)", color: "var(--foreground)", lineHeight: 1.6, background: "var(--color-blush-soft)", padding: "0.75rem", borderRadius: "0.5rem", margin: 0 }}>
               {moodboardNotes}
             </p>
           )}
         </div>
       ) : (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           {canEdit
             ? "Voeg een moodboard-link of stijlomschrijving toe als referentie voor de sessie."
             : "Nog geen moodboard gedeeld."}

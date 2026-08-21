@@ -37,7 +37,7 @@ export default function VendorNotesEditor({ weddingId, wvId, initialNotes }: { w
         placeholder="Eigen aantekeningen over deze bruiloft, alleen voor jou zichtbaar…"
         rows={4}
         className="ddp-input resize-none"
-        style={{ fontSize: "0.875rem" }}
+        style={{ fontSize: "var(--text-md)" }}
       />
       <div className="text-xs mt-1.5" style={{ color: "var(--muted-light)" }}>
         {saving ? "Opslaan…" : saved ? "Opgeslagen" : ""}

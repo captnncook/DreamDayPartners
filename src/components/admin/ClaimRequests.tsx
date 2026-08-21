@@ -66,7 +66,7 @@ export default function ClaimRequests() {
       </p>
 
       {pending.length > 0 && (
-        <div className="mb-2" style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div className="mb-2" style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
           {pending.map((r) => (
             <div key={r.id} className="flex items-center gap-3 p-3" style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0" }}>
               <div className="flex-1 min-w-0">
@@ -77,7 +77,7 @@ export default function ClaimRequests() {
                 onClick={() => decide(r.id, "approve")}
                 disabled={busyId === r.id}
                 className="ddp-btn-primary"
-                style={{ padding: "0.4rem 0.9rem", fontSize: "0.8125rem" }}
+                style={{ padding: "0.4rem 0.9rem", fontSize: "var(--text-base)" }}
               >
                 Goedkeuren
               </button>
@@ -85,7 +85,7 @@ export default function ClaimRequests() {
                 onClick={() => decide(r.id, "reject")}
                 disabled={busyId === r.id}
                 className="ddp-btn-secondary"
-                style={{ padding: "0.4rem 0.9rem", fontSize: "0.8125rem" }}
+                style={{ padding: "0.4rem 0.9rem", fontSize: "var(--text-base)" }}
               >
                 Afwijzen
               </button>
@@ -102,7 +102,7 @@ export default function ClaimRequests() {
                 <div className="text-sm font-medium truncate">{r.vendor.name}</div>
                 <div className="text-xs" style={{ color: "var(--muted)" }}>{r.email} · {formatDate(r.createdAt)}</div>
               </div>
-              <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor[r.status] ?? "var(--muted)", flexShrink: 0 }}>
+              <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor[r.status] ?? "var(--muted)", flexShrink: 0 }}>
                 {statusLabel[r.status] ?? r.status}
               </span>
               {r.status === "approved" && (
@@ -110,7 +110,7 @@ export default function ClaimRequests() {
                   onClick={() => remind(r.id)}
                   disabled={busyId === r.id || reminded[r.id]}
                   className="ddp-btn-ghost flex-shrink-0"
-                  style={{ padding: "0.3rem 0.7rem", fontSize: "0.75rem" }}
+                  style={{ padding: "0.3rem 0.7rem", fontSize: "var(--text-sm)" }}
                 >
                   {reminded[r.id] ? "Verstuurd" : "Stuur herinnering"}
                 </button>

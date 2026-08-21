@@ -158,7 +158,7 @@ export default function MobileNav({ user }: { user: User }) {
                   borderRadius: "999px",
                   background: "var(--gold-deep)",
                   color: "white",
-                  fontSize: "0.625rem",
+                  fontSize: "var(--text-2xs)",
                   fontWeight: 700,
                   display: "flex",
                   alignItems: "center",
@@ -349,7 +349,7 @@ export default function MobileNav({ user }: { user: User }) {
                       position: "absolute", top: "-4px", right: "-8px",
                       minWidth: "15px", height: "15px", padding: "0 3px",
                       borderRadius: "999px", background: "var(--gold-deep)", color: "white",
-                      fontSize: "0.5625rem", fontWeight: 700, display: "flex",
+                      fontSize: "var(--text-3xs)", fontWeight: 700, display: "flex",
                       alignItems: "center", justifyContent: "center", lineHeight: 1,
                       border: "1.5px solid white",
                     }}
@@ -358,7 +358,7 @@ export default function MobileNav({ user }: { user: User }) {
                   </span>
                 )}
               </div>
-              <span style={{ fontSize: "0.625rem", fontWeight: active ? 700 : 500 }}>{tab.label}</span>
+              <span style={{ fontSize: "var(--text-2xs)", fontWeight: active ? 700 : 500 }}>{tab.label}</span>
             </Link>
           );
         })}
@@ -372,7 +372,7 @@ export default function MobileNav({ user }: { user: User }) {
           }}
         >
           <MoreHorizontal style={{ width: "21px", height: "21px" }} strokeWidth={open ? 2.4 : 2} />
-          <span style={{ fontSize: "0.625rem", fontWeight: open ? 700 : 500 }}>Meer</span>
+          <span style={{ fontSize: "var(--text-2xs)", fontWeight: open ? 700 : 500 }}>Meer</span>
         </button>
       </nav>
     </div>

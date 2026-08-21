@@ -80,7 +80,7 @@ export default function VenueRooms({ intakeData, onUpdate, isVendor, isPlanner, 
 
   const totalCapacity = rooms.reduce((s, r) => s + (Number(r.capacity) || 0), 0);
 
-  const inputStyle: React.CSSProperties = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)" };
+  const inputStyle: React.CSSProperties = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--foreground)" };
 
   return (
     <div className="ddp-card">
@@ -99,12 +99,12 @@ export default function VenueRooms({ intakeData, onUpdate, isVendor, isPlanner, 
         <div className="flex items-center gap-3">
           {canEdit && isVendor && vendorId && (
             <button onClick={importFromProfile} disabled={importing} title="Zet de zalen van je eigen profiel hierheen over"
-              style={{ fontSize: "0.8125rem", color: "var(--muted)", background: "none", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
+              style={{ fontSize: "var(--text-base)", color: "var(--muted)", background: "none", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
               {importing ? "Overnemen…" : "Overnemen uit profiel"}
             </button>
           )}
           {canEdit && (
-            <button onClick={startAdd} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+            <button onClick={startAdd} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
               <Plus className="w-3.5 h-3.5" /> Ruimte toevoegen
             </button>
           )}
@@ -116,7 +116,7 @@ export default function VenueRooms({ intakeData, onUpdate, isVendor, isPlanner, 
       )}
 
       {rooms.length === 0 && editingId !== "new" && (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           {canEdit ? "Voeg de ruimtes toe die beschikbaar zijn op de locatie." : "Nog geen ruimtes geconfigureerd."}
         </p>
       )}
@@ -130,11 +130,11 @@ export default function VenueRooms({ intakeData, onUpdate, isVendor, isPlanner, 
               <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.75rem 1rem" }}>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{room.name}</div>
-                    <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "1px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "var(--text-lg)" }}>{room.name}</div>
+                    <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "1px" }}>
                       {room.function}{room.capacity ? ` · max. ${room.capacity} personen` : ""}
                     </div>
-                    {room.notes && <div style={{ fontSize: "0.8125rem", color: "var(--foreground)", marginTop: "0.375rem" }}>{room.notes}</div>}
+                    {room.notes && <div style={{ fontSize: "var(--text-base)", color: "var(--foreground)", marginTop: "var(--space-2)" }}>{room.notes}</div>}
                   </div>
                   {canEdit && (
                     <div className="flex gap-1.5 flex-shrink-0">
@@ -164,7 +164,7 @@ function RoomForm({ form, setForm, onSave, onCancel, inputStyle }: {
   inputStyle: React.CSSProperties;
 }) {
   return (
-    <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.875rem", marginBottom: "0.75rem" }} className="space-y-2">
+    <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.875rem", marginBottom: "var(--space-5)" }} className="space-y-2">
       <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Naam ruimte *" style={inputStyle} />
       <div className="grid grid-cols-2 gap-2">
         <select value={form.function} onChange={e => setForm(f => ({ ...f, function: e.target.value }))} style={inputStyle}>
@@ -174,7 +174,7 @@ function RoomForm({ form, setForm, onSave, onCancel, inputStyle }: {
       </div>
       <input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Extra info (optioneel)" style={inputStyle} />
       <div className="flex gap-2">
-        <button onClick={onSave} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.8125rem" }}>
+        <button onClick={onSave} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-base)" }}>
           <Check className="w-3.5 h-3.5" /> Opslaan
         </button>
         <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex", alignItems: "center" }}>

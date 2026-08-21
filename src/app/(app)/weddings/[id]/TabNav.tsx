@@ -20,7 +20,7 @@ export default function TabNav({ id, isVendor = false, hideTeamTab = false }: { 
   ].filter((tab) => tab.always || !isVendor);
 
   return (
-    <div className="ddp-scroll-fade" style={{ marginBottom: "2rem" }}>
+    <div className="ddp-scroll-fade" style={{ marginBottom: "var(--space-9)" }}>
       <div
         className="flex gap-1.5 overflow-x-auto pb-0.5"
         style={{ scrollbarWidth: "none" }}
@@ -33,7 +33,7 @@ export default function TabNav({ id, isVendor = false, hideTeamTab = false }: { 
               href={tab.href}
               className="flex-shrink-0 px-4 py-2 rounded-full font-medium whitespace-nowrap"
               style={{
-                fontSize: "0.8125rem",
+                fontSize: "var(--text-base)",
                 background: isActive ? "var(--ink)" : "rgba(0,0,0,0.05)",
                 color: isActive ? "white" : "var(--muted)",
                 letterSpacing: "-0.01em",

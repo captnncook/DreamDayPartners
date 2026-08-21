@@ -35,7 +35,7 @@ export default function EditableNotes({ weddingId, initialNotes }: Props) {
   return (
     <div className="ddp-card">
       <div className="flex items-center justify-between mb-2">
-        <h3 style={{ fontWeight: 600, fontSize: "0.9375rem" }}>Notities</h3>
+        <h3 style={{ fontWeight: 600, fontSize: "var(--text-lg)" }}>Notities</h3>
         {!editing && (
           <button
             onClick={() => { setDraft(notes); setEditing(true); }}
@@ -54,22 +54,22 @@ export default function EditableNotes({ weddingId, initialNotes }: Props) {
             onChange={(e) => setDraft(e.target.value)}
             rows={4}
             style={{
-              width: "100%", fontSize: "0.875rem", lineHeight: 1.65, color: "var(--muted)",
+              width: "100%", fontSize: "var(--text-md)", lineHeight: 1.65, color: "var(--muted)",
               border: "1px solid var(--border)", borderRadius: "10px", padding: "0.5rem 0.625rem",
-              resize: "vertical", outline: "none", marginBottom: "0.625rem",
+              resize: "vertical", outline: "none", marginBottom: "var(--space-4)",
             }}
           />
-          <div style={{ display: "flex", gap: "0.5rem" }}>
+          <div style={{ display: "flex", gap: "var(--space-3)" }}>
             <button
               onClick={save}
               disabled={saving}
-              style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.875rem", borderRadius: "8px", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", padding: "0.375rem 0.875rem", borderRadius: "8px", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-base)", fontWeight: 600 }}
             >
               <Check className="w-3.5 h-3.5" /> {saving ? "Opslaan…" : "Opslaan"}
             </button>
             <button
               onClick={cancel}
-              style={{ display: "flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.75rem", borderRadius: "8px", background: "var(--accent)", color: "var(--foreground)", border: "none", cursor: "pointer", fontSize: "0.8125rem" }}
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", padding: "0.375rem 0.75rem", borderRadius: "8px", background: "var(--accent)", color: "var(--foreground)", border: "none", cursor: "pointer", fontSize: "var(--text-base)" }}
             >
               <X className="w-3.5 h-3.5" /> Annuleren
             </button>

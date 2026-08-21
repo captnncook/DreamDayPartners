@@ -150,7 +150,7 @@ export default function VendorDashboardModulesSection() {
       )}
 
       {data.isPremium && (
-        <div style={{ borderTop: "1px solid var(--border)", marginTop: "1.25rem", paddingTop: "1.25rem" }}>
+        <div style={{ borderTop: "1px solid var(--border)", marginTop: "var(--space-7)", paddingTop: "1.25rem" }}>
           <h3 className="text-sm font-semibold mb-1">Extra functie aanvragen</h3>
           <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
             Niet elke functie zit standaard in jouw dashboard. Vraag een functie aan en de admin beoordeelt je verzoek.

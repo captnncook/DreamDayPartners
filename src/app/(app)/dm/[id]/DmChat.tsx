@@ -128,21 +128,21 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
           <div style={{
             width: "2.25rem", height: "2.25rem", borderRadius: "50%",
             background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "0.9375rem", fontWeight: 700, color: "var(--primary)",
+            fontSize: "var(--text-lg)", fontWeight: 700, color: "var(--primary)",
           }}>
             {otherUser.name.charAt(0)}
           </div>
         )}
         <div>
-          <div style={{ fontWeight: 700, fontSize: "0.9375rem", letterSpacing: "-0.01em" }}>{otherUser.name}</div>
-          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{otherUser.label ?? ROLE_LABELS[otherUser.role] ?? otherUser.role}</div>
+          <div style={{ fontWeight: 700, fontSize: "var(--text-lg)", letterSpacing: "-0.01em" }}>{otherUser.name}</div>
+          <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{otherUser.label ?? ROLE_LABELS[otherUser.role] ?? otherUser.role}</div>
         </div>
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
         {messages.length === 0 && (
-          <div style={{ textAlign: "center", color: "var(--muted)", fontSize: "0.875rem", marginTop: "3rem" }}>
+          <div style={{ textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)", marginTop: "var(--space-10)" }}>
             Stuur een bericht om het gesprek te starten.
           </div>
         )}
@@ -154,7 +154,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
           return (
             <div key={msg.id}>
               {showTime && (
-                <div style={{ textAlign: "center", fontSize: "0.6875rem", color: "var(--muted)", margin: "0.5rem 0" }}>
+                <div style={{ textAlign: "center", fontSize: "var(--text-xs)", color: "var(--muted)", margin: "0.5rem 0" }}>
                   {formatTime(msg.createdAt)}
                 </div>
               )}
@@ -164,7 +164,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
                   borderRadius: isMine ? "1.25rem 1.25rem 0.25rem 1.25rem" : "1.25rem 1.25rem 1.25rem 0.25rem",
                   background: isMine ? "var(--primary)" : "var(--accent)",
                   color: isMine ? "white" : "var(--foreground)",
-                  fontSize: "0.9375rem", lineHeight: 1.4,
+                  fontSize: "var(--text-lg)", lineHeight: 1.4,
                   wordBreak: "break-word",
                 }}>
                   {msg.content}
@@ -179,7 +179,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
       {/* Input */}
       <div style={{
         padding: "0.75rem 1rem", borderTop: "1px solid var(--border)",
-        background: "var(--card)", display: "flex", gap: "0.625rem", alignItems: "flex-end",
+        background: "var(--card)", display: "flex", gap: "var(--space-4)", alignItems: "flex-end",
       }}>
         <textarea
           value={input}
@@ -189,7 +189,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
           rows={1}
           style={{
             flex: 1, padding: "0.625rem 0.875rem", borderRadius: "1.25rem",
-            border: "1px solid var(--border)", fontSize: "0.9375rem",
+            border: "1px solid var(--border)", fontSize: "var(--text-lg)",
             resize: "none", background: "var(--accent)", color: "var(--foreground)",
             outline: "none", lineHeight: 1.4, maxHeight: "120px", overflowY: "auto",
           }}

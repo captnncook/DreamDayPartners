@@ -117,18 +117,18 @@ function ShieldCard({
         <div style={{ textAlign: "center", lineHeight: 1.25 }}>
           {member ? (
             <>
-              <div style={{ fontSize: "0.8125rem", color: "var(--muted)", fontWeight: 400 }}>{firstName}</div>
-              <div style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--foreground)" }}>
+              <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", fontWeight: 400 }}>{firstName}</div>
+              <div style={{ fontSize: "var(--text-lg)", fontWeight: 700, color: "var(--foreground)" }}>
                 {rest.join(" ") || firstName}
               </div>
-              <div style={{ fontSize: "0.6875rem", color: "var(--primary)", fontWeight: 600, marginTop: "2px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--primary)", fontWeight: 600, marginTop: "2px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                 {slot.label}
               </div>
             </>
           ) : (
             <>
-              <div style={{ fontSize: "0.8125rem", color: "var(--muted)", fontWeight: 500 }}>{slot.label}</div>
-              <div style={{ fontSize: "0.75rem", color: "var(--primary)", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "3px", marginTop: "2px" }}>
+              <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", fontWeight: 500 }}>{slot.label}</div>
+              <div style={{ fontSize: "var(--text-sm)", color: "var(--primary)", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "3px", marginTop: "2px" }}>
                 <Plus style={{ width: "11px", height: "11px" }} /> Toevoegen
               </div>
             </>
@@ -169,14 +169,14 @@ export default function DreamTeamPage() {
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       <div className="mb-8">
-        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Dream Team</h1>
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "4px" }}>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Dream Team</h1>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginTop: "4px" }}>
           Jullie leveranciers per categorie
         </p>
       </div>
 
       {loading ? (
-        <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>Laden…</p>
+        <p style={{ color: "var(--muted)", fontSize: "var(--text-md)" }}>Laden…</p>
       ) : (
         <div
           style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "2rem 1.25rem" }}
@@ -203,13 +203,13 @@ export default function DreamTeamPage() {
         const extra = team.filter(m => !slotCategories.has(m.category));
         if (extra.length === 0) return null;
         return (
-          <div style={{ marginTop: "3rem" }}>
-            <p className="ddp-section-label" style={{ marginBottom: "0.5rem" }}>Overige gekoppelde leveranciers</p>
+          <div style={{ marginTop: "var(--space-10)" }}>
+            <p className="ddp-section-label" style={{ marginBottom: "var(--space-3)" }}>Overige gekoppelde leveranciers</p>
             <div>
               {extra.map(m => (
                 <Link key={m.vendorId} href={weddingId ? `/weddings/${weddingId}/vendors/${m.wvId}` : `/leveranciers/${m.vendorId}`} className="dash-row" style={{ textDecoration: "none", justifyContent: "space-between" }}>
                   <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{m.name}</span>
-                  <span style={{ color: "var(--muted)", fontSize: "0.8125rem" }}>{getVendorTypeConfig(m.category).label}</span>
+                  <span style={{ color: "var(--muted)", fontSize: "var(--text-base)" }}>{getVendorTypeConfig(m.category).label}</span>
                 </Link>
               ))}
             </div>
@@ -239,13 +239,13 @@ export default function DreamTeamPage() {
               boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
             }}
           >
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "0.5rem" }}>
+            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "var(--space-3)" }}>
               Verwijderen uit Dream Team?
             </h2>
-            <p style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "var(--space-8)", lineHeight: 1.5 }}>
               Weet je zeker dat je <strong>{confirmMember.name}</strong> wilt verwijderen uit je Dream Team?
             </p>
-            <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", gap: "var(--space-5)", justifyContent: "flex-end" }}>
               <button
                 onClick={() => setConfirmMember(null)}
                 disabled={removing}
@@ -265,7 +265,7 @@ export default function DreamTeamPage() {
                   border: "none",
                   cursor: removing ? "not-allowed" : "pointer",
                   opacity: removing ? 0.6 : 1,
-                  fontSize: "0.875rem",
+                  fontSize: "var(--text-md)",
                 }}
               >
                 {removing ? "Verwijderen…" : "Ja, verwijderen"}

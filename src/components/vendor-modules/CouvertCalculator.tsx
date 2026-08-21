@@ -43,30 +43,30 @@ export default function CouvertCalculator({ guests, intakeData }: Props) {
         <h3 className="font-semibold text-sm">Couvert-calculator</h3>
       </div>
 
-      <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: "var(--space-8)", marginBottom: "var(--space-6)", flexWrap: "wrap" }}>
         {[
           { label: "Bevestigd", value: confirmed.length },
           { label: "In afwachting", value: pending.length },
           { label: "Totaal uitgenodigd", value: total },
         ].map(({ label, value }) => (
           <div key={label}>
-            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--foreground)" }}>{value}</div>
-            <div style={{ fontSize: "0.6875rem", color: "var(--muted)", marginTop: "2px" }}>{label}</div>
+            <div style={{ fontSize: "var(--text-5xl)", fontWeight: 700, color: "var(--foreground)" }}>{value}</div>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", marginTop: "2px" }}>{label}</div>
           </div>
         ))}
       </div>
 
       {totalMenuPpp != null && confirmed.length > 0 && (
-        <div style={{ padding: "0.75rem 0", marginBottom: "1rem", borderTop: "1px solid var(--border)" }}>
-          <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "0.25rem" }}>Geschatte totaalprijs (op basis van menu)</div>
-          <div style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--foreground)" }}>{euro(totalMenuPpp * confirmed.length)}</div>
-          <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>{euro(totalMenuPpp)} p.p. × {confirmed.length} bevestigde gasten</div>
+        <div style={{ padding: "0.75rem 0", marginBottom: "var(--space-6)", borderTop: "1px solid var(--border)" }}>
+          <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-1)" }}>Geschatte totaalprijs (op basis van menu)</div>
+          <div style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--foreground)" }}>{euro(totalMenuPpp * confirmed.length)}</div>
+          <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>{euro(totalMenuPpp)} p.p. × {confirmed.length} bevestigde gasten</div>
         </div>
       )}
 
       {Object.keys(dietaryMap).length > 0 && (
         <div>
-          <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Dieetwensen (bevestigde gasten)</div>
+          <div style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dieetwensen (bevestigde gasten)</div>
           <div style={{ borderTop: "1px solid var(--border)" }}>
             {Object.entries(dietaryMap).sort((a, b) => b[1] - a[1]).map(([diet, count]) => (
               <div key={diet} className="dash-row" style={{ padding: "0.5rem 0" }}>
@@ -79,7 +79,7 @@ export default function CouvertCalculator({ guests, intakeData }: Props) {
       )}
 
       {confirmed.length === 0 && (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>Nog geen bevestigde gasten. De calculator wordt automatisch bijgewerkt.</p>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>Nog geen bevestigde gasten. De calculator wordt automatisch bijgewerkt.</p>
       )}
     </div>
   );

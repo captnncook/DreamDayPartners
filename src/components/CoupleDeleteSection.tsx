@@ -113,7 +113,7 @@ export default function CoupleDeleteSection() {
                   key={n}
                   onClick={() => setPlatformRating(n)}
                   style={{
-                    width: "40px", height: "40px", borderRadius: "10px", fontSize: "0.875rem", fontWeight: 700,
+                    width: "40px", height: "40px", borderRadius: "10px", fontSize: "var(--text-md)", fontWeight: 700,
                     border: platformRating === n ? "none" : "1px solid var(--border)",
                     background: platformRating === n ? "var(--gold)" : "white",
                     color: platformRating === n ? "var(--ink)" : "var(--foreground)",
@@ -144,7 +144,7 @@ export default function CoupleDeleteSection() {
                           onClick={() => setVendorRatings((p) => ({ ...p, [v.vendorId]: n }))}
                           aria-label={`${n} van 5`}
                           style={{
-                            width: "32px", height: "32px", borderRadius: "8px", fontSize: "0.8125rem", fontWeight: 700,
+                            width: "32px", height: "32px", borderRadius: "8px", fontSize: "var(--text-base)", fontWeight: 700,
                             border: (vendorRatings[v.vendorId] ?? 0) >= n ? "none" : "1px solid var(--border)",
                             background: (vendorRatings[v.vendorId] ?? 0) >= n ? "var(--gold)" : "white",
                             color: (vendorRatings[v.vendorId] ?? 0) >= n ? "var(--ink)" : "var(--muted)",
@@ -163,10 +163,10 @@ export default function CoupleDeleteSection() {
           )}
 
           <div className="flex gap-2 flex-wrap">
-            <button onClick={submitReviewsAndContinue} disabled={loading} className="ddp-btn-primary" style={{ fontSize: "0.8125rem" }}>
+            <button onClick={submitReviewsAndContinue} disabled={loading} className="ddp-btn-primary" style={{ fontSize: "var(--text-base)" }}>
               {loading ? "Versturen…" : "Versturen en doorgaan"}
             </button>
-            <button onClick={() => setStep("confirm")} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem" }}>
+            <button onClick={() => setStep("confirm")} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)" }}>
               Overslaan
             </button>
             <button onClick={() => setStep("idle")} className="text-xs" style={{ color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>
@@ -208,10 +208,10 @@ export default function CoupleDeleteSection() {
             </p>
           )}
           <div className="flex gap-2 flex-wrap">
-            <button onClick={requestDelete} disabled={loading} className="ddp-btn-secondary" style={{ color: "var(--danger)", borderColor: "var(--danger)", fontSize: "0.8125rem" }}>
+            <button onClick={requestDelete} disabled={loading} className="ddp-btn-secondary" style={{ color: "var(--danger)", borderColor: "var(--danger)", fontSize: "var(--text-base)" }}>
               {loading ? "Versturen…" : "Bevestig: stuur verwijdermail"}
             </button>
-            <button onClick={() => setStep("idle")} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem" }}>
+            <button onClick={() => setStep("idle")} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)" }}>
               Annuleren
             </button>
           </div>

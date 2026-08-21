@@ -29,7 +29,7 @@ export default async function AllGuestsPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Gasten</h1>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Gasten</h1>
         <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{totalGuests} gasten totaal · {totalConfirmed} bevestigd</p>
       </div>
 
@@ -42,7 +42,7 @@ export default async function AllGuestsPage() {
           {weddings.map((w) => (
             <Link key={w.id} href={`/weddings/${w.id}/guests`} className="dash-row" style={{ padding: "1.125rem 0.25rem" }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</div>
+                <div className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</div>
                 <div className="flex items-center gap-4 mt-1.5 flex-wrap">
                   {(["confirmed", "invited", "no_response", "declined"] as const).map((status) => {
                     const count = w.guests.filter((g) => g.rsvpStatus === status).length;
@@ -50,7 +50,7 @@ export default async function AllGuestsPage() {
                     return (
                       <span key={status} className="text-xs" style={{ color: meta.color }}>
                         <span style={{ fontWeight: 700 }}>{count}</span>{" "}
-                        <span style={{ fontSize: "0.6875rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{meta.label}</span>
+                        <span style={{ fontSize: "var(--text-xs)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{meta.label}</span>
                       </span>
                     );
                   })}

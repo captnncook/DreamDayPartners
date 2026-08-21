@@ -21,8 +21,8 @@ export default function StatusTracker({ status, onUpdate, isPlanner }: Props) {
 
   return (
     <div className="card" style={{ padding: "1.5rem" }}>
-      <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", marginBottom: "1rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Status</h3>
-      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+      <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", marginBottom: "var(--space-6)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Status</h3>
+      <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
         {STATUSES.map((s, idx) => {
           const isActive = s.key === status;
           const isPast = idx < currentIdx;
@@ -34,7 +34,7 @@ export default function StatusTracker({ status, onUpdate, isPlanner }: Props) {
               style={{
                 padding: "0.375rem 0.875rem",
                 borderRadius: "9999px",
-                fontSize: "0.8125rem",
+                fontSize: "var(--text-base)",
                 fontWeight: isActive ? 600 : 400,
                 border: isActive ? "none" : "1px solid var(--border)",
                 background: isActive ? "var(--primary)" : isPast ? "var(--blush-soft)" : "transparent",

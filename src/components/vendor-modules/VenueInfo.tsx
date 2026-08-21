@@ -33,7 +33,7 @@ export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
       </div>
 
       {hasFacts ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2" style={{ fontSize: "0.875rem" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2" style={{ fontSize: "var(--text-md)" }}>
           {venue.setupTime && (
             <div><span style={{ color: "var(--muted)" }}>Opbouwen vanaf:</span> {venue.setupTime}</div>
           )}
@@ -61,7 +61,7 @@ export default function VenueInfo({ venue }: { venue: VenueInfoData }) {
           )}
         </div>
       ) : (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           De trouwlocatie heeft deze gegevens nog niet ingevuld op hun profiel.
         </p>
       )}

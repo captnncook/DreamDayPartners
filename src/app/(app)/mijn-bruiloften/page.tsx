@@ -33,7 +33,7 @@ const VENDOR_STATUS_COLORS: Record<string, string> = {
 const INP: React.CSSProperties = {
   width: "100%", padding: "0.625rem 0.875rem",
   border: "1px solid var(--border)", borderRadius: "10px",
-  fontSize: "0.875rem", background: "white", outline: "none",
+  fontSize: "var(--text-md)", background: "white", outline: "none",
 };
 
 function formatDate(iso: string) {
@@ -107,8 +107,8 @@ export default function MijnBruiloftenPage() {
     <div style={{ maxWidth: "760px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
         <div>
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Mijn bruiloften</h1>
-          <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Mijn bruiloften</h1>
+          <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginTop: "2px" }}>
             Vul het e-mailadres van het bruidspaar in: heeft het bruidspaar al een account, dan word je
             direct gekoppeld. Nog geen account? Dan zetten we alvast een bruiloft voor je klaar en koppelen
             we automatisch zodra ze zich aanmelden.
@@ -123,7 +123,7 @@ export default function MijnBruiloftenPage() {
       </div>
 
       {success && (
-        <div style={{ padding: "0.875rem 1rem", borderRadius: "0 10px 10px 0", background: "var(--sand)", borderLeft: "3px solid var(--gold)", color: "var(--foreground)", fontSize: "0.875rem", marginBottom: "1rem" }}>
+        <div style={{ padding: "0.875rem 1rem", borderRadius: "0 10px 10px 0", background: "var(--sand)", borderLeft: "3px solid var(--gold)", color: "var(--foreground)", fontSize: "var(--text-md)", marginBottom: "var(--space-6)" }}>
           {success}
         </div>
       )}
@@ -131,34 +131,34 @@ export default function MijnBruiloftenPage() {
       {/* Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="ddp-card mb-6" style={{ padding: "1.5rem" }}>
-          <h2 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: "1.25rem" }}>Bruiloft registreren</h2>
-          <div style={{ display: "grid", gap: "1rem" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-              <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+          <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-7)" }}>Bruiloft registreren</h2>
+          <div style={{ display: "grid", gap: "var(--space-6)" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}>
+              <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
                 E-mail partner 1 *<br />
                 <input type="email" required value={form.email1} onChange={e => set("email1", e.target.value)} placeholder="partner1@email.nl" style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
-              <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+              <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
                 E-mail partner 2<br />
                 <input type="email" value={form.email2} onChange={e => set("email2", e.target.value)} placeholder="partner2@email.nl" style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-              <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}>
+              <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
                 Trouwdatum *<br />
                 <DatePicker value={form.weddingDate} onChange={v => set("weddingDate", v)} className="" style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
-              <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+              <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
                 Naam bruiloft (optioneel)<br />
                 <input value={form.weddingTitle} onChange={e => set("weddingTitle", e.target.value)} placeholder="bijv. Bruiloft Emma & Thomas" style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
             </div>
-            <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+            <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
               Notities<br />
               <input value={form.notes} onChange={e => set("notes", e.target.value)} placeholder="Bijv. decoratie kerk + diner" style={{ ...INP, marginTop: "0.3rem" }} />
             </label>
-            {error && <p style={{ fontSize: "0.875rem", color: "var(--danger)" }}>{error}</p>}
-            <div style={{ display: "flex", gap: "0.5rem" }}>
+            {error && <p style={{ fontSize: "var(--text-md)", color: "var(--danger)" }}>{error}</p>}
+            <div style={{ display: "flex", gap: "var(--space-3)" }}>
               <button type="submit" disabled={saving} className="ddp-btn-primary">
                 {saving ? "Opslaan…" : "Registreren"}
               </button>
@@ -170,11 +170,11 @@ export default function MijnBruiloftenPage() {
 
       {/* List */}
       {loading ? (
-        <p style={{ color: "var(--muted)", fontSize: "0.875rem" }}>Laden…</p>
+        <p style={{ color: "var(--muted)", fontSize: "var(--text-md)" }}>Laden…</p>
       ) : invites.length === 0 ? (
         <div className="text-center py-16" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontWeight: 600, marginBottom: "0.5rem" }}>Nog geen bruiloften geregistreerd</p>
-          <p style={{ fontSize: "0.875rem" }}>Voeg een bruiloft toe om automatisch gekoppeld te worden zodra het bruidspaar zich aanmeldt.</p>
+          <p style={{ fontWeight: 600, marginBottom: "var(--space-3)" }}>Nog geen bruiloften geregistreerd</p>
+          <p style={{ fontSize: "var(--text-md)" }}>Voeg een bruiloft toe om automatisch gekoppeld te worden zodra het bruidspaar zich aanmeldt.</p>
         </div>
       ) : (
         <div style={{ borderTop: "1px solid var(--border)" }}>
@@ -183,39 +183,39 @@ export default function MijnBruiloftenPage() {
             return (
               <div key={invite.id} className="dash-row" style={{ cursor: linked ? "pointer" : "default", alignItems: "flex-start" }}
                 onClick={() => { if (linked && invite.weddingId) window.location.href = `/weddings/${invite.weddingId}`; }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem", width: "100%" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-6)", width: "100%" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "1rem" }}>
+                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-xl)" }}>
                       {invite.weddingTitle ?? formatDate(invite.weddingDate)}
                     </div>
-                    <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "2px" }}>
+                    <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginTop: "2px" }}>
                       {formatDate(invite.weddingDate)} · {invite.email1}{invite.email2 ? ` & ${invite.email2}` : ""}
                     </div>
                     {invite.notes && (
-                      <div style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "4px" }}>{invite.notes}</div>
+                      <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginTop: "4px" }}>{invite.notes}</div>
                     )}
                     <div style={{ marginTop: "6px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {linked ? (
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
                           Bruidspaar gekoppeld
                         </span>
                       ) : (
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
                           Bruidspaar nog niet aangemeld
                         </span>
                       )}
                       {invite.vendorStatus && (
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: VENDOR_STATUS_COLORS[invite.vendorStatus] ?? "var(--muted)" }}>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: VENDOR_STATUS_COLORS[invite.vendorStatus] ?? "var(--muted)" }}>
                           {VENDOR_STATUS_LABELS[invite.vendorStatus] ?? invite.vendorStatus}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                  <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
                     {invite.weddingId && (
                       <Link
                         href={`/weddings/${invite.weddingId}`}
-                        style={{ fontSize: "0.8125rem", color: "var(--gold-deep)", fontWeight: 600, textDecoration: "none" }}
+                        style={{ fontSize: "var(--text-base)", color: "var(--gold-deep)", fontWeight: 600, textDecoration: "none" }}
                       >
                         Dashboard
                       </Link>
@@ -224,7 +224,7 @@ export default function MijnBruiloftenPage() {
                       <button
                         onClick={() => handleInvite(invite.weddingId!)}
                         disabled={invitingId === invite.weddingId || invitedIds.has(invite.weddingId)}
-                        style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
+                        style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
                       >
                         {invitedIds.has(invite.weddingId) ? "Uitnodiging verstuurd" : invitingId === invite.weddingId ? "Bezig…" : "Uitnodigen"}
                       </button>

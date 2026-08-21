@@ -104,8 +104,8 @@ export default function ShieldPhotoCropper({
         onClick={(e) => e.stopPropagation()}
         style={{ background: "var(--background)", borderRadius: "20px", padding: "1.5rem", maxWidth: "360px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
       >
-        <h3 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "0.25rem" }}>Foto plaatsen</h3>
-        <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+        <h3 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "var(--space-1)" }}>Foto plaatsen</h3>
+        <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
           Sleep de foto om te verplaatsen en gebruik de schuif om in of uit te zoomen.
         </p>
 
@@ -158,7 +158,7 @@ export default function ShieldPhotoCropper({
           type="range" min={1} max={3} step={0.01} value={zoom}
           onChange={(e) => handleZoom(parseFloat(e.target.value))}
           className="ddp-range"
-          style={{ marginTop: "1.25rem" }}
+          style={{ marginTop: "var(--space-7)" }}
         />
 
         <div className="flex gap-2 mt-4">

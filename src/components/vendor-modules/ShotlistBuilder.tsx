@@ -67,7 +67,7 @@ export default function ShotlistBuilder({ intakeData, onUpdate, isVendor, isPlan
           <h3 className="font-semibold text-sm">Fotolijst</h3>
         </div>
         {totalShots > 0 && (
-          <span style={{ fontSize: "0.75rem", color: "var(--muted)", background: "var(--accent)", borderRadius: "9999px", padding: "0.125rem 0.625rem" }}>
+          <span style={{ fontSize: "var(--text-sm)", color: "var(--muted)", background: "var(--accent)", borderRadius: "9999px", padding: "0.125rem 0.625rem" }}>
             {doneShots}/{totalShots} afgevinkt
           </span>
         )}
@@ -80,7 +80,7 @@ export default function ShotlistBuilder({ intakeData, onUpdate, isVendor, isPlan
               <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>{cat.title}</span>
               {canEdit && (
                 <button onClick={() => setAdding({ catId: cat.id, text: "" })}
-                  style={{ fontSize: "0.75rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                  style={{ fontSize: "var(--text-sm)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
                   <Plus className="w-3 h-3" /> Toevoegen
                 </button>
               )}
@@ -102,7 +102,7 @@ export default function ShotlistBuilder({ intakeData, onUpdate, isVendor, isPlan
             )}
 
             {cat.shots.length === 0 && adding?.catId !== cat.id && (
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", fontStyle: "italic" }}>Nog geen foto's toegevoegd.</p>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", fontStyle: "italic" }}>Nog geen foto's toegevoegd.</p>
             )}
 
             <div className="space-y-1">

@@ -6,7 +6,7 @@ import { SkeletonBlock } from "@/components/Skeleton";
 export default function AppLoading() {
   return (
     <div className="px-4 py-6 md:p-8 max-w-3xl mx-auto space-y-4">
-      <SkeletonBlock style={{ height: "2rem", width: "50%", marginBottom: "1.5rem" }} />
+      <SkeletonBlock style={{ height: "2rem", width: "50%", marginBottom: "var(--space-8)" }} />
       <SkeletonBlock style={{ height: "140px", borderRadius: "16px" }} />
       <SkeletonBlock style={{ height: "56px", borderRadius: "12px" }} />
       <SkeletonBlock style={{ height: "56px", borderRadius: "12px" }} />

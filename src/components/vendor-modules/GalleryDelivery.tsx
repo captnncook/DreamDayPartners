@@ -33,7 +33,7 @@ export default function GalleryDelivery({ intakeData, onUpdate, isVendor, isPlan
           <h3 className="font-semibold text-sm">Galerij levering</h3>
         </div>
         {canEdit && (
-          <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => setEditing(!editing)} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             {editing ? "Annuleren" : "Bewerken"}
           </button>
         )}
@@ -56,12 +56,12 @@ export default function GalleryDelivery({ intakeData, onUpdate, isVendor, isPlan
             <input type="text" value={galleryNote} onChange={e => setGalleryNote(e.target.value)}
               placeholder="Bijv. wachtwoord: bruidspaar2026" className="w-full border rounded-lg px-3 py-2 text-sm bg-white" style={{ borderColor: "var(--border)" }} />
           </div>
-          <button onClick={save} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+          <button onClick={save} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-md)", fontWeight: 600 }}>
             Opslaan
           </button>
         </div>
       ) : !hasContent ? (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           {canEdit ? "Voeg een leverdatum en galerij-link toe zodra de foto's klaar zijn." : "Nog geen galerij beschikbaar."}
         </p>
       ) : (
@@ -85,7 +85,7 @@ export default function GalleryDelivery({ intakeData, onUpdate, isVendor, isPlan
             <div className="flex justify-between items-center text-sm" style={{ padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
               <span style={{ color: "var(--muted)" }}>Galerij</span>
               <a href={galleryLink} target="_blank" rel="noopener noreferrer"
-                style={{ color: "var(--primary)", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                style={{ color: "var(--primary)", fontWeight: 600, display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
                 Bekijk galerij <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>

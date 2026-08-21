@@ -40,7 +40,7 @@ export default async function AllMessagesPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Alle berichten</h1>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Alle berichten</h1>
         <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{threads.length} gesprek{threads.length !== 1 ? "ken" : ""}</p>
       </div>
 
@@ -59,7 +59,7 @@ export default async function AllMessagesPage() {
                     <span className="text-sm" style={{ fontWeight: 600, color: "var(--foreground)" }}>
                       {thread.subject ?? THREAD_LABELS[thread.type] ?? thread.type}
                     </span>
-                    <span style={{ fontSize: "0.6875rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
+                    <span style={{ fontSize: "var(--text-xs)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
                       {THREAD_LABELS[thread.type] ?? thread.type}
                     </span>
                     {thread.wedding && (

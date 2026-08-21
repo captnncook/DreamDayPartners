@@ -91,11 +91,11 @@ function TierSlider({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: textColor }}>
+        <span style={{ fontSize: "var(--text-base)", fontWeight: 600, color: textColor }}>
           Tot {tierLabel(tier)} bruiloften tegelijk
         </span>
-        <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--gold)" }}>
-          €{price}<span style={{ fontSize: "0.75rem", fontWeight: 500, color: mutedColor }}>/{billingInterval === "year" ? "jaar" : "maand"} ex btw</span>
+        <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, color: "var(--gold)" }}>
+          €{price}<span style={{ fontSize: "var(--text-sm)", fontWeight: 500, color: mutedColor }}>/{billingInterval === "year" ? "jaar" : "maand"} ex btw</span>
         </span>
       </div>
       <input
@@ -107,25 +107,25 @@ function TierSlider({
         onChange={(e) => setSelectedTierIndex(parseInt(e.target.value, 10))}
         className={`ddp-range${dark ? " ddp-range--dark" : ""}`}
       />
-      <div className="flex justify-between" style={{ fontSize: "0.6875rem", color: mutedLightColor, marginBottom: "0.75rem" }}>
+      <div className="flex justify-between" style={{ fontSize: "var(--text-xs)", color: mutedLightColor, marginBottom: "var(--space-5)" }}>
         <span>10</span>
         <span>100+</span>
       </div>
 
-      <p style={{ fontSize: "0.75rem", color: mutedColor, marginBottom: "0.25rem" }}>
+      <p style={{ fontSize: "var(--text-sm)", color: mutedColor, marginBottom: "var(--space-1)" }}>
         Dat is €{perWeddingPerMonth.toFixed(2).replace(".", ",")} per bruiloft per maand.
       </p>
-      <p style={{ fontSize: "0.75rem", color: mutedColor, marginBottom: "1rem" }}>
+      <p style={{ fontSize: "var(--text-sm)", color: mutedColor, marginBottom: "var(--space-6)" }}>
         Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft. Bij {tierLabel(tier)} bruiloften per maand is dat <strong style={{ color: textColor }}>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
       </p>
 
-      <div style={{ display: "flex", border: `1px solid ${dark ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "0.75rem", maxWidth: "260px" }}>
+      <div style={{ display: "flex", border: `1px solid ${dark ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "var(--space-5)", maxWidth: "260px" }}>
         <button
           type="button"
           onClick={() => setBillingInterval("month")}
           style={{
             flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
-            fontSize: "0.75rem", fontWeight: billingInterval === "month" ? 700 : 500,
+            fontSize: "var(--text-sm)", fontWeight: billingInterval === "month" ? 700 : 500,
             background: billingInterval === "month" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
             color: billingInterval === "month" ? (dark ? "var(--ink-text)" : "white") : mutedColor,
           }}
@@ -137,7 +137,7 @@ function TierSlider({
           onClick={() => setBillingInterval("year")}
           style={{
             flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
-            fontSize: "0.75rem", fontWeight: billingInterval === "year" ? 700 : 500,
+            fontSize: "var(--text-sm)", fontWeight: billingInterval === "year" ? 700 : 500,
             background: billingInterval === "year" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
             color: billingInterval === "year" ? "var(--gold)" : mutedColor,
           }}
@@ -150,7 +150,7 @@ function TierSlider({
         onClick={onAction}
         disabled={disabled}
         className="ddp-btn-gold"
-        style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: disabled ? "not-allowed" : "pointer", fontSize: "0.875rem", fontWeight: 700, whiteSpace: "nowrap", opacity: disabled ? 0.6 : 1 }}
+        style={{ padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", background: "var(--gold)", color: "var(--ink)", border: "none", cursor: disabled ? "not-allowed" : "pointer", fontSize: "var(--text-md)", fontWeight: 700, whiteSpace: "nowrap", opacity: disabled ? 0.6 : 1 }}
       >
         {actionLabel}
       </button>
@@ -178,7 +178,7 @@ function CheckboxGroup({ options, selected, onChange }: { options: string[]; sel
             type="button"
             onClick={() => toggle(opt)}
             style={{
-              fontSize: "0.8125rem", fontWeight: active ? 700 : 500, padding: "0.4rem 0.75rem",
+              fontSize: "var(--text-base)", fontWeight: active ? 700 : 500, padding: "0.4rem 0.75rem",
               borderRadius: "var(--radius-full)", border: `1px solid ${active ? "var(--gold)" : "var(--border)"}`,
               background: active ? "var(--sand)" : "transparent", color: active ? "var(--gold-deep)" : "var(--muted)",
               cursor: "pointer",
@@ -199,16 +199,16 @@ function ProfileDetailField({ field, value, onChange }: {
 }) {
   if (field.type === "boolean") {
     return (
-      <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", cursor: "pointer" }}>
         <input type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} style={{ width: 16, height: 16, accentColor: "var(--gold-deep)" }} />
-        <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>{field.label}</span>
+        <span style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)" }}>{field.label}</span>
       </label>
     );
   }
   if (field.type === "multiselect") {
     return (
       <div>
-        <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{field.label}</label>
+        <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{field.label}</label>
         <CheckboxGroup options={field.options ?? []} selected={Array.isArray(value) ? (value as string[]) : []} onChange={onChange} />
       </div>
     );
@@ -216,7 +216,7 @@ function ProfileDetailField({ field, value, onChange }: {
   if (field.type === "select") {
     return (
       <div>
-        <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{field.label}</label>
+        <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{field.label}</label>
         <select value={typeof value === "string" ? value : ""} onChange={(e) => onChange(e.target.value)} className="ddp-select">
           <option value="">Kies…</option>
           {(field.options ?? []).map((opt) => <option key={opt} value={opt}>{opt}</option>)}
@@ -226,7 +226,7 @@ function ProfileDetailField({ field, value, onChange }: {
   }
   return (
     <div>
-      <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{field.label}</label>
+      <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{field.label}</label>
       {field.type === "longtext" ? (
         <textarea
           value={typeof value === "string" ? value : ""}
@@ -277,14 +277,14 @@ function BusyCalendar({ busyDates, onToggle }: {
   return (
     <div>
       {/* Month navigator */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
-        <button onClick={() => setCalMonth(new Date(year, month - 1, 1))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.25rem", color: "var(--muted)", padding: "0.25rem 0.5rem" }}>‹</button>
-        <span style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{MONTHS_NL[month]} {year}</span>
-        <button onClick={() => setCalMonth(new Date(year, month + 1, 1))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.25rem", color: "var(--muted)", padding: "0.25rem 0.5rem" }}>›</button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-5)" }}>
+        <button onClick={() => setCalMonth(new Date(year, month - 1, 1))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "var(--text-3xl)", color: "var(--muted)", padding: "0.25rem 0.5rem" }}>‹</button>
+        <span style={{ fontWeight: 600, fontSize: "var(--text-lg)" }}>{MONTHS_NL[month]} {year}</span>
+        <button onClick={() => setCalMonth(new Date(year, month + 1, 1))} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "var(--text-3xl)", color: "var(--muted)", padding: "0.25rem 0.5rem" }}>›</button>
       </div>
       {/* Weekday headers */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "2px" }}>
-        {WEEKDAYS.map(w => <div key={w} style={{ textAlign: "center", fontSize: "0.6875rem", fontWeight: 600, color: "var(--muted)", padding: "0.25rem 0" }}>{w}</div>)}
+        {WEEKDAYS.map(w => <div key={w} style={{ textAlign: "center", fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--muted)", padding: "0.25rem 0" }}>{w}</div>)}
       </div>
       {/* Day cells */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
@@ -298,7 +298,7 @@ function BusyCalendar({ busyDates, onToggle }: {
               padding: "0.375rem 0.25rem", borderRadius: "6px", border: "none", cursor: isPast ? "default" : "pointer",
               background: isBusy ? "var(--ink)" : "var(--sand)",
               color: isBusy ? "var(--ink-text)" : isPast ? "var(--muted)" : "var(--foreground)",
-              fontWeight: isBusy ? 700 : 400, fontSize: "0.8125rem", transition: "background 0.1s",
+              fontWeight: isBusy ? 700 : 400, fontSize: "var(--text-base)", transition: "background 0.1s",
               opacity: isPast ? 0.4 : 1,
             }}>
               {day}
@@ -306,11 +306,11 @@ function BusyCalendar({ busyDates, onToggle }: {
           );
         })}
       </div>
-      <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.75rem" }}>Klik op een dag in de kalender om hem te blokkeren of deblokkeren.</p>
+      <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-5)" }}>Klik op een dag in de kalender om hem te blokkeren of deblokkeren.</p>
       {busyDates.length > 0 && (
-        <div style={{ marginTop: "0.75rem", display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+        <div style={{ marginTop: "var(--space-5)", display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
           {busyDates.sort().map(d => (
-            <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", background: "var(--ink)", color: "var(--ink-text)", borderRadius: "9999px", padding: "0.2rem 0.625rem", fontSize: "0.75rem", fontWeight: 500 }}>
+            <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", background: "var(--ink)", color: "var(--ink-text)", borderRadius: "9999px", padding: "0.2rem 0.625rem", fontSize: "var(--text-sm)", fontWeight: 500 }}>
               {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(new Date(d))}
               <button onClick={() => onToggle(d)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--gold)", padding: 0, lineHeight: 1, fontSize: "0.9rem" }}>×</button>
             </span>
@@ -778,7 +778,7 @@ function VendorEditPage() {
     return (
       <div style={{ maxWidth: "680px", margin: "0 auto", padding: "2rem 1.25rem" }}>
         {[100, 60, 80, 60, 90, 70].map((w, i) => (
-          <div key={i} style={{ height: i === 0 ? "2.5rem" : "2.75rem", width: `${w}%`, borderRadius: "10px", marginBottom: "1rem",
+          <div key={i} style={{ height: i === 0 ? "2.5rem" : "2.75rem", width: `${w}%`, borderRadius: "10px", marginBottom: "var(--space-6)",
             background: "linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%)", backgroundSize: "200% 100%", animation: "skeleton-shimmer 1.5s infinite" }} />
         ))}
       </div>
@@ -791,33 +791,33 @@ function VendorEditPage() {
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       <div className="dash-hero" style={{ borderRadius: 0, padding: "1.75rem 1.25rem 2rem" }}>
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
             Profiel bewerken
           </h1>
-          <p style={{ fontSize: "0.9rem", color: "var(--ink-muted)", marginTop: "0.25rem" }}>{vendor.name}</p>
+          <p style={{ fontSize: "0.9rem", color: "var(--ink-muted)", marginTop: "var(--space-1)" }}>{vendor.name}</p>
         </div>
       </div>
 
       <div style={{ maxWidth: "760px", margin: "1.5rem auto", padding: "0 1.25rem 3rem" }}>
         {/* Premium status banner — shown at top */}
         {isUserPremium && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.75rem 1rem", marginBottom: "1rem", fontSize: "0.875rem", color: "var(--foreground)", fontWeight: 600 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.75rem 1rem", marginBottom: "var(--space-6)", fontSize: "var(--text-md)", color: "var(--foreground)", fontWeight: 600 }}>
             <Star className="w-4 h-4" style={{ color: "var(--gold-deep)", flexShrink: 0 }} />
             Premium actief. Je profiel staat bovenaan de zoekresultaten.
           </div>
         )}
         {upgradeStatus === "success" && (
-          <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "var(--foreground)", marginBottom: "1rem" }}>
+          <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "var(--text-md)", color: "var(--foreground)", marginBottom: "var(--space-6)" }}>
             Premium actief, welkom bij DreamDay Platform Pro!
           </div>
         )}
         {upgradeStatus === "cancelled" && (
-          <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "var(--foreground)", marginBottom: "1rem" }}>
+          <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "var(--text-md)", color: "var(--foreground)", marginBottom: "var(--space-6)" }}>
             Betaling geannuleerd. Je kunt het altijd opnieuw proberen.
           </div>
         )}
         {error && (
-          <div style={{ background: "var(--danger-bg)", borderLeft: "3px solid var(--danger)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "0.875rem", color: "var(--danger)", marginBottom: "1rem" }}>
+          <div style={{ background: "var(--danger-bg)", borderLeft: "3px solid var(--danger)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "var(--text-md)", color: "var(--danger)", marginBottom: "var(--space-6)" }}>
             {error}
           </div>
         )}
@@ -857,7 +857,7 @@ function VendorEditPage() {
         {/* Profielfoto (cover) */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
           <h2 className="dash-section-title mb-1">Profielfoto</h2>
-          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+          <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
             Wordt getoond op de leverancierskaart in het overzicht. Kies een opvallende foto die jullie werk goed vertegenwoordigt.
           </p>
 
@@ -879,7 +879,7 @@ function VendorEditPage() {
                 style={{
                   position: "absolute", bottom: "8px", right: "8px",
                   background: "rgba(0,0,0,0.65)", border: "none", borderRadius: "8px",
-                  padding: "5px 10px", cursor: "pointer", color: "white", fontSize: "0.75rem", fontWeight: 600,
+                  padding: "5px 10px", cursor: "pointer", color: "white", fontSize: "var(--text-sm)", fontWeight: 600,
                 }}
               >
                 Vervangen
@@ -893,7 +893,7 @@ function VendorEditPage() {
                 width: "280px", aspectRatio: "4/3",
                 border: "2px dashed rgba(0,0,0,0.15)", borderRadius: "12px",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                gap: "0.5rem", cursor: "pointer", background: "none", color: "var(--muted)", fontSize: "0.8125rem",
+                gap: "var(--space-3)", cursor: "pointer", background: "none", color: "var(--muted)", fontSize: "var(--text-base)",
               }}
             >
               <Upload className="w-5 h-5" />
@@ -901,16 +901,16 @@ function VendorEditPage() {
             </button>
           )}
           <input ref={coverInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.75rem" }}>Max 10 MB · JPG, PNG, WebP</p>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-5)" }}>Max 10 MB · JPG, PNG, WebP</p>
         </section>
 
         {/* Embleem foto */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
           <h2 className="dash-section-title mb-1">Embleem foto</h2>
-          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+          <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
             Portretfoto die verschijnt in het Dream Team overzicht van het bruidspaar en in de chat. Gebruik een foto waarbij je gezicht goed zichtbaar is.
           </p>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: "1.5rem", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-8)", flexWrap: "wrap" }}>
             {/* Shield preview */}
             <div style={{ position: "relative", width: "120px", flexShrink: 0 }}>
               <svg viewBox="0 0 120 140" width="120" height="140" style={{ display: "block" }}>
@@ -928,19 +928,19 @@ function VendorEditPage() {
                 )}
               </svg>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingTop: "0.5rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)", paddingTop: "0.5rem" }}>
               <button onClick={() => emblemInputRef.current?.click()} disabled={uploadingEmblem}
-                style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--ink)", color: "white", border: "none", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontWeight: 600, fontSize: "0.8125rem" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--ink)", color: "white", border: "none", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-base)" }}>
                 <Upload className="w-4 h-4" />
                 {uploadingEmblem ? "Uploaden…" : emblemUrl ? "Vervangen" : "Foto uploaden"}
               </button>
               {emblemUrl && (
                 <button onClick={handleDeleteEmblem}
-                  style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "none", color: "var(--danger)", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontSize: "0.8125rem" }}>
+                  style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "none", color: "var(--danger)", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontSize: "var(--text-base)" }}>
                   <Trash2 className="w-4 h-4" /> Verwijderen
                 </button>
               )}
-              <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Max 10 MB · JPG, PNG, WebP</p>
+              <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>Max 10 MB · JPG, PNG, WebP</p>
             </div>
           </div>
           <input ref={emblemInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEmblemFileSelected} />
@@ -952,7 +952,7 @@ function VendorEditPage() {
         {/* Galerij */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
           <h2 className="dash-section-title mb-1">Galerij</h2>
-          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+          <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
             Tot 12 foto&apos;s die worden getoond op jullie profielpagina. Laat zien wat jullie kunnen!
           </p>
 
@@ -980,7 +980,7 @@ function VendorEditPage() {
                 style={{
                   aspectRatio: "4/3", border: "2px dashed rgba(0,0,0,0.15)", borderRadius: "10px",
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  gap: "0.5rem", cursor: "pointer", background: "none", color: "var(--muted)", fontSize: "0.8125rem",
+                  gap: "var(--space-3)", cursor: "pointer", background: "none", color: "var(--muted)", fontSize: "var(--text-base)",
                 }}
               >
                 <Upload className="w-5 h-5" />
@@ -990,7 +990,7 @@ function VendorEditPage() {
           </div>
 
           <input ref={galleryInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleGalleryUpload} />
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Max 12 foto&apos;s · Max 10 MB per foto</p>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>Max 12 foto&apos;s · Max 10 MB per foto</p>
         </section>
 
         {/* Tekst & info */}
@@ -999,7 +999,7 @@ function VendorEditPage() {
 
           <div className="flex flex-col gap-4">
             <div>
-              <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>
+              <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>
                 Over ons / beschrijving
               </label>
               <textarea
@@ -1020,7 +1020,7 @@ function VendorEditPage() {
                 { key: "reviewLinkUrl", label: "Externe reviewlink (bijv. Google)", placeholder: "https://g.page/r/...../review" },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>
                     {label}
                   </label>
                   <input
@@ -1039,7 +1039,7 @@ function VendorEditPage() {
         {/* Prijzen & specialisaties */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
           <h2 className="dash-section-title mb-1">Prijsindicatie & specialisaties</h2>
-          <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+          <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
             Geef bruidsparen een richtprijs en vertel in welke specialisaties jullie uitblinken.
           </p>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -1048,7 +1048,7 @@ function VendorEditPage() {
               { key: "priceTo", label: "Tot (€)", placeholder: "bijv. 120" },
             ].map(({ key, label, placeholder }) => (
               <div key={key}>
-                <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{label}</label>
+                <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{label}</label>
                 <input
                   type="number"
                   value={form[key as keyof typeof form]}
@@ -1060,7 +1060,7 @@ function VendorEditPage() {
             ))}
           </div>
           <div className="mb-4">
-            <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Prijseenheid</label>
+            <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Prijseenheid</label>
             <select
               value={form.priceUnit}
               onChange={(e) => setForm({ ...form, priceUnit: e.target.value })}
@@ -1076,7 +1076,7 @@ function VendorEditPage() {
             </select>
           </div>
           <div>
-            <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Specialisaties (komma-gescheiden)</label>
+            <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Specialisaties (komma-gescheiden)</label>
             <input
               type="text"
               value={form.specializations}
@@ -1094,7 +1094,7 @@ function VendorEditPage() {
           return (
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
               <h2 className="dash-section-title mb-1">{section.title}</h2>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
                 Deze gegevens helpen bruidsparen om snel te zien of jullie bij elkaar passen.
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -1117,11 +1117,11 @@ function VendorEditPage() {
             {/* Gemiddelde bruiloftprijs */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
               <h2 className="dash-section-title mb-1">Gemiddelde bruiloftprijs</h2>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
                 Naast de startprijs hierboven: wat geeft een gemiddeld bruidspaar in totaal uit bij jullie?
               </p>
               <div style={{ maxWidth: "200px" }}>
-                <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Gemiddeld totaalbedrag (€)</label>
+                <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Gemiddeld totaalbedrag (€)</label>
                 <input
                   type="number"
                   value={form.averageWeddingPrice}
@@ -1135,7 +1135,7 @@ function VendorEditPage() {
             {/* Capaciteit */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
               <h2 className="dash-section-title mb-1">Capaciteit</h2>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
                 Aantal gasten per moment van de dag. Bruidsparen filteren hier direct op.
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
@@ -1146,7 +1146,7 @@ function VendorEditPage() {
                   ["partyMinGuests", "partyMaxGuests", "Feest"],
                 ] as const).map(([minKey, maxKey, label]) => (
                   <div key={label}>
-                    <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>{label}</label>
+                    <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{label}</label>
                     <div className="flex items-center gap-1.5">
                       <input type="number" value={form[minKey]} onChange={(e) => setForm({ ...form, [minKey]: e.target.value })} placeholder="min" className="ddp-input" style={{ width: "100%" }} />
                       <span style={{ color: "var(--muted)" }}>–</span>
@@ -1156,7 +1156,7 @@ function VendorEditPage() {
                 ))}
               </div>
               <div style={{ maxWidth: "200px" }}>
-                <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Aantal hotelkamers</label>
+                <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Aantal hotelkamers</label>
                 <input type="number" value={form.hotelRooms} onChange={(e) => setForm({ ...form, hotelRooms: e.target.value })} placeholder="bijv. 20" className="ddp-input" />
               </div>
             </section>
@@ -1164,7 +1164,7 @@ function VendorEditPage() {
             {/* Zalen */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
               <h2 className="dash-section-title mb-1">Zalen</h2>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
                 Heb je meerdere ruimtes? Voeg ze los toe met eigen oppervlakte en capaciteit.
               </p>
               <div className="space-y-4 mb-4">
@@ -1186,11 +1186,11 @@ function VendorEditPage() {
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
                       <div>
-                        <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Oppervlakte (m²)</label>
+                        <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>Oppervlakte (m²)</label>
                         <input type="number" value={room.surfaceArea ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { surfaceArea: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} className="ddp-input" />
                       </div>
                       <div>
-                        <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Hoogte (m)</label>
+                        <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>Hoogte (m)</label>
                         <input type="number" value={room.ceilingHeight ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { ceilingHeight: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} className="ddp-input" />
                       </div>
                     </div>
@@ -1202,7 +1202,7 @@ function VendorEditPage() {
                         ["partyMin", "partyMax", "Feest"],
                       ] as const).map(([minKey, maxKey, label]) => (
                         <div key={label}>
-                          <label style={{ fontSize: "0.75rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>{label}</label>
+                          <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>{label}</label>
                           <div className="flex items-center gap-1">
                             <input type="number" value={room[minKey] ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { [minKey]: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} placeholder="min" className="ddp-input" style={{ width: "100%" }} />
                             <input type="number" value={room[maxKey] ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { [maxKey]: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} placeholder="max" className="ddp-input" style={{ width: "100%" }} />
@@ -1223,34 +1223,34 @@ function VendorEditPage() {
               <h2 className="dash-section-title mb-4">Eigenschappen</h2>
 
               <div className="flex flex-wrap gap-4 mb-5">
-                <label className="flex items-center gap-2" style={{ fontSize: "0.875rem", cursor: "pointer" }}>
+                <label className="flex items-center gap-2" style={{ fontSize: "var(--text-md)", cursor: "pointer" }}>
                   <input type="checkbox" checked={isOfficialCeremonyLocation} onChange={(e) => setIsOfficialCeremonyLocation(e.target.checked)} />
                   Officiële trouwlocatie
                 </label>
-                <label className="flex items-center gap-2" style={{ fontSize: "0.875rem", cursor: "pointer" }}>
+                <label className="flex items-center gap-2" style={{ fontSize: "var(--text-md)", cursor: "pointer" }}>
                   <input type="checkbox" checked={outdoorCeremonyPossible} onChange={(e) => setOutdoorCeremonyPossible(e.target.checked)} />
                   Buiten trouwen mogelijk
                 </label>
               </div>
 
               <div className="mb-5">
-                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Toegankelijkheid</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Toegankelijkheid</p>
                 <CheckboxGroup options={ACCESSIBILITY_OPTIONS} selected={accessibility} onChange={setAccessibility} />
               </div>
               <div className="mb-5">
-                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Faciliteiten</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Faciliteiten</p>
                 <CheckboxGroup options={VENUE_FACILITIES_OPTIONS} selected={venueFacilities} onChange={setVenueFacilities} />
               </div>
               <div className="mb-5">
-                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Dinermogelijkheden</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dinermogelijkheden</p>
                 <CheckboxGroup options={CATERING_OPTIONS_LIST} selected={cateringOptions} onChange={setCateringOptions} />
               </div>
               <div className="mb-5">
-                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Barmogelijkheden</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Barmogelijkheden</p>
                 <CheckboxGroup options={BAR_OPTIONS_LIST} selected={barOptions} onChange={setBarOptions} />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Omgeving</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Omgeving</p>
                 <CheckboxGroup options={ENVIRONMENT_OPTIONS} selected={environment} onChange={setEnvironment} />
               </div>
             </section>
@@ -1258,30 +1258,30 @@ function VendorEditPage() {
             {/* Regels */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
               <h2 className="dash-section-title mb-1">Regels</h2>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
                 Praktische afspraken die bruidsparen vaak vroeg willen weten.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Sluitingstijd</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Sluitingstijd</label>
                   <input type="time" value={form.closingTime} onChange={(e) => setForm({ ...form, closingTime: e.target.value })} className="ddp-input" />
                 </div>
                 <div>
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Geluidslimiet</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Geluidslimiet</label>
                   <input type="text" value={form.soundLimit} onChange={(e) => setForm({ ...form, soundLimit: e.target.value })} placeholder="bijv. 90 dB na 23:00" className="ddp-input" />
                 </div>
                 <div>
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Standaard opbouwtijd</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Standaard opbouwtijd</label>
                   <input type="time" value={form.setupTime} onChange={(e) => setForm({ ...form, setupTime: e.target.value })} className="ddp-input" />
-                  <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.25rem" }}>Vanaf hoelaat mogen leveranciers standaard opbouwen. Per bruiloft kan de leverancier dit desgewenst aanpassen.</p>
+                  <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-1)" }}>Vanaf hoelaat mogen leveranciers standaard opbouwen. Per bruiloft kan de leverancier dit desgewenst aanpassen.</p>
                 </div>
                 <div>
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Standaard afbouwtijd</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Standaard afbouwtijd</label>
                   <input type="time" value={form.teardownTime} onChange={(e) => setForm({ ...form, teardownTime: e.target.value })} className="ddp-input" />
-                  <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.25rem" }}>Tot hoelaat er standaard afgebouwd mag worden.</p>
+                  <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-1)" }}>Tot hoelaat er standaard afgebouwd mag worden.</p>
                 </div>
                 <div className="col-span-2">
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Geluid buiten</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Geluid buiten</label>
                   <input
                     type="text"
                     value={form.outdoorSoundRule}
@@ -1291,7 +1291,7 @@ function VendorEditPage() {
                   />
                 </div>
                 <div className="col-span-2">
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "0.375rem" }}>Slechtweer-scenario</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Slechtweer-scenario</label>
                   <textarea
                     value={form.badWeatherPlan}
                     onChange={(e) => setForm({ ...form, badWeatherPlan: e.target.value })}
@@ -1311,17 +1311,17 @@ function VendorEditPage() {
           <BusyCalendar busyDates={busyDates} onToggle={toggleBusyDate} />
         </section>
 
-        <section className={isUserPremium ? "" : "dash-hero"} style={isUserPremium ? { background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem", marginBottom: "2rem" } : { padding: "1.5rem", marginBottom: "2rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.375rem" }}>
+        <section className={isUserPremium ? "" : "dash-hero"} style={isUserPremium ? { background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem", marginBottom: "var(--space-9)" } : { padding: "1.5rem", marginBottom: "var(--space-9)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-2)" }}>
             <Star className="w-4 h-4" style={{ color: "var(--gold)", flexShrink: 0 }} />
-            <span className="font-serif" style={{ fontWeight: 700, fontSize: "1.0625rem", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
+            <span className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-2xl)", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
               {isUserPremium ? (cancelAtPeriodEnd ? "Premium opgezegd" : "Premium actief") : "Upgrade naar Premium"}
             </span>
           </div>
 
           {isUserPremium ? (
             <>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", maxWidth: "440px", marginBottom: "1rem" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", maxWidth: "440px", marginBottom: "var(--space-6)" }}>
                 {cancelAtPeriodEnd
                   ? `Je blijft Premium tot ${currentPeriodEnd ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(currentPeriodEnd)) : "het einde van je huidige periode"}. Daarna wordt je profiel niet meer verlengd.`
                   : `Je huidige plan: tot ${tierLabel((currentWeddingLimit ?? 100) as WeddingTier)} bruiloften. Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen.`}
@@ -1339,7 +1339,7 @@ function VendorEditPage() {
                 />
               )}
 
-              <div style={{ display: "flex", gap: "0.75rem", marginTop: "1.25rem", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "var(--space-5)", marginTop: "var(--space-7)", flexWrap: "wrap" }}>
                 <button onClick={handlePortal} disabled={billingLoading} className="ddp-btn-secondary">
                   {billingLoading ? "Laden…" : "Betaalgegevens beheren"}
                 </button>
@@ -1347,7 +1347,7 @@ function VendorEditPage() {
                   <button
                     onClick={handleResumeSubscription}
                     disabled={billingLoading}
-                    style={{ fontSize: "0.75rem", color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, alignSelf: "center" }}
+                    style={{ fontSize: "var(--text-sm)", color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, alignSelf: "center" }}
                   >
                     Opzegging ongedaan maken
                   </button>
@@ -1355,7 +1355,7 @@ function VendorEditPage() {
                   <button
                     onClick={handleCancelSubscription}
                     disabled={billingLoading}
-                    style={{ fontSize: "0.75rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline", alignSelf: "center" }}
+                    style={{ fontSize: "var(--text-sm)", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline", alignSelf: "center" }}
                   >
                     Abonnement opzeggen
                   </button>
@@ -1365,7 +1365,7 @@ function VendorEditPage() {
           ) : (
             <>
               {profileViews !== null && profileViews > 0 && (
-                <p style={{ fontSize: "0.8125rem", color: "var(--gold)", fontWeight: 600, marginBottom: "0.375rem" }}>
+                <p style={{ fontSize: "var(--text-base)", color: "var(--gold)", fontWeight: 600, marginBottom: "var(--space-2)" }}>
                   Je profiel is al {profileViews}× bekeken door bruidsparen.
                 </p>
               )}
@@ -1377,7 +1377,7 @@ function VendorEditPage() {
                   "Dashboard zelf inrichten + extra functies aanvragen",
                   "Analytisch overzicht van weergaven en boekingen",
                 ].map((b) => (
-                  <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "0.8125rem", color: "var(--ink-muted)" }}>
+                  <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)", fontSize: "var(--text-base)", color: "var(--ink-muted)" }}>
                     <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--gold)", marginTop: "2px" }} />
                     {b}
                   </li>
@@ -1439,10 +1439,10 @@ function VendorEditPage() {
                 </p>
               )}
               <div className="flex gap-2 flex-wrap">
-                <button onClick={handleRequestDelete} disabled={deleteLoading} className="ddp-btn-secondary" style={{ color: "var(--danger)", borderColor: "var(--danger)", fontSize: "0.8125rem" }}>
+                <button onClick={handleRequestDelete} disabled={deleteLoading} className="ddp-btn-secondary" style={{ color: "var(--danger)", borderColor: "var(--danger)", fontSize: "var(--text-base)" }}>
                   {deleteLoading ? "Versturen…" : "Bevestig: stuur verwijdermail"}
                 </button>
-                <button onClick={() => setDeleteInfo(null)} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem" }}>
+                <button onClick={() => setDeleteInfo(null)} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)" }}>
                   Annuleren
                 </button>
               </div>

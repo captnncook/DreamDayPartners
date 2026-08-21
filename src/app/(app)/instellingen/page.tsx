@@ -37,7 +37,7 @@ function Toast({ msg, onDone }: { msg: string; onDone: () => void }) {
     return () => clearTimeout(t);
   }, [onDone]);
   return (
-    <div style={{ position: "fixed", bottom: "1.5rem", left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: "#1a1a1a", color: "white", padding: "0.75rem 1.25rem", borderRadius: "12px", fontSize: "0.875rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.5rem", boxShadow: "0 8px 32px rgba(0,0,0,0.18)", whiteSpace: "nowrap" }}>
+    <div style={{ position: "fixed", bottom: "1.5rem", left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: "#1a1a1a", color: "white", padding: "0.75rem 1.25rem", borderRadius: "12px", fontSize: "var(--text-md)", fontWeight: 600, display: "flex", alignItems: "center", gap: "var(--space-3)", boxShadow: "0 8px 32px rgba(0,0,0,0.18)", whiteSpace: "nowrap" }}>
       <Check className="w-4 h-4 text-green-400" /> {msg}
     </div>
   );
@@ -98,7 +98,7 @@ export default function InstellingenPage() {
 
   if (loading) return (
     <div className="p-8 max-w-xl mx-auto space-y-4">
-      <SkeletonBlock style={{ height: "1.75rem", width: "60%", marginBottom: "1rem" }} />
+      <SkeletonBlock style={{ height: "1.75rem", width: "60%", marginBottom: "var(--space-6)" }} />
       <SkeletonBlock style={{ height: "220px", borderRadius: "16px" }} />
       <SkeletonBlock style={{ height: "180px", borderRadius: "16px" }} />
       <SkeletonBlock style={{ height: "80px", borderRadius: "16px" }} />
@@ -109,7 +109,7 @@ export default function InstellingenPage() {
     <div className="p-8 max-w-xl mx-auto">
       {toast && <Toast msg={toast} onDone={() => setToast("")} />}
 
-      <h1 className="font-serif mb-6" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Profielinstellingen</h1>
+      <h1 className="font-serif mb-6" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Profielinstellingen</h1>
 
       {/* Account */}
       <div className="ddp-card mb-6">

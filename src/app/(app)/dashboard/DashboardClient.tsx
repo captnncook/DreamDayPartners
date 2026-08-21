@@ -121,7 +121,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
   return (
     <div className="px-4 py-6 md:p-8 max-w-3xl mx-auto">
       {/* Header */}
-      <div className="mb-8" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
+      <div className="mb-8" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--space-5)" }}>
         <div>
           <h1 className="font-serif" style={{ fontSize: "clamp(1.5rem, 5vw, 2.125rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>
             {greeting}
@@ -131,7 +131,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
           </p>
         </div>
         {user.role === "planner" && (
-          <div style={{ display: "flex", gap: "1.5rem" }}>
+          <div style={{ display: "flex", gap: "var(--space-8)" }}>
             <StatInline value={stats.total} label="bruiloften" />
             <StatInline value={stats.upcoming30} label="komende 30 dagen" />
           </div>
@@ -151,14 +151,14 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
         <section className="mb-8" style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem" }}>
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <div className="font-serif" style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)" }}>
+              <div className="font-serif" style={{ fontSize: "var(--text-xl)", fontWeight: 700, color: "var(--foreground)" }}>
                 Je hebt het maximum van {vendorWeddingLimitInfo.limit} bruiloften bereikt
               </div>
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginTop: "2px" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginTop: "2px" }}>
                 Upgrade naar Premium om meer bruiloften tegelijk in je dashboard te beheren.
               </p>
             </div>
-            <Link href="/leveranciers/mijn-profiel" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.6rem 1.25rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}>
+            <Link href="/leveranciers/mijn-profiel" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.6rem 1.25rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}>
               Upgrade naar Premium
             </Link>
           </div>
@@ -169,16 +169,16 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
       {user.role === "vendor" && requests.length > 0 && (
         <section className="mb-8">
           <h2 className="dash-section-title mb-3">Nieuwe uitnodigingen</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
             {requests.map((r) => {
               const busy = processingRequest === r.id;
               return (
                 <div key={r.id} style={{ borderLeft: "3px solid var(--gold)", background: "var(--sand)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1rem 1.25rem" }}>
-                  <div className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>{r.weddingTitle}</div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>
+                  <div className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "var(--foreground)" }}>{r.weddingTitle}</div>
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>
                     {r.weddingVenue ? `${r.weddingVenue} · ` : ""}{formatDate(r.weddingDate)}
                   </div>
-                  <p style={{ fontSize: "0.8125rem", color: "var(--muted)", margin: "0.625rem 0" }}>
+                  <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", margin: "0.625rem 0" }}>
                     Je bent uitgenodigd voor het Dream Team van deze bruiloft.
                   </p>
                   <div className="flex gap-2">
@@ -186,7 +186,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
                       onClick={() => respondToRequest(r.id, "accept")}
                       disabled={busy}
                       className="ddp-btn-primary"
-                      style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}
+                      style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}
                     >
                       <Check className="w-3.5 h-3.5" /> {busy ? "Bezig…" : "Accepteren"}
                     </button>
@@ -194,7 +194,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
                       onClick={() => respondToRequest(r.id, "decline")}
                       disabled={busy}
                       className="ddp-btn-ghost"
-                      style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem" }}
+                      style={{ fontSize: "var(--text-base)", padding: "0.4rem 0.875rem" }}
                     >
                       <X className="w-3.5 h-3.5" /> Afwijzen
                     </button>
@@ -209,16 +209,16 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
       {/* Vandaag: trouwdag (leverancier) */}
       {user.role === "vendor" && weddings.filter((w) => w.days === 0).map((w) => (
         <section key={w.id} className="mb-8">
-          <div style={{ background: "var(--ink)", color: "var(--ink-text)", borderRadius: "var(--radius-lg)", padding: "1.25rem 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+          <div style={{ background: "var(--ink)", color: "var(--ink-text)", borderRadius: "var(--radius-lg)", padding: "1.25rem 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-6)", flexWrap: "wrap" }}>
             <div>
-              <div style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--gold)" }}>Vandaag</div>
-              <div className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, marginTop: "2px" }}>{w.title}</div>
-              {w.venue && <div style={{ fontSize: "0.8125rem", color: "var(--ink-muted)", marginTop: "2px" }}>{w.venue}</div>}
+              <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--gold)" }}>Vandaag</div>
+              <div className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, marginTop: "2px" }}>{w.title}</div>
+              {w.venue && <div style={{ fontSize: "var(--text-base)", color: "var(--ink-muted)", marginTop: "2px" }}>{w.venue}</div>}
             </div>
             <Link
               href={`/weddings/${w.id}`}
               className="ddp-btn-gold"
-              style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.6rem 1.25rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}
+              style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.6rem 1.25rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}
             >
               Open draaiboek
             </Link>
@@ -280,7 +280,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
           <div className="flex items-center justify-between mb-2">
             <h2 className="dash-section-title">Bruiloften</h2>
             {user.role === "planner" && (
-              <Link href="/weddings/new" className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
+              <Link href="/weddings/new" className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}>
                 <Plus className="w-3.5 h-3.5" /> Nieuw
               </Link>
             )}
@@ -325,7 +325,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             <Link
               href={`/weddings/${weddings[0].id}`}
               className="ddp-btn-gold mt-4"
-              style={{ display: "inline-flex", background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none" }}
+              style={{ display: "inline-flex", background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none" }}
             >
               Naar onze bruiloft
             </Link>
@@ -341,7 +341,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
       {/* Reviews (bruidspaar) — verschijnt zodra de bruiloft achter de rug is */}
       {user.role === "couple" && weddings[0] && weddings[0].days < 0 && reviewVendors.length > 0 && (
         <section className="mb-8">
-          <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
+          <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", lineHeight: 1.6, marginBottom: "var(--space-7)" }}>
             Bij jullie trouwdag waren de volgende leveranciers aanwezig, die elk met liefde en passie voor jullie veel hebben gedaan.
             Vergeet ze niet te waarderen: schrijf een review via DreamDay, en als je hun werk ook elders wilt delen, staat de link daarvoor erbij.
           </p>
@@ -349,16 +349,16 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
             {reviewVendors.map((v) => (
               <div key={v.wvId} className="dash-row">
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="font-serif" style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--foreground)" }}>{v.name}</div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--muted)", textTransform: "capitalize" }}>{v.category}</div>
+                  <div className="font-serif" style={{ fontSize: "var(--text-lg)", fontWeight: 700, color: "var(--foreground)" }}>{v.name}</div>
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", textTransform: "capitalize" }}>{v.category}</div>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   {v.reviewLinkUrl && (
-                    <a href={v.reviewLinkUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.8125rem", color: "var(--muted)", textDecoration: "underline" }}>
+                    <a href={v.reviewLinkUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "var(--text-base)", color: "var(--muted)", textDecoration: "underline" }}>
                       Review elders
                     </a>
                   )}
-                  <button onClick={() => setReviewTarget(v)} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
+                  <button onClick={() => setReviewTarget(v)} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}>
                     {v.myReview ? "Bewerk je review" : "Schrijf een review"}
                   </button>
                 </div>
@@ -380,7 +380,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
                 {user.role === "couple" ? "Taken" : "Mijn taken"}
               </h2>
               {taskProgress && taskProgress.total > 0 && (
-                <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>
+                <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>
                   {taskProgress.done} van {taskProgress.total} afgerond
                 </div>
               )}
@@ -389,7 +389,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
               <button
                 onClick={() => setShowNewTask(true)}
                 className="ddp-btn-primary"
-                style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}
+                style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}
               >
                 <Plus className="w-3.5 h-3.5" /> Taak
               </button>
@@ -404,7 +404,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
 
           {/* New task form */}
           {showNewTask && (
-            <form onSubmit={addTask} style={{ padding: "1rem", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", marginTop: "0.75rem", marginBottom: "0.75rem" }}>
+            <form onSubmit={addTask} style={{ padding: "1rem", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", marginTop: "var(--space-5)", marginBottom: "var(--space-5)" }}>
               <input
                 autoFocus
                 type="text"
@@ -412,23 +412,23 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
                 className="ddp-input"
-                style={{ marginBottom: "0.625rem" }}
+                style={{ marginBottom: "var(--space-4)" }}
               />
               {weddings.length > 1 && (
                 <select
                   value={newTaskWedding}
                   onChange={(e) => setNewTaskWedding(e.target.value)}
                   className="ddp-select"
-                  style={{ marginBottom: "0.625rem" }}
+                  style={{ marginBottom: "var(--space-4)" }}
                 >
                   {weddings.map((w) => <option key={w.id} value={w.id}>{w.title}</option>)}
                 </select>
               )}
               <div className="flex gap-2">
-                <button type="submit" disabled={savingTask || !newTaskTitle.trim()} className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
+                <button type="submit" disabled={savingTask || !newTaskTitle.trim()} className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}>
                   {savingTask ? "Opslaan…" : "Toevoegen"}
                 </button>
-                <button type="button" onClick={() => { setShowNewTask(false); setNewTaskTitle(""); }} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem" }}>
+                <button type="button" onClick={() => { setShowNewTask(false); setNewTaskTitle(""); }} className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", padding: "0.4rem 0.875rem" }}>
                   Annuleren
                 </button>
               </div>
@@ -444,14 +444,14 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
                 return (
                   <div key={task.id} className="dash-row">
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "0.9375rem", fontWeight: meta.weight, color: "var(--foreground)" }}>{task.title}</div>
+                      <div style={{ fontSize: "var(--text-lg)", fontWeight: meta.weight, color: "var(--foreground)" }}>{task.title}</div>
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{task.weddingTitle}</span>
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>
+                        <span style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{task.weddingTitle}</span>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>
                           {meta.label}
                         </span>
                         {task.dueDate && (
-                          <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{formatDateShort(task.dueDate)}</span>
+                          <span style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{formatDateShort(task.dueDate)}</span>
                         )}
                       </div>
                     </div>
@@ -536,8 +536,8 @@ function AdminOverview() {
         <StatInline value={loginsToday} label="logins vandaag" />
         <StatInline value={loginsWeek} label="logins deze week" />
         <div>
-          <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, letterSpacing: "-0.01em", color: errorCount7d > 0 ? "var(--gold-deep)" : "var(--foreground)" }}>{errorCount7d}</span>
-          <span style={{ display: "block", fontSize: "0.625rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>fouten deze week</span>
+          <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.01em", color: errorCount7d > 0 ? "var(--gold-deep)" : "var(--foreground)" }}>{errorCount7d}</span>
+          <span style={{ display: "block", fontSize: "var(--text-2xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>fouten deze week</span>
         </div>
       </div>
 
@@ -567,7 +567,7 @@ function AdminOverview() {
             {events.map((e) => (
               <div key={e.id} className="dash-row">
                 <div className="flex-1 min-w-0">
-                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: EVENT_META[e.type]?.color ?? "var(--muted)" }}>
+                  <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: EVENT_META[e.type]?.color ?? "var(--muted)" }}>
                     {e.label}
                   </span>
                   <div className="text-sm mt-0.5" style={{ color: "var(--foreground)" }}>{e.message}</div>
@@ -585,8 +585,8 @@ function AdminOverview() {
 function StatInline({ value, label }: { value: number; label: string }) {
   return (
     <div style={{ textAlign: "right" }}>
-      <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{value}</span>
-      <span style={{ display: "block", fontSize: "0.625rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{label}</span>
+      <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{value}</span>
+      <span style={{ display: "block", fontSize: "var(--text-2xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{label}</span>
     </div>
   );
 }
@@ -597,12 +597,12 @@ function NextWeddingHero({ wedding }: { wedding: Wedding }) {
   return (
     <section className="mb-8">
       <div className="ddp-section-label mb-2">Eerstvolgende bruiloft</div>
-      <div className="dash-hero" style={{ padding: "1.75rem", display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
+      <div className="dash-hero" style={{ padding: "1.75rem", display: "flex", alignItems: "center", gap: "var(--space-8)", flexWrap: "wrap" }}>
         <div style={{ flex: 1, minWidth: "180px" }}>
-          <div className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
+          <div className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
             {wedding.title}
           </div>
-          <div style={{ fontSize: "0.8125rem", color: "var(--ink-muted)", marginTop: "0.3rem" }}>
+          <div style={{ fontSize: "var(--text-base)", color: "var(--ink-muted)", marginTop: "0.3rem" }}>
             {wedding.venue ? `${wedding.venue} · ` : ""}{formatDateRange(new Date(wedding.date), wedding.endDate ? new Date(wedding.endDate) : null)}
           </div>
         </div>
@@ -611,7 +611,7 @@ function NextWeddingHero({ wedding }: { wedding: Wedding }) {
           <div className="font-serif" style={{ fontSize: "2.75rem", fontWeight: 700, lineHeight: 1, color: urgent ? "var(--gold)" : "var(--ink-text)", letterSpacing: "-0.02em" }}>
             {wedding.days}
           </div>
-          <div style={{ fontSize: "0.625rem", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>
+          <div style={{ fontSize: "var(--text-2xs)", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>
             {wedding.days === 0 ? "vandaag" : wedding.days === 1 ? "dag te gaan" : "dagen te gaan"}
           </div>
         </div>
@@ -619,7 +619,7 @@ function NextWeddingHero({ wedding }: { wedding: Wedding }) {
         <Link
           href={`/weddings/${wedding.id}`}
           className="ddp-btn-gold"
-          style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}
+          style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.65rem 1.375rem", borderRadius: "var(--radius-full)", textDecoration: "none", whiteSpace: "nowrap" }}
         >
           Open draaiboek
         </Link>
@@ -638,23 +638,23 @@ function WeddingRow({ wedding }: { wedding: Wedding }) {
   return (
     <Link href={`/weddings/${wedding.id}`} className="dash-row" style={{ opacity: isPast ? 0.55 : 1 }}>
       <div style={{ textAlign: "center", minWidth: "42px", flexShrink: 0 }}>
-        <div style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", lineHeight: 1.1 }}>{day}</div>
-        <div style={{ fontSize: "0.625rem", color: "var(--muted)", textTransform: "uppercase" }}>{month}</div>
+        <div style={{ fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", lineHeight: 1.1 }}>{day}</div>
+        <div style={{ fontSize: "var(--text-2xs)", color: "var(--muted)", textTransform: "uppercase" }}>{month}</div>
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="font-serif" style={{ fontSize: "1rem", fontWeight: 700, color: "var(--foreground)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        <div className="font-serif" style={{ fontSize: "var(--text-xl)", fontWeight: 700, color: "var(--foreground)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {wedding.title}
         </div>
         {wedding.venue && (
-          <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {wedding.venue}
           </div>
         )}
       </div>
 
       <div style={{ textAlign: "right", flexShrink: 0 }}>
-        <div style={{ fontSize: "0.9375rem", fontWeight: urgent ? 700 : 600, color: urgent ? "var(--gold-deep)" : "var(--foreground)" }}>
+        <div style={{ fontSize: "var(--text-lg)", fontWeight: urgent ? 700 : 600, color: urgent ? "var(--gold-deep)" : "var(--foreground)" }}>
           {isPast ? `${Math.abs(wedding.days)}d geleden` : wedding.days === 0 ? "Vandaag" : `${wedding.days}d`}
         </div>
       </div>
@@ -677,7 +677,7 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
           key={n}
           type="button"
           onClick={() => onChange(n)}
-          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "1.25rem", lineHeight: 1, color: "var(--gold)" }}
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "var(--text-3xl)", lineHeight: 1, color: "var(--gold)" }}
           aria-label={`${n} sterren`}
         >
           {n <= value ? "★" : "☆"}
@@ -732,13 +732,13 @@ function ReviewModal({
         onClick={(e) => e.stopPropagation()}
         style={{ background: "var(--background)", borderRadius: "16px", padding: "1.75rem", maxWidth: "420px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
       >
-        <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "0.25rem" }}>Review voor {target.name}</h2>
-        <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1.25rem" }}>Zichtbaar op het openbare profiel van deze leverancier.</p>
+        <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "var(--space-1)" }}>Review voor {target.name}</h2>
+        <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-7)" }}>Zichtbaar op het openbare profiel van deze leverancier.</p>
 
         <div className="flex flex-col gap-3 mb-4">
           {REVIEW_CATEGORIES.map(({ key, label }) => (
             <div key={key} className="flex items-center justify-between">
-              <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>{label}</span>
+              <span style={{ fontSize: "var(--text-md)", color: "var(--foreground)" }}>{label}</span>
               <StarPicker value={ratings[key]} onChange={(v) => setRatings((r) => ({ ...r, [key]: v }))} />
             </div>
           ))}
@@ -746,7 +746,7 @@ function ReviewModal({
 
         <label className="flex items-center gap-2 mb-4" style={{ cursor: "pointer" }}>
           <input type="checkbox" checked={wouldRecommend} onChange={(e) => setWouldRecommend(e.target.checked)} />
-          <span style={{ fontSize: "0.875rem", color: "var(--foreground)" }}>Ik zou deze leverancier aanraden bij andere bruidsparen</span>
+          <span style={{ fontSize: "var(--text-md)", color: "var(--foreground)" }}>Ik zou deze leverancier aanraden bij andere bruidsparen</span>
         </label>
 
         <textarea
@@ -757,7 +757,7 @@ function ReviewModal({
           className="ddp-input resize-none mb-4"
         />
 
-        {error && <p style={{ fontSize: "0.8125rem", color: "var(--danger)", marginBottom: "0.75rem" }}>{error}</p>}
+        {error && <p style={{ fontSize: "var(--text-base)", color: "var(--danger)", marginBottom: "var(--space-5)" }}>{error}</p>}
 
         <div className="flex gap-2">
           <button onClick={handleSave} disabled={saving} className="ddp-btn-primary">
@@ -815,16 +815,16 @@ function VendorTasksSection({ weddings }: { weddings: Wedding[] }) {
       <div className="flex items-center justify-between mb-2">
         <h2 className="dash-section-title">Mijn taken</h2>
         {weddings.length > 0 && !adding && (
-          <button onClick={() => setAdding(true)} className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
+          <button onClick={() => setAdding(true)} className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}>
             <Plus className="w-3.5 h-3.5" /> Taak
           </button>
         )}
       </div>
       {adding && (
-        <form onSubmit={addTask} style={{ padding: "1rem", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", marginTop: "0.75rem", marginBottom: "0.75rem" }}>
+        <form onSubmit={addTask} style={{ padding: "1rem", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", marginTop: "var(--space-5)", marginBottom: "var(--space-5)" }}>
           <input autoFocus type="text" placeholder="Taak omschrijving…" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-            className="ddp-input" style={{ marginBottom: "0.625rem" }} />
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginBottom: "0.625rem" }}>
+            className="ddp-input" style={{ marginBottom: "var(--space-4)" }} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)", marginBottom: "var(--space-4)" }}>
             {weddings.length > 1 && (
               <select value={form.weddingId} onChange={e => setForm(f => ({ ...f, weddingId: e.target.value }))} className="ddp-select">
                 {weddings.map(w => <option key={w.id} value={w.id}>{w.title}</option>)}
@@ -833,10 +833,10 @@ function VendorTasksSection({ weddings }: { weddings: Wedding[] }) {
             <DatePicker value={form.dueDate} onChange={v => setForm(f => ({ ...f, dueDate: v }))} />
           </div>
           <div className="flex gap-2">
-            <button type="submit" disabled={saving || !form.title.trim()} className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.4rem 1rem" }}>
+            <button type="submit" disabled={saving || !form.title.trim()} className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}>
               {saving ? "Opslaan…" : "Toevoegen"}
             </button>
-            <button type="button" onClick={() => setAdding(false)} className="ddp-btn-ghost" style={{ fontSize: "0.8125rem", padding: "0.4rem 0.875rem" }}>
+            <button type="button" onClick={() => setAdding(false)} className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", padding: "0.4rem 0.875rem" }}>
               Annuleren
             </button>
           </div>
@@ -849,8 +849,8 @@ function VendorTasksSection({ weddings }: { weddings: Wedding[] }) {
           {tasks.map(t => (
             <div key={t.id} className="dash-row">
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "0.9375rem", fontWeight: 500, color: "var(--foreground)" }}>{t.title}</div>
-                <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ fontSize: "var(--text-lg)", fontWeight: 500, color: "var(--foreground)" }}>{t.title}</div>
+                <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px", display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
                   <span>{t.weddingTitle}</span>
                   {t.dueDate && <span>{formatDateShort(t.dueDate)}</span>}
                 </div>

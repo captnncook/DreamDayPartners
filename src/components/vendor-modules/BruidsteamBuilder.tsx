@@ -60,7 +60,7 @@ export default function BruidsteamBuilder({ intakeData, onUpdate, isVendor, isPl
     save(persons.filter(p => p.id !== id));
   }
 
-  const sel = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)" } as const;
+  const sel = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--foreground)" } as const;
 
   return (
     <div className="ddp-card">
@@ -70,7 +70,7 @@ export default function BruidsteamBuilder({ intakeData, onUpdate, isVendor, isPl
           <h3 className="font-semibold text-sm">Bruidsteam per look</h3>
         </div>
         {canEdit && (
-          <button onClick={startAdd} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+          <button onClick={startAdd} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
             <Plus className="w-3.5 h-3.5" /> Persoon toevoegen
           </button>
         )}
@@ -81,7 +81,7 @@ export default function BruidsteamBuilder({ intakeData, onUpdate, isVendor, isPl
       )}
 
       {persons.length === 0 && editingId !== "new" && (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           {canEdit ? "Voeg de personen toe die haar en make-up krijgen." : "Nog geen personen toegevoegd."}
         </p>
       )}
@@ -95,10 +95,10 @@ export default function BruidsteamBuilder({ intakeData, onUpdate, isVendor, isPl
               <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.75rem 1rem" }}>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{p.name}</div>
-                    <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "1px" }}>{p.role} · {p.haarlengte} haar</div>
-                    {p.stijl && <div style={{ fontSize: "0.8125rem", color: "var(--foreground)", marginTop: "0.375rem" }}>{p.stijl}</div>}
-                    {p.notities && <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.25rem" }}>{p.notities}</div>}
+                    <div style={{ fontWeight: 600, fontSize: "var(--text-lg)" }}>{p.name}</div>
+                    <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "1px" }}>{p.role} · {p.haarlengte} haar</div>
+                    {p.stijl && <div style={{ fontSize: "var(--text-base)", color: "var(--foreground)", marginTop: "var(--space-2)" }}>{p.stijl}</div>}
+                    {p.notities && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-1)" }}>{p.notities}</div>}
                   </div>
                   {canEdit && (
                     <div className="flex gap-1.5 flex-shrink-0">
@@ -128,7 +128,7 @@ function PersonForm({ form, setForm, onSave, onCancel, sel }: {
   sel: React.CSSProperties;
 }) {
   return (
-    <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.875rem", marginBottom: "0.75rem" }} className="space-y-2">
+    <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.875rem", marginBottom: "var(--space-5)" }} className="space-y-2">
       <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Naam *"
         style={{ ...sel, marginBottom: 0 }} />
       <div className="grid grid-cols-2 gap-2">
@@ -144,7 +144,7 @@ function PersonForm({ form, setForm, onSave, onCancel, sel }: {
       <input value={form.notities} onChange={e => setForm(p => ({ ...p, notities: e.target.value }))} placeholder="Extra notities (optioneel)"
         style={sel} />
       <div className="flex gap-2">
-        <button onClick={onSave} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.8125rem" }}>
+        <button onClick={onSave} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-base)" }}>
           <Check className="w-3.5 h-3.5" /> Opslaan
         </button>
         <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex", alignItems: "center" }}>

@@ -50,7 +50,7 @@ export default function RittenPlanner({ intakeData, onUpdate, isVendor, isPlanne
     return `https://www.google.com/maps/dir/${encodeURIComponent(from)}/${encodeURIComponent(to)}`;
   }
 
-  const inputStyle: React.CSSProperties = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)" };
+  const inputStyle: React.CSSProperties = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--foreground)" };
 
   return (
     <div className="ddp-card">
@@ -65,7 +65,7 @@ export default function RittenPlanner({ intakeData, onUpdate, isVendor, isPlanne
           </div>
         </div>
         {canEdit && (
-          <button onClick={startAdd} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+          <button onClick={startAdd} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
             <Plus className="w-3.5 h-3.5" /> Rit toevoegen
           </button>
         )}
@@ -76,7 +76,7 @@ export default function RittenPlanner({ intakeData, onUpdate, isVendor, isPlanne
       )}
 
       {ritten.length === 0 && editingId !== "new" && (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           {canEdit ? "Voeg alle ritten toe voor de trouwdag." : "Nog geen ritten gepland."}
         </p>
       )}
@@ -90,20 +90,20 @@ export default function RittenPlanner({ intakeData, onUpdate, isVendor, isPlanne
               <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.75rem 1rem" }}>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div style={{ minWidth: "2.75rem", textAlign: "center", background: "var(--primary)", color: "white", borderRadius: "6px", padding: "0.2rem 0.25rem", fontSize: "0.75rem", fontWeight: 700, fontVariantNumeric: "tabular-nums", flexShrink: 0, marginTop: "1px" }}>
+                    <div style={{ minWidth: "2.75rem", textAlign: "center", background: "var(--primary)", color: "white", borderRadius: "6px", padding: "0.2rem 0.25rem", fontSize: "var(--text-sm)", fontWeight: 700, fontVariantNumeric: "tabular-nums", flexShrink: 0, marginTop: "1px" }}>
                       {rit.time || `Rit ${idx + 1}`}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div style={{ fontSize: "0.875rem", fontWeight: 600 }}>{rit.from}</div>
-                      <div style={{ fontSize: "0.75rem", color: "var(--muted)", margin: "1px 0 2px" }}>→ {rit.to}</div>
+                      <div style={{ fontSize: "var(--text-md)", fontWeight: 600 }}>{rit.from}</div>
+                      <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", margin: "1px 0 2px" }}>→ {rit.to}</div>
                       {(rit.passengers || rit.notes) && (
-                        <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                        <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>
                           {rit.passengers ? `${rit.passengers} passagiers` : ""}{rit.passengers && rit.notes ? " · " : ""}{rit.notes}
                         </div>
                       )}
                       {rit.from && rit.to && (
                         <a href={mapsLink(rit.from, rit.to)} target="_blank" rel="noopener noreferrer"
-                          style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem", marginTop: "0.375rem", fontSize: "0.75rem", color: "var(--primary)", textDecoration: "none", fontWeight: 500 }}>
+                          style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem", marginTop: "var(--space-2)", fontSize: "var(--text-sm)", color: "var(--primary)", textDecoration: "none", fontWeight: 500 }}>
                           <Navigation className="w-3 h-3" /> Route openen
                         </a>
                       )}
@@ -137,14 +137,14 @@ function RitForm({ form, setForm, onSave, onCancel, inputStyle }: {
   inputStyle: React.CSSProperties;
 }) {
   return (
-    <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.875rem", marginBottom: "0.75rem" }} className="space-y-2">
+    <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.875rem", marginBottom: "var(--space-5)" }} className="space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Vertrektijd</label>
+          <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>Vertrektijd</label>
           <input type="time" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))} style={inputStyle} />
         </div>
         <div>
-          <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Passagiers</label>
+          <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>Passagiers</label>
           <input type="number" value={form.passengers} onChange={e => setForm(f => ({ ...f, passengers: e.target.value ? Number(e.target.value) : "" }))} placeholder="Aantal" style={inputStyle} />
         </div>
       </div>
@@ -152,7 +152,7 @@ function RitForm({ form, setForm, onSave, onCancel, inputStyle }: {
       <input value={form.to} onChange={e => setForm(f => ({ ...f, to: e.target.value }))} placeholder="Afleverpunt *" style={inputStyle} />
       <input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Extra notities" style={inputStyle} />
       <div className="flex gap-2">
-        <button onClick={onSave} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.8125rem" }}>
+        <button onClick={onSave} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-base)" }}>
           <Check className="w-3.5 h-3.5" /> Opslaan
         </button>
         <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex", alignItems: "center" }}>

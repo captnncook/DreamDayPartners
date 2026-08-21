@@ -33,7 +33,7 @@ export default async function WeddingsPage() {
     <div className="p-8 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Bruiloften</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Bruiloften</h1>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{weddings.length} bruiloft{weddings.length !== 1 ? "en" : ""}</p>
         </div>
         <Link href="/weddings/new" className="ddp-btn-primary">+ Nieuwe bruiloft</Link>
@@ -41,7 +41,7 @@ export default async function WeddingsPage() {
 
       {weddings.length === 0 ? (
         <div className="text-center py-20" style={{ borderTop: "1px solid var(--border)" }}>
-          <h2 className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: "0.5rem", color: "var(--foreground)" }}>Nog geen bruiloften</h2>
+          <h2 className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, marginBottom: "var(--space-3)", color: "var(--foreground)" }}>Nog geen bruiloften</h2>
           <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>Maak de eerste bruiloft aan om te beginnen</p>
           <Link href="/weddings/new" className="ddp-btn-primary">Bruiloft aanmaken</Link>
         </div>
@@ -61,17 +61,17 @@ export default async function WeddingsPage() {
                 key={w.id}
                 href={`/weddings/${w.id}`}
                 className="dash-row"
-                style={{ padding: "1.25rem 0.25rem", gap: "1.5rem", opacity: isPast ? 0.6 : 1 }}
+                style={{ padding: "1.25rem 0.25rem", gap: "var(--space-8)", opacity: isPast ? 0.6 : 1 }}
               >
                 <div style={{ textAlign: "center", minWidth: "58px", flexShrink: 0 }}>
-                  <div style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", lineHeight: 1.05 }}>{day}</div>
-                  <div style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase" }}>{month} {year}</div>
+                  <div style={{ fontSize: "var(--text-5xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", lineHeight: 1.05 }}>{day}</div>
+                  <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase" }}>{month} {year}</div>
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-0.5">
                     <h3 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</h3>
-                    <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: status.color }}>
+                    <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: status.color }}>
                       {status.label}
                     </span>
                   </div>
@@ -100,10 +100,10 @@ export default async function WeddingsPage() {
                 )}
 
                 <div className="text-right flex-shrink-0" style={{ minWidth: "72px" }}>
-                  <div style={{ fontSize: "1.0625rem", fontWeight: urgent ? 700 : 600, color: urgent ? "var(--gold-deep)" : "var(--foreground)" }}>
+                  <div style={{ fontSize: "var(--text-2xl)", fontWeight: urgent ? 700 : 600, color: urgent ? "var(--gold-deep)" : "var(--foreground)" }}>
                     {isPast ? Math.abs(days) : days}
                   </div>
-                  <div style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                     {isPast ? "geweest" : "dagen"}
                   </div>
                 </div>

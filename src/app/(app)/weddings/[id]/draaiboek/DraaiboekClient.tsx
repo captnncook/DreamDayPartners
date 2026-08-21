@@ -60,7 +60,7 @@ function toMinutes(t: string): number {
 const INPUT_STYLE: React.CSSProperties = {
   width: "100%", padding: "0.625rem 0.875rem",
   border: "1px solid var(--border)", borderRadius: "10px",
-  fontSize: "0.875rem", outline: "none", background: "white",
+  fontSize: "var(--text-md)", outline: "none", background: "white",
 };
 
 export default function DraaiboekClient({
@@ -295,7 +295,7 @@ export default function DraaiboekClient({
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h1 className="font-serif" style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.01em" }}>Draaiboek</h1>
-            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
+            <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             <button onClick={openCalendarLink} className="ddp-btn-secondary">
@@ -325,7 +325,7 @@ export default function DraaiboekClient({
                 className=""
                 style={{ ...INPUT_STYLE, width: "auto" }}
               />
-              <button onClick={() => saveEndDate(false)} disabled={savingEndDate || !endDateDraft} className="ddp-btn-primary" style={{ fontSize: "0.8125rem", padding: "0.5rem 1rem" }}>
+              <button onClick={() => saveEndDate(false)} disabled={savingEndDate || !endDateDraft} className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.5rem 1rem" }}>
                 {savingEndDate ? "Opslaan…" : "Opslaan"}
               </button>
               {isMultiDay && (
@@ -356,7 +356,7 @@ export default function DraaiboekClient({
                 onClick={() => switchDay(idx)}
                 className="flex-shrink-0 px-4 py-2 rounded-full font-medium whitespace-nowrap"
                 style={{
-                  fontSize: "0.8125rem",
+                  fontSize: "var(--text-base)",
                   background: active ? "var(--ink)" : "rgba(0,0,0,0.05)",
                   color: active ? "white" : "var(--muted)",
                   border: "none", cursor: "pointer",
@@ -382,7 +382,7 @@ export default function DraaiboekClient({
       {visibleDraaiboeken.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
           <ClipboardList className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--color-rose)" }} />
-          <h2 style={{ fontWeight: 700, fontSize: "1.0625rem", marginBottom: "0.5rem" }}>
+          <h2 style={{ fontWeight: 700, fontSize: "var(--text-2xl)", marginBottom: "var(--space-3)" }}>
             {isMultiDay ? `Nog geen draaiboek voor dag ${activeDayIndex + 1}` : "Nog geen draaiboek"}
           </h2>
           <p className="text-sm mb-4">
@@ -398,7 +398,7 @@ export default function DraaiboekClient({
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar: version picker */}
           <div style={{ width: "100%", maxWidth: "200px", flexShrink: 0 }}>
-            <p style={{ fontSize: "0.6875rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted-light)", marginBottom: "0.75rem" }}>Versies</p>
+            <p style={{ fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted-light)", marginBottom: "var(--space-5)" }}>Versies</p>
             <div className="flex flex-col gap-1.5">
               {visibleDraaiboeken.map(d => (
                 <button
@@ -416,9 +416,9 @@ export default function DraaiboekClient({
                   onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                 >
-                  <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--foreground)" }} className="truncate">{d.title}</div>
+                  <div style={{ fontSize: "var(--text-md)", fontWeight: 600, color: "var(--foreground)" }} className="truncate">{d.title}</div>
                   <div className="flex items-center gap-1.5 mt-1">
-                    <span style={{ fontSize: "0.625rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: d.status === "final" ? "var(--gold-deep)" : "var(--muted-light)" }}>
+                    <span style={{ fontSize: "var(--text-2xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: d.status === "final" ? "var(--gold-deep)" : "var(--muted-light)" }}>
                       {d.status === "final" ? "Definitief" : "Concept"}
                     </span>
                   </div>
@@ -430,10 +430,10 @@ export default function DraaiboekClient({
           {/* Grid */}
           <div style={{ flex: 1, minWidth: 0 }}>
             {isPlanner && activeDraaiboek && activeDraaiboek.items.length === 0 && (
-              <div className="mb-4" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", padding: "1rem 1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--sand)" }}>
+              <div className="mb-4" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-6)", flexWrap: "wrap", padding: "1rem 1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--sand)" }}>
                 <div>
-                  <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--foreground)" }}>Nog leeg</div>
-                  <div style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Begin met een standaard trouwdag-tijdlijn, je past daarna zelf alles aan.</div>
+                  <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--foreground)" }}>Nog leeg</div>
+                  <div style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Begin met een standaard trouwdag-tijdlijn, je past daarna zelf alles aan.</div>
                 </div>
                 <button onClick={insertTemplate} disabled={insertingTemplate} className="ddp-btn-secondary" style={{ flexShrink: 0 }}>
                   {insertingTemplate ? "Bezig…" : "Standaardtijdlijn invoegen"}
@@ -465,16 +465,16 @@ export default function DraaiboekClient({
             onClick={e => e.stopPropagation()}
             style={{ background: "var(--background)", borderRadius: "16px", padding: "1.75rem", maxWidth: "460px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
           >
-            <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "0.5rem" }}>Koppel aan agenda</h2>
-            <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.5 }}>
+            <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "var(--space-3)" }}>Koppel aan agenda</h2>
+            <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)", lineHeight: 1.5 }}>
               Abonneer je op dit draaiboek in Google Calendar, Apple Kalender of Outlook. Nieuwe of gewijzigde onderdelen verschijnen automatisch; de agenda-app bepaalt zelf hoe vaak hij ververst.
             </p>
             {loadingCalendarLink ? (
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Bezig…</p>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Bezig…</p>
             ) : calendarLink ? (
               <>
-                <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
-                  <input readOnly value={calendarLink.httpsUrl} style={{ ...INPUT_STYLE, fontSize: "0.75rem" }} onFocus={e => e.target.select()} />
+                <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-6)" }}>
+                  <input readOnly value={calendarLink.httpsUrl} style={{ ...INPUT_STYLE, fontSize: "var(--text-sm)" }} onFocus={e => e.target.select()} />
                   <button
                     className="ddp-btn-secondary"
                     style={{ flexShrink: 0 }}
@@ -487,17 +487,17 @@ export default function DraaiboekClient({
                     {calendarLinkCopied ? "Gekopieerd" : "Kopiëren"}
                   </button>
                 </div>
-                <a href={calendarLink.webcalUrl} className="ddp-btn-primary" style={{ display: "inline-block", marginBottom: "1rem", textDecoration: "none" }}>
+                <a href={calendarLink.webcalUrl} className="ddp-btn-primary" style={{ display: "inline-block", marginBottom: "var(--space-6)", textDecoration: "none" }}>
                   Direct openen in agenda-app
                 </a>
-                <p style={{ fontSize: "0.75rem", color: "var(--muted)", lineHeight: 1.6 }}>
+                <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", lineHeight: 1.6 }}>
                   <strong>Google Calendar:</strong> Instellingen → Agenda toevoegen → Op URL → plak de link.<br />
                   <strong>Apple Kalender:</strong> Archief → Nieuw agenda-abonnement → plak de link.<br />
                   <strong>Outlook:</strong> Agenda toevoegen → Abonneren via internet → plak de link.
                 </p>
               </>
             ) : (
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Kon de link niet ophalen.</p>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Kon de link niet ophalen.</p>
             )}
             <button onClick={() => setShowCalendarLink(false)} className="ddp-btn-secondary mt-4">Sluiten</button>
           </div>

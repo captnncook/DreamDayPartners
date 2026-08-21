@@ -149,10 +149,10 @@ export default async function VendorBookingPage({
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "1.5rem 1rem" }}>
       {/* Back navigation */}
-      <div style={{ marginBottom: "1.25rem" }}>
+      <div style={{ marginBottom: "var(--space-7)" }}>
         <Link
           href={`/weddings/${weddingId}`}
-          style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.875rem", color: "var(--muted)", textDecoration: "none" }}
+          style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-md)", color: "var(--muted)", textDecoration: "none" }}
         >
           <ChevronLeft size={16} />
           {wedding.title}
@@ -160,22 +160,22 @@ export default async function VendorBookingPage({
       </div>
 
       {/* Header */}
-      <div className="card" style={{ padding: "1.5rem", marginBottom: "1rem", background: "var(--blush-soft)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <div style={{ width: "3rem", height: "3rem", borderRadius: "0.75rem", background: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", fontWeight: 700, color: "var(--primary)", flexShrink: 0 }}>
+      <div className="card" style={{ padding: "1.5rem", marginBottom: "var(--space-6)", background: "var(--blush-soft)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-6)" }}>
+          <div style={{ width: "3rem", height: "3rem", borderRadius: "0.75rem", background: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--primary)", flexShrink: 0 }}>
             {booking.vendor.name.charAt(0)}
           </div>
           <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--charcoal)", letterSpacing: "-0.02em" }}>
+            <h1 style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--charcoal)", letterSpacing: "-0.02em" }}>
               {booking.vendor.name}
             </h1>
-            <div style={{ fontSize: "0.875rem", color: "var(--muted)", textTransform: "capitalize" }}>
+            <div style={{ fontSize: "var(--text-md)", color: "var(--muted)", textTransform: "capitalize" }}>
               {booking.vendor.category}
               {booking.vendor.city && ` · ${booking.vendor.city}`}
             </div>
           </div>
           {booking.vendor.email && (
-            <a href={`mailto:${booking.vendor.email}`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>
+            <a href={`mailto:${booking.vendor.email}`} style={{ fontSize: "var(--text-base)", color: "var(--primary)", textDecoration: "none" }}>
               Contact
             </a>
           )}

@@ -147,7 +147,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
           <div className="font-serif" style={{ fontSize: "2.25rem", fontWeight: 700, lineHeight: 1, letterSpacing: "-0.02em", color: urgent ? "var(--gold)" : "var(--ink-text)" }}>
             {Math.max(0, days)}
           </div>
-          <div style={{ fontSize: "0.625rem", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>
+          <div style={{ fontSize: "var(--text-2xs)", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>
             {days > 0 ? tw.days : days === 0 ? tw.today : tw.passed}
           </div>
         </div>
@@ -171,8 +171,8 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 { value: wedding.vendors.length, label: tw.vendors },
               ].map((stat) => (
                 <div key={stat.label}>
-                  <span className="font-serif" style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{stat.value}</span>
-                  <span style={{ display: "block", fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: "1px" }}>{stat.label}</span>
+                  <span className="font-serif" style={{ fontSize: "var(--text-5xl)", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{stat.value}</span>
+                  <span style={{ display: "block", fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: "1px" }}>{stat.label}</span>
                 </div>
               ))}
             </div>
@@ -228,10 +228,10 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                         {task.title}
                       </span>
                       {task.status === "in_progress" && (
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)", flexShrink: 0 }}>Bezig</span>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)", flexShrink: 0 }}>Bezig</span>
                       )}
                       {task.assignedUser && (
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "var(--gold)", color: "var(--ink)", fontSize: "0.625rem" }}>
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "var(--gold)", color: "var(--ink)", fontSize: "var(--text-2xs)" }}>
                           {task.assignedUser.name.charAt(0)}
                         </div>
                       )}
@@ -264,7 +264,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 </Link>
               </div>
               <div className="pt-3" style={{ borderTop: "1px solid var(--border)" }}>
-                <div className="flex justify-between mb-2" style={{ fontSize: "0.875rem" }}>
+                <div className="flex justify-between mb-2" style={{ fontSize: "var(--text-md)" }}>
                   <span style={{ fontWeight: 700, color: budgetPct > 90 ? "var(--gold-deep)" : "var(--foreground)" }}>
                     €{spent.toLocaleString(lang === "en" ? "en-GB" : "nl-NL")}
                   </span>
@@ -273,7 +273,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                 <div style={{ height: "3px", borderRadius: "999px", background: "var(--border)", overflow: "hidden" }}>
                   <div style={{ height: "100%", width: `${budgetPct}%`, background: budgetPct > 90 ? "var(--gold-deep)" : "var(--ink)" }} />
                 </div>
-                <div className="text-right mt-1.5" style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{budgetPct}{tw.used}</div>
+                <div className="text-right mt-1.5" style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{budgetPct}{tw.used}</div>
               </div>
             </section>
           )}

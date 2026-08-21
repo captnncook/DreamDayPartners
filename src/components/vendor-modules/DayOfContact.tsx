@@ -34,7 +34,7 @@ export default function DayOfContact({ intakeData, onUpdate, isVendor, isPlanner
     setEditing(false);
   }
 
-  const inputStyle: React.CSSProperties = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)" };
+  const inputStyle: React.CSSProperties = { width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--foreground)" };
 
   return (
     <div className="ddp-card">
@@ -62,7 +62,7 @@ export default function DayOfContact({ intakeData, onUpdate, isVendor, isPlanner
           <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="Telefoonnummer *" type="tel" style={inputStyle} />
           <input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Extra info (optioneel)" style={inputStyle} />
           <div className="flex gap-2">
-            <button onClick={saveContact} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.8125rem" }}>
+            <button onClick={saveContact} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-base)" }}>
               <Check className="w-3.5 h-3.5" /> Opslaan
             </button>
             <button onClick={() => setEditing(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex", alignItems: "center" }}>
@@ -72,17 +72,17 @@ export default function DayOfContact({ intakeData, onUpdate, isVendor, isPlanner
         </div>
       ) : hasData ? (
         <div style={{ background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.875rem 1rem" }}>
-          <div style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{contact.name}</div>
-          {contact.role && <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "1px" }}>{contact.role}</div>}
+          <div style={{ fontWeight: 600, fontSize: "var(--text-lg)" }}>{contact.name}</div>
+          {contact.role && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "1px" }}>{contact.role}</div>}
           {contact.phone && (
-            <a href={`tel:${contact.phone}`} style={{ display: "flex", alignItems: "center", gap: "0.375rem", marginTop: "0.5rem", color: "var(--primary)", fontSize: "0.9375rem", fontWeight: 600, textDecoration: "none" }}>
+            <a href={`tel:${contact.phone}`} style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: "var(--space-3)", color: "var(--primary)", fontSize: "var(--text-lg)", fontWeight: 600, textDecoration: "none" }}>
               <Phone className="w-3.5 h-3.5" /> {contact.phone}
             </a>
           )}
-          {contact.notes && <div style={{ fontSize: "0.8125rem", color: "var(--foreground)", marginTop: "0.375rem" }}>{contact.notes}</div>}
+          {contact.notes && <div style={{ fontSize: "var(--text-base)", color: "var(--foreground)", marginTop: "var(--space-2)" }}>{contact.notes}</div>}
         </div>
       ) : (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           {canEdit ? "Voeg het noodcontact toe voor de trouwdag." : "Nog geen contactpersoon ingesteld."}
         </p>
       )}

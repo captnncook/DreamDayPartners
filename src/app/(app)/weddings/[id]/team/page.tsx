@@ -155,7 +155,7 @@ export default function TeamPage() {
           ← {t.tabs.overview}
         </Link>
         <div className="mt-4">
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{tm.title}</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{tm.title}</h1>
           <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
             {tm.sub} {weddingTitle}
           </p>
@@ -194,9 +194,9 @@ export default function TeamPage() {
                     </div>
                     {!isDiscovery && (
                       <div className="mt-2 flex items-center gap-2 flex-wrap">
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor }}>{statusLabel}</span>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor }}>{statusLabel}</span>
                         {wv.portalAccess && (
-                          <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>{tm.portal}</span>
+                          <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>{tm.portal}</span>
                         )}
                       </div>
                     )}
@@ -261,16 +261,16 @@ export default function TeamPage() {
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
             <h2 className="dash-section-title" style={{ marginBottom: 0 }}>Planningsteam</h2>
             {canInvite && (
-              <button onClick={() => setShowInviteForm(v => !v)} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem", padding: "0.375rem 0.875rem" }}>
+              <button onClick={() => setShowInviteForm(v => !v)} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)", padding: "0.375rem 0.875rem" }}>
                 + Teamlid uitnodigen
               </button>
             )}
           </div>
 
           {canInvite && showInviteForm && (
-            <form onSubmit={handleInvite} className="ddp-card mb-4" style={{ padding: "1.25rem", display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "flex-end" }}>
+            <form onSubmit={handleInvite} className="ddp-card mb-4" style={{ padding: "1.25rem", display: "flex", gap: "var(--space-5)", flexWrap: "wrap", alignItems: "flex-end" }}>
               <div style={{ flex: 1, minWidth: "220px" }}>
-                <label style={{ fontSize: "0.75rem", fontWeight: 600, display: "block", marginBottom: "0.3rem" }}>
+                <label style={{ fontSize: "var(--text-sm)", fontWeight: 600, display: "block", marginBottom: "0.3rem" }}>
                   E-mailadres van het teamlid
                 </label>
                 <input
@@ -281,20 +281,20 @@ export default function TeamPage() {
               <button type="submit" disabled={inviteBusy} className="ddp-btn-primary" style={{ flexShrink: 0 }}>
                 {inviteBusy ? "Versturen…" : "Uitnodiging versturen"}
               </button>
-              {inviteError && <p style={{ fontSize: "0.8125rem", color: "var(--danger, #b3261e)", width: "100%", margin: 0 }}>{inviteError}</p>}
+              {inviteError && <p style={{ fontSize: "var(--text-base)", color: "var(--danger, #b3261e)", width: "100%", margin: 0 }}>{inviteError}</p>}
             </form>
           )}
           {inviteSuccess && !showInviteForm && (
-            <p style={{ fontSize: "0.8125rem", color: "var(--gold-deep)", marginBottom: "1rem" }}>{inviteSuccess}</p>
+            <p style={{ fontSize: "var(--text-base)", color: "var(--gold-deep)", marginBottom: "var(--space-6)" }}>{inviteSuccess}</p>
           )}
 
           {canInvite && invites.filter(i => !i.acceptedAt).length > 0 && (
             <div className="mb-4">
-              <p className="ddp-section-label" style={{ marginBottom: "0.375rem" }}>Openstaande uitnodigingen</p>
+              <p className="ddp-section-label" style={{ marginBottom: "var(--space-2)" }}>Openstaande uitnodigingen</p>
               {invites.filter(i => !i.acceptedAt).map(i => (
                 <div key={i.id} className="dash-row" style={{ justifyContent: "space-between" }}>
                   <span>{i.email}</span>
-                  <button onClick={() => cancelInvite(i.id)} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "0.75rem" }}>
+                  <button onClick={() => cancelInvite(i.id)} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: "var(--text-sm)" }}>
                     Intrekken
                   </button>
                 </div>

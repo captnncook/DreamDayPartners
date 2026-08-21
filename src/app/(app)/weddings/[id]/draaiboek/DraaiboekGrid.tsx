@@ -87,7 +87,7 @@ function getLayout(items: GridItem[]): Map<string, { col: number; total: number 
 const INP: React.CSSProperties = {
   width: "100%", padding: "0.5rem 0.75rem",
   border: "1px solid var(--border)", borderRadius: "8px",
-  fontSize: "0.875rem", background: "white", outline: "none",
+  fontSize: "var(--text-md)", background: "white", outline: "none",
 };
 
 type FormData = { startTime: string; endTime: string; title: string; location: string; audience: Audience; vendorIds: string[]; notes: string };
@@ -167,36 +167,36 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
 
   return (
     <Modal onClose={onCancel}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-        <h3 style={{ fontSize: "1rem", fontWeight: 700 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-6)" }}>
+        <h3 style={{ fontSize: "var(--text-xl)", fontWeight: 700 }}>
           {init.title ? "Item bewerken" : "Item toevoegen"}
         </h3>
         <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted-light)", padding: "4px", display: "flex" }}>
           <X className="w-5 h-5" />
         </button>
       </div>
-      <div style={{ display: "grid", gap: "0.75rem" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-          <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+      <div style={{ display: "grid", gap: "var(--space-5)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}>
+          <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
             Van<br />
-            <input type="time" value={f.startTime} onChange={e => set("startTime", e.target.value)} style={{ ...INP, marginTop: "0.25rem" }} />
+            <input type="time" value={f.startTime} onChange={e => set("startTime", e.target.value)} style={{ ...INP, marginTop: "var(--space-1)" }} />
           </label>
-          <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+          <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
             Tot<br />
-            <input type="time" value={f.endTime} onChange={e => set("endTime", e.target.value)} style={{ ...INP, marginTop: "0.25rem" }} />
+            <input type="time" value={f.endTime} onChange={e => set("endTime", e.target.value)} style={{ ...INP, marginTop: "var(--space-1)" }} />
           </label>
         </div>
-        <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+        <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
           Titel *<br />
-          <input value={f.title} onChange={e => set("title", e.target.value)} placeholder="bijv. Huwelijksinzegening" style={{ ...INP, marginTop: "0.25rem" }} />
+          <input value={f.title} onChange={e => set("title", e.target.value)} placeholder="bijv. Huwelijksinzegening" style={{ ...INP, marginTop: "var(--space-1)" }} />
         </label>
-        <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+        <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
           Locatie<br />
-          <input value={f.location} onChange={e => set("location", e.target.value)} placeholder="bijv. Feestzaal" style={{ ...INP, marginTop: "0.25rem" }} />
+          <input value={f.location} onChange={e => set("location", e.target.value)} placeholder="bijv. Feestzaal" style={{ ...INP, marginTop: "var(--space-1)" }} />
         </label>
 
         <div>
-          <p style={{ fontSize: "0.75rem", fontWeight: 600, marginBottom: "0.4rem" }}>Zichtbaar voor</p>
+          <p style={{ fontSize: "var(--text-sm)", fontWeight: 600, marginBottom: "0.4rem" }}>Zichtbaar voor</p>
           <div style={{ display: "flex", flexDirection: "column", border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
             {AUDIENCE_OPTIONS.map((opt, i) => {
               const active = f.audience === opt.value;
@@ -212,7 +212,7 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
                     borderTop: i === 0 ? "none" : "1px solid var(--border)",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
                     <span style={{
                       width: 16, height: 16, borderRadius: "50%", flexShrink: 0,
                       border: `1.5px solid ${active ? "var(--gold-deep)" : "var(--muted-light)"}`,
@@ -220,35 +220,35 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
                     }}>
                       {active && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--gold-deep)" }} />}
                     </span>
-                    <span style={{ fontSize: "0.8125rem", fontWeight: active ? 700 : 500, color: active ? "var(--gold-deep)" : "var(--foreground)" }}>
+                    <span style={{ fontSize: "var(--text-base)", fontWeight: active ? 700 : 500, color: active ? "var(--gold-deep)" : "var(--foreground)" }}>
                       {opt.label}
                     </span>
                   </div>
-                  <p style={{ fontSize: "0.6875rem", color: "var(--muted)", marginTop: "2px", marginLeft: "1.5rem" }}>{opt.hint}</p>
+                  <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", marginTop: "2px", marginLeft: "var(--space-8)" }}>{opt.hint}</p>
                 </button>
               );
             })}
           </div>
 
           {f.audience === "vendors" && (
-            <div style={{ marginTop: "0.5rem", border: "1px solid var(--border)", borderRadius: "10px", maxHeight: "180px", overflowY: "auto" }}>
+            <div style={{ marginTop: "var(--space-3)", border: "1px solid var(--border)", borderRadius: "10px", maxHeight: "180px", overflowY: "auto" }}>
               {vendors.length === 0 ? (
-                <p style={{ fontSize: "0.75rem", color: "var(--muted)", padding: "0.75rem" }}>Nog geen leveranciers gekoppeld aan deze bruiloft.</p>
+                <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", padding: "0.75rem" }}>Nog geen leveranciers gekoppeld aan deze bruiloft.</p>
               ) : vendors.map((v, i) => {
                 const checked = f.vendorIds.includes(v.vendor.id);
                 return (
                   <label
                     key={v.vendor.id}
                     style={{
-                      display: "flex", alignItems: "center", gap: "0.625rem",
+                      display: "flex", alignItems: "center", gap: "var(--space-4)",
                       padding: "0.625rem 0.875rem", cursor: "pointer",
                       borderTop: i === 0 ? "none" : "1px solid var(--border)",
                       background: checked ? "var(--sand)" : "white",
                     }}
                   >
                     <input type="checkbox" checked={checked} onChange={() => toggleVendor(v.vendor.id)} style={{ width: 16, height: 16, accentColor: "var(--gold-deep)" }} />
-                    <span style={{ fontSize: "0.8125rem", fontWeight: checked ? 600 : 500 }}>{v.vendor.name}</span>
-                    <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "capitalize" }}>{v.vendor.category}</span>
+                    <span style={{ fontSize: "var(--text-base)", fontWeight: checked ? 600 : 500 }}>{v.vendor.name}</span>
+                    <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "capitalize" }}>{v.vendor.category}</span>
                   </label>
                 );
               })}
@@ -256,16 +256,16 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
           )}
         </div>
 
-        <label style={{ fontSize: "0.75rem", fontWeight: 600 }}>
+        <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
           Notities<br />
-          <input value={f.notes} onChange={e => set("notes", e.target.value)} placeholder="Extra info" style={{ ...INP, marginTop: "0.25rem" }} />
+          <input value={f.notes} onChange={e => set("notes", e.target.value)} placeholder="Extra info" style={{ ...INP, marginTop: "var(--space-1)" }} />
         </label>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
+        <div style={{ display: "flex", gap: "var(--space-3)" }}>
           <button
             onClick={() => { if (f.title.trim()) onSave(f); }}
             disabled={saving || !f.title.trim()}
             className="ddp-btn-primary"
-            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)" }}
           >
             <Check className="w-3.5 h-3.5" />{saving ? "Opslaan…" : "Opslaan"}
           </button>
@@ -420,7 +420,7 @@ export default function DraaiboekGrid({
   const tenMinLines = Array.from({ length: (DAY_END - DAY_START) / 10 }, (_, i) => i * 10);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
       {/* Add form */}
       {formMode === "add" && (
         <ItemForm
@@ -453,10 +453,10 @@ export default function DraaiboekGrid({
 
       {/* Selected item info bar */}
       {selItem && formMode !== "edit" && (
-        <div className="ddp-card" style={{ padding: "0.875rem 1rem", display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+        <div className="ddp-card" style={{ padding: "0.875rem 1rem", display: "flex", alignItems: "center", gap: "var(--space-5)", flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 600, fontSize: "0.9375rem" }}>{selItem.title}</div>
-            <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+            <div style={{ fontWeight: 600, fontSize: "var(--text-lg)" }}>{selItem.title}</div>
+            <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px", display: "flex", gap: "var(--space-5)", flexWrap: "wrap" }}>
               <span>{selItem.startTime} – {endMin(selItem.startTime, selItem.duration)}</span>
               {selItem.location && <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}><MapPin className="w-3 h-3" />{selItem.location}</span>}
               <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontWeight: audienceOf(selItem) !== "all" ? 700 : 400, color: audienceOf(selItem) !== "all" ? "var(--gold-deep)" : "var(--muted)" }}>
@@ -464,10 +464,10 @@ export default function DraaiboekGrid({
               </span>
             </div>
           </div>
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexShrink: 0 }}>
             {canEditItem(selItem) && (
               <>
-                <button onClick={() => setFormMode("edit")} className="ddp-btn-secondary" style={{ fontSize: "0.8125rem", padding: "0.3rem 0.75rem" }}>Bewerken</button>
+                <button onClick={() => setFormMode("edit")} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)", padding: "0.3rem 0.75rem" }}>Bewerken</button>
                 <button onClick={() => del(selItem.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: "4px", display: "flex" }} title="Verwijderen">
                   <X className="w-4 h-4" />
                 </button>
@@ -483,13 +483,13 @@ export default function DraaiboekGrid({
       {/* Hint + expliciete toevoeg-knop (belangrijk op mobiel, waar precies tikken op het raster lastig is) */}
       {!formMode && !selItem && (
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", fontStyle: "italic" }}>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", fontStyle: "italic" }}>
             Tik op een item om te bewerken · Tik op het raster of gebruik de knop om iets toe te voegen
           </p>
           <button
             onClick={() => { setNewTime("09:00"); setSelected(null); setFormMode("add"); }}
             className="ddp-btn-secondary"
-            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", flexShrink: 0 }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", flexShrink: 0 }}
           >
             <Plus className="w-3.5 h-3.5" />Item toevoegen
           </button>
@@ -505,7 +505,7 @@ export default function DraaiboekGrid({
               position: "absolute",
               top: (min - DAY_START) * PPM - 7,
               right: 8,
-              fontSize: "0.625rem",
+              fontSize: "var(--text-2xs)",
               fontWeight: 700,
               color: "var(--muted)",
               lineHeight: 1,
@@ -554,7 +554,7 @@ export default function DraaiboekGrid({
               position: "absolute",
               top: (min - DAY_START) * PPM + 2,
               left: 4,
-              fontSize: "0.5625rem",
+              fontSize: "var(--text-3xs)",
               color: "#d4cdc8",
               lineHeight: 1,
               pointerEvents: "none",
@@ -632,14 +632,14 @@ export default function DraaiboekGrid({
                   }}
                 >
                   <div style={{
-                    fontSize: "0.6875rem", fontWeight: 700, lineHeight: 1.3,
+                    fontSize: "var(--text-xs)", fontWeight: 700, lineHeight: 1.3,
                     overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis",
                     color: "var(--foreground)",
                   }}>
                     {item.title}
                   </div>
                   {height > 30 && (
-                    <div style={{ fontSize: "0.5625rem", color: "var(--muted)", lineHeight: 1.3, marginTop: "1px" }}>
+                    <div style={{ fontSize: "var(--text-3xs)", color: "var(--muted)", lineHeight: 1.3, marginTop: "1px" }}>
                       {item.startTime}–{endStr}{item.vendor ? ` · ${item.vendor.name}` : ""}
                     </div>
                   )}

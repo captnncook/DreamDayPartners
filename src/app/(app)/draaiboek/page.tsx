@@ -30,7 +30,7 @@ export default async function AllDraaiboekPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Draaiboeken</h1>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Draaiboeken</h1>
         <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
           {user.role === "vendor" ? "Jouw onderdelen in het draaiboek" : "Overzicht van alle draaiboeken"}
         </p>

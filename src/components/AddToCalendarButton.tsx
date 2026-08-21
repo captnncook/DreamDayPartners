@@ -35,7 +35,7 @@ export default function AddToCalendarButton({ title, date, description }: { titl
       onClick={handleClick}
       disabled={saving}
       title="Voeg toe aan je eigen agenda"
-      style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "none", border: "none", cursor: "pointer", color: "var(--primary, var(--gold-deep))", fontSize: "0.75rem", fontWeight: 600, padding: 0 }}
+      style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", background: "none", border: "none", cursor: "pointer", color: "var(--primary, var(--gold-deep))", fontSize: "var(--text-sm)", fontWeight: 600, padding: 0 }}
     >
       <CalendarPlus size={13} /> Agenda
     </button>

@@ -81,26 +81,26 @@ export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId
             {/* Drag handle */}
             <div style={{ width: "2.5rem", height: "4px", background: "var(--border)", borderRadius: "2px", margin: "0 auto 1.25rem" }} />
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-7)" }}>
               <div>
-                <div style={{ fontWeight: 700, fontSize: "1.0625rem", letterSpacing: "-0.02em" }}>{vendor.name}</div>
-                <div style={{ fontSize: "0.8125rem", color: "var(--muted)", textTransform: "capitalize" }}>{vendor.category}</div>
+                <div style={{ fontWeight: 700, fontSize: "var(--text-2xl)", letterSpacing: "-0.02em" }}>{vendor.name}</div>
+                <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", textTransform: "capitalize" }}>{vendor.category}</div>
               </div>
               <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: "0.25rem" }}>
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div style={{ display: "grid", gap: "0.625rem" }}>
+            <div style={{ display: "grid", gap: "var(--space-4)" }}>
               {vendor.userId ? (
                 <button
                   onClick={openChat}
                   disabled={starting}
                   style={{
-                    display: "flex", alignItems: "center", gap: "0.75rem",
+                    display: "flex", alignItems: "center", gap: "var(--space-5)",
                     padding: "0.875rem 1rem", borderRadius: "0.875rem",
                     background: "var(--primary)", color: "white",
-                    border: "none", cursor: "pointer", fontWeight: 600, fontSize: "0.9375rem",
+                    border: "none", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-lg)",
                     opacity: starting ? 0.7 : 1,
                   }}
                 >
@@ -109,10 +109,10 @@ export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId
                 </button>
               ) : (
                 <div style={{
-                  display: "flex", alignItems: "center", gap: "0.75rem",
+                  display: "flex", alignItems: "center", gap: "var(--space-5)",
                   padding: "0.875rem 1rem", borderRadius: "0.875rem",
                   background: "var(--accent)", color: "var(--muted)",
-                  fontSize: "0.875rem",
+                  fontSize: "var(--text-md)",
                 }}>
                   <MessageCircle className="w-5 h-5" />
                   Leverancier heeft nog geen account
@@ -125,10 +125,10 @@ export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    display: "flex", alignItems: "center", gap: "0.75rem",
+                    display: "flex", alignItems: "center", gap: "var(--space-5)",
                     padding: "0.875rem 1rem", borderRadius: "0.875rem",
                     background: "var(--accent)", color: "var(--foreground)",
-                    textDecoration: "none", fontSize: "0.9375rem",
+                    textDecoration: "none", fontSize: "var(--text-lg)",
                   }}
                 >
                   <Globe className="w-5 h-5" style={{ color: "var(--primary)" }} />
@@ -142,10 +142,10 @@ export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId
                 <a
                   href={`mailto:${vendor.email}`}
                   style={{
-                    display: "flex", alignItems: "center", gap: "0.75rem",
+                    display: "flex", alignItems: "center", gap: "var(--space-5)",
                     padding: "0.875rem 1rem", borderRadius: "0.875rem",
                     background: "var(--accent)", color: "var(--foreground)",
-                    textDecoration: "none", fontSize: "0.9375rem",
+                    textDecoration: "none", fontSize: "var(--text-lg)",
                   }}
                 >
                   <Mail className="w-5 h-5" style={{ color: "var(--primary)" }} />
@@ -157,10 +157,10 @@ export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId
                 <a
                   href={`tel:${vendor.phone}`}
                   style={{
-                    display: "flex", alignItems: "center", gap: "0.75rem",
+                    display: "flex", alignItems: "center", gap: "var(--space-5)",
                     padding: "0.875rem 1rem", borderRadius: "0.875rem",
                     background: "var(--accent)", color: "var(--foreground)",
-                    textDecoration: "none", fontSize: "0.9375rem",
+                    textDecoration: "none", fontSize: "var(--text-lg)",
                   }}
                 >
                   <Phone className="w-5 h-5" style={{ color: "var(--primary)" }} />
@@ -170,9 +170,9 @@ export default function VendorContactSheet({ vendor, weddingId: _weddingId, wvId
 
               {vendor.contactPerson && (
                 <div style={{
-                  display: "flex", alignItems: "center", gap: "0.75rem",
+                  display: "flex", alignItems: "center", gap: "var(--space-5)",
                   padding: "0.875rem 1rem", borderRadius: "0.875rem",
-                  background: "var(--accent)", fontSize: "0.875rem", color: "var(--muted)",
+                  background: "var(--accent)", fontSize: "var(--text-md)", color: "var(--muted)",
                 }}>
                   <User className="w-5 h-5" style={{ color: "var(--primary)" }} />
                   {vendor.contactPerson}

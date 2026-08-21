@@ -95,7 +95,7 @@ export default function VendorsPage() {
       <div className="mb-6">
         <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4">
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Leveranciers</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Leveranciers</h1>
           <button onClick={() => setShowAdd(!showAdd)} className="ddp-btn-primary">
             {showAdd ? "Annuleren" : "+ Leverancier koppelen"}
           </button>
@@ -168,7 +168,7 @@ export default function VendorsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-sm">{wv.vendor.name}</h3>
-                    {wv.portalAccess && <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Portal</span>}
+                    {wv.portalAccess && <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Portal</span>}
                   </div>
                   <div className="text-xs capitalize mt-0.5" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
                 </div>

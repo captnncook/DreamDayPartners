@@ -37,7 +37,7 @@ export default function VideoDelivery({ intakeData, onUpdate, isVendor, isPlanne
           <h3 className="font-semibold text-sm">Trouwfilm levering</h3>
         </div>
         {canEdit && (
-          <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => setEditing(!editing)} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             {editing ? "Annuleren" : "Bewerken"}
           </button>
         )}
@@ -45,8 +45,8 @@ export default function VideoDelivery({ intakeData, onUpdate, isVendor, isPlanne
 
       {/* Phase progress bar */}
       {phase && !editing && (
-        <div style={{ marginBottom: "1rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+        <div style={{ marginBottom: "var(--space-6)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-3)" }}>
             {FILM_PHASES.map((p, i) => (
               <div key={p} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
                 <div style={{
@@ -54,13 +54,13 @@ export default function VideoDelivery({ intakeData, onUpdate, isVendor, isPlanne
                   background: i <= phaseIndex ? "var(--primary)" : "var(--accent)",
                   border: `2px solid ${i <= phaseIndex ? "var(--primary)" : "var(--border)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "0.6875rem", fontWeight: 700,
+                  fontSize: "var(--text-xs)", fontWeight: 700,
                   color: i <= phaseIndex ? "white" : "var(--muted)",
                   zIndex: 1,
                 }}>
                   {i < phaseIndex ? "✓" : i + 1}
                 </div>
-                <span style={{ fontSize: "0.625rem", color: i <= phaseIndex ? "var(--primary)" : "var(--muted)", marginTop: "0.25rem", textAlign: "center", fontWeight: i === phaseIndex ? 700 : 400 }}>{p}</span>
+                <span style={{ fontSize: "var(--text-2xs)", color: i <= phaseIndex ? "var(--primary)" : "var(--muted)", marginTop: "var(--space-1)", textAlign: "center", fontWeight: i === phaseIndex ? 700 : 400 }}>{p}</span>
               </div>
             ))}
           </div>
@@ -95,12 +95,12 @@ export default function VideoDelivery({ intakeData, onUpdate, isVendor, isPlanne
             <input type="text" value={filmNote} onChange={e => setFilmNote(e.target.value)}
               placeholder="Bijv. wachtwoord: bruiloft2026" className="w-full border rounded-lg px-3 py-2 text-sm bg-white" style={{ borderColor: "var(--border)" }} />
           </div>
-          <button onClick={save} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+          <button onClick={save} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-md)", fontWeight: 600 }}>
             Opslaan
           </button>
         </div>
       ) : !hasContent ? (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>
           {canEdit ? "Voeg de bewerkfase en filmlink toe zodra de opnames klaar zijn." : "Nog geen film beschikbaar."}
         </p>
       ) : (
@@ -121,7 +121,7 @@ export default function VideoDelivery({ intakeData, onUpdate, isVendor, isPlanne
             <div className="flex justify-between items-center text-sm" style={{ padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
               <span style={{ color: "var(--muted)" }}>Film</span>
               <a href={filmLink} target="_blank" rel="noopener noreferrer"
-                style={{ color: "var(--primary)", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                style={{ color: "var(--primary)", fontWeight: 600, display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
                 Bekijk film <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>

@@ -26,7 +26,7 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
 
   const inputStyle = {
     width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem",
-    border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--foreground)",
+    border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--foreground)",
   };
 
   function save() {
@@ -36,29 +36,29 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
 
   return (
     <div className="ddp-card" style={{ padding: "1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
         <div>
           <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Logistiek</h3>
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>
             {isVendor
               ? "Zet een vlag bij een veld om er een taak van te maken bij het bruidspaar/de planner."
               : "Wordt ingevuld door het bruidspaar of de planner."}
           </p>
         </div>
         {canEdit && (
-          <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => setEditing(!editing)} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             {editing ? "Annuleren" : "Bewerken"}
           </button>
         )}
       </div>
 
-      <div style={{ display: "grid", gap: "0.75rem" }}>
+      <div style={{ display: "grid", gap: "var(--space-5)" }}>
         {fields.map(field => {
           const value = form[field.key];
           if (editing) {
             return (
               <div key={field.key}>
-                <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>{field.label}</label>
+                <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>{field.label}</label>
                 {field.type === "boolean" ? (
                   <select
                     value={value === true ? "ja" : value === false ? "nee" : ""}
@@ -99,8 +99,8 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
           const isRequired = requiredKeys.includes(field.key);
 
           return (
-            <div key={field.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+            <div key={field.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-6)", padding: "0.5rem 0", borderBottom: "1px solid var(--border)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", flexShrink: 0 }}>
                 {isVendor && onToggleRequired && (
                   <button
                     type="button"
@@ -112,16 +112,16 @@ export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner
                     <Flag className="w-3.5 h-3.5" style={{ color: isRequired ? "var(--gold-deep)" : "var(--muted-light)", fill: isRequired ? "var(--gold-deep)" : "none" }} />
                   </button>
                 )}
-                <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}>{field.label}</span>
+                <span style={{ fontSize: "var(--text-md)", color: "var(--muted)" }}>{field.label}</span>
               </span>
-              <span style={{ fontSize: "0.875rem", color: "var(--foreground)", textAlign: "right" }}>{display}</span>
+              <span style={{ fontSize: "var(--text-md)", color: "var(--foreground)", textAlign: "right" }}>{display}</span>
             </div>
           );
         })}
       </div>
 
       {editing && (
-        <button onClick={save} style={{ marginTop: "1rem", padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+        <button onClick={save} style={{ marginTop: "var(--space-6)", padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-md)", fontWeight: 600 }}>
           Opslaan
         </button>
       )}

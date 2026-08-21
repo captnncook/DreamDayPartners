@@ -38,13 +38,13 @@ export default function CookieBanner() {
         <button
           onClick={() => choose("accepted")}
           className="ddp-btn-gold"
-          style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.5rem 1.25rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer" }}
+          style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.5rem 1.25rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer" }}
         >
           Accepteren
         </button>
         <button
           onClick={() => choose("declined")}
-          style={{ background: "transparent", color: "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: "0.8125rem", padding: "0.5rem 1.25rem", borderRadius: "var(--radius-full)", border: "1px solid rgba(255,255,255,0.25)", cursor: "pointer" }}
+          style={{ background: "transparent", color: "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: "var(--text-base)", padding: "0.5rem 1.25rem", borderRadius: "var(--radius-full)", border: "1px solid rgba(255,255,255,0.25)", cursor: "pointer" }}
         >
           Alleen functioneel
         </button>

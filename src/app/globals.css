@@ -82,29 +82,41 @@
   --transition-slow: 0.35s var(--ease-out);
 
   /* ── Type-schaal ──
-     Vaste stappen i.p.v. losse fontSize-waarden per component (was tot nu
-     toe overal ad hoc ingevuld). Elke stap heeft een bijpassende leading —
-     kies de dichtstbijzijnde stap, verzin geen tussenmaten. */
-  --text-xs:   0.75rem;   --leading-xs:   1.4;
-  --text-sm:   0.8125rem; --leading-sm:   1.5;
-  --text-base: 0.9375rem; --leading-base: 1.6;
-  --text-md:   1.0625rem; --leading-md:   1.5;
-  --text-lg:   1.25rem;   --leading-lg:   1.35;
-  --text-xl:   1.5rem;    --leading-xl:   1.25;
-  --text-2xl:  1.875rem;  --leading-2xl:  1.15;
-  --text-3xl:  2.375rem;  --leading-3xl:  1.1;
+     Vaste stappen i.p.v. losse fontSize-waarden per component. Waarden zijn
+     gekozen op de daadwerkelijk meest gebruikte maten in de codebase (audit
+     van alle inline fontSize's), zodat integratie overal lossless is —
+     dezelfde visuele maat, nu als benoemde token i.p.v. losse rem-waarde.
+     Kies bij nieuw werk de dichtstbijzijnde stap, verzin geen tussenmaten. */
+  --text-3xs:  0.5625rem; --leading-3xs:  1.4;
+  --text-2xs:  0.625rem;  --leading-2xs:  1.4;
+  --text-xs:   0.6875rem; --leading-xs:   1.45;
+  --text-sm:   0.75rem;   --leading-sm:   1.5;
+  --text-base: 0.8125rem; --leading-base: 1.55;
+  --text-md:   0.875rem;  --leading-md:   1.55;
+  --text-lg:   0.9375rem; --leading-lg:   1.6;
+  --text-xl:   1rem;      --leading-xl:   1.4;
+  --text-2xl:  1.0625rem; --leading-2xl:  1.4;
+  --text-3xl:  1.25rem;   --leading-3xl:  1.35;
+  --text-4xl:  1.375rem;  --leading-4xl:  1.3;
+  --text-5xl:  1.5rem;    --leading-5xl:  1.25;
+  --text-6xl:  1.75rem;   --leading-6xl:  1.15;
+  --text-7xl:  2.375rem;  --leading-7xl:  1.1;
 
   /* ── Spacing-schaal ──
-     8pt-grid (met een 4px halve stap voor krappe gevallen zoals icoon-gaps).
-     Gebruik deze i.p.v. losse rem/px-waarden in nieuwe/bijgewerkte componenten. */
+     8pt-grid met halve stappen voor krappe gevallen (icoon-gaps, compacte
+     rijen) — waarden gekozen op daadwerkelijk gebruik in de codebase, zodat
+     integratie lossless is. Gebruik deze i.p.v. losse rem/px-waarden. */
   --space-1:  0.25rem;  /* 4px  */
-  --space-2:  0.5rem;   /* 8px  */
-  --space-3:  0.75rem;  /* 12px */
-  --space-4:  1rem;     /* 16px */
-  --space-5:  1.5rem;   /* 24px */
-  --space-6:  2rem;     /* 32px */
-  --space-7:  3rem;     /* 48px */
-  --space-8:  4rem;     /* 64px */
+  --space-2:  0.375rem; /* 6px  */
+  --space-3:  0.5rem;   /* 8px  */
+  --space-4:  0.625rem; /* 10px */
+  --space-5:  0.75rem;  /* 12px */
+  --space-6:  1rem;     /* 16px */
+  --space-7:  1.25rem;  /* 20px */
+  --space-8:  1.5rem;   /* 24px */
+  --space-9:  2rem;     /* 32px */
+  --space-10: 3rem;     /* 48px */
+  --space-11: 4rem;     /* 64px */
 
   /* Minimale aanraakgrootte voor icoon-only knoppen (Apple's 44pt-richtlijn) —
      de knop mag er kleiner uitzien, maar de klikbare/tikbare zone niet. */

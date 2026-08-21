@@ -79,7 +79,7 @@ export default function MenuBuilder({ intakeData, onUpdate, isVendor, isPlanner 
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>{section.title}</span>
               {canEdit && (
-                <button onClick={() => startAddCourse(section.id)} style={{ fontSize: "0.75rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                <button onClick={() => startAddCourse(section.id)} style={{ fontSize: "var(--text-sm)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.2rem" }}>
                   <Plus className="w-3 h-3" /> Gang toevoegen
                 </button>
               )}
@@ -94,7 +94,7 @@ export default function MenuBuilder({ intakeData, onUpdate, isVendor, isPlanner 
                 <div className="flex gap-2 items-center">
                   <input type="number" step="0.01" value={courseForm.pricePerPerson} onChange={e => setCourseForm(p => ({ ...p, pricePerPerson: e.target.value }))} placeholder="€ per persoon"
                     className="w-32 border rounded-lg px-3 py-1.5 text-sm bg-white" style={{ borderColor: "var(--border)" }} />
-                  <button onClick={saveCourse} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.8125rem" }}>
+                  <button onClick={saveCourse} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-base)" }}>
                     <Check className="w-3.5 h-3.5" /> Opslaan
                   </button>
                   <button onClick={() => setEditingCourse(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex" }}>
@@ -105,7 +105,7 @@ export default function MenuBuilder({ intakeData, onUpdate, isVendor, isPlanner 
             )}
 
             {section.courses.length === 0 && editingCourse?.sectionId !== section.id && (
-              <p style={{ fontSize: "0.8125rem", color: "var(--muted)", fontStyle: "italic" }}>Nog geen gerechten.</p>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", fontStyle: "italic" }}>Nog geen gerechten.</p>
             )}
 
             <div className="space-y-1.5">
@@ -120,7 +120,7 @@ export default function MenuBuilder({ intakeData, onUpdate, isVendor, isPlanner 
                       <div className="flex gap-2 items-center">
                         <input type="number" step="0.01" value={courseForm.pricePerPerson} onChange={e => setCourseForm(p => ({ ...p, pricePerPerson: e.target.value }))} placeholder="€ per persoon"
                           className="w-32 border rounded-lg px-3 py-1.5 text-sm bg-white" style={{ borderColor: "var(--border)" }} />
-                        <button onClick={saveCourse} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.8125rem" }}>
+                        <button onClick={saveCourse} style={{ background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", padding: "0.3rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-base)" }}>
                           <Check className="w-3.5 h-3.5" /> Opslaan
                         </button>
                         <button onClick={() => setEditingCourse(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex" }}>

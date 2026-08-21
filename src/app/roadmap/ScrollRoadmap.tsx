@@ -109,15 +109,15 @@ export default function ScrollRoadmap() {
           {MILESTONES.map((m, i) => (
             <div key={m.title} style={{ position: "relative", padding: "0 0 2rem 1.75rem" }}>
               <span style={{ position: "absolute", left: "-9px", top: "2px", width: 16, height: 16, borderRadius: "50%", background: dotColor(m.status), border: "2px solid var(--ink)" }} />
-              <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: m.status === "upcoming" ? "rgba(255,255,255,0.4)" : "var(--gold)" }}>
+              <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: m.status === "upcoming" ? "rgba(255,255,255,0.4)" : "var(--gold)" }}>
                 {String(i + 1).padStart(2, "0")} · {m.period}
               </span>
-              <h3 className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "white", marginTop: "2px" }}>{m.title}</h3>
+              <h3 className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, color: "white", marginTop: "2px" }}>{m.title}</h3>
               <div className="flex flex-col sm:flex-row gap-3 mt-2 items-start">
                 <div style={{ position: "relative", width: "100%", maxWidth: "220px", height: "140px", borderRadius: "14px", overflow: "hidden", flexShrink: 0 }}>
                   <Image src={m.image} alt={m.imageAlt} fill style={{ objectFit: "cover" }} sizes="220px" />
                 </div>
-                <p style={{ fontSize: "0.9375rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{m.description}</p>
+                <p style={{ fontSize: "var(--text-lg)", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{m.description}</p>
               </div>
             </div>
           ))}
@@ -157,17 +157,17 @@ export default function ScrollRoadmap() {
                   <div
                     ref={(el) => { numberRefs.current[i] = el; }}
                     className="font-serif"
-                    style={{ fontSize: "clamp(3rem, 8vw, 5rem)", fontWeight: 700, color: "var(--gold)", lineHeight: 1, marginBottom: "0.5rem" }}
+                    style={{ fontSize: "clamp(3rem, 8vw, 5rem)", fontWeight: 700, color: "var(--gold)", lineHeight: 1, marginBottom: "var(--space-3)" }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: m.status === "upcoming" ? "rgba(255,255,255,0.45)" : "var(--gold)" }}>
+                  <span style={{ fontSize: "var(--text-sm)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: m.status === "upcoming" ? "rgba(255,255,255,0.45)" : "var(--gold)" }}>
                     {m.period}
                   </span>
-                  <h3 className="font-serif" style={{ fontSize: "clamp(1.375rem, 3.4vw, 2rem)", fontWeight: 700, color: "white", marginTop: "0.5rem" }}>
+                  <h3 className="font-serif" style={{ fontSize: "clamp(1.375rem, 3.4vw, 2rem)", fontWeight: 700, color: "white", marginTop: "var(--space-3)" }}>
                     {m.title}
                   </h3>
-                  <p style={{ fontSize: "0.9375rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.65, marginTop: "0.75rem", maxWidth: "440px" }}>
+                  <p style={{ fontSize: "var(--text-lg)", color: "rgba(255,255,255,0.65)", lineHeight: 1.65, marginTop: "var(--space-5)", maxWidth: "440px" }}>
                     {m.description}
                   </p>
                 </div>
@@ -177,7 +177,7 @@ export default function ScrollRoadmap() {
         </div>
 
         {/* HUD: dots + counter */}
-        <div style={{ position: "absolute", bottom: "clamp(1.25rem, 4vh, 2.5rem)", left: 0, right: 0, display: "flex", justifyContent: "center", gap: "0.625rem" }}>
+        <div style={{ position: "absolute", bottom: "clamp(1.25rem, 4vh, 2.5rem)", left: 0, right: 0, display: "flex", justifyContent: "center", gap: "var(--space-4)" }}>
           {MILESTONES.map((_, i) => (
             <span
               key={i}
@@ -186,10 +186,10 @@ export default function ScrollRoadmap() {
             />
           ))}
         </div>
-        <div ref={counterRef} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", color: "rgba(255,255,255,0.4)" }}>
+        <div ref={counterRef} style={{ position: "absolute", top: "1.5rem", right: "1.5rem", fontSize: "var(--text-sm)", fontWeight: 600, letterSpacing: "0.05em", color: "rgba(255,255,255,0.4)" }}>
           01 / {String(MILESTONES.length).padStart(2, "0")}
         </div>
-        <div ref={hintRef} style={{ position: "absolute", top: "1.5rem", left: LINE_LEFT, fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em", color: "rgba(255,255,255,0.4)", transition: "opacity 200ms var(--ease-out)" }}>
+        <div ref={hintRef} style={{ position: "absolute", top: "1.5rem", left: LINE_LEFT, fontSize: "var(--text-sm)", fontWeight: 600, letterSpacing: "0.05em", color: "rgba(255,255,255,0.4)", transition: "opacity 200ms var(--ease-out)" }}>
           Scroll om verder te gaan ↓
         </div>
       </div>

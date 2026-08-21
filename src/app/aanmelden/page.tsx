@@ -418,7 +418,7 @@ function AanmeldenForm() {
                 <button onClick={() => chooseAccount("vendor")} className="auth-choice-pane auth-choice-pane--vendor">
                   <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>Ik ben een leverancier</div>
                   <div className="text-sm" style={{ color: "var(--ink-muted)" }}>Presenteer je bedrijf en beheer je bruiloften.</div>
-                  <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold)", fontWeight: 600, marginTop: "0.25rem" }}>
+                  <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold)", fontWeight: 600, marginTop: "var(--space-1)" }}>
                     Kiezen <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
@@ -426,7 +426,7 @@ function AanmeldenForm() {
                 <button onClick={() => chooseAccount("couple")} className="auth-choice-pane auth-choice-pane--couple">
                   <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>Wij zijn een bruidspaar</div>
                   <div className="text-sm" style={{ color: "var(--muted)" }}>Plan jullie bruiloft, gratis, voor altijd.</div>
-                  <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600, marginTop: "0.25rem" }}>
+                  <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600, marginTop: "var(--space-1)" }}>
                     Kiezen <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>

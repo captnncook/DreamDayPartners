@@ -61,7 +61,7 @@ export default function VendorFeatureRequestsPanel() {
                 <button onClick={() => decide(r.id, "reject")} disabled={busyId === r.id} className="text-xs" style={{ color: "var(--muted)", fontWeight: 600 }}>
                   Afwijzen
                 </button>
-                <button onClick={() => decide(r.id, "approve")} disabled={busyId === r.id} className="ddp-btn-secondary" style={{ fontSize: "0.75rem", padding: "0.3rem 0.75rem" }}>
+                <button onClick={() => decide(r.id, "approve")} disabled={busyId === r.id} className="ddp-btn-secondary" style={{ fontSize: "var(--text-sm)", padding: "0.3rem 0.75rem" }}>
                   Goedkeuren
                 </button>
               </div>
@@ -75,7 +75,7 @@ export default function VendorFeatureRequestsPanel() {
           <summary className="text-xs cursor-pointer" style={{ color: "var(--muted)", fontWeight: 600 }}>
             {decided.length} eerder afgehandeld{decided.length === 1 ? "" : "e"} verzoek{decided.length === 1 ? "" : "en"}
           </summary>
-          <div style={{ borderTop: "1px solid var(--border)", marginTop: "0.5rem" }}>
+          <div style={{ borderTop: "1px solid var(--border)", marginTop: "var(--space-3)" }}>
             {decided.map((r) => (
               <div key={r.id} className="dash-row">
                 <div className="flex-1 min-w-0 text-sm">

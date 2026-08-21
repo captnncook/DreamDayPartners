@@ -131,7 +131,7 @@ function LeveranciersContent() {
         <div style={{ maxWidth: "1040px", margin: "0 auto" }}>
 
           {/* Top bar */}
-          <div className="flex items-center justify-between mb-8" style={{ gap: "0.75rem" }}>
+          <div className="flex items-center justify-between mb-8" style={{ gap: "var(--space-5)" }}>
             <Link href="/" className="inline-flex items-center gap-2" style={{ minWidth: 0 }}>
               <Image src="/images/logo-wit.svg" alt="" width={24} height={24} style={{ flexShrink: 0 }} />
               <span style={{ fontWeight: 700, fontSize: "0.9rem", letterSpacing: "-0.02em", color: "var(--ink-text)", whiteSpace: "nowrap" }}>
@@ -139,21 +139,21 @@ function LeveranciersContent() {
               </span>
             </Link>
             {loggedIn ? (
-              <Link href="/dashboard" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.8125rem", padding: "0.45rem 1.125rem", borderRadius: "var(--radius-full)", whiteSpace: "nowrap", flexShrink: 0 }}>
+              <Link href="/dashboard" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.45rem 1.125rem", borderRadius: "var(--radius-full)", whiteSpace: "nowrap", flexShrink: 0 }}>
                 Profiel
               </Link>
             ) : (
-              <Link href="/login" style={{ color: "var(--ink-text)", fontSize: "0.8125rem", fontWeight: 600, padding: "0.45rem 0.875rem", whiteSpace: "nowrap", flexShrink: 0 }}>
+              <Link href="/login" style={{ color: "var(--ink-text)", fontSize: "var(--text-base)", fontWeight: 600, padding: "0.45rem 0.875rem", whiteSpace: "nowrap", flexShrink: 0 }}>
                 Inloggen
               </Link>
             )}
           </div>
 
           <p className="ddp-section-label mb-2" style={{ color: "var(--gold)" }}>Leveranciersoverzicht</p>
-          <h1 className="font-serif" style={{ fontSize: "clamp(1.625rem, 5vw, 2.75rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.12, color: "var(--ink-text)", marginBottom: "0.625rem" }}>
+          <h1 className="font-serif" style={{ fontSize: "clamp(1.625rem, 5vw, 2.75rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.12, color: "var(--ink-text)", marginBottom: "var(--space-4)" }}>
             Vind leveranciers die passen bij jullie dag
           </h1>
-          <p style={{ fontSize: "0.9375rem", color: "var(--ink-muted)", maxWidth: "440px", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "var(--text-lg)", color: "var(--ink-muted)", maxWidth: "440px", lineHeight: 1.6 }}>
             Vergelijk fotografen, bloemisten, locaties en cateraars in één overzicht.
           </p>
 
@@ -166,14 +166,14 @@ function LeveranciersContent() {
                 placeholder="Zoek op naam of stad…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ padding: "0.7rem 1rem 0.7rem 2.5rem", fontSize: "0.9375rem", border: "none" }}
+                style={{ padding: "0.7rem 1rem 0.7rem 2.5rem", fontSize: "var(--text-lg)", border: "none" }}
               />
             </div>
             {hasFilter && (
               <button
                 onClick={() => { setSearch(""); setCategory(""); }}
                 className="flex items-center gap-1.5"
-                style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", borderRadius: "var(--radius-full)", padding: "0.6rem 1.125rem", fontSize: "0.8125rem", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}
+                style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", borderRadius: "var(--radius-full)", padding: "0.6rem 1.125rem", fontSize: "var(--text-base)", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}
               >
                 <X className="w-3.5 h-3.5" /> Alles wissen
               </button>
@@ -209,8 +209,8 @@ function LeveranciersContent() {
 
         {/* Results header */}
         {!loading && vendors.length > 0 && (
-          <div className="flex items-center justify-between mb-4" style={{ gap: "0.75rem" }}>
-            <p style={{ fontSize: "0.875rem", color: "var(--muted)", minWidth: 0 }}>
+          <div className="flex items-center justify-between mb-4" style={{ gap: "var(--space-5)" }}>
+            <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", minWidth: 0 }}>
               <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{total}</span>{" "}
               leverancier{total !== 1 ? "s" : ""}
               {category && ` · ${CATEGORY_MAP[category] ?? category}`}
@@ -237,12 +237,12 @@ function LeveranciersContent() {
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "5rem 0", color: "var(--muted)" }}>
-            <p style={{ fontSize: "0.9375rem" }}>Leveranciers laden…</p>
+            <p style={{ fontSize: "var(--text-lg)" }}>Leveranciers laden…</p>
           </div>
         ) : vendors.length === 0 ? (
           <div style={{ textAlign: "center", padding: "5rem 0" }}>
-            <h3 className="font-serif" style={{ fontWeight: 700, fontSize: "1.25rem", marginBottom: "0.5rem", color: "var(--foreground)" }}>Geen leveranciers gevonden</h3>
-            <p style={{ fontSize: "0.9375rem", color: "var(--muted)", marginBottom: "1.5rem" }}>
+            <h3 className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-3xl)", marginBottom: "var(--space-3)", color: "var(--foreground)" }}>Geen leveranciers gevonden</h3>
+            <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>
               Pas je filters aan of zoek op een andere naam.
             </p>
             <button onClick={() => { setSearch(""); setCategory(""); }} className="ddp-btn-secondary">
@@ -274,15 +274,15 @@ function LeveranciersContent() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--foreground)", cursor: page <= 1 ? "default" : "pointer" }}
+                  style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--foreground)", cursor: page <= 1 ? "default" : "pointer" }}
                 >
                   ← Vorige
                 </button>
-                <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Pagina {page} van {totalPages}</span>
+                <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Pagina {page} van {totalPages}</span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--foreground)", cursor: page >= totalPages ? "default" : "pointer" }}
+                  style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--foreground)", cursor: page >= totalPages ? "default" : "pointer" }}
                 >
                   Volgende →
                 </button>
@@ -311,7 +311,7 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
 
       <div style={{ minWidth: 0 }}>
         {vendor.isPremium && (
-          <div style={{ fontSize: "0.625rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold-deep)", marginBottom: "1px" }}>
+          <div style={{ fontSize: "var(--text-2xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold-deep)", marginBottom: "1px" }}>
             Aanbevolen
           </div>
         )}
@@ -322,12 +322,12 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
       <div className="vcat-desc">
         {vendor.description ?? ""}
         {vendor.isPremium && vendor.specializations && vendor.specializations.length > 0 && (
-          <div style={{ marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--gold-deep)" }}>
+          <div style={{ marginTop: "var(--space-1)", fontSize: "var(--text-sm)", color: "var(--gold-deep)" }}>
             {vendor.specializations.join(" · ")}
           </div>
         )}
         {vendor.avgResponseMinutes != null && (
-          <div style={{ marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--muted)" }}>
+          <div style={{ marginTop: "var(--space-1)", fontSize: "var(--text-sm)", color: "var(--muted)" }}>
             {responseTimeLabel(vendor.avgResponseMinutes)}
           </div>
         )}
@@ -340,7 +340,7 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
             <div className="amount">€{vendor.priceFrom.toLocaleString("nl-NL")}</div>
           </>
         ) : (
-          <div className="label" style={{ fontSize: "0.6875rem" }}>Op aanvraag</div>
+          <div className="label" style={{ fontSize: "var(--text-xs)" }}>Op aanvraag</div>
         )}
       </div>
     </Link>

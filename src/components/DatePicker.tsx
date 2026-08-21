@@ -98,7 +98,7 @@ export default function DatePicker({
 
   return (
     <div ref={wrapRef} style={{ position: "relative" }}>
-      <div className={className} style={{ display: "flex", alignItems: "center", gap: "0.5rem", ...style }}>
+      <div className={className} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", ...style }}>
         <input
           type="text"
           inputMode="numeric"
@@ -137,12 +137,12 @@ export default function DatePicker({
             boxShadow: "0 12px 32px rgba(0,0,0,0.10)", padding: "1rem", width: "290px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-5)" }}>
             <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} aria-label="Vorige maand"
               style={{ background: "none", border: "none", cursor: "pointer", padding: "0.25rem", color: "var(--muted)", display: "flex" }}>
               <ChevronLeft style={{ width: "16px", height: "16px" }} />
             </button>
-            <span className="font-serif" style={{ fontSize: "0.9375rem", fontWeight: 700, color: "var(--foreground)", textTransform: "capitalize" }}>
+            <span className="font-serif" style={{ fontSize: "var(--text-lg)", fontWeight: 700, color: "var(--foreground)", textTransform: "capitalize" }}>
               {MAANDEN[month]} {year}
             </span>
             <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} aria-label="Volgende maand"
@@ -151,9 +151,9 @@ export default function DatePicker({
             </button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "0.25rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "var(--space-1)" }}>
             {DAGEN.map(d => (
-              <div key={d} style={{ textAlign: "center", fontSize: "0.6875rem", fontWeight: 600, color: "var(--muted-light)", padding: "0.25rem 0" }}>
+              <div key={d} style={{ textAlign: "center", fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--muted-light)", padding: "0.25rem 0" }}>
                 {d}
               </div>
             ))}
@@ -173,7 +173,7 @@ export default function DatePicker({
                   onClick={() => { flushSync(() => { onChange(toIso(d)); setOpen(false); }); }}
                   style={{
                     aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center",
-                    borderRadius: "8px", border: "none", fontSize: "0.8125rem", cursor: disabled ? "default" : "pointer",
+                    borderRadius: "8px", border: "none", fontSize: "var(--text-base)", cursor: disabled ? "default" : "pointer",
                     fontWeight: isSelected ? 700 : 500,
                     background: isSelected ? "var(--gold)" : "transparent",
                     color: disabled ? "var(--muted-light)" : isSelected ? "var(--ink)" : isToday ? "var(--gold-deep)" : "var(--foreground)",
@@ -186,13 +186,13 @@ export default function DatePicker({
             })}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid var(--border)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "var(--space-5)", paddingTop: "0.75rem", borderTop: "1px solid var(--border)" }}>
             <button type="button" onClick={() => { flushSync(() => { onChange(""); setOpen(false); }); }}
-              style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600, color: "var(--muted)", padding: 0 }}>
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: "var(--text-base)", fontWeight: 600, color: "var(--muted)", padding: 0 }}>
               Wissen
             </button>
             <button type="button" onClick={() => { const t = new Date(); t.setHours(0, 0, 0, 0); if (!isDisabled(t)) { flushSync(() => { onChange(toIso(t)); setOpen(false); }); } }}
-              style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600, color: "var(--gold-deep)", padding: 0 }}>
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: "var(--text-base)", fontWeight: 600, color: "var(--gold-deep)", padding: 0 }}>
               Vandaag
             </button>
           </div>

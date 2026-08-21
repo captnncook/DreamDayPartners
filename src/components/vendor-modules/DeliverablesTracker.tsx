@@ -54,7 +54,7 @@ export default function DeliverablesTracker({ weddingId, wvId, deliverables, con
     padding: "0.5rem 0.75rem",
     borderRadius: "0.5rem",
     border: "1px solid var(--border)",
-    fontSize: "0.875rem",
+    fontSize: "var(--text-md)",
     background: "white",
   };
 
@@ -66,48 +66,48 @@ export default function DeliverablesTracker({ weddingId, wvId, deliverables, con
 
   return (
     <div className="card" style={{ padding: "1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
         <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Deliverables</h3>
         {isPlanner && (
-          <button onClick={() => setAdding(!adding)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => setAdding(!adding)} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             + Toevoegen
           </button>
         )}
       </div>
 
       {adding && (
-        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-6)", flexWrap: "wrap" }}>
           <input placeholder="Label" value={newLabel} onChange={e => setNewLabel(e.target.value)} style={{ ...inputStyle, flex: 1, minWidth: "140px" }} />
           <DatePicker value={newDue} onChange={v => setNewDue(v)} className="" style={{ ...inputStyle, width: "140px" }} />
-          <button onClick={addDeliverable} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem" }}>
+          <button onClick={addDeliverable} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-md)" }}>
             Toevoegen
           </button>
         </div>
       )}
 
       {deliverables.length === 0 ? (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>Nog geen deliverables.</p>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>Nog geen deliverables.</p>
       ) : (
-        <div style={{ display: "grid", gap: "0.5rem" }}>
+        <div style={{ display: "grid", gap: "var(--space-3)" }}>
           {deliverables.map(d => (
             <div key={d.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.5rem" }}>
               <div>
-                <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--charcoal)" }}>{d.label}</div>
-                {d.dueDate && <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Deadline: {fmt(d.dueDate)}</div>}
+                <div style={{ fontSize: "var(--text-md)", fontWeight: 600, color: "var(--charcoal)" }}>{d.label}</div>
+                {d.dueDate && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>Deadline: {fmt(d.dueDate)}</div>}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
                 <select
                   value={d.status}
                   onChange={e => (isPlanner || isVendor) && onUpdate(d.id, { status: e.target.value })}
                   disabled={!isPlanner && !isVendor}
-                  style={{ fontSize: "0.75rem", fontWeight: 600, color: STATUS_COLORS[d.status] ?? "var(--muted)", border: "none", background: "transparent", cursor: "pointer" }}
+                  style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: STATUS_COLORS[d.status] ?? "var(--muted)", border: "none", background: "transparent", cursor: "pointer" }}
                 >
                   {Object.entries(STATUS_LABELS).map(([k, v]) => (
                     <option key={k} value={k}>{v}</option>
                   ))}
                 </select>
                 {isPlanner && (
-                  <button onClick={() => onDelete(d.id)} style={{ fontSize: "1rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", lineHeight: 1 }}>×</button>
+                  <button onClick={() => onDelete(d.id)} style={{ fontSize: "var(--text-xl)", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", lineHeight: 1 }}>×</button>
                 )}
               </div>
             </div>

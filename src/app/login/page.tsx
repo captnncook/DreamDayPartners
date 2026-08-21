@@ -218,7 +218,7 @@ export default function LoginPage() {
               {selectedRole === "planner" && <p>Volledig bruiloftsbeheer: taken, gasten, budget, draaiboek, communicatie</p>}
               {selectedRole === "couple"  && <p>Overzicht van de eigen bruiloft, taken en communicatie met het team</p>}
               {!["admin","planner","couple"].includes(selectedRole) && (
-                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek. <span style={{ color: "var(--gold-deep)", fontWeight: 700, textTransform: "uppercase", fontSize: "0.6875rem", letterSpacing: "0.05em" }}>Premium</span></p>
+                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek. <span style={{ color: "var(--gold-deep)", fontWeight: 700, textTransform: "uppercase", fontSize: "var(--text-xs)", letterSpacing: "0.05em" }}>Premium</span></p>
               )}
             </div>
 
@@ -285,7 +285,7 @@ export default function LoginPage() {
         {/* Register CTA — donker paneel met gouden knop, consistent met dash-hero */}
         <div className="dash-hero text-center" style={{ padding: "1.5rem" }}>
           <Image src="/images/logo-wit.svg" alt="DreamDay" width={36} height={36} className="mx-auto mb-3" />
-          <h2 className="font-serif font-bold mb-1" style={{ fontSize: "1.0625rem", color: "var(--ink-text)" }}>Jullie dream day plannen?</h2>
+          <h2 className="font-serif font-bold mb-1" style={{ fontSize: "var(--text-2xl)", color: "var(--ink-text)" }}>Jullie dream day plannen?</h2>
           <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
             Stel jullie dream team samen en regel alles op één plek, gratis voor bruidsparen.
           </p>

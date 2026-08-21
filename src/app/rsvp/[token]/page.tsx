@@ -77,29 +77,29 @@ export default function RsvpPage() {
     <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem 1rem" }}>
       <div style={{ maxWidth: "480px", width: "100%", background: "white", borderRadius: "20px", boxShadow: "0 4px 32px rgba(0,0,0,0.08)", overflow: "hidden" }}>
         <div style={{ background: "linear-gradient(150deg, var(--ink) 0%, var(--ink-mid) 100%)", padding: "2rem 2rem 1.75rem", textAlign: "center" }}>
-          <h1 className="font-serif" style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--ink-text)", marginBottom: "0.375rem" }}>{wedding?.title}</h1>
-          <p style={{ color: "var(--gold)", marginBottom: "0.125rem", textTransform: "capitalize", fontSize: "0.875rem", fontWeight: 600 }}>{weddingDate}</p>
-          {wedding?.venue && <p style={{ color: "var(--ink-muted)", fontSize: "0.8125rem" }}>{wedding.venue}</p>}
+          <h1 className="font-serif" style={{ fontSize: "var(--text-5xl)", fontWeight: 700, color: "var(--ink-text)", marginBottom: "var(--space-2)" }}>{wedding?.title}</h1>
+          <p style={{ color: "var(--gold)", marginBottom: "0.125rem", textTransform: "capitalize", fontSize: "var(--text-md)", fontWeight: 600 }}>{weddingDate}</p>
+          {wedding?.venue && <p style={{ color: "var(--ink-muted)", fontSize: "var(--text-base)" }}>{wedding.venue}</p>}
         </div>
 
         <div style={{ padding: "2rem" }}>
           {submitted ? (
             <div style={{ padding: "1.5rem 0", textAlign: "center" }}>
-              <h2 className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--foreground)" }}>Bedankt!</h2>
-              <p style={{ color: "var(--muted)", marginTop: "0.5rem", fontSize: "0.9rem" }}>
+              <h2 className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--foreground)" }}>Bedankt!</h2>
+              <p style={{ color: "var(--muted)", marginTop: "var(--space-3)", fontSize: "0.9rem" }}>
                 {email ? "Je ontvangt zo een bevestiging per e-mail." : "Je reactie is ontvangen."}
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
-              <div style={{ marginBottom: "1rem" }}>
-                <label htmlFor="rsvp-email" style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>E-mailadres</label>
+              <div style={{ marginBottom: "var(--space-6)" }}>
+                <label htmlFor="rsvp-email" style={{ display: "block", fontSize: "var(--text-base)", fontWeight: 600, marginBottom: "var(--space-2)", color: "var(--foreground)" }}>E-mailadres</label>
                 <input id="rsvp-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
                   placeholder="voor een bevestiging per mail" style={INPUT} />
               </div>
 
-              <div style={{ marginBottom: "1.25rem" }}>
-                <label htmlFor="rsvp-status" style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem", color: "var(--foreground)" }}>Aanwezigheid</label>
+              <div style={{ marginBottom: "var(--space-7)" }}>
+                <label htmlFor="rsvp-status" style={{ display: "block", fontSize: "var(--text-base)", fontWeight: 600, marginBottom: "var(--space-2)", color: "var(--foreground)" }}>Aanwezigheid</label>
                 <select id="rsvp-status" value={rsvpStatus} onChange={e => setRsvpStatus(e.target.value)} style={{ ...INPUT, cursor: "pointer" }}>
                   <option value="confirmed">Ik kom!</option>
                   <option value="declined">Ik kan helaas niet</option>
@@ -107,11 +107,11 @@ export default function RsvpPage() {
               </div>
 
               {rsvpStatus === "confirmed" && (
-                <div style={{ marginBottom: "1.5rem" }}>
-                  <div className="ddp-section-label" style={{ marginBottom: "0.625rem" }}>Wie komen er?</div>
+                <div style={{ marginBottom: "var(--space-8)" }}>
+                  <div className="ddp-section-label" style={{ marginBottom: "var(--space-4)" }}>Wie komen er?</div>
                   {guests.map((g, i) => (
-                    <div key={i} style={{ border: "1px solid var(--border)", borderRadius: "12px", padding: "0.875rem", marginBottom: "0.625rem" }}>
-                      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                    <div key={i} style={{ border: "1px solid var(--border)", borderRadius: "12px", padding: "0.875rem", marginBottom: "var(--space-4)" }}>
+                      <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-3)" }}>
                         <input
                           value={g.name}
                           onChange={e => updateGuest(i, { name: e.target.value })}
@@ -126,7 +126,7 @@ export default function RsvpPage() {
                           </button>
                         )}
                       </div>
-                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexWrap: "wrap" }}>
                         <select value={g.isChild ? "child" : "adult"} onChange={e => updateGuest(i, { isChild: e.target.value === "child" })}
                           aria-label={`Volwassene of kind, gast ${i + 1}`}
                           style={{ ...INPUT, width: "auto", flexShrink: 0, cursor: "pointer" }}>
@@ -145,14 +145,14 @@ export default function RsvpPage() {
                   ))}
                   <button type="button" onClick={addGuest}
                     className="inline-flex items-center gap-1.5"
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--gold-deep)", fontSize: "0.8125rem", fontWeight: 600, padding: "0.25rem 0" }}>
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--gold-deep)", fontSize: "var(--text-base)", fontWeight: 600, padding: "0.25rem 0" }}>
                     <Plus className="w-3.5 h-3.5" /> Nog iemand toevoegen
                   </button>
                 </div>
               )}
 
               <button type="submit" disabled={saving} className="ddp-btn-gold"
-                style={{ width: "100%", background: "var(--gold)", color: "var(--ink)", border: "none", borderRadius: "var(--radius-full)", padding: "0.875rem", fontSize: "1rem", fontWeight: 700, cursor: saving ? "wait" : "pointer" }}>
+                style={{ width: "100%", background: "var(--gold)", color: "var(--ink)", border: "none", borderRadius: "var(--radius-full)", padding: "0.875rem", fontSize: "var(--text-xl)", fontWeight: 700, cursor: saving ? "wait" : "pointer" }}>
                 {saving ? "Versturen…" : "RSVP versturen"}
               </button>
             </form>

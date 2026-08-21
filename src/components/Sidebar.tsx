@@ -127,7 +127,7 @@ export default function Sidebar({ user }: SidebarProps) {
                     borderRadius: "999px",
                     background: "var(--gold)",
                     color: "var(--ink)",
-                    fontSize: "0.6875rem",
+                    fontSize: "var(--text-xs)",
                     fontWeight: 700,
                     display: "flex",
                     alignItems: "center",

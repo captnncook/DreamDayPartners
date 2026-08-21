@@ -45,8 +45,8 @@ function diffMinutes(from: string, to: string) {
 const TIME_OPTS = timeOptions();
 const emptyForm = { startTime: "09:00", endTime: "09:30", description: "" };
 
-const inputStyle = { padding: "0.5rem 0.75rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", width: "100%", boxSizing: "border-box" as const };
-const selectStyle = { padding: "0.375rem 0.5rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white" };
+const inputStyle = { padding: "0.5rem 0.75rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", width: "100%", boxSizing: "border-box" as const };
+const selectStyle = { padding: "0.375rem 0.5rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white" };
 
 // Top-level so React never remounts them on parent re-render
 function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -68,11 +68,11 @@ interface EntryFormProps {
 
 function EntryForm({ form, setForm, saving, onSave, onCancel, saveLabel }: EntryFormProps) {
   return (
-    <div style={{ background: "var(--accent)", borderRadius: "0.625rem", padding: "1rem", display: "grid", gap: "0.625rem" }}>
-      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-        <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Van</span>
+    <div style={{ background: "var(--accent)", borderRadius: "0.625rem", padding: "1rem", display: "grid", gap: "var(--space-4)" }}>
+      <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Van</span>
         <TimeSelect value={form.startTime} onChange={v => setForm(f => ({ ...f, startTime: v }))} />
-        <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>tot</span>
+        <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>tot</span>
         <TimeSelect value={form.endTime} onChange={v => setForm(f => ({ ...f, endTime: v }))} />
       </div>
       <input
@@ -81,13 +81,13 @@ function EntryForm({ form, setForm, saving, onSave, onCancel, saveLabel }: Entry
         onChange={e => { const val = e.target.value; setForm(f => ({ ...f, description: val })); }}
         style={inputStyle}
       />
-      <div style={{ display: "flex", gap: "0.5rem" }}>
+      <div style={{ display: "flex", gap: "var(--space-3)" }}>
         <button onClick={onSave} disabled={saving}
-          style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-base)", fontWeight: 600 }}>
           {saving ? "Opslaan..." : saveLabel}
         </button>
         <button onClick={onCancel}
-          style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "rgba(0,0,0,0.06)", color: "var(--muted)", border: "none", cursor: "pointer", fontSize: "0.8125rem" }}>
+          style={{ padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "rgba(0,0,0,0.06)", color: "var(--muted)", border: "none", cursor: "pointer", fontSize: "var(--text-base)" }}>
           Annuleren
         </button>
       </div>
@@ -239,35 +239,35 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
 
   return (
     <div className="card" style={{ padding: "1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
         <div>
           <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Tijdlijn</h3>
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Opbouw- en bezorgtijden voor deze bruiloft.</p>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>Opbouw- en bezorgtijden voor deze bruiloft.</p>
         </div>
-        <div style={{ display: "flex", gap: "0.625rem", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "var(--space-4)", alignItems: "center" }}>
           {blocks.length > 0 && (
             <button onClick={() => exportTimelineCsv(blocks, endOf)}
               title="Exporteer tijdlijn als CSV"
-              style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem", color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-sm)", color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>
               <Download className="w-3.5 h-3.5" /> Exporteren
             </button>
           )}
           {canEdit && blocks.length > 0 && !adding && !editingId && (
             <button onClick={syncFromDraaiboek} disabled={syncingDraaiboek}
               title="Haalt de actuele tijden uit het Draaiboek en werkt overeenkomende items bij"
-              style={{ fontSize: "0.8125rem", color: "var(--muted)", background: "none", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
+              style={{ fontSize: "var(--text-base)", color: "var(--muted)", background: "none", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
               {syncingDraaiboek ? "Synchroniseren…" : "Vernieuwen vanuit draaiboek"}
             </button>
           )}
           {canEdit && templates && templates.length > 0 && blocks.length > 0 && !adding && !editingId && (
             <button onClick={() => setShowTemplateConfirm(true)} disabled={loadingTemplate}
-              style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
+              style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.3rem 0.625rem", cursor: "pointer", fontWeight: 600 }}>
               {loadingTemplate ? "Laden…" : "Template"}
             </button>
           )}
           {canEdit && !adding && !editingId && (
             <button onClick={() => { setAdding(true); setForm(emptyForm); }}
-              style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
+              style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
               + Toevoegen
             </button>
           )}
@@ -275,21 +275,21 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
       </div>
 
       {adding && (
-        <div style={{ marginBottom: "0.75rem" }}>
+        <div style={{ marginBottom: "var(--space-5)" }}>
           <EntryForm form={form} setForm={setForm} saving={saving} onSave={saveNew} onCancel={() => setAdding(false)} saveLabel="Toevoegen" />
         </div>
       )}
 
       {blocks.length === 0 && !adding && (
         <div style={{ textAlign: "center", padding: "1.5rem 0" }}>
-          <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic", marginBottom: "0.75rem" }}>
+          <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic", marginBottom: "var(--space-5)" }}>
             Nog geen tijden ingepland.
           </p>
           {canEdit && templates && templates.length > 0 && (
             <button
               onClick={() => setShowTemplateConfirm(true)}
               disabled={loadingTemplate}
-              style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.4rem 0.875rem", cursor: "pointer", fontWeight: 600 }}
+              style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "var(--color-blush-soft)", border: "1px solid var(--color-blush)", borderRadius: "8px", padding: "0.4rem 0.875rem", cursor: "pointer", fontWeight: 600 }}
             >
               {loadingTemplate ? "Template laden…" : "Template toepassen"}
             </button>
@@ -300,19 +300,19 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
       {showTemplateConfirm && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
           <div style={{ background: "white", borderRadius: "16px", padding: "1.5rem", maxWidth: "380px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.18)" }}>
-            <h3 style={{ fontWeight: 700, fontSize: "1rem", marginBottom: "0.5rem" }}>Template toepassen?</h3>
-            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginBottom: "0.75rem" }}>
+            <h3 style={{ fontWeight: 700, fontSize: "var(--text-xl)", marginBottom: "var(--space-3)" }}>Template toepassen?</h3>
+            <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginBottom: "var(--space-5)" }}>
               Dit voegt {templates.length} tijdblokken toe aan de tijdlijn. Bestaande items worden niet verwijderd.
             </p>
-            <ul style={{ fontSize: "0.8125rem", color: "var(--foreground)", marginBottom: "1rem", paddingLeft: "1rem" }}>
+            <ul style={{ fontSize: "var(--text-base)", color: "var(--foreground)", marginBottom: "var(--space-6)", paddingLeft: "1rem" }}>
               {templates.slice(0, 6).map(t => <li key={t.key} style={{ marginBottom: "0.2rem" }}>{t.label}{t.defaultDuration ? ` (${t.defaultDuration} min)` : ""}</li>)}
               {templates.length > 6 && <li style={{ color: "var(--muted)" }}>+ {templates.length - 6} meer…</li>}
             </ul>
-            <div style={{ display: "flex", gap: "0.625rem" }}>
-              <button onClick={applyTemplate} style={{ flex: 1, background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", padding: "0.625rem", cursor: "pointer", fontWeight: 600, fontSize: "0.875rem" }}>
+            <div style={{ display: "flex", gap: "var(--space-4)" }}>
+              <button onClick={applyTemplate} style={{ flex: 1, background: "var(--primary)", color: "white", border: "none", borderRadius: "10px", padding: "0.625rem", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-md)" }}>
                 Toepassen
               </button>
-              <button onClick={() => setShowTemplateConfirm(false)} style={{ flex: 1, background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.625rem", cursor: "pointer", fontWeight: 600, fontSize: "0.875rem", color: "var(--foreground)" }}>
+              <button onClick={() => setShowTemplateConfirm(false)} style={{ flex: 1, background: "var(--accent)", border: "1px solid var(--border)", borderRadius: "10px", padding: "0.625rem", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-md)", color: "var(--foreground)" }}>
                 Annuleren
               </button>
             </div>
@@ -320,19 +320,19 @@ export default function TimelinePlanner({ blocks: initial, templates, weddingId,
         </div>
       )}
 
-      <div style={{ display: "grid", gap: "0.5rem" }}>
+      <div style={{ display: "grid", gap: "var(--space-3)" }}>
         {blocks.map(b => (
           <div key={b.id}>
             {editingId === b.id
               ? <EntryForm form={form} setForm={setForm} saving={saving} onSave={() => saveEdit(b.id)} onCancel={() => setEditingId(null)} saveLabel="Opslaan" />
               : (
-                <div style={{ display: "flex", gap: "0.75rem", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.5rem", alignItems: "flex-start" }}>
+                <div style={{ display: "flex", gap: "var(--space-5)", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.5rem", alignItems: "flex-start" }}>
                   <div style={{ flexShrink: 0, minWidth: "6.5rem" }}>
-                    <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--charcoal)" }}>{b.startTime} – {endOf(b)}</span>
+                    <span style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--charcoal)" }}>{b.startTime} – {endOf(b)}</span>
                   </div>
-                  <div style={{ flex: 1, fontSize: "0.875rem", color: "var(--charcoal)" }}>{b.description || b.title}</div>
+                  <div style={{ flex: 1, fontSize: "var(--text-md)", color: "var(--charcoal)" }}>{b.description || b.title}</div>
                   {canEdit && (
-                    <div style={{ display: "flex", gap: "0.625rem", flexShrink: 0 }}>
+                    <div style={{ display: "flex", gap: "var(--space-4)", flexShrink: 0 }}>
                       <button onClick={() => startEdit(b)} style={{ color: "var(--primary)", background: "none", border: "none", cursor: "pointer", display: "flex" }}><Pencil className="w-3.5 h-3.5" /></button>
                       <button onClick={() => del(b.id)} style={{ color: "#e53e3e", background: "none", border: "none", cursor: "pointer", display: "flex" }}><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>

@@ -95,7 +95,7 @@ export default function AdminVendorsPage() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="font-serif mb-1" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>
+      <h1 className="font-serif mb-1" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>
         Leveranciers
       </h1>
       <p className="text-sm mb-4" style={{ color: "var(--muted)" }}>
@@ -188,15 +188,15 @@ export default function AdminVendorsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                style={{ fontSize: "0.8125rem", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--ink-text)" }}
+                style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--ink-text)" }}
               >
                 ← Vorige
               </button>
-              <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>Pagina {page} van {totalPages} · {total} totaal</span>
+              <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Pagina {page} van {totalPages} · {total} totaal</span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                style={{ fontSize: "0.8125rem", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--ink-text)" }}
+                style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--ink-text)" }}
               >
                 Volgende →
               </button>

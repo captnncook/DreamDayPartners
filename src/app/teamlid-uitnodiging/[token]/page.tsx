@@ -98,7 +98,7 @@ export default function TeamInviteAcceptPage() {
 
   return (
     <div style={{ maxWidth: "420px", margin: "0 auto", padding: "3rem 1.25rem" }}>
-      <h1 className="font-serif" style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.5rem" }}>
+      <h1 className="font-serif" style={{ fontSize: "var(--text-5xl)", fontWeight: 700, marginBottom: "var(--space-3)" }}>
         Uitnodiging voor DreamDay
       </h1>
 
@@ -110,18 +110,18 @@ export default function TeamInviteAcceptPage() {
 
       {step === "name" && (
         <div className="space-y-4">
-          <p style={{ color: "var(--muted)", fontSize: "0.9375rem" }}>
+          <p style={{ color: "var(--muted)", fontSize: "var(--text-lg)" }}>
             <strong>{invitedByName}</strong> nodigt je uit om mee te helpen bij <strong>{weddingTitle}</strong> — met je eigen account, los van hun inloggegevens.
           </p>
           <div>
-            <label style={{ fontSize: "0.8125rem", fontWeight: 600 }}>Je naam</label>
+            <label style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>Je naam</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="bijv. Corrie" className="ddp-input" style={{ marginTop: "0.3rem" }} />
           </div>
           <div>
-            <label style={{ fontSize: "0.8125rem", fontWeight: 600 }}>E-mailadres</label>
+            <label style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>E-mailadres</label>
             <input value={email} disabled className="ddp-input" style={{ marginTop: "0.3rem", opacity: 0.7 }} />
           </div>
-          {error && <p style={{ color: "var(--danger, #b3261e)", fontSize: "0.875rem" }}>{error}</p>}
+          {error && <p style={{ color: "var(--danger, #b3261e)", fontSize: "var(--text-md)" }}>{error}</p>}
           <button onClick={handleSendCode} disabled={busy} className="ddp-btn-primary" style={{ width: "100%" }}>
             {busy ? "Code versturen…" : "Code versturen"}
           </button>
@@ -130,11 +130,11 @@ export default function TeamInviteAcceptPage() {
 
       {step === "verify-code" && (
         <div className="space-y-4">
-          <p style={{ color: "var(--muted)", fontSize: "0.9375rem" }}>
+          <p style={{ color: "var(--muted)", fontSize: "var(--text-lg)" }}>
             We hebben een 6-cijferige code gestuurd naar <strong>{email}</strong>.
           </p>
           <input value={code} onChange={e => setCode(e.target.value)} placeholder="123456" className="ddp-input" />
-          {error && <p style={{ color: "var(--danger, #b3261e)", fontSize: "0.875rem" }}>{error}</p>}
+          {error && <p style={{ color: "var(--danger, #b3261e)", fontSize: "var(--text-md)" }}>{error}</p>}
           <button onClick={handleVerifyCode} disabled={busy} className="ddp-btn-primary" style={{ width: "100%" }}>
             {busy ? "Bevestigen…" : "Code bevestigen"}
           </button>
@@ -143,9 +143,9 @@ export default function TeamInviteAcceptPage() {
 
       {step === "password" && (
         <div className="space-y-4">
-          <p style={{ color: "var(--muted)", fontSize: "0.9375rem" }}>E-mail bevestigd. Kies een wachtwoord voor je eigen account.</p>
+          <p style={{ color: "var(--muted)", fontSize: "var(--text-lg)" }}>E-mail bevestigd. Kies een wachtwoord voor je eigen account.</p>
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimaal 8 tekens" className="ddp-input" />
-          {error && <p style={{ color: "var(--danger, #b3261e)", fontSize: "0.875rem" }}>{error}</p>}
+          {error && <p style={{ color: "var(--danger, #b3261e)", fontSize: "var(--text-md)" }}>{error}</p>}
           <button onClick={handleRegister} disabled={busy} className="ddp-btn-primary" style={{ width: "100%" }}>
             {busy ? "Account aanmaken…" : "Account aanmaken"}
           </button>

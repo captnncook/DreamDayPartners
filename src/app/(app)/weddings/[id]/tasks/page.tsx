@@ -120,7 +120,7 @@ export default function TasksPage() {
       <div className="mb-6">
         <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Taken</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Taken</h1>
           <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary">
             {showForm ? "Annuleren" : "+ Taak toevoegen"}
           </button>
@@ -165,11 +165,11 @@ export default function TasksPage() {
 
       <div className="flex flex-wrap gap-2 mb-4 items-center">
         {(["all", "open", "done"] as const).map((f) => (
-          <button key={f} onClick={() => setFilter(f)} className={`ddp-chip${filter === f ? " active" : ""}`} style={{ padding: "0.35rem 0.875rem", fontSize: "0.75rem" }}>
+          <button key={f} onClick={() => setFilter(f)} className={`ddp-chip${filter === f ? " active" : ""}`} style={{ padding: "0.35rem 0.875rem", fontSize: "var(--text-sm)" }}>
             {f === "all" ? "Alles" : f === "open" ? "Open" : "Klaar"}
           </button>
         ))}
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "var(--space-3)", flexWrap: "wrap" }}>
           <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
             className="text-xs rounded-lg px-2 py-1.5 border"
             style={{ borderColor: "var(--border)", background: "white", cursor: "pointer" }}>
@@ -220,10 +220,10 @@ export default function TasksPage() {
               )}
               <div className="flex items-center gap-2.5 mt-1 flex-wrap text-xs" style={{ color: "var(--muted)" }}>
                 {!isDone && (
-                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>{meta.label}</span>
+                  <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>{meta.label}</span>
                 )}
                 {isUrgent && (
-                  <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
+                  <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
                     {daysLeft !== null && daysLeft <= 0 ? "Vandaag" : `Nog ${daysLeft}d`}
                   </span>
                 )}
@@ -284,7 +284,7 @@ function TimelineView({ tasks, onToggle }: { tasks: Task[]; onToggle: (t: Task) 
                     <div className="flex-1 min-w-0">
                       <span className={`text-sm font-medium ${t.status === "done" ? "line-through" : ""}`}>{t.title}</span>
                       <div className="flex gap-2.5 mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
-                        <span style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>{meta.label}</span>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color }}>{meta.label}</span>
                         {t.dueDate && <span>{formatDate(t.dueDate)}</span>}
                       </div>
                     </div>

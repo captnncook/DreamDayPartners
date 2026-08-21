@@ -50,11 +50,11 @@ export default function VendorMap({ vendors }: Props) {
     return (
       <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--color-blush-soft)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border)" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ marginBottom: "1rem", opacity: 0.4, display: "flex", justifyContent: "center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></div>
-          <p style={{ color: "var(--muted)", fontSize: "0.9375rem" }}>
+          <div style={{ marginBottom: "var(--space-6)", opacity: 0.4, display: "flex", justifyContent: "center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg></div>
+          <p style={{ color: "var(--muted)", fontSize: "var(--text-lg)" }}>
             Nog geen leveranciers met locatie beschikbaar.
           </p>
-          <p style={{ color: "var(--muted-light)", fontSize: "0.8125rem", marginTop: "0.375rem" }}>
+          <p style={{ color: "var(--muted-light)", fontSize: "var(--text-base)", marginTop: "var(--space-2)" }}>
             Leveranciers verschijnen op de kaart zodra zij hun stad hebben ingevuld.
           </p>
         </div>
@@ -84,13 +84,13 @@ export default function VendorMap({ vendors }: Props) {
                   </div>
                 )}
                 <div style={{ fontWeight: 700, fontSize: "0.9rem", marginBottom: "2px" }}>{v.name}</div>
-                <div style={{ fontSize: "0.75rem", color: "#666", marginBottom: "6px" }}>
+                <div style={{ fontSize: "var(--text-sm)", color: "#666", marginBottom: "6px" }}>
                   {CATEGORY_LABELS[v.category] ?? v.category}
                   {v.city && ` · ${v.city}`}
                 </div>
                 <Link
                   href={`/leveranciers/${v.id}`}
-                  style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#1F2428", textDecoration: "none" }}
+                  style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "#1F2428", textDecoration: "none" }}
                 >
                   Bekijk profiel →
                 </Link>

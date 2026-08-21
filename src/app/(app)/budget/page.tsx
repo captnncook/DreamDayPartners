@@ -25,7 +25,7 @@ export default async function AllBudgetPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Budget</h1>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Budget</h1>
         <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{withBudget.length} bruiloft{withBudget.length !== 1 ? "en" : ""} met budget</p>
       </div>
 
@@ -43,7 +43,7 @@ export default async function AllBudgetPage() {
             return (
               <Link key={w.id} href={`/weddings/${w.id}/budget`} className="dash-row" style={{ padding: "1.125rem 0.25rem", display: "block" }}>
                 <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                  <span className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</span>
+                  <span className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "var(--foreground)" }}>{w.title}</span>
                   <span className="text-sm">
                     <span style={{ fontWeight: 700, color: over ? "var(--gold-deep)" : "var(--foreground)" }}>{euro(spent)}</span>
                     <span style={{ color: "var(--muted)" }}> van {euro(total)}</span>

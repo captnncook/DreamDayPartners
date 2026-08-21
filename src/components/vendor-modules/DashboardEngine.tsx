@@ -128,7 +128,7 @@ export default function DashboardEngine({
   }, [weddingId, wvId, intakeData]);
 
   return (
-    <div style={{ display: "grid", gap: "1rem" }}>
+    <div style={{ display: "grid", gap: "var(--space-6)" }}>
       {venueInfo && <VenueInfo venue={venueInfo} />}
 
       <ContractPayment

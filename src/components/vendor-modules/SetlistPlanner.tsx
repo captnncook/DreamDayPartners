@@ -60,7 +60,7 @@ export default function SetlistPlanner({ intakeData, onUpdate, isVendor, isPlann
           <h3 className="font-semibold text-sm">Setlist & Muziekwensen</h3>
         </div>
         {canEdit && (
-          <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary" style={{ padding: "0.3rem 0.75rem", fontSize: "0.75rem", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+          <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary" style={{ padding: "0.3rem 0.75rem", fontSize: "var(--text-sm)", display: "inline-flex", alignItems: "center", gap: "var(--space-1)" }}>
             <Plus className="w-3.5 h-3.5" /> Nummer toevoegen
           </button>
         )}
@@ -94,8 +94,8 @@ export default function SetlistPlanner({ intakeData, onUpdate, isVendor, isPlann
             </label>
           </div>
           <div className="flex gap-2">
-            <button type="submit" className="ddp-btn-primary" style={{ padding: "0.4rem 0.875rem", fontSize: "0.8125rem" }}>Toevoegen</button>
-            <button type="button" onClick={() => setShowForm(false)} className="ddp-btn-secondary" style={{ padding: "0.4rem 0.875rem", fontSize: "0.8125rem" }}>
+            <button type="submit" className="ddp-btn-primary" style={{ padding: "0.4rem 0.875rem", fontSize: "var(--text-base)" }}>Toevoegen</button>
+            <button type="button" onClick={() => setShowForm(false)} className="ddp-btn-secondary" style={{ padding: "0.4rem 0.875rem", fontSize: "var(--text-base)" }}>
               <X className="w-3.5 h-3.5" />
             </button>
           </div>

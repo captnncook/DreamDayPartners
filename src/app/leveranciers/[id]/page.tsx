@@ -46,8 +46,8 @@ function GuestRange({ label, min, max }: { label: string; min?: number | null; m
   if (min == null && max == null) return null;
   return (
     <div>
-      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>{label}</span>
-      <span className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>
+      <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>{label}</span>
+      <span className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "var(--foreground)" }}>
         {min != null && max != null ? `${min} – ${max}` : min != null ? `vanaf ${min}` : `tot ${max}`}
       </span>
     </div>
@@ -174,7 +174,7 @@ export default function VendorProfilePage() {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--background)" }}>
         <div style={{ textAlign: "center" }}>
-          <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>Leverancier niet gevonden.</p>
+          <p style={{ color: "var(--muted)", marginBottom: "var(--space-6)" }}>Leverancier niet gevonden.</p>
           <Link href="/leveranciers" className="ddp-btn-secondary">← Terug naar catalogus</Link>
         </div>
       </div>
@@ -218,7 +218,7 @@ export default function VendorProfilePage() {
                   </div>
                 )}
                 {photoUrls.length > 0 && (
-                  <div style={{ position: "absolute", bottom: "12px", right: "12px", background: "rgba(0,0,0,0.6)", color: "white", borderRadius: "8px", padding: "4px 10px", fontSize: "0.8125rem", fontWeight: 600 }}>
+                  <div style={{ position: "absolute", bottom: "12px", right: "12px", background: "rgba(0,0,0,0.6)", color: "white", borderRadius: "8px", padding: "4px 10px", fontSize: "var(--text-base)", fontWeight: 600 }}>
                     {photoUrls.length} foto&apos;s
                   </div>
                 )}
@@ -248,9 +248,9 @@ export default function VendorProfilePage() {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
               {vendor.isPremium && (
-                <span className="mb-2" style={{ display: "inline-block", fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold-deep)" }}>Aanbevolen leverancier</span>
+                <span className="mb-2" style={{ display: "inline-block", fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold-deep)" }}>Aanbevolen leverancier</span>
               )}
-              <h1 className="font-serif" style={{ fontSize: "clamp(1.5rem, 4vw, 2.25rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)", lineHeight: 1.1, marginBottom: "0.375rem" }}>
+              <h1 className="font-serif" style={{ fontSize: "clamp(1.5rem, 4vw, 2.25rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)", lineHeight: 1.1, marginBottom: "var(--space-2)" }}>
                 {vendor.name}
               </h1>
               <div className="flex items-center gap-3 flex-wrap" style={{ fontSize: "0.9rem", color: "var(--muted)" }}>
@@ -282,7 +282,7 @@ export default function VendorProfilePage() {
             {vendor.description && (
               <section className="mb-8">
                 <h2 className="dash-section-title mb-2">Over {vendor.name}</h2>
-                <p style={{ fontSize: "0.9375rem", color: "var(--muted)", lineHeight: 1.75, whiteSpace: "pre-wrap" }}>
+                <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", lineHeight: 1.75, whiteSpace: "pre-wrap" }}>
                   {vendor.description}
                 </p>
               </section>
@@ -293,26 +293,26 @@ export default function VendorProfilePage() {
               <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                 <h2 className="dash-section-title mb-3">Diensten & prijzen</h2>
                 {(vendor.priceFrom || vendor.priceTo) && (
-                  <div style={{ marginBottom: "0.75rem" }}>
-                    <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "0.25rem" }}>Prijsindicatie</span>
-                    <span className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--foreground)" }}>
+                  <div style={{ marginBottom: "var(--space-5)" }}>
+                    <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "var(--space-1)" }}>Prijsindicatie</span>
+                    <span className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--foreground)" }}>
                       {vendor.priceFrom ? `€${vendor.priceFrom.toLocaleString("nl-NL")}` : ""}
                       {vendor.priceFrom && vendor.priceTo ? " – " : ""}
                       {vendor.priceTo ? `€${vendor.priceTo.toLocaleString("nl-NL")}` : ""}
-                      {vendor.priceUnit && <span className="font-sans" style={{ fontSize: "0.875rem", fontWeight: 400, color: "var(--muted)", marginLeft: "0.375rem" }}>{vendor.priceUnit}</span>}
+                      {vendor.priceUnit && <span className="font-sans" style={{ fontSize: "var(--text-md)", fontWeight: 400, color: "var(--muted)", marginLeft: "var(--space-2)" }}>{vendor.priceUnit}</span>}
                     </span>
                   </div>
                 )}
                 {vendor.averageWeddingPrice != null && (
-                  <div style={{ marginBottom: "0.75rem" }}>
-                    <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "0.25rem" }}>Gemiddelde bruiloft</span>
-                    <span className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, color: "var(--foreground)" }}>
+                  <div style={{ marginBottom: "var(--space-5)" }}>
+                    <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "var(--space-1)" }}>Gemiddelde bruiloft</span>
+                    <span className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "var(--foreground)" }}>
                       €{vendor.averageWeddingPrice.toLocaleString("nl-NL")}
                     </span>
                   </div>
                 )}
                 {vendor.specializations && vendor.specializations.length > 0 && (
-                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600 }}>
+                  <p style={{ fontSize: "var(--text-md)", color: "var(--gold-deep)", fontWeight: 600 }}>
                     {vendor.specializations.join(" · ")}
                   </p>
                 )}
@@ -336,7 +336,7 @@ export default function VendorProfilePage() {
                   <GuestRange label="Feest" min={vendor.partyMinGuests} max={vendor.partyMaxGuests} />
                 </div>
                 {vendor.hotelRooms != null && (
-                  <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
+                  <p style={{ fontSize: "var(--text-md)", color: "var(--muted)" }}>
                     <strong style={{ color: "var(--foreground)" }}>{vendor.hotelRooms}</strong> hotelkamers beschikbaar
                   </p>
                 )}
@@ -348,7 +348,7 @@ export default function VendorProfilePage() {
               <section className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                 <h2 className="dash-section-title mb-3">Zaalindeling</h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full" style={{ borderCollapse: "collapse", fontSize: "0.8125rem" }}>
+                  <table className="w-full" style={{ borderCollapse: "collapse", fontSize: "var(--text-base)" }}>
                     <thead>
                       <tr style={{ borderBottom: "1px solid var(--border)" }}>
                         <th style={{ textAlign: "left", padding: "0.5rem 0.5rem 0.5rem 0", color: "var(--muted)", fontWeight: 600 }}>Zaal</th>
@@ -391,7 +391,7 @@ export default function VendorProfilePage() {
                 <h2 className="dash-section-title mb-3">Eigenschappen</h2>
 
                 {(vendor.isOfficialCeremonyLocation || vendor.outdoorCeremonyPossible) && (
-                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600, marginBottom: "0.75rem" }}>
+                  <p style={{ fontSize: "var(--text-md)", color: "var(--gold-deep)", fontWeight: 600, marginBottom: "var(--space-5)" }}>
                     {[
                       vendor.isOfficialCeremonyLocation && "Officiële trouwlocatie",
                       vendor.outdoorCeremonyPossible && "Buiten trouwen mogelijk",
@@ -409,9 +409,9 @@ export default function VendorProfilePage() {
                   const list = values as string[] | undefined;
                   if (!list || list.length === 0) return null;
                   return (
-                    <div key={label as string} style={{ marginBottom: "0.75rem" }}>
-                      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "0.25rem" }}>{label}</span>
-                      <p style={{ fontSize: "0.875rem", color: "var(--muted)" }}>{list.join(" · ")}</p>
+                    <div key={label as string} style={{ marginBottom: "var(--space-5)" }}>
+                      <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "var(--space-1)" }}>{label}</span>
+                      <p style={{ fontSize: "var(--text-md)", color: "var(--muted)" }}>{list.join(" · ")}</p>
                     </div>
                   );
                 })}
@@ -425,14 +425,14 @@ export default function VendorProfilePage() {
                 <div className="flex flex-wrap gap-x-8 gap-y-3">
                   {vendor.closingTime && (
                     <div>
-                      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>Sluitingstijd</span>
-                      <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)" }}>{vendor.closingTime}</span>
+                      <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>Sluitingstijd</span>
+                      <span style={{ fontSize: "var(--text-lg)", fontWeight: 600, color: "var(--foreground)" }}>{vendor.closingTime}</span>
                     </div>
                   )}
                   {vendor.soundLimit && (
                     <div>
-                      <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>Geluidslimiet</span>
-                      <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)" }}>{vendor.soundLimit}</span>
+                      <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>Geluidslimiet</span>
+                      <span style={{ fontSize: "var(--text-lg)", fontWeight: 600, color: "var(--foreground)" }}>{vendor.soundLimit}</span>
                     </div>
                   )}
                 </div>
@@ -452,11 +452,11 @@ export default function VendorProfilePage() {
                   <div className="flex flex-col gap-3">
                     {entries.map(({ field, value }) => (
                       <div key={field.key}>
-                        <span style={{ fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>{field.label}</span>
+                        <span style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "2px" }}>{field.label}</span>
                         {field.type === "boolean" ? (
-                          <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--gold-deep)" }}>Ja</span>
+                          <span style={{ fontSize: "var(--text-lg)", fontWeight: 600, color: "var(--gold-deep)" }}>Ja</span>
                         ) : (
-                          <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--foreground)" }}>
+                          <span style={{ fontSize: "var(--text-lg)", fontWeight: 600, color: "var(--foreground)" }}>
                             {Array.isArray(value) ? value.join(" · ") : String(value)}
                           </span>
                         )}
@@ -488,7 +488,7 @@ export default function VendorProfilePage() {
                   </a>
                 )}
                 {!vendor.contactPerson && !vendor.email && !vendor.phone && !vendor.website && (
-                  <p style={{ fontSize: "0.875rem", color: "var(--muted-light)" }}>Nog geen contactgegevens ingevuld.</p>
+                  <p style={{ fontSize: "var(--text-md)", color: "var(--muted-light)" }}>Nog geen contactgegevens ingevuld.</p>
                 )}
               </div>
             </section>
@@ -512,31 +512,31 @@ export default function VendorProfilePage() {
                   <div className="flex items-center gap-6 flex-wrap mb-5">
                     <div>
                       <span className="font-serif" style={{ fontSize: "2rem", fontWeight: 700, color: "var(--foreground)" }}>{overall.toFixed(1)}</span>
-                      <span style={{ fontSize: "0.875rem", color: "var(--muted)" }}> / 5</span>
-                      <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{reviews.length} {reviews.length === 1 ? "review" : "reviews"}</div>
+                      <span style={{ fontSize: "var(--text-md)", color: "var(--muted)" }}> / 5</span>
+                      <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{reviews.length} {reviews.length === 1 ? "review" : "reviews"}</div>
                     </div>
                     <div>
-                      <span className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--gold-deep)" }}>{recommendPct}%</span>
-                      <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>zou aanraden</div>
+                      <span className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--gold-deep)" }}>{recommendPct}%</span>
+                      <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>zou aanraden</div>
                     </div>
                     <div className="flex flex-col gap-1">
                       {categories.map(c => (
                         <div key={c.key} className="flex items-center gap-2">
-                          <span style={{ fontSize: "0.75rem", color: "var(--muted)", width: "120px" }}>{c.label}</span>
-                          <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)" }}>{categoryAvg(c.key).toFixed(1)}</span>
+                          <span style={{ fontSize: "var(--text-sm)", color: "var(--muted)", width: "120px" }}>{c.label}</span>
+                          <span style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)" }}>{categoryAvg(c.key).toFixed(1)}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                   <div>
                     {reviews.map(r => (
-                      <div key={r.id} className="dash-row" style={{ flexDirection: "column", alignItems: "flex-start", gap: "0.25rem" }}>
+                      <div key={r.id} className="dash-row" style={{ flexDirection: "column", alignItems: "flex-start", gap: "var(--space-1)" }}>
                         <div className="flex items-center gap-2">
-                          <span style={{ color: "var(--gold)", fontSize: "0.9375rem", letterSpacing: "2px" }}>{"★".repeat(Math.round(avg(r)))}{"☆".repeat(5 - Math.round(avg(r)))}</span>
-                          <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>{r.author.name}</span>
-                          {r.wouldRecommend && <span style={{ fontSize: "0.6875rem", color: "var(--gold-deep)", fontWeight: 600 }}>Beveelt aan</span>}
+                          <span style={{ color: "var(--gold)", fontSize: "var(--text-lg)", letterSpacing: "2px" }}>{"★".repeat(Math.round(avg(r)))}{"☆".repeat(5 - Math.round(avg(r)))}</span>
+                          <span style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>{r.author.name}</span>
+                          {r.wouldRecommend && <span style={{ fontSize: "var(--text-xs)", color: "var(--gold-deep)", fontWeight: 600 }}>Beveelt aan</span>}
                         </div>
-                        {r.text && <p style={{ fontSize: "0.875rem", color: "var(--muted)", lineHeight: 1.6 }}>{r.text}</p>}
+                        {r.text && <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", lineHeight: 1.6 }}>{r.text}</p>}
                       </div>
                     ))}
                   </div>
@@ -547,16 +547,16 @@ export default function VendorProfilePage() {
             {/* Claim profile */}
             {!vendor.userId && (
               <section className="mb-8" style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1.25rem 1.5rem" }}>
-                <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "0.25rem", color: "var(--foreground)" }}>Is dit jouw bedrijf?</h2>
-                <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.6 }}>
+                <h2 style={{ fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "var(--space-1)", color: "var(--foreground)" }}>Is dit jouw bedrijf?</h2>
+                <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)", lineHeight: 1.6 }}>
                   Claim dit profiel om het te beheren, foto&apos;s toe te voegen en aanvragen van bruidsparen te ontvangen.
                 </p>
                 {claimSent ? (
-                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600 }}>
+                  <p style={{ fontSize: "var(--text-md)", color: "var(--gold-deep)", fontWeight: 600 }}>
                     Aanvraag verstuurd! We nemen je verzoek in behandeling en sturen je een e-mail zodra het is goedgekeurd.
                   </p>
                 ) : (
-                  <form onSubmit={handleClaim} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <form onSubmit={handleClaim} style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
                     <input
                       type="email"
                       required
@@ -571,7 +571,7 @@ export default function VendorProfilePage() {
                     </button>
                   </form>
                 )}
-                {claimError && <p style={{ fontSize: "0.8125rem", color: "var(--danger)", marginTop: "0.5rem" }}>{claimError}</p>}
+                {claimError && <p style={{ fontSize: "var(--text-base)", color: "var(--danger)", marginTop: "var(--space-3)" }}>{claimError}</p>}
               </section>
             )}
 
@@ -579,15 +579,15 @@ export default function VendorProfilePage() {
             {!isVendorOwner && (
               <section className="pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                 <h2 className="dash-section-title mb-1">Stuur een aanvraag</h2>
-                <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "1rem", lineHeight: 1.6 }}>
+                <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)", lineHeight: 1.6 }}>
                   Stel een vraag of doe een vrijblijvende aanvraag bij {vendor.name}.
                 </p>
                 {contactSent ? (
-                  <p style={{ fontSize: "0.875rem", color: "var(--gold-deep)", fontWeight: 600 }}>
+                  <p style={{ fontSize: "var(--text-md)", color: "var(--gold-deep)", fontWeight: 600 }}>
                     Aanvraag verstuurd! {vendor.name} neemt zo snel mogelijk contact op.
                   </p>
                 ) : (
-                  <form onSubmit={handleContact} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                  <form onSubmit={handleContact} style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
                     {[
                       { key: "name", label: "Naam", placeholder: "Jouw naam", type: "text" },
                       { key: "email", label: "E-mailadres", placeholder: "jouw@email.nl", type: "email" },
@@ -595,7 +595,7 @@ export default function VendorProfilePage() {
                       { key: "weddingDate", label: "Trouwdatum (optioneel)", placeholder: "", type: "date" },
                     ].map(f => (
                       <div key={f.key}>
-                        <label style={{ fontSize: "0.8125rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>{f.label}</label>
+                        <label style={{ fontSize: "var(--text-base)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>{f.label}</label>
                         <input
                           type={f.type}
                           required={f.key === "name" || f.key === "email"}
@@ -607,7 +607,7 @@ export default function VendorProfilePage() {
                       </div>
                     ))}
                     <div>
-                      <label style={{ fontSize: "0.8125rem", color: "var(--muted)", display: "block", marginBottom: "0.25rem" }}>Bericht</label>
+                      <label style={{ fontSize: "var(--text-base)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>Bericht</label>
                       <textarea
                         required
                         value={contactForm.message}
@@ -630,24 +630,24 @@ export default function VendorProfilePage() {
           {/* Sidebar — Dream Team */}
           <div style={{ width: "100%", maxWidth: "300px", flexShrink: 0 }} className="lg:flex-shrink-0">
             <div className="dash-hero" style={{ padding: "1.5rem" }}>
-              <h3 className="font-serif" style={{ fontSize: "1.0625rem", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "0.375rem", color: "var(--ink-text)" }}>
+              <h3 className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "var(--space-2)", color: "var(--ink-text)" }}>
                 Toevoegen aan Dream Team
               </h3>
-              <p style={{ fontSize: "0.8125rem", color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: "1.25rem" }}>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: "var(--space-7)" }}>
                 Nodig {vendor.name} uit voor jullie bruiloft. De leverancier ontvangt een verzoek en kan dit accepteren.
               </p>
 
               {!currentUser ? (
                 <div className="flex flex-col gap-2">
-                  <Link href="/aanmelden" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
+                  <Link href="/aanmelden" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "var(--text-md)" }}>
                     Account aanmaken
                   </Link>
-                  <Link href="/login" className="ddp-btn-outline-ink" style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", fontWeight: 600, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "0.875rem" }}>
+                  <Link href="/login" className="ddp-btn-outline-ink" style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", fontWeight: 600, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", textDecoration: "none", fontSize: "var(--text-md)" }}>
                     Inloggen
                   </Link>
                 </div>
               ) : isVendorOwner ? (
-                <p style={{ fontSize: "0.875rem", color: "var(--ink-muted)" }}>Dit is jouw eigen profiel.</p>
+                <p style={{ fontSize: "var(--text-md)", color: "var(--ink-muted)" }}>Dit is jouw eigen profiel.</p>
               ) : added ? (
                 <div className="flex items-center gap-2" style={{ color: "var(--gold)", fontSize: "0.9rem", fontWeight: 600 }}>
                   <Check className="w-4 h-4" /> Uitnodiging verstuurd!
@@ -670,18 +670,18 @@ export default function VendorProfilePage() {
                       <ChevronDown className="w-4 h-4" style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--muted)", pointerEvents: "none" }} />
                     </div>
                   )}
-                  {addError && <p style={{ fontSize: "0.8125rem", color: "var(--danger)" }}>{addError}</p>}
+                  {addError && <p style={{ fontSize: "var(--text-base)", color: "var(--danger)" }}>{addError}</p>}
                   <button
                     onClick={handleAddToDreamTeam}
                     disabled={adding || !selectedWedding}
                     className="ddp-btn-gold"
-                    style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer", fontSize: "0.875rem", opacity: (adding || !selectedWedding) ? 0.6 : 1 }}
+                    style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer", fontSize: "var(--text-md)", opacity: (adding || !selectedWedding) ? 0.6 : 1 }}
                   >
                     {adding ? "Bezig…" : "Uitnodigen voor Dream Team"}
                   </button>
                 </div>
               ) : (
-                <p style={{ fontSize: "0.875rem", color: "var(--ink-muted)" }}>
+                <p style={{ fontSize: "var(--text-md)", color: "var(--ink-muted)" }}>
                   Alleen bruidsparen kunnen leveranciers toevoegen.
                 </p>
               )}

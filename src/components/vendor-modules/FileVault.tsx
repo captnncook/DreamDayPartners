@@ -81,30 +81,30 @@ export default function FileVault({ documents: initial, weddingId, isPlanner, is
 
   return (
     <div className="card" style={{ padding: "1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
         <div>
           <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
             <FileText className="inline w-4 h-4 mr-1" style={{ verticalAlign: "middle" }} />
             Bestanden
           </h3>
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "2px" }}>Offertes, facturen en contracten voor deze bruiloft. Gebruik het Draaiboek voor de tijdlijn van de dag.</p>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>Offertes, facturen en contracten voor deze bruiloft. Gebruik het Draaiboek voor de tijdlijn van de dag.</p>
         </div>
-        <Link href={`/weddings/${weddingId}/files`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alles →</Link>
+        <Link href={`/weddings/${weddingId}/files`} style={{ fontSize: "var(--text-base)", color: "var(--primary)", textDecoration: "none" }}>Alles →</Link>
       </div>
 
       {canUpload && (
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", marginBottom: "var(--space-6)", flexWrap: "wrap" }}>
           <select
             value={selectedCategory}
             onChange={e => setSelectedCategory(e.target.value)}
-            style={{ padding: "0.375rem 0.625rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "0.875rem", background: "white" }}
+            style={{ padding: "0.375rem 0.625rem", borderRadius: "0.375rem", border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white" }}
           >
             {CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
           </select>
           <button
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", padding: "0.375rem 0.875rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-base)", fontWeight: 600 }}
           >
             <Upload size={14} />
             {uploading ? "Uploaden..." : "Bestand uploaden"}
@@ -114,23 +114,23 @@ export default function FileVault({ documents: initial, weddingId, isPlanner, is
       )}
 
       {docs.length === 0 ? (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>Nog geen bestanden gedeeld.</p>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>Nog geen bestanden gedeeld.</p>
       ) : (
-        <div style={{ display: "grid", gap: "0.5rem" }}>
+        <div style={{ display: "grid", gap: "var(--space-3)" }}>
           {docs.map(doc => (
-            <div key={doc.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.625rem 0.75rem", background: "var(--blush-soft)", borderRadius: "0.5rem", gap: "0.75rem" }}>
+            <div key={doc.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.625rem 0.75rem", background: "var(--blush-soft)", borderRadius: "0.5rem", gap: "var(--space-5)" }}>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--charcoal)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <div style={{ fontSize: "var(--text-md)", fontWeight: 500, color: "var(--charcoal)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {doc.name}
                 </div>
-                <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>
                   {CATEGORY_LABELS[doc.category] ?? doc.category} · {fmtSize(doc.fileSize)}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexShrink: 0 }}>
+              <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexShrink: 0 }}>
                 <a
                   href={`/api/documents/${doc.id}/download`}
-                  style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none", fontWeight: 600 }}
+                  style={{ fontSize: "var(--text-base)", color: "var(--primary)", textDecoration: "none", fontWeight: 600 }}
                 >
                   ↓
                 </a>

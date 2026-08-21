@@ -80,7 +80,7 @@ export default function ContractPayment({
 
   const inputStyle = {
     width: "100%", padding: "0.5rem 0.75rem", borderRadius: "0.5rem",
-    border: "1px solid var(--border)", fontSize: "0.875rem", background: "white", color: "var(--charcoal)",
+    border: "1px solid var(--border)", fontSize: "var(--text-md)", background: "white", color: "var(--charcoal)",
     boxSizing: "border-box" as const,
   };
 
@@ -91,10 +91,10 @@ export default function ContractPayment({
 
   return (
     <div className="card" style={{ padding: "1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
         <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Betaling</h3>
         {canEdit && (
-          <button onClick={() => setEditing(!editing)} style={{ fontSize: "0.8125rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
+          <button onClick={() => setEditing(!editing)} style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}>
             {editing ? "Annuleren" : "Bewerken"}
           </button>
         )}
@@ -102,61 +102,61 @@ export default function ContractPayment({
 
       {contractUrl && (
         <a href={contractUrl} target="_blank" rel="noopener noreferrer"
-          style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", fontSize: "0.875rem", color: "var(--primary)", marginBottom: "1rem" }}>
+          style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", fontSize: "var(--text-md)", color: "var(--primary)", marginBottom: "var(--space-6)" }}>
           Contract bekijken
         </a>
       )}
 
       {editing && canEdit ? (
-        <div style={{ display: "grid", gap: "0.75rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+        <div style={{ display: "grid", gap: "var(--space-5)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}>
             <div>
-              <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Aanbetaling (€)</label>
+              <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>Aanbetaling (€)</label>
               <input type="number" value={form.depositAmount} onChange={e => setForm(f => ({ ...f, depositAmount: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Vervaldatum aanbetaling</label>
+              <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>Vervaldatum aanbetaling</label>
               <DatePicker value={form.depositDue} onChange={v => setForm(f => ({ ...f, depositDue: v }))} className="" style={inputStyle} />
             </div>
             <div>
-              <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Eindbedrag (€)</label>
+              <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>Eindbedrag (€)</label>
               <input type="number" value={form.finalAmount} onChange={e => setForm(f => ({ ...f, finalAmount: e.target.value }))} style={inputStyle} />
             </div>
             <div>
-              <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Vervaldatum eindbetaling</label>
+              <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>Vervaldatum eindbetaling</label>
               <DatePicker value={form.finalDue} onChange={v => setForm(f => ({ ...f, finalDue: v }))} className="" style={inputStyle} />
             </div>
           </div>
           <div>
-            <label style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem", display: "block" }}>Contract/offerte/factuur-link</label>
+            <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginBottom: "var(--space-1)", display: "block" }}>Contract/offerte/factuur-link</label>
             <input type="url" value={form.contractUrl} onChange={e => setForm(f => ({ ...f, contractUrl: e.target.value }))} style={inputStyle} placeholder="https://... (of upload het bestand hieronder bij Bestanden)" />
           </div>
-          <button onClick={save} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+          <button onClick={save} style={{ padding: "0.5rem 1rem", borderRadius: "0.5rem", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-md)", fontWeight: 600 }}>
             Opslaan
           </button>
         </div>
       ) : (
-        <div style={{ display: "grid", gap: "0.625rem" }}>
+        <div style={{ display: "grid", gap: "var(--space-4)" }}>
           {rows.map(row => (
-            <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.625rem", gap: "0.75rem", flexWrap: "wrap" }}>
+            <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", background: "var(--blush-soft)", borderRadius: "0.625rem", gap: "var(--space-5)", flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--charcoal)" }}>{row.label}</div>
+                <div style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--charcoal)" }}>{row.label}</div>
                 {(fmtEur(row.amount) || fmt(row.due)) ? (
-                  <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.125rem" }}>
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "0.125rem" }}>
                     {[fmtEur(row.amount), fmt(row.due) ? `vervalt ${fmt(row.due)}` : null].filter(Boolean).join(" · ")}
                   </div>
                 ) : canEdit && (
-                  <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginTop: "0.125rem", fontStyle: "italic" }}>
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "0.125rem", fontStyle: "italic" }}>
                     Nog geen bedrag ingevuld
                   </div>
                 )}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
                 {!row.paid && (
                   <button
                     onClick={() => makeTask(row.label, row.due)}
                     disabled={creatingTaskFor === row.label || taskCreated.has(row.label)}
-                    style={{ fontSize: "0.75rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                    style={{ fontSize: "var(--text-sm)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
                   >
                     {taskCreated.has(row.label) ? "Taak aangemaakt" : creatingTaskFor === row.label ? "Bezig…" : "Maak taak"}
                   </button>
@@ -166,7 +166,7 @@ export default function ContractPayment({
                   style={{
                     padding: "0.375rem 0.875rem",
                     borderRadius: "9999px",
-                    fontSize: "0.8125rem",
+                    fontSize: "var(--text-base)",
                     fontWeight: 600,
                     border: "none",
                     background: row.paid ? "#22c55e20" : "rgba(0,0,0,0.06)",

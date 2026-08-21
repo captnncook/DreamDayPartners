@@ -21,7 +21,7 @@ export default async function AdminPage() {
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
-        <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Platform Beheer</h1>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Platform Beheer</h1>
         <div className="flex gap-6">
           {[
             { val: userCount, label: "Gebruikers" },
@@ -29,8 +29,8 @@ export default async function AdminPage() {
             { val: vendorCount, label: "Leveranciers" },
           ].map(({ val, label }) => (
             <div key={label} style={{ textAlign: "right" }}>
-              <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{val}</span>
-              <span style={{ display: "block", fontSize: "0.625rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{label}</span>
+              <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{val}</span>
+              <span style={{ display: "block", fontSize: "var(--text-2xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{label}</span>
             </div>
           ))}
         </div>

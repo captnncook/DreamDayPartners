@@ -43,37 +43,37 @@ export default function GuestDataPanel({ guests, weddingId, isPlanner }: Props) 
 
   return (
     <div className="ddp-card">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-6)" }}>
         <h3 className="text-sm font-semibold" style={{ color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Gastgegevens</h3>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "var(--space-5)", alignItems: "center" }}>
           {guests.length > 0 && (
             <button
               onClick={() => exportGuestsCsv(guests)}
               title="Exporteer als CSV"
-              style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
+              style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-sm)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
             >
               <Download className="w-3.5 h-3.5" /> CSV
             </button>
           )}
           {isPlanner && (
-            <a href={`/weddings/${weddingId}/guests`} style={{ fontSize: "0.8125rem", color: "var(--primary)", textDecoration: "none" }}>Alle gasten →</a>
+            <a href={`/weddings/${weddingId}/guests`} style={{ fontSize: "var(--text-base)", color: "var(--primary)", textDecoration: "none" }}>Alle gasten →</a>
           )}
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", gap: "var(--space-8)", marginBottom: "var(--space-6)" }}>
         <div>
-          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--foreground)" }}>{total}</div>
-          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Totaal gasten</div>
+          <div style={{ fontSize: "var(--text-5xl)", fontWeight: 700, color: "var(--foreground)" }}>{total}</div>
+          <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>Totaal gasten</div>
         </div>
         <div>
-          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--foreground)" }}>{confirmed.length}</div>
-          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Bevestigd</div>
+          <div style={{ fontSize: "var(--text-5xl)", fontWeight: 700, color: "var(--foreground)" }}>{confirmed.length}</div>
+          <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>Bevestigd</div>
         </div>
       </div>
 
       {total > 0 && (
-        <div style={{ padding: "0.625rem 0", borderTop: "1px solid var(--border)", marginBottom: "0.75rem", fontSize: "0.8125rem", color: "var(--muted)" }}>
+        <div style={{ padding: "0.625rem 0", borderTop: "1px solid var(--border)", marginBottom: "var(--space-5)", fontSize: "var(--text-base)", color: "var(--muted)" }}>
           <strong style={{ color: "var(--foreground)" }}>{confirmed.length} couverts</strong> bevestigd
           {withDietary.length > 0 && <> · <strong style={{ color: "var(--foreground)" }}>{withDietary.length}</strong> met dieetwens</>}
         </div>
@@ -81,14 +81,14 @@ export default function GuestDataPanel({ guests, weddingId, isPlanner }: Props) 
 
       {Object.keys(dietaryMap).length > 0 && (
         <div>
-          <div style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--foreground)", marginBottom: "0.5rem" }}>Dieetwensen & allergieën</div>
-          <div style={{ display: "grid", gap: "0.375rem" }}>
+          <div style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dieetwensen & allergieën</div>
+          <div style={{ display: "grid", gap: "var(--space-2)" }}>
             {Object.entries(dietaryMap)
               .sort((a, b) => b[1] - a[1])
               .map(([diet, count]) => (
-                <div key={diet} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.875rem" }}>
+                <div key={diet} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "var(--text-md)" }}>
                   <span style={{ color: "var(--foreground)", textTransform: "capitalize" }}>{diet}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "1.5rem", height: "1.5rem", borderRadius: "50%", background: "var(--primary)", color: "white", fontSize: "0.6875rem", fontWeight: 700 }}>{count}</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "1.5rem", height: "1.5rem", borderRadius: "50%", background: "var(--primary)", color: "white", fontSize: "var(--text-xs)", fontWeight: 700 }}>{count}</span>
                 </div>
               ))}
           </div>
@@ -96,7 +96,7 @@ export default function GuestDataPanel({ guests, weddingId, isPlanner }: Props) 
       )}
 
       {total === 0 && (
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", fontStyle: "italic" }}>Nog geen gasten voor deze bruiloft.</p>
+        <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", fontStyle: "italic" }}>Nog geen gasten voor deze bruiloft.</p>
       )}
     </div>
   );

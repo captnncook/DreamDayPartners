@@ -143,7 +143,7 @@ export default function GuestsPage() {
       <div className="mb-6">
         <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Gastenlijst</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Gastenlijst</h1>
           <div className="flex gap-2">
             <input ref={csvRef} type="file" accept=".csv" onChange={handleCsvImport} className="hidden" id="csv-import" />
             <label htmlFor="csv-import" className="ddp-btn-secondary cursor-pointer flex items-center gap-1">
@@ -175,8 +175,8 @@ export default function GuestsPage() {
             <button key={key}
               onClick={() => setFilterRsvp(active ? "all" : key)}
               style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left", opacity: filterRsvp !== "all" && !active ? 0.45 : 1 }}>
-              <span className="font-serif" style={{ fontSize: "1.375rem", fontWeight: 700, color: active ? "var(--gold-deep)" : "var(--foreground)", letterSpacing: "-0.01em" }}>{count}</span>
-              <span style={{ display: "block", fontSize: "0.6875rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: "1px" }}>{RSVP_LABELS[key]}</span>
+              <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, color: active ? "var(--gold-deep)" : "var(--foreground)", letterSpacing: "-0.01em" }}>{count}</span>
+              <span style={{ display: "block", fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: "1px" }}>{RSVP_LABELS[key]}</span>
             </button>
           );
         })}

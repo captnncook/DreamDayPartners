@@ -50,13 +50,13 @@ export default function WeddingLocationEditor({
           onChange={(e) => { setCity(e.target.value); scheduleSave(e.target.value, province); }}
           placeholder="Woonplaats"
           className="ddp-input"
-          style={{ fontSize: "0.875rem" }}
+          style={{ fontSize: "var(--text-md)" }}
         />
         <select
           value={province}
           onChange={(e) => { setProvince(e.target.value); scheduleSave(city, e.target.value); }}
           className="ddp-input"
-          style={{ fontSize: "0.875rem" }}
+          style={{ fontSize: "var(--text-md)" }}
         >
           <option value="">Kies provincie…</option>
           {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}

@@ -134,7 +134,7 @@ export default function BudgetPage() {
       <div className="mb-6">
         <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
         <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
-          <h1 className="font-serif" style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Budget</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Budget</h1>
           <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary">
             {showForm ? "Annuleren" : "+ Post toevoegen"}
           </button>
@@ -145,19 +145,19 @@ export default function BudgetPage() {
       <div className="dash-hero mb-6" style={{ padding: "1.5rem 1.75rem" }}>
         <div className="flex items-baseline justify-between flex-wrap gap-2">
           <div>
-            <div style={{ fontSize: "0.6875rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold)" }}>Totaalbudget</div>
+            <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold)" }}>Totaalbudget</div>
             {editTotal ? (
               <form onSubmit={handleUpdateTotal} className="flex gap-2 mt-2">
                 <input type="number" value={newTotal} onChange={(e) => setNewTotal(e.target.value)} autoFocus
                   className="flex-1 rounded-lg px-3 py-1.5 text-sm" style={{ border: "none", minWidth: "120px" }} />
-                <button type="submit" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "0.75rem", padding: "0.35rem 0.875rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer" }}>Opslaan</button>
+                <button type="submit" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-sm)", padding: "0.35rem 0.875rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer" }}>Opslaan</button>
                 <button type="button" onClick={() => setEditTotal(false)} style={{ background: "none", border: "none", color: "var(--ink-muted)", cursor: "pointer", display: "flex", alignItems: "center" }}><X className="w-4 h-4" /></button>
               </form>
             ) : (
               <div className="flex items-baseline gap-3">
                 <span className="font-serif" style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>{euro(budget.totalAmount)}</span>
                 <button onClick={() => { setNewTotal(String(budget.totalAmount)); setEditTotal(true); }}
-                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.75rem", color: "var(--gold)", fontWeight: 600, padding: 0 }}>Wijzigen</button>
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: "var(--text-sm)", color: "var(--gold)", fontWeight: 600, padding: 0 }}>Wijzigen</button>
               </div>
             )}
           </div>
@@ -168,8 +168,8 @@ export default function BudgetPage() {
               { value: costPerGuest !== null ? euro(costPerGuest) : euro(0), label: `Per gast (${confirmedGuests})` },
             ].map((s) => (
               <div key={s.label} style={{ textAlign: "right" }}>
-                <div className="font-serif" style={{ fontSize: "1.25rem", fontWeight: 700, color: s.warn ? "var(--gold)" : "var(--ink-text)" }}>{s.value}</div>
-                <div style={{ fontSize: "0.625rem", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{s.label}</div>
+                <div className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: s.warn ? "var(--gold)" : "var(--ink-text)" }}>{s.value}</div>
+                <div style={{ fontSize: "var(--text-2xs)", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -267,7 +267,7 @@ export default function BudgetPage() {
                             <button
                               onClick={() => cyclePayStatus(item)}
                               title="Klik om status te wijzigen"
-                              style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "0.6875rem", fontWeight: meta.weight, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color, whiteSpace: "nowrap" }}
+                              style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "var(--text-xs)", fontWeight: meta.weight, textTransform: "uppercase", letterSpacing: "0.05em", color: meta.color, whiteSpace: "nowrap" }}
                             >
                               {PAY_LABELS[item.payStatus]}
                             </button>
