@@ -41,7 +41,20 @@ export async function GET(_req: NextRequest, { params }: Params) {
     ...publicItems.filter(i => !vendorItemIds.has(i.id)),
   ].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-  return NextResponse.json({ booking: { ...wv, draaiboekItems: mergedItems } });
+  // Gastenaantal: VendorDashboardInline (de inline weergave op de
+  // bruiloftspagina) haalt alles via deze route op, dus zonder dit hier mee
+  // te sturen blijft de couvert-calculator/gastgegevens-paneel altijd op 0
+  // staan voor de leverancier, ook als het bruidspaar al gasten heeft.
+  const guests = await prisma.guest.findMany({
+    where: { weddingId },
+    select: { id: true, name: true, dietary: true, rsvpStatus: true, side: true },
+  });
+
+  return NextResponse.json({
+    booking: { ...wv, draaiboekItems: mergedItems },
+    guests,
+    totalGuests: guests.length,
+  });
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {

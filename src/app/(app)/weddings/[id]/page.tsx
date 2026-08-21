@@ -148,7 +148,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             {Math.max(0, days)}
           </div>
           <div style={{ fontSize: "0.625rem", color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>
-            {days > 0 ? tw.days : tw.passed}
+            {days > 0 ? tw.days : days === 0 ? tw.today : tw.passed}
           </div>
         </div>
       </div>
