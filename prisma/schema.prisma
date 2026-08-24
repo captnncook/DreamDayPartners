@@ -411,6 +411,7 @@ model Guest {
   side       String   @default("both")
   rsvpStatus String   @default("invited")
   dietary    String?
+  allergies  String?
   plusOne    Boolean  @default(false)
   isChild    Boolean  @default(false)
   tableId    String?

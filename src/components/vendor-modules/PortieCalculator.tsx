@@ -6,6 +6,7 @@ interface Guest {
   id: string;
   name: string;
   dietary?: string | null;
+  allergies?: string | null;
   rsvpStatus: string;
   side: string;
 }
@@ -37,6 +38,7 @@ export default function PortieCalculator({ guests, totalGuests, intakeData }: Pr
   }
 
   const recommended = LAYERS.find(l => needed >= l.min && needed < l.max) ?? LAYERS[LAYERS.length - 1];
+  const withAllergies = guests.filter(g => g.allergies?.trim());
 
   return (
     <div className="ddp-card">
@@ -75,9 +77,23 @@ export default function PortieCalculator({ guests, totalGuests, intakeData }: Pr
             <Cake className="w-8 h-8" style={{ color: "var(--primary)", opacity: 0.4 }} />
           </div>
 
+          {withAllergies.length > 0 && (
+            <div>
+              <div style={{ fontSize: "var(--text-sm)", fontWeight: 700, color: "var(--gold-deep)", marginBottom: "var(--space-2)" }}>Allergieën — let hierop</div>
+              <div style={{ display: "grid", gap: "0.3rem" }}>
+                {withAllergies.map(g => (
+                  <div key={g.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "var(--text-base)", background: "var(--accent)", borderRadius: "6px", padding: "0.375rem 0.625rem" }}>
+                    <span style={{ color: "var(--foreground)", fontWeight: 600 }}>{g.name}</span>
+                    <span style={{ fontWeight: 700, color: "var(--gold-deep)", fontSize: "var(--text-md)", textAlign: "right" }}>{g.allergies}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {Object.keys(dietaryMap).length > 0 && (
             <div>
-              <div style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-2)" }}>Dieetwensen & allergieën</div>
+              <div style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-2)" }}>Dieetwensen (voorkeur)</div>
               <div style={{ display: "grid", gap: "0.3rem" }}>
                 {Object.entries(dietaryMap).sort((a, b) => b[1] - a[1]).map(([diet, count]) => (
                   <div key={diet} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "var(--text-base)", background: "var(--accent)", borderRadius: "6px", padding: "0.375rem 0.625rem" }}>

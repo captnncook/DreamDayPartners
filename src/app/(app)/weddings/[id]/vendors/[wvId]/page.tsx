@@ -49,7 +49,7 @@ export default async function VendorBookingPage({
 
   const guests = await prisma.guest.findMany({
     where: { weddingId },
-    select: { id: true, name: true, dietary: true, rsvpStatus: true, side: true },
+    select: { id: true, name: true, dietary: true, allergies: true, rsvpStatus: true, side: true },
   });
 
   // Gegevens van de gekoppelde trouwlocatie (vermogen, water, sluitingstijd,

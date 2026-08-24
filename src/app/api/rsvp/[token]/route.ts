@@ -12,7 +12,22 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tok
   return NextResponse.json({ wedding });
 }
 
-type GuestInput = { name: string; isChild: boolean; dietary: string };
+type GuestInput = { name: string; isChild: boolean; dietary: string; allergies?: string };
+
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const curr = [i];
+    for (let j = 1; j <= b.length; j++) {
+      curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = curr;
+  }
+  return prev[b.length];
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -28,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
 
   const guestList: GuestInput[] = Array.isArray(guests) && guests.length > 0
     ? guests
-    : [{ name: "Gast", isChild: false, dietary: "" }];
+    : [{ name: "Gast", isChild: false, dietary: "", allergies: "" }];
 
   // Naam-matching alleen (case/whitespace/diakrieten-ongevoelig) is te
   // broos tegen kleine schrijfvarianten — normaliseren voorkomt dat "Marieke
@@ -50,7 +65,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
       const byEmail = existingGuests.find((g) => g.email && g.email.toLowerCase() === email!.toLowerCase());
       if (byEmail) return byEmail;
     }
-    return existingGuests.find((g) => normalize(g.name) === normalized);
+    const exact = existingGuests.find((g) => normalize(g.name) === normalized);
+    if (exact) return exact;
+    // Alleen voor de indiener zelf: bij een transliteratie-/typfoutvariant
+    // (bv. "Yuki Tanaka" ingetypt op de RSVP terwijl de gastenlijst al "Yui
+    // Tanaka" bevat) is een enkele, ondubbelzinnige bijna-match nog steeds
+    // beter dan een harde duplicaat-rij. Alleen toepassen als er precies één
+    // kandidaat binnen bereik ligt, om nooit twee verschillende gasten samen
+    // te voegen.
+    if (isFirst && normalized.length >= 4) {
+      const close = existingGuests.filter((g) => {
+        const cand = normalize(g.name);
+        const maxDist = normalized.length > 8 ? 2 : 1;
+        return levenshtein(normalized, cand) <= maxDist;
+      });
+      if (close.length === 1) return close[0];
+    }
+    return undefined;
   }
 
   // Sequentieel (niet Promise.all) zodat matches binnen dezelfde aanvraag
@@ -65,6 +96,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
       email: i === 0 ? (email || null) : null,
       rsvpStatus: rsvpStatus ?? "confirmed",
       dietary: g.dietary?.trim() || null,
+      allergies: g.allergies?.trim() || null,
       isChild: Boolean(g.isChild),
     };
     if (match) {

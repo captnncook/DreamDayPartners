@@ -6,6 +6,7 @@ interface Guest {
   id: string;
   name: string;
   dietary?: string | null;
+  allergies?: string | null;
   rsvpStatus: string;
   side: string;
 }
@@ -33,6 +34,8 @@ export default function CouvertCalculator({ guests, intakeData }: Props) {
       dietaryMap[d] = (dietaryMap[d] ?? 0) + 1;
     }
   }
+
+  const withAllergies = confirmed.filter(g => g.allergies?.trim());
 
   const euro = (n: number) => new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(n);
 
@@ -64,9 +67,25 @@ export default function CouvertCalculator({ guests, intakeData }: Props) {
         </div>
       )}
 
+      {withAllergies.length > 0 && (
+        <div style={{ marginBottom: "var(--space-6)" }}>
+          <div style={{ fontSize: "var(--text-base)", fontWeight: 700, color: "var(--gold-deep)", marginBottom: "var(--space-3)" }}>
+            Allergieën — let hierop bij het opdienen
+          </div>
+          <div style={{ borderTop: "1px solid var(--border)" }}>
+            {withAllergies.map(g => (
+              <div key={g.id} className="dash-row" style={{ padding: "0.5rem 0" }}>
+                <span style={{ color: "var(--foreground)", fontWeight: 600, flex: 1 }}>{g.name}</span>
+                <span style={{ fontWeight: 700, color: "var(--gold-deep)", textAlign: "right" }}>{g.allergies}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {Object.keys(dietaryMap).length > 0 && (
         <div>
-          <div style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dieetwensen (bevestigde gasten)</div>
+          <div style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dieetwensen (voorkeur, bevestigde gasten)</div>
           <div style={{ borderTop: "1px solid var(--border)" }}>
             {Object.entries(dietaryMap).sort((a, b) => b[1] - a[1]).map(([diet, count]) => (
               <div key={diet} className="dash-row" style={{ padding: "0.5rem 0" }}>

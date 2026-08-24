@@ -48,7 +48,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   // staan voor de leverancier, ook als het bruidspaar al gasten heeft.
   const guests = await prisma.guest.findMany({
     where: { weddingId },
-    select: { id: true, name: true, dietary: true, rsvpStatus: true, side: true },
+    select: { id: true, name: true, dietary: true, allergies: true, rsvpStatus: true, side: true },
   });
 
   // Venue-gegevens (water/koeling/toegangstijd/weerplan) eenmalig invullen

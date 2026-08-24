@@ -14,6 +14,7 @@ type Guest = {
   side: string;
   rsvpStatus: string;
   dietary?: string;
+  allergies?: string;
   plusOne: boolean;
   isChild: boolean;
 };
@@ -30,7 +31,7 @@ export default function GuestsPage() {
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
   const [filterRsvp, setFilterRsvp] = useState("all");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false, isChild: false });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", side: "both", dietary: "", allergies: "", plusOne: false, isChild: false });
   const [saving, setSaving] = useState(false);
   const [csvImporting, setCsvImporting] = useState(false);
   const [rsvpToken, setRsvpToken] = useState<string | null>(null);
@@ -69,7 +70,7 @@ export default function GuestsPage() {
       }
       return;
     }
-    setForm({ name: "", email: "", phone: "", side: "both", dietary: "", plusOne: false, isChild: false });
+    setForm({ name: "", email: "", phone: "", side: "both", dietary: "", allergies: "", plusOne: false, isChild: false });
     setShowForm(false);
     load();
   }
@@ -83,22 +84,45 @@ export default function GuestsPage() {
     load();
   }
 
+  // Splitst één CSV-regel in kolommen, met respect voor aanhalingstekens
+  // (zodat een naam of notitie met een komma erin — "Jansen, Marie" — niet
+  // per ongeluk kolommen laat verschuiven).
+  function splitCsvLine(line: string): string[] {
+    const out: string[] = [];
+    let cur = "";
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQuotes) {
+        if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+        else if (ch === '"') inQuotes = false;
+        else cur += ch;
+      } else if (ch === '"') inQuotes = true;
+      else if (ch === ",") { out.push(cur); cur = ""; }
+      else cur += ch;
+    }
+    out.push(cur);
+    return out.map(v => v.trim());
+  }
+
   async function handleCsvImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setCsvImporting(true);
     const text = await file.text();
-    const lines = text.trim().split("\n");
-    const header = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/"/g, ""));
+    const lines = text.trim().split(/\r?\n/);
+    const header = splitCsvLine(lines[0]).map(h => h.toLowerCase());
     const col = (row: string[], name: string) => {
       const i = header.indexOf(name);
-      return i >= 0 ? row[i]?.trim().replace(/"/g, "") : "";
+      return i >= 0 ? (row[i] ?? "") : "";
     };
-    const rows = lines.slice(1).map(l => l.split(","));
+    const rows = lines.slice(1).filter(l => l.trim()).map(splitCsvLine);
+    let imported = 0;
+    const skipped: string[] = [];
     for (const row of rows) {
       const name = col(row, "naam") || col(row, "name");
-      if (!name) continue;
-      await fetch(`/api/weddings/${id}/guests`, {
+      if (!name) { skipped.push(`(rij zonder naam)`); continue; }
+      const res = await fetch(`/api/weddings/${id}/guests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -107,13 +131,22 @@ export default function GuestsPage() {
           phone: col(row, "telefoon") || col(row, "phone") || "",
           side: col(row, "kant") || col(row, "side") || "both",
           dietary: col(row, "dieet") || col(row, "dietary") || "",
+          allergies: col(row, "allergie") || col(row, "allergieën") || col(row, "allergie(en)") || col(row, "allergy") || col(row, "allergies") || "",
           plusOne: false,
+          confirmDuplicate: true,
         }),
       });
+      if (res.ok) imported++;
+      else skipped.push(name);
     }
     if (csvRef.current) csvRef.current.value = "";
     setCsvImporting(false);
     load();
+    if (skipped.length > 0) {
+      alert(`${imported} gast(en) geïmporteerd, ${skipped.length} overgeslagen:\n${skipped.slice(0, 15).join(", ")}${skipped.length > 15 ? "…" : ""}`);
+    } else {
+      alert(`${imported} gast(en) geïmporteerd.`);
+    }
   }
 
   async function deleteGuest(guestId: string) {
@@ -215,6 +248,11 @@ export default function GuestsPage() {
               <input value={form.dietary} onChange={(e) => setForm((p) => ({ ...p, dietary: e.target.value }))}
                 placeholder="Vegetarisch, vegan, etc." className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
             </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">Allergieën</label>
+              <input value={form.allergies} onChange={(e) => setForm((p) => ({ ...p, allergies: e.target.value }))}
+                placeholder="Pinda's, schaaldieren, etc." className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: form.allergies.trim() ? "var(--gold-deep)" : "var(--border)" }} />
+            </div>
             <div className="flex items-center gap-2 pt-5">
               <input type="checkbox" id="plusOne" checked={form.plusOne} onChange={(e) => setForm((p) => ({ ...p, plusOne: e.target.checked }))} />
               <label htmlFor="plusOne" className="text-sm">Plus één meenemen</label>
@@ -246,7 +284,7 @@ export default function GuestsPage() {
         <table className="w-full" style={{ minWidth: "640px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
-              {["Naam", "Contact", "Kant", "Aanwezig", "Dieet", ""].map((h) => (
+              {["Naam", "Contact", "Kant", "Aanwezig", "Dieet", "Allergie", ""].map((h) => (
                 <th key={h} className="text-xs font-semibold text-left px-4 py-3" style={{ color: "var(--muted)" }}>{h}</th>
               ))}
             </tr>
@@ -273,7 +311,7 @@ export default function GuestsPage() {
                   {guest.email && <div>{guest.email}</div>}
                   {guest.phone && <div>{guest.phone}</div>}
                 </td>
-                <td className="px-4 py-3 text-xs">{SIDE_LABELS[guest.side]}</td>
+                <td className="px-4 py-3 text-xs">{SIDE_LABELS[guest.side] ?? guest.side}</td>
                 <td className="px-4 py-3">
                   <select value={guest.rsvpStatus} onChange={(e) => updateRsvp(guest, e.target.value)}
                     className="border rounded-md px-2 py-1 text-xs" style={{ borderColor: "var(--border)" }}>
@@ -281,6 +319,7 @@ export default function GuestsPage() {
                   </select>
                 </td>
                 <td className="px-4 py-3 text-xs" style={{ color: "var(--muted)" }}>{guest.dietary ?? ""}</td>
+                <td className="px-4 py-3 text-xs" style={{ color: guest.allergies ? "var(--gold-deep)" : "var(--muted)", fontWeight: guest.allergies ? 700 : 400 }}>{guest.allergies ?? ""}</td>
                 <td className="px-4 py-3">
                   <button onClick={() => deleteGuest(guest.id)} className="text-xs hover:opacity-70" style={{ color: "var(--muted)" }}><X className="w-3.5 h-3.5" /></button>
                 </td>

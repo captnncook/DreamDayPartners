@@ -165,7 +165,7 @@ export default function BudgetPage() {
             {[
               { value: euro(totalActual), label: "Uitgegeven" },
               { value: euro(Math.abs(remaining)), label: remaining < 0 ? "Over budget" : "Resterend", warn: remaining < 0 },
-              { value: costPerGuest !== null ? euro(costPerGuest) : euro(0), label: `Per gast (${confirmedGuests})` },
+              { value: costPerGuest !== null ? euro(costPerGuest) : euro(0), label: `Per bevestigde gast (${confirmedGuests})` },
             ].map((s) => (
               <div key={s.label} style={{ textAlign: "right" }}>
                 <div className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: s.warn ? "var(--gold)" : "var(--ink-text)" }}>{s.value}</div>

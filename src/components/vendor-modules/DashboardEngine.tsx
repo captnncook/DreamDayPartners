@@ -48,7 +48,7 @@ interface Props {
   documents: Array<{ id: string; name: string; fileKey: string; mimeType: string; fileSize: number; category: string; createdAt: string }>;
   timelineBlocks: Array<{ id: string; startTime: string; duration: number; title: string; description?: string | null; location?: string | null; phase?: string | null }>;
   tasks: Array<{ id: string; title: string; status: string; dueDate?: string | null; priority: string }>;
-  guests: Array<{ id: string; name: string; dietary?: string | null; rsvpStatus: string; side: string }>;
+  guests: Array<{ id: string; name: string; dietary?: string | null; allergies?: string | null; rsvpStatus: string; side: string }>;
   totalGuests: number;
   userRole: string;
   userId: string;

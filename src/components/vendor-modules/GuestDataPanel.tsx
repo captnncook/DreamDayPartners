@@ -6,6 +6,7 @@ interface Guest {
   id: string;
   name: string;
   dietary?: string | null;
+  allergies?: string | null;
   rsvpStatus: string;
   side: string;
 }
@@ -18,9 +19,9 @@ interface Props {
 }
 
 function exportGuestsCsv(guests: Guest[]) {
-  const header = "Naam,Status,Kant,Dieetwens";
+  const header = "Naam,Status,Kant,Dieetwens,Allergie";
   const rows = guests.map(g =>
-    `"${g.name}","${g.rsvpStatus}","${g.side}","${g.dietary ?? ""}"`
+    `"${g.name}","${g.rsvpStatus}","${g.side}","${g.dietary ?? ""}","${g.allergies ?? ""}"`
   );
   const csv = [header, ...rows].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -40,6 +41,11 @@ export default function GuestDataPanel({ guests, weddingId, isPlanner }: Props) 
     const d = g.dietary!.trim().toLowerCase();
     dietaryMap[d] = (dietaryMap[d] ?? 0) + 1;
   }
+
+  // Allergieën apart van dieetvoorkeuren: dit is een gezondheidsrisico, geen
+  // smaakvoorkeur, en moet per gast te herleiden blijven i.p.v. samengevoegd
+  // te worden tot een anoniem totaal.
+  const withAllergies = guests.filter(g => g.allergies && g.allergies.trim());
 
   return (
     <div className="ddp-card">
@@ -79,16 +85,32 @@ export default function GuestDataPanel({ guests, weddingId, isPlanner }: Props) 
         </div>
       )}
 
+      {withAllergies.length > 0 && (
+        <div style={{ marginBottom: "var(--space-6)" }}>
+          <div style={{ fontSize: "var(--text-base)", fontWeight: 700, color: "var(--gold-deep)", marginBottom: "var(--space-3)" }}>
+            Allergieën — let hierop bij het opdienen
+          </div>
+          <div style={{ display: "grid", gap: "var(--space-2)" }}>
+            {withAllergies.map(g => (
+              <div key={g.id} style={{ display: "flex", justifyContent: "space-between", gap: "var(--space-4)", fontSize: "var(--text-md)", padding: "0.375rem 0", borderBottom: "1px solid var(--border)" }}>
+                <span style={{ color: "var(--foreground)", fontWeight: 600 }}>{g.name}</span>
+                <span style={{ color: "var(--gold-deep)", fontWeight: 700, textAlign: "right" }}>{g.allergies}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {Object.keys(dietaryMap).length > 0 && (
         <div>
-          <div style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dieetwensen & allergieën</div>
+          <div style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dieetwensen (voorkeur)</div>
           <div style={{ display: "grid", gap: "var(--space-2)" }}>
             {Object.entries(dietaryMap)
               .sort((a, b) => b[1] - a[1])
               .map(([diet, count]) => (
                 <div key={diet} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "var(--text-md)" }}>
                   <span style={{ color: "var(--foreground)", textTransform: "capitalize" }}>{diet}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "1.5rem", height: "1.5rem", borderRadius: "50%", background: "var(--primary)", color: "white", fontSize: "var(--text-xs)", fontWeight: 700 }}>{count}</span>
+                  <span style={{ color: "var(--muted)", fontWeight: 700 }}>{count}</span>
                 </div>
               ))}
           </div>
