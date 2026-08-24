@@ -52,6 +52,25 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
     fetch(`/api/dm/conversations/${conversationId}/read`, { method: "POST" }).catch(() => {});
   }, [conversationId, messages.length]);
 
+  // Voegt binnenkomende berichten idempotent toe: een bericht kan zowel via
+  // de eigen send()-respons als via een gelijktijdige poll binnenkomen (twee
+  // losse network requests zonder gegarandeerde volgorde) — dedupliceren op
+  // id voorkomt dat hetzelfde bericht twee keer in de lijst terechtkomt.
+  function mergeMessages(prev: DmMessage[], incoming: DmMessage[]) {
+    const existingIds = new Set(prev.map(m => m.id));
+    const newOnes = incoming.filter(m => !existingIds.has(m.id));
+    if (newOnes.length === 0) return prev;
+    return [...prev, ...newOnes].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }
+
+  function bumpLastCreatedAt(iso: string) {
+    if (!lastCreatedAt.current || new Date(iso).getTime() > new Date(lastCreatedAt.current).getTime()) {
+      lastCreatedAt.current = iso;
+    }
+  }
+
   // Poll for new messages every 2.5s
   useEffect(() => {
     const poll = async () => {
@@ -63,8 +82,8 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
         if (!res.ok) return;
         const data = await res.json();
         if (data.messages?.length > 0) {
-          setMessages(prev => [...prev, ...data.messages]);
-          lastCreatedAt.current = data.messages[data.messages.length - 1].createdAt;
+          setMessages(prev => mergeMessages(prev, data.messages));
+          bumpLastCreatedAt(data.messages[data.messages.length - 1].createdAt);
         }
       } catch {}
     };
@@ -80,16 +99,15 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
     setInput("");
 
     const optimisticTime = new Date().toISOString();
+    const optimisticId = `tmp-${Date.now()}`;
     const optimistic: DmMessage = {
-      id: `tmp-${Date.now()}`,
+      id: optimisticId,
       conversationId,
       senderId: currentUserId,
       content: text,
       createdAt: optimisticTime,
       sender: { id: currentUserId, name: "Jij" },
     };
-    // Advance lastCreatedAt immediately so the poll won't re-fetch this message
-    lastCreatedAt.current = optimisticTime;
     setMessages(prev => [...prev, optimistic]);
 
     try {
@@ -100,10 +118,20 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
       });
       if (res.ok) {
         const { message } = await res.json();
-        setMessages(prev => prev.map(m => m.id === optimistic.id ? message : m));
-        lastCreatedAt.current = message.createdAt;
+        setMessages(prev => {
+          // Als een gelijktijdige poll dit bericht al binnenhaalde, is de tmp-
+          // placeholder de enige die nog verwijderd moet worden i.p.v. het
+          // bericht nog een keer toe te voegen.
+          const withoutOptimistic = prev.filter(m => m.id !== optimisticId);
+          return mergeMessages(withoutOptimistic, [message]);
+        });
+        bumpLastCreatedAt(message.createdAt);
+      } else {
+        setMessages(prev => prev.filter(m => m.id !== optimisticId));
       }
-    } catch {}
+    } catch {
+      setMessages(prev => prev.filter(m => m.id !== optimisticId));
+    }
     setSending(false);
   }
 

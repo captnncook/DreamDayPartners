@@ -12,17 +12,22 @@ export async function GET() {
   const vendorId = await getOwnVendorId(user.id);
   if (!vendorId) return NextResponse.json({ invites: [] });
 
-  const [invites, directLinks] = await Promise.all([
+  const [invites, allLinks] = await Promise.all([
     prisma.vendorWeddingInvite.findMany({
       where: { vendorId },
       include: { wedding: { select: { id: true, title: true, date: true } } },
       orderBy: { weddingDate: "asc" },
     }),
+    // Ook niet-goedgekeurde koppelingen ophalen (portalAccess: false), zodat
+    // een "In afwachting van goedkeuring"-status getoond kan worden i.p.v.
+    // stilzwijgend te doen alsof er nog niets gebeurd is.
     prisma.weddingVendor.findMany({
-      where: { vendorId, portalAccess: true },
-      include: { wedding: { select: { id: true, title: true, date: true } } },
+      where: { vendorId },
+      select: { id: true, weddingId: true, status: true, portalAccess: true, wedding: { select: { id: true, title: true, date: true } } },
     }),
   ]);
+  const portalAccessByWeddingId = new Map(allLinks.map(wv => [wv.weddingId, wv.portalAccess]));
+  const directLinks = allLinks; // alle koppelingen, incl. wachtend op goedkeuring
 
   // Merge: invites take precedence; add direct links that have no corresponding invite
   const inviteWeddingIds = new Set(invites.map(i => i.weddingId).filter(Boolean));
@@ -38,12 +43,13 @@ export async function GET() {
       weddingId: wv.weddingId,
       wedding: wv.wedding,
       vendorStatus: wv.status,
+      portalAccess: wv.portalAccess,
       createdAt: wv.wedding.date.toISOString(),
       source: "direct" as const,
     }));
 
   const allInvites = [
-    ...invites.map(i => ({ ...i, vendorStatus: undefined, source: "invite" as const })),
+    ...invites.map(i => ({ ...i, vendorStatus: undefined, portalAccess: portalAccessByWeddingId.get(i.weddingId ?? "") ?? null, source: "invite" as const })),
     ...extra,
   ].sort((a, b) => new Date(a.weddingDate).getTime() - new Date(b.weddingDate).getTime());
 
@@ -120,11 +126,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Je hebt het maximum aantal bruiloften voor je account bereikt. Upgrade naar Premium om meer bruiloften toe te voegen.", code: "wedding_limit_reached" }, { status: 403 });
   }
 
+  // Voor een bruiloft die de leverancier hier zelf net als plaatshouder heeft
+  // aangemaakt (ownerId === deze leverancier) is directe toegang logisch.
+  // Maar als het e-mailadres matcht met een bruiloft van een ECHT, al
+  // aangemeld bruidspaar, kreeg de leverancier voorheen zonder enige
+  // toestemming meteen volledige portaltoegang — alleen op basis van het
+  // kennen van een e-mailadres. Die koppeling moet net als een Dream
+  // Team-uitnodiging pas na goedkeuring (via de bestaande "Portal"-knop bij
+  // Leveranciers) toegang geven.
+  const isOwnPlaceholder = wedding.ownerId === user.id;
+  const grantPortalNow = !alreadyExisted || isOwnPlaceholder || existingLink?.portalAccess === true;
+
   await prisma.weddingVendor.upsert({
     where: { weddingId_vendorId: { weddingId: wedding.id, vendorId } },
-    update: { portalAccess: true },
-    create: { weddingId: wedding.id, vendorId, status: "lead", portalAccess: true },
+    update: grantPortalNow ? { portalAccess: true } : {},
+    create: { weddingId: wedding.id, vendorId, status: grantPortalNow ? "lead" : "invited", portalAccess: grantPortalNow },
   });
+
+  if (!grantPortalNow && !existingLink) {
+    await prisma.notification.create({
+      data: {
+        userId: wedding.ownerId,
+        weddingId: wedding.id,
+        type: "vendor_invite",
+        content: "Een leverancier heeft aangegeven jullie bruiloft te beheren en vraagt om portaltoegang. Geef toegang bij Leveranciers.",
+        relatedType: "weddingVendor",
+        relatedId: wedding.id,
+      },
+    });
+  }
 
   // Store the invite for future matching (if couple signs up later)
   const invite = await prisma.vendorWeddingInvite.create({
@@ -140,5 +170,5 @@ export async function POST(req: NextRequest) {
     include: { wedding: { select: { id: true, title: true, date: true } } },
   });
 
-  return NextResponse.json({ invite, matched: alreadyExisted }, { status: 201 });
+  return NextResponse.json({ invite, matched: alreadyExisted, pendingApproval: !grantPortalNow }, { status: 201 });
 }

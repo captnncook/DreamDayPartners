@@ -39,6 +39,7 @@ export default function RsvpPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!email.trim()) return;
     setSaving(true);
     await fetch(`/api/rsvp/${token}`, {
       method: "POST",
@@ -87,15 +88,17 @@ export default function RsvpPage() {
             <div style={{ padding: "1.5rem 0", textAlign: "center" }}>
               <h2 className="font-serif" style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--foreground)" }}>Bedankt!</h2>
               <p style={{ color: "var(--muted)", marginTop: "var(--space-3)", fontSize: "0.9rem" }}>
-                {email ? "Je ontvangt zo een bevestiging per e-mail." : "Je reactie is ontvangen."}
+                Je ontvangt zo een bevestiging per e-mail op {email}.
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
               <div style={{ marginBottom: "var(--space-6)" }}>
-                <label htmlFor="rsvp-email" style={{ display: "block", fontSize: "var(--text-base)", fontWeight: 600, marginBottom: "var(--space-2)", color: "var(--foreground)" }}>E-mailadres</label>
-                <input id="rsvp-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="voor een bevestiging per mail" style={INPUT} />
+                <label htmlFor="rsvp-email" style={{ display: "block", fontSize: "var(--text-base)", fontWeight: 600, marginBottom: "var(--space-2)", color: "var(--foreground)" }}>
+                  E-mailadres <span style={{ color: "var(--gold-deep)" }}>*</span>
+                </label>
+                <input id="rsvp-email" type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="voor je bevestiging per mail" style={INPUT} />
               </div>
 
               <div style={{ marginBottom: "var(--space-7)" }}>

@@ -19,6 +19,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
   const body = await req.json();
   const { email, rsvpStatus, guests } = body as { email?: string; rsvpStatus: string; guests: GuestInput[] };
 
+  if (!email || !email.trim()) {
+    return NextResponse.json({ error: "E-mailadres is verplicht." }, { status: 400 });
+  }
+
   const wedding = await prisma.wedding.findUnique({ where: { rsvpToken: token }, select: { id: true, title: true, date: true, venue: true } });
   if (!wedding) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -26,17 +30,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
     ? guests
     : [{ name: "Gast", isChild: false, dietary: "" }];
 
+  // Naam-matching alleen (case/whitespace/diakrieten-ongevoelig) is te
+  // broos tegen kleine schrijfvarianten — normaliseren voorkomt dat "Marieke
+  // de Vries" en "Marieke  de  Vríes" als twee verschillende gasten worden
+  // gezien en dus dubbel in de lijst belanden.
+  function normalize(name: string) {
+    return name.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ");
+  }
+
   // Bestaande gasten van deze bruiloft ophalen om te matchen op naam/e-mail
   // i.p.v. blind nieuwe rijen aan te maken — anders ontstaat er een
   // duplicaat zodra iemand die al op de gastenlijst staat zelf RSVP't.
   const existingGuests = await prisma.guest.findMany({ where: { weddingId: wedding.id } });
   function findMatch(name: string, isFirst: boolean) {
-    const normalized = name.trim().toLowerCase();
-    return existingGuests.find((g) => {
-      if (g.name.trim().toLowerCase() === normalized) return true;
-      if (isFirst && email && g.email && g.email.toLowerCase() === email.toLowerCase()) return true;
-      return false;
-    });
+    const normalized = normalize(name);
+    // E-mail is nu verplicht voor de indiener zelf, dus een match op e-mail
+    // (ongeacht naamspelling) is de sterkste garantie tegen duplicaten.
+    if (isFirst) {
+      const byEmail = existingGuests.find((g) => g.email && g.email.toLowerCase() === email!.toLowerCase());
+      if (byEmail) return byEmail;
+    }
+    return existingGuests.find((g) => normalize(g.name) === normalized);
   }
 
   // Sequentieel (niet Promise.all) zodat matches binnen dezelfde aanvraag

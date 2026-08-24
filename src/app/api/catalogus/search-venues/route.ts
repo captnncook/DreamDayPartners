@@ -49,11 +49,17 @@ function wordMatches(queryWord: string, candidateWord: string): boolean {
 
 // Elk woord uit de zoekopdracht moet ergens in de naam of stad een fuzzy-match
 // vinden, in willekeurige volgorde (zo matcht "haar kasteel" ook op "Kasteel de Haar").
-function isMatch(query: string, name: string, city: string | null): boolean {
+// Bij meerdere zoekwoorden mag er precies één niet matchen — iemand die haast
+// heeft, tikt vaak niet alleen een letter fout in de naam maar ook in de
+// plaatsnaam (of noemt een nabijgelegen plaats i.p.v. de exacte vestigingsplaats)
+// — dat mag niet meteen alle resultaten wegvallen als de rest wél klopt.
+function matchScore(query: string, name: string, city: string | null): number | null {
   const queryWords = normalize(query).split(/\s+/).filter(Boolean);
   const candidateWords = [...normalize(name).split(/\s+/), ...normalize(city ?? "").split(/\s+/)].filter(Boolean);
-  if (queryWords.length === 0) return false;
-  return queryWords.every((qw) => candidateWords.some((cw) => wordMatches(qw, cw)));
+  if (queryWords.length === 0) return null;
+  const misses = queryWords.filter((qw) => !candidateWords.some((cw) => wordMatches(qw, cw))).length;
+  const allowedMisses = queryWords.length > 1 ? 1 : 0;
+  return misses <= allowedMisses ? misses : null;
 }
 
 export async function GET(req: NextRequest) {
@@ -65,7 +71,12 @@ export async function GET(req: NextRequest) {
     select: { id: true, name: true, city: true },
   });
 
-  const matches = venues.filter((v) => isMatch(search, v.name, v.city)).slice(0, 5);
+  const matches = venues
+    .map((v) => ({ v, score: matchScore(search, v.name, v.city) }))
+    .filter((m): m is { v: typeof venues[number]; score: number } => m.score !== null)
+    .sort((a, b) => a.score - b.score)
+    .slice(0, 5)
+    .map((m) => m.v);
 
   return NextResponse.json({ vendors: matches });
 }

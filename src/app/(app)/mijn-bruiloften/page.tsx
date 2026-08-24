@@ -17,6 +17,7 @@ type Invite = {
   createdAt: string;
   source?: "invite" | "direct";
   vendorStatus?: string;
+  portalAccess?: boolean | null;
 };
 
 const VENDOR_STATUS_LABELS: Record<string, string> = {
@@ -76,7 +77,9 @@ export default function MijnBruiloftenPage() {
       setInvites(prev => [data.invite, ...prev]);
       setForm({ email1: "", email2: "", weddingDate: "", weddingTitle: "", notes: "" });
       setShowForm(false);
-      setSuccess(data.matched
+      setSuccess(data.pendingApproval
+        ? "Bruiloft gevonden! Dit account bestaat al — het bruidspaar moet je eerst toegang geven bij hun Leveranciers-pagina voor je het dashboard kunt zien."
+        : data.matched
         ? "Bruiloft gevonden en direct gekoppeld aan een bestaand account!"
         : "Bruiloft aangemaakt. Je hebt nu meteen toegang tot het dashboard. Zodra het bruidspaar zich aanmeldt worden ze automatisch gekoppeld."
       );
@@ -180,9 +183,11 @@ export default function MijnBruiloftenPage() {
         <div style={{ borderTop: "1px solid var(--border)" }}>
           {invites.map(invite => {
             const linked = !!invite.weddingId;
+            const pending = linked && invite.portalAccess === false;
+            const canOpen = linked && !pending;
             return (
-              <div key={invite.id} className="dash-row" style={{ cursor: linked ? "pointer" : "default", alignItems: "flex-start" }}
-                onClick={() => { if (linked && invite.weddingId) window.location.href = `/weddings/${invite.weddingId}`; }}>
+              <div key={invite.id} className="dash-row" style={{ cursor: canOpen ? "pointer" : "default", alignItems: "flex-start" }}
+                onClick={() => { if (canOpen && invite.weddingId) window.location.href = `/weddings/${invite.weddingId}`; }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-6)", width: "100%" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-xl)" }}>
@@ -195,7 +200,11 @@ export default function MijnBruiloftenPage() {
                       <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginTop: "4px" }}>{invite.notes}</div>
                     )}
                     <div style={{ marginTop: "6px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                      {linked ? (
+                      {pending ? (
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
+                          Wacht op goedkeuring bruidspaar
+                        </span>
+                      ) : linked ? (
                         <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
                           Bruidspaar gekoppeld
                         </span>
@@ -212,7 +221,7 @@ export default function MijnBruiloftenPage() {
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-                    {invite.weddingId && (
+                    {canOpen && (
                       <Link
                         href={`/weddings/${invite.weddingId}`}
                         style={{ fontSize: "var(--text-base)", color: "var(--gold-deep)", fontWeight: 600, textDecoration: "none" }}
@@ -220,13 +229,13 @@ export default function MijnBruiloftenPage() {
                         Dashboard
                       </Link>
                     )}
-                    {invite.weddingId && (
+                    {canOpen && (
                       <button
                         onClick={() => handleInvite(invite.weddingId!)}
-                        disabled={invitingId === invite.weddingId || invitedIds.has(invite.weddingId)}
+                        disabled={invitingId === invite.weddingId || invitedIds.has(invite.weddingId!)}
                         style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
                       >
-                        {invitedIds.has(invite.weddingId) ? "Uitnodiging verstuurd" : invitingId === invite.weddingId ? "Bezig…" : "Uitnodigen"}
+                        {invitedIds.has(invite.weddingId!) ? "Uitnodiging verstuurd" : invitingId === invite.weddingId ? "Bezig…" : "Uitnodigen"}
                       </button>
                     )}
                     <button onClick={() => handleDelete(invite.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: "4px", display: "flex" }}>

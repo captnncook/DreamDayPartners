@@ -248,17 +248,19 @@ export function accountActivationEmail(name: string, activateUrl: string): { sub
 export function rsvpConfirmationEmail(
   weddingTitle: string, weddingDate: Date, venue: string | null, attending: boolean, guestNames: string[]
 ): { subject: string; html: string } {
-  const dateStr = new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(weddingDate);
-  const namesList = guestNames.filter(Boolean).map((n) => `<li style="margin:2px 0;">${n}</li>`).join("");
+  const dateStr = new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(weddingDate);
+  const names = guestNames.filter(Boolean);
+  const namesList = names.map((n) => `<li style="margin:2px 0;">${n}</li>`).join("");
   return {
-    subject: attending ? `Aanmelding ontvangen voor ${weddingTitle}` : `Afmelding ontvangen voor ${weddingTitle}`,
+    subject: attending ? `Je aanmelding voor ${weddingTitle} is bevestigd` : `Je afmelding voor ${weddingTitle} is ontvangen`,
     html: emailLayout({
-      heading: attending ? "Bedankt voor je aanmelding!" : "Bedankt voor je reactie",
+      heading: attending ? "Jullie komst is bevestigd" : "Bedankt voor je reactie",
       body: `
-        <p style="margin:0 0 12px;">Jullie reactie voor <strong>${weddingTitle}</strong> (${dateStr}${venue ? `, ${venue}` : ""}) is ontvangen.</p>
+        <p style="margin:0 0 4px;font-weight:600;">${weddingTitle}</p>
+        <p style="margin:0 0 16px;color:#6b6b6b;text-transform:capitalize;">${dateStr}${venue ? ` &middot; ${venue}` : ""}</p>
         ${attending
-          ? `<p style="margin:0 0 8px;">Je hebt je aangemeld met:</p><ul style="margin:0 0 12px;padding-left:20px;">${namesList}</ul><p style="margin:0;">We kijken ernaar uit jullie te zien!</p>`
-          : `<p style="margin:0;">Jammer dat je er niet bij kunt zijn. Bedankt voor het laten weten.</p>`
+          ? `<p style="margin:0 0 8px;">We hebben je aanmelding genoteerd voor:</p><ul style="margin:0 0 16px;padding-left:20px;">${namesList || `<li>${names[0] ?? "Jou"}</li>`}</ul><p style="margin:0;">We kijken ernaar uit jullie te zien! Wijzigen je plannen alsnog, gebruik dan opnieuw de uitnodigingslink om je reactie aan te passen.</p>`
+          : `<p style="margin:0;">Jammer dat je er niet bij kunt zijn — bedankt voor het laten weten. Kun je onverwacht toch komen, gebruik dan opnieuw de uitnodigingslink om je reactie aan te passen.</p>`
         }
       `,
     }),
