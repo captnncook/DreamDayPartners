@@ -25,6 +25,7 @@ interface Props {
   weddingTitle: string;
   threads: Thread[];
   currentUser: { id: string; name: string; role: string };
+  linkedVendors?: { id: string; name: string }[];
 }
 
 const THREAD_ICONS: Record<string, React.ElementType> = { internal: Lock, couple: Heart, vendor: Handshake };
@@ -34,7 +35,7 @@ function formatTime(iso: string) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
-export default function MessagesClient({ weddingId, weddingTitle, threads: initial, currentUser }: Props) {
+export default function MessagesClient({ weddingId, weddingTitle, threads: initial, currentUser, linkedVendors = [] }: Props) {
   const [threads, setThreads] = useState<Thread[]>(initial);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(initial[0]?.id ?? null);
   const [message, setMessage] = useState("");
@@ -42,9 +43,19 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
   const [showNewThread, setShowNewThread] = useState(false);
   const [newSubject, setNewSubject] = useState("");
   const [newType, setNewType] = useState("internal");
+  const [newVendorId, setNewVendorId] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activeThread = threads.find((t) => t.id === activeThreadId);
+
+  function threadLabel(t: Thread) {
+    if (t.subject) return t.subject;
+    if (t.type === "vendor" && t.vendorId) {
+      const v = linkedVendors.find((lv) => lv.id === t.vendorId);
+      if (v) return v.name;
+    }
+    return THREAD_LABELS[t.type];
+  }
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,10 +63,11 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
 
   async function createThread(e: React.FormEvent) {
     e.preventDefault();
+    if (newType === "vendor" && !newVendorId) return;
     const res = await fetch(`/api/weddings/${weddingId}/messages/threads`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: newType, subject: newSubject }),
+      body: JSON.stringify({ type: newType, subject: newSubject, vendorId: newType === "vendor" ? newVendorId : undefined }),
     });
     const data = await res.json();
     if (data.thread) {
@@ -63,6 +75,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
       setActiveThreadId(data.thread.id);
     }
     setNewSubject("");
+    setNewVendorId("");
     setShowNewThread(false);
   }
 
@@ -125,7 +138,25 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                   <option value="couple">Bruidspaar</option>
                   <option value="vendor">Leverancier</option>
                 </select>
-                <button type="submit" className="w-full text-xs py-1.5 rounded-lg" style={{ background: "var(--accent)", color: "var(--primary)" }}>
+                {newType === "vendor" && (
+                  linkedVendors.length > 0 ? (
+                    <select
+                      required
+                      value={newVendorId}
+                      onChange={(e) => setNewVendorId(e.target.value)}
+                      className="w-full border rounded-lg px-2 py-1.5 text-xs"
+                      style={{ borderColor: "var(--border)" }}
+                    >
+                      <option value="">Kies een leverancier...</option>
+                      {linkedVendors.map((v) => (
+                        <option key={v.id} value={v.id}>{v.name}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="text-xs" style={{ color: "var(--muted)" }}>Nog geen leveranciers gekoppeld aan deze bruiloft.</p>
+                  )
+                )}
+                <button type="submit" disabled={newType === "vendor" && !newVendorId} className="w-full text-xs py-1.5 rounded-lg" style={{ background: "var(--accent)", color: "var(--primary)" }}>
                   Aanmaken
                 </button>
               </form>
@@ -142,7 +173,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                   style={{ background: active ? "var(--accent)" : "transparent" }}>
                   <div className="flex items-center gap-2 mb-1">
                     {(() => { const Icon = THREAD_ICONS[thread.type] ?? MessageCircle; return <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--muted)" }} />; })()}
-                    <span className="text-xs font-semibold">{thread.subject ?? THREAD_LABELS[thread.type]}</span>
+                    <span className="text-xs font-semibold">{threadLabel(thread)}</span>
                   </div>
                   {lastMsg && (
                     <>
@@ -170,7 +201,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                 <div className="flex items-center gap-2">
                   {(() => { const Icon = THREAD_ICONS[activeThread.type] ?? MessageCircle; return <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)" }} />; })()}
                   <div>
-                    <div className="font-medium text-sm">{activeThread.subject ?? THREAD_LABELS[activeThread.type]}</div>
+                    <div className="font-medium text-sm">{threadLabel(activeThread)}</div>
                     <div className="text-xs" style={{ color: "var(--muted)" }}>{activeThread.messages.length} berichten</div>
                   </div>
                 </div>

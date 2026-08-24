@@ -13,9 +13,19 @@ export default async function MessagesPage({ params }: { params: Promise<{ id: s
   if (!wedding) notFound();
 
   let threadFilter: object = { weddingId: id };
+  let linkedVendors: { id: string; name: string }[] = [];
 
   if (user.role === "couple") {
-    threadFilter = { weddingId: id, type: { in: ["couple"] } };
+    // Het bruidspaar is eigenaar van de bruiloft en moet elk gesprek over
+    // deze bruiloft kunnen zien, ook een net zelf aangemaakt "vendor"-thread
+    // — voorheen filterde dit alleen op type "couple", waardoor een eigen
+    // "Leverancier"-gesprek na een herlaad leek te zijn verdwenen.
+    threadFilter = { weddingId: id };
+    const weddingVendors = await prisma.weddingVendor.findMany({
+      where: { weddingId: id },
+      include: { vendor: { select: { id: true, name: true } } },
+    });
+    linkedVendors = weddingVendors.map((wv) => wv.vendor);
   } else if (user.role === "vendor") {
     const vendor = await prisma.vendor.findFirst({ where: { userId: user.id } });
     threadFilter = { weddingId: id, OR: [{ type: "vendor", vendorId: vendor?.id }] };
@@ -38,6 +48,7 @@ export default async function MessagesPage({ params }: { params: Promise<{ id: s
       weddingTitle={wedding.title}
       threads={JSON.parse(JSON.stringify(threads))}
       currentUser={JSON.parse(JSON.stringify(user))}
+      linkedVendors={linkedVendors}
     />
   );
 }
