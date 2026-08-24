@@ -241,7 +241,8 @@ export default function GuestsPage() {
         </select>
       </div>
 
-      <div className="ddp-scroll-fade ddp-scroll-fade--surface" style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)", overflowX: "auto" }}>
+      <div className="ddp-scroll-fade ddp-scroll-fade--surface" style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-md)" }}>
+      <div style={{ overflowX: "auto" }}>
         <table className="w-full" style={{ minWidth: "640px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
@@ -292,6 +293,7 @@ export default function GuestsPage() {
             <p>Geen gasten gevonden</p>
           </div>
         )}
+      </div>
       </div>
       <div className="text-xs mt-2 text-right" style={{ color: "var(--muted)" }}>
         {filtered.length} van {guests.length} gasten

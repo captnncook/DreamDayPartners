@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { User, Mail, Phone, X, CheckCircle2 } from "lucide-react";
+import { User, Mail, Phone, X, CheckCircle2, Search } from "lucide-react";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = {
@@ -18,39 +18,63 @@ const STATUS_LABELS: Record<string, string> = {
 export default function VendorsPage() {
   const { id } = useParams<{ id: string }>();
   const [weddingVendors, setWeddingVendors] = useState<WeddingVendor[]>([]);
-  const [allVendors, setAllVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  const [selectedVendorId, setSelectedVendorId] = useState("");
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Vendor[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [showResults, setShowResults] = useState(false);
   const [addNotes, setAddNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [addError, setAddError] = useState("");
+  const searchSeq = useRef(0);
 
   const load = useCallback(async () => {
-    const [wvRes, vRes] = await Promise.all([
-      fetch(`/api/weddings/${id}/vendors`),
-      fetch("/api/vendors"),
-    ]);
-    const [wvData, vData] = await Promise.all([wvRes.json(), vRes.json()]);
+    const wvRes = await fetch(`/api/weddings/${id}/vendors`);
+    const wvData = await wvRes.json();
     setWeddingVendors(wvData.vendors ?? []);
-    setAllVendors(vData.vendors ?? []);
     setLoading(false);
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
 
   const linkedIds = new Set(weddingVendors.map((wv) => wv.vendor.id));
-  const available = allVendors.filter((v) => !linkedIds.has(v.id));
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setSearching(false);
+      return;
+    }
+    setSearching(true);
+    const seq = ++searchSeq.current;
+    const timer = setTimeout(async () => {
+      const res = await fetch(`/api/vendors?q=${encodeURIComponent(query.trim())}`);
+      const data = await res.json().catch(() => ({ vendors: [] }));
+      if (seq !== searchSeq.current) return;
+      setSearchResults((data.vendors ?? []).filter((v: Vendor) => !linkedIds.has(v.id)));
+      setSearching(false);
+    }, 250);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  function pickVendor(v: Vendor) {
+    setSelectedVendor(v);
+    setQuery(`${v.name} · ${v.category}`);
+    setShowResults(false);
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedVendorId) return;
+    if (!selectedVendor) return;
     setSaving(true);
     setAddError("");
     const res = await fetch(`/api/weddings/${id}/vendors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ vendorId: selectedVendorId, notes: addNotes }),
+      body: JSON.stringify({ vendorId: selectedVendor.id, notes: addNotes }),
     });
     setSaving(false);
     if (!res.ok) {
@@ -58,7 +82,8 @@ export default function VendorsPage() {
       setAddError(data?.error || "Koppelen is niet gelukt. Probeer het opnieuw.");
       return;
     }
-    setSelectedVendorId("");
+    setSelectedVendor(null);
+    setQuery("");
     setAddNotes("");
     setShowAdd(false);
     load();
@@ -114,40 +139,69 @@ export default function VendorsPage() {
             Staat een leverancier hier niet tussen? Zoek en nodig ze uit vanaf hun profiel in de{" "}
             <Link href="/leveranciers" className="underline" style={{ color: "var(--gold-deep)" }}>catalogus</Link>.
           </p>
-          {available.length === 0 ? (
-            <p className="text-sm" style={{ color: "var(--muted)" }}>Alle leveranciers zijn al gekoppeld.</p>
-          ) : (
-            <>
-              <div>
-                <label className="block text-xs font-medium mb-1">Leverancier</label>
-                <select
-                  required
-                  value={selectedVendorId}
-                  onChange={(e) => setSelectedVendorId(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                  style={{ borderColor: "var(--border)" }}
+          <div>
+            <label className="block text-xs font-medium mb-1">Leverancier</label>
+            <div className="ddp-search" style={{ position: "relative" }}>
+              <Search />
+              <input
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSelectedVendor(null);
+                  setShowResults(true);
+                }}
+                onFocus={() => setShowResults(true)}
+                onBlur={() => setTimeout(() => setShowResults(false), 150)}
+                placeholder="Typ een naam om te zoeken..."
+                autoComplete="off"
+              />
+              {showResults && query.trim() && (
+                <div
+                  role="listbox"
+                  style={{
+                    position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 20,
+                    background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.08)", maxHeight: "260px", overflowY: "auto",
+                  }}
                 >
-                  <option value="">Kies een leverancier...</option>
-                  {available.map((v) => (
-                    <option key={v.id} value={v.id}>{v.name} · {v.category}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium mb-1">Notities (optioneel)</label>
-                <input
-                  value={addNotes}
-                  onChange={(e) => setAddNotes(e.target.value)}
-                  placeholder="bijv. menu voor 80 personen besproken"
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                  style={{ borderColor: "var(--border)" }}
-                />
-              </div>
-              <button type="submit" disabled={saving || !selectedVendorId} className="ddp-btn-primary w-full">
-                {saving ? "Koppelen..." : "Leverancier koppelen"}
-              </button>
-            </>
-          )}
+                  {searching ? (
+                    <div className="text-sm" style={{ padding: "0.625rem 0.875rem", color: "var(--muted)" }}>Zoeken...</div>
+                  ) : searchResults.length === 0 ? (
+                    <div className="text-sm" style={{ padding: "0.625rem 0.875rem", color: "var(--muted)" }}>Geen leveranciers gevonden.</div>
+                  ) : (
+                    searchResults.map((v) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        onClick={() => pickVendor(v)}
+                        className="text-sm"
+                        style={{
+                          display: "block", width: "100%", textAlign: "left", padding: "0.625rem 0.875rem",
+                          background: "none", border: "none", cursor: "pointer", color: "var(--foreground)",
+                        }}
+                        onMouseDown={(e) => e.preventDefault()}
+                      >
+                        {v.name} <span style={{ color: "var(--muted)" }}>· {v.category}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1">Notities (optioneel)</label>
+            <input
+              value={addNotes}
+              onChange={(e) => setAddNotes(e.target.value)}
+              placeholder="bijv. menu voor 80 personen besproken"
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+              style={{ borderColor: "var(--border)" }}
+            />
+          </div>
+          <button type="submit" disabled={saving || !selectedVendor} className="ddp-btn-primary w-full">
+            {saving ? "Koppelen..." : "Leverancier koppelen"}
+          </button>
         </form>
       )}
 

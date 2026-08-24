@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Flag } from "lucide-react";
 import type { Field } from "@/lib/vendorTypeConfigs";
 
@@ -19,6 +19,11 @@ interface Props {
 export default function LogisticsPanel({ fields, intakeData, onUpdate, isPlanner, isVendor, requiredKeys = [], onToggleRequired, defaults }: Props) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, unknown>>(intakeData ?? {});
+
+  useEffect(() => {
+    if (!editing) setForm(intakeData ?? {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intakeData]);
 
   if (!fields || fields.length === 0) return null;
 
