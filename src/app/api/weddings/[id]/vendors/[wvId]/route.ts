@@ -59,14 +59,18 @@ export async function GET(_req: NextRequest, { params }: Params) {
   if (wv && wv.vendor.category !== "trouwlocatie") {
     const venueBooking = await prisma.weddingVendor.findFirst({
       where: { weddingId, vendor: { category: "trouwlocatie" } },
-      include: { vendor: { select: { venueFacilities: true, setupTime: true, badWeatherPlan: true } } },
+      include: { vendor: { select: { venueFacilities: true, setupTime: true, teardownTime: true, badWeatherPlan: true } } },
     });
     if (venueBooking) {
+      const venueOverrides = (venueBooking.intakeData ?? {}) as Record<string, unknown>;
+      const venueSetupTime = (typeof venueOverrides.setupTimeOverride === "string" && venueOverrides.setupTimeOverride) || venueBooking.vendor.setupTime;
+      const venueTeardownTime = (typeof venueOverrides.teardownTimeOverride === "string" && venueOverrides.teardownTimeOverride) || venueBooking.vendor.teardownTime;
       const currentIntake = (wv.intakeData ?? {}) as Record<string, unknown>;
       const autoFill: Record<string, unknown> = {};
       if (venueBooking.vendor.venueFacilities.includes("Water aanwezig") && !currentIntake["water-venue"]) autoFill["water-venue"] = true;
       if (venueBooking.vendor.venueFacilities.includes("Koeling aanwezig") && !currentIntake["koeling-venue"]) autoFill["koeling-venue"] = true;
-      if (venueBooking.vendor.setupTime && !currentIntake["toegang-venue"]) autoFill["toegang-venue"] = venueBooking.vendor.setupTime;
+      if (venueSetupTime && !currentIntake["toegang-venue"]) autoFill["toegang-venue"] = venueSetupTime;
+      if (venueTeardownTime && !currentIntake["afbouw-venue"]) autoFill["afbouw-venue"] = venueTeardownTime;
       if (venueBooking.vendor.badWeatherPlan && !currentIntake["weerplan-venue"]) autoFill["weerplan-venue"] = venueBooking.vendor.badWeatherPlan;
 
       if (Object.keys(autoFill).length > 0) {

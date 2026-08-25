@@ -462,6 +462,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
       { key: "koeling-venue", label: "Koeling bij venue aanwezig?", type: "boolean" },
       { key: "huurmateriaal-retour", label: "Afspraak verhuurmateriaal retourneren", type: "text", placeholder: "bijv. maandag 14:00 bij venue" },
       { key: "toegang-venue", label: "Toegangstijd venue (eerste mogelijke opbouwtijd)", type: "time" },
+      { key: "afbouw-venue", label: "Uiterlijke afbouwtijd venue", type: "time" },
     ],
   },
 
@@ -510,6 +511,7 @@ export const VENDOR_TYPE_CONFIGS: VendorTypeConfig[] = [
     ],
     logisticsFields: [
       { key: "toegang-venue", label: "Toegangstijd venue voor opbouw", type: "time" },
+      { key: "afbouw-venue", label: "Uiterlijke afbouwtijd venue", type: "time" },
       { key: "weerplan-venue", label: "Weerplan van de locatie (indien buiten)", type: "longtext" },
       { key: "huurmateriaal-retour", label: "Huurmateriaal retour datum", type: "text" },
       { key: "stroomvereiste", label: "Stroomvereiste (Watt)", type: "number" },

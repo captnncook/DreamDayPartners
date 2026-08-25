@@ -39,12 +39,15 @@ interface Props {
   isVendor: boolean;
   isPlanner?: boolean;
   weddingId: string;
+  editorName?: string;
+  editorIsVendor?: boolean;
 }
 
-export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPlanner, weddingId }: Props) {
+export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPlanner, weddingId, editorName, editorIsVendor }: Props) {
   const canEdit = isVendor || isPlanner;
   const moodboardUrl = intakeData?.moodboardUrl as string | undefined;
   const moodboardNotes = intakeData?.moodboardNotes as string | undefined;
+  const moodboardEditedBy = intakeData?.moodboardEditedBy as string | undefined;
   const photos: MoodboardPhoto[] = Array.isArray(intakeData?.moodboardPhotos) ? (intakeData.moodboardPhotos as MoodboardPhoto[]) : [];
   const [editing, setEditing] = useState(false);
   const [url, setUrl] = useState(moodboardUrl ?? "");
@@ -52,8 +55,12 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPl
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Zonder attributie kon niet gezien worden of het bruidspaar of de
+  // leverancier het moodboard had gevuld — nu vastgelegd bij elke wijziging.
+  const editorLabel = editorName?.trim() || (editorIsVendor ? "de leverancier" : "het bruidspaar");
+
   function save() {
-    onUpdate({ moodboardUrl: url.trim(), moodboardNotes: notes.trim() });
+    onUpdate({ moodboardUrl: url.trim(), moodboardNotes: notes.trim(), moodboardEditedBy: editorLabel });
     setEditing(false);
   }
 
@@ -73,7 +80,7 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPl
         return;
       }
       const { document: uploaded } = await res.json();
-      onUpdate({ moodboardPhotos: [...photos, { id: uploaded.id, fileKey: uploaded.fileKey }] });
+      onUpdate({ moodboardPhotos: [...photos, { id: uploaded.id, fileKey: uploaded.fileKey }], moodboardEditedBy: editorLabel });
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -171,6 +178,9 @@ export default function MoodboardUploader({ intakeData, onUpdate, isVendor, isPl
             <p style={{ fontSize: "var(--text-md)", color: "var(--foreground)", lineHeight: 1.6, background: "var(--color-blush-soft)", padding: "0.75rem", borderRadius: "0.5rem", margin: 0 }}>
               {moodboardNotes}
             </p>
+          )}
+          {moodboardEditedBy && (
+            <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", margin: 0 }}>Ingevuld door {moodboardEditedBy}</p>
           )}
         </div>
       ) : (

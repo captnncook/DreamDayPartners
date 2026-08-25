@@ -36,6 +36,34 @@ function euro(n: number) {
   return new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(n);
 }
 
+// Indicatieve verdeling van een gemiddeld Nederlands bruiloftsbudget
+// (circa €20.000 totaal) over de meest voorkomende categorieën — geen harde
+// data, maar genoeg houvast om te zien of je zelf duidelijk boven of onder
+// het gebruikelijke uitgeeft aan een categorie, zodat je bewust kunt kiezen:
+// budget bijstellen, of verwachtingen bijstellen.
+const AVERAGE_TOTAL_BUDGET = 20000;
+const CATEGORY_BENCHMARKS: { match: string[]; pct: number }[] = [
+  { match: ["locatie", "trouwlocatie", "venue", "zaal"], pct: 0.28 },
+  { match: ["catering", "eten", "drinken", "diner", "buffet"], pct: 0.22 },
+  { match: ["fotografie", "fotograaf", "foto"], pct: 0.08 },
+  { match: ["videografie", "videograaf", "video"], pct: 0.05 },
+  { match: ["bloemen", "bloemist", "decoratie", "styling"], pct: 0.08 },
+  { match: ["dj", "band", "muziek", "entertainment"], pct: 0.06 },
+  { match: ["bruidsmode", "kleding", "jurk", "pak", "herenmode"], pct: 0.08 },
+  { match: ["trouwring", "juwelier", "ring"], pct: 0.04 },
+  { match: ["vervoer", "auto", "trouwauto"], pct: 0.02 },
+  { match: ["uitnodiging", "drukwerk", "papeterie"], pct: 0.02 },
+  { match: ["visagie", "haarstyling", "haar", "make-up", "makeup"], pct: 0.03 },
+  { match: ["taart", "bakker"], pct: 0.02 },
+];
+
+function categoryBenchmark(category: string): number | null {
+  const c = category.trim().toLowerCase();
+  if (!c) return null;
+  const hit = CATEGORY_BENCHMARKS.find((b) => b.match.some((m) => c.includes(m)));
+  return hit ? Math.round(hit.pct * AVERAGE_TOTAL_BUDGET) : null;
+}
+
 export default function BudgetPage() {
   const { id } = useParams<{ id: string }>();
   const [budget, setBudget] = useState<Budget | null>(null);
@@ -126,8 +154,10 @@ export default function BudgetPage() {
   const categoryTotals = Object.entries(byCategory).map(([cat, items]) => ({
     cat,
     actual: items.reduce((s, i) => s + i.actual, 0),
+    estimated: items.reduce((s, i) => s + i.estimated, 0),
   })).sort((a, b) => b.actual - a.actual);
   const maxCategoryActual = Math.max(...categoryTotals.map(c => c.actual), 1);
+  const estimatedOverBudget = budget.totalAmount > 0 && totalEstimated > budget.totalAmount;
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -178,23 +208,41 @@ export default function BudgetPage() {
           <div style={{ height: "100%", width: `${pct}%`, background: "var(--gold)" }} />
         </div>
         <div className="text-xs mt-1.5" style={{ color: "var(--ink-muted)" }}>{pct}% gebruikt · geschat {euro(totalEstimated)}</div>
+        {estimatedOverBudget && (
+          <div className="text-xs mt-1.5" style={{ color: "var(--gold)", fontWeight: 700 }}>
+            Let op: jullie geschatte kosten ({euro(totalEstimated)}) liggen al boven het totaalbudget ({euro(budget.totalAmount)}), ook al is dit nog niet allemaal uitgegeven.
+          </div>
+        )}
       </div>
 
       {categoryTotals.length > 0 && (
         <section className="mb-8">
           <h3 className="dash-section-title mb-2">Kosten per categorie</h3>
+          <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
+            Ter vergelijking: het gemiddelde bedrag dat Nederlandse stellen per categorie uitgeven (bij een totaalbudget
+            van circa {euro(AVERAGE_TOTAL_BUDGET)}). Je mag daar prima overheen gaan — dit helpt vooral om te zien of
+            je budget of je verwachtingen bijgesteld moeten worden.
+          </p>
           <div className="pt-3 space-y-2.5" style={{ borderTop: "1px solid var(--border)" }}>
-            {categoryTotals.map(({ cat, actual }) => (
+            {categoryTotals.map(({ cat, actual, estimated }) => {
+              const compareAmount = actual > 0 ? actual : estimated;
+              const benchmark = categoryBenchmark(cat);
+              const overBenchmark = benchmark !== null && compareAmount > benchmark * 1.15;
+              return (
               <div key={cat}>
                 <div className="flex justify-between text-xs mb-1">
                   <span style={{ color: "var(--foreground)", fontWeight: 500 }}>{cat}</span>
-                  <span style={{ color: "var(--muted)" }}>{euro(actual)}</span>
+                  <span style={{ color: overBenchmark ? "var(--gold-deep)" : "var(--muted)", fontWeight: overBenchmark ? 700 : 400 }}>
+                    {euro(actual)}
+                    {benchmark !== null && <span style={{ color: "var(--muted-light)", fontWeight: 400 }}> · gemiddeld {euro(benchmark)}</span>}
+                  </span>
                 </div>
                 <div style={{ height: "3px", borderRadius: "999px", background: "var(--border)", overflow: "hidden" }}>
                   <div style={{ height: "100%", background: "var(--ink)", width: `${Math.round((actual / maxCategoryActual) * 100)}%`, transition: "width 0.5s ease" }} />
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

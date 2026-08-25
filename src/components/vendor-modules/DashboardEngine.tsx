@@ -52,6 +52,7 @@ interface Props {
   totalGuests: number;
   userRole: string;
   userId: string;
+  userName?: string;
   vendorUserId?: string | null;
   vendorIsPremium?: boolean;
   vendorDisabledModules?: string[];
@@ -62,7 +63,7 @@ interface Props {
 
 export default function DashboardEngine({
   weddingId, wvId, vendorId, vendorType, vendorName, initialBooking,
-  documents, timelineBlocks, tasks, guests, totalGuests, userRole, userId, vendorUserId,
+  documents, timelineBlocks, tasks, guests, totalGuests, userRole, userId, userName, vendorUserId,
   vendorIsPremium, vendorDisabledModules, vendorExtraModules, venueInfo, logisticsDefaults,
 }: Props) {
   const config = getVendorTypeConfig(vendorType);
@@ -255,7 +256,7 @@ export default function DashboardEngine({
       )}
 
       {modules.includes("moodboardUploader") && (
-        <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} weddingId={weddingId} />
+        <MoodboardUploader intakeData={intakeData} onUpdate={patchIntake} isVendor={isVendor} isPlanner={isPlanner} weddingId={weddingId} editorName={userName} editorIsVendor={isVendor} />
       )}
 
       {modules.includes("portieCalculator") && (

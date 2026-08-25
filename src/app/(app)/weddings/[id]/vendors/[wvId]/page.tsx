@@ -92,6 +92,7 @@ export default async function VendorBookingPage({
       if (venueInfo.venueFacilities.includes("Water aanwezig") && !currentIntake["water-venue"]) autoFill["water-venue"] = true;
       if (venueInfo.venueFacilities.includes("Koeling aanwezig") && !currentIntake["koeling-venue"]) autoFill["koeling-venue"] = true;
       if (venueInfo.setupTime && !currentIntake["toegang-venue"]) autoFill["toegang-venue"] = venueInfo.setupTime;
+      if (venueInfo.teardownTime && !currentIntake["afbouw-venue"]) autoFill["afbouw-venue"] = venueInfo.teardownTime;
       if (venueInfo.badWeatherPlan && !currentIntake["weerplan-venue"]) autoFill["weerplan-venue"] = venueInfo.badWeatherPlan;
 
       if (Object.keys(autoFill).length > 0) {
@@ -229,6 +230,7 @@ export default async function VendorBookingPage({
         totalGuests={totalGuests}
         userRole={user.role}
         userId={user.id}
+        userName={user.name}
         vendorUserId={booking.vendor.userId}
         vendorIsPremium={booking.vendor.isPremium}
         vendorDisabledModules={booking.vendor.disabledModules}
