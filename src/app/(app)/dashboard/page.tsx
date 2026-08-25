@@ -66,6 +66,7 @@ export default async function DashboardPage() {
     weddingTitle: wv.wedding.title,
     weddingVenue: wv.wedding.venue,
     weddingDate: wv.wedding.date.toISOString(),
+    weddingEndDate: wv.wedding.endDate?.toISOString() ?? null,
   }));
 
   const greetings: Record<string, string> = {

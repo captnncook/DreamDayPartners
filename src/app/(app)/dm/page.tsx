@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { MessageCircle, Pencil, Search, X, ArrowLeft, Send, Check, Calendar } from "lucide-react";
 import ShieldAvatar from "@/components/ShieldAvatar";
+import { formatDateRange } from "@/lib/dateRange";
 
 const ROLE_LABELS: Record<string, string> = {
   couple: "Bruidspaar", planner: "Trouwplanner", admin: "Beheerder", team_member: "Teamlid", vendor: "Leverancier",
@@ -26,11 +27,11 @@ type DmMessage = {
   sender: { id: string; name: string; avatar?: string | null };
 };
 
-type Recipient = { userId: string; name: string; role: string; category?: string; photoUrl?: string | null };
+type Recipient = { userId: string; name: string; role: string; category?: string; photoUrl?: string | null; linked?: boolean };
 
 type VendorRequestItem = {
   id: string;
-  wedding: { id: string; title: string; date: string; venue?: string | null };
+  wedding: { id: string; title: string; date: string; endDate?: string | null; venue?: string | null };
 };
 
 function formatDate(iso: string) {
@@ -82,7 +83,7 @@ function RequestsPanel() {
           <div key={r.id} style={{ borderLeft: "3px solid var(--gold)", background: "var(--sand)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1rem 1.25rem" }}>
             <div className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "var(--foreground)" }}>{r.wedding.title}</div>
             <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>
-              {r.wedding.venue ? `${r.wedding.venue} · ` : ""}{formatDate(r.wedding.date)}
+              {r.wedding.venue ? `${r.wedding.venue} · ` : ""}{formatDateRange(new Date(r.wedding.date), r.wedding.endDate ? new Date(r.wedding.endDate) : null)}
             </div>
             <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", margin: "0.625rem 0" }}>
               Je bent uitgenodigd voor het Dream Team van deze bruiloft.
@@ -468,7 +469,9 @@ export default function DmPage() {
                     )}
                     <div>
                       <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--charcoal)" }}>{r.name}</div>
-                      <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{r.category ?? ROLE_LABELS[r.role] ?? r.role}</div>
+                      <div style={{ fontSize: "var(--text-sm)", color: r.linked ? "var(--gold-deep)" : "var(--muted)", fontWeight: r.linked ? 600 : 400 }}>
+                        {r.linked ? "Gekoppeld aan jullie bruiloft" : (r.category ?? ROLE_LABELS[r.role] ?? r.role)}
+                      </div>
                     </div>
                   </button>
                 ))

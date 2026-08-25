@@ -15,7 +15,7 @@ export async function GET() {
   const [invites, allLinks] = await Promise.all([
     prisma.vendorWeddingInvite.findMany({
       where: { vendorId },
-      include: { wedding: { select: { id: true, title: true, date: true } } },
+      include: { wedding: { select: { id: true, title: true, date: true, endDate: true } } },
       orderBy: { weddingDate: "asc" },
     }),
     // Ook niet-goedgekeurde koppelingen ophalen (portalAccess: false), zodat
@@ -23,7 +23,7 @@ export async function GET() {
     // stilzwijgend te doen alsof er nog niets gebeurd is.
     prisma.weddingVendor.findMany({
       where: { vendorId },
-      select: { id: true, weddingId: true, status: true, portalAccess: true, wedding: { select: { id: true, title: true, date: true } } },
+      select: { id: true, weddingId: true, status: true, portalAccess: true, wedding: { select: { id: true, title: true, date: true, endDate: true } } },
     }),
   ]);
   const portalAccessByWeddingId = new Map(allLinks.map(wv => [wv.weddingId, wv.portalAccess]));

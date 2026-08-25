@@ -117,6 +117,10 @@ export default function GuestsPage() {
     return out.map(v => v.trim());
   }
 
+  function normalizeGuestKey(name: string) {
+    return name.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ");
+  }
+
   async function handleCsvImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -124,26 +128,44 @@ export default function GuestsPage() {
     const text = await file.text();
     const lines = text.trim().split(/\r?\n/);
     const header = splitCsvLine(lines[0]).map(h => h.toLowerCase());
-    const col = (row: string[], name: string) => {
-      const i = header.indexOf(name);
+    // Zoekt een kolom op een van de gegeven trefwoorden als SUBSTRING i.p.v.
+    // een exacte kolomnaam — "Dieetwensen"/"Allergieën"/"Allergieen" werden
+    // voorheen stil genegeerd omdat alleen de kale woorden "dieet"/"allergie"
+    // exact herkend werden.
+    const colByKeywords = (row: string[], keywords: string[]) => {
+      const i = header.findIndex(h => keywords.some(k => h.includes(k)));
       return i >= 0 ? (row[i] ?? "") : "";
     };
     const rows = lines.slice(1).filter(l => l.trim()).map(splitCsvLine);
+
+    // Dedupliceren tegen zowel de al bestaande gastenlijst als tegen andere
+    // rijen in dezelfde import — anders levert twee keer per ongeluk
+    // hetzelfde bestand importeren stilzwijgend dubbele gasten op.
+    const existingKeys = new Set(guests.map(g => normalizeGuestKey(g.name)));
+    const existingEmails = new Set(guests.filter(g => g.email).map(g => g.email!.toLowerCase()));
+    const seenInBatch = new Set<string>();
+
     let imported = 0;
     const skipped: string[] = [];
+    const duplicates: string[] = [];
     for (const row of rows) {
-      const name = col(row, "naam") || col(row, "name");
+      const name = colByKeywords(row, ["naam", "name"]);
       if (!name) { skipped.push(`(rij zonder naam)`); continue; }
+      const email = colByKeywords(row, ["email", "e-mail"]) || "";
+      const key = normalizeGuestKey(name);
+      const isDuplicate = existingKeys.has(key) || seenInBatch.has(key) || (email && existingEmails.has(email.toLowerCase()));
+      if (isDuplicate) { duplicates.push(name); continue; }
+      seenInBatch.add(key);
       const res = await fetch(`/api/weddings/${id}/guests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          email: col(row, "email") || "",
-          phone: col(row, "telefoon") || col(row, "phone") || "",
-          side: col(row, "kant") || col(row, "side") || "both",
-          dietary: col(row, "dieet") || col(row, "dietary") || "",
-          allergies: col(row, "allergie") || col(row, "allergieën") || col(row, "allergie(en)") || col(row, "allergy") || col(row, "allergies") || "",
+          email,
+          phone: colByKeywords(row, ["telefoon", "phone"]) || "",
+          side: colByKeywords(row, ["kant", "side"]) || "both",
+          dietary: colByKeywords(row, ["dieet", "dietary"]) || "",
+          allergies: colByKeywords(row, ["allerg"]) || "",
           plusOne: false,
           confirmDuplicate: true,
         }),
@@ -154,11 +176,10 @@ export default function GuestsPage() {
     if (csvRef.current) csvRef.current.value = "";
     setCsvImporting(false);
     load();
-    if (skipped.length > 0) {
-      alert(`${imported} gast(en) geïmporteerd, ${skipped.length} overgeslagen:\n${skipped.slice(0, 15).join(", ")}${skipped.length > 15 ? "…" : ""}`);
-    } else {
-      alert(`${imported} gast(en) geïmporteerd.`);
-    }
+    const parts = [`${imported} gast(en) geïmporteerd`];
+    if (duplicates.length > 0) parts.push(`${duplicates.length} overgeslagen als duplicaat (${duplicates.slice(0, 10).join(", ")}${duplicates.length > 10 ? "…" : ""})`);
+    if (skipped.length > 0) parts.push(`${skipped.length} overgeslagen: ${skipped.slice(0, 10).join(", ")}${skipped.length > 10 ? "…" : ""}`);
+    alert(parts.join("\n"));
   }
 
   async function deleteGuest(guestId: string) {

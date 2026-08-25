@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
 import DatePicker from "@/components/DatePicker";
+import { formatDateRange } from "@/lib/dateRange";
 
 type Invite = {
   id: string;
@@ -13,7 +14,7 @@ type Invite = {
   weddingTitle: string | null;
   notes: string | null;
   weddingId: string | null;
-  wedding: { id: string; title: string; date: string } | null;
+  wedding: { id: string; title: string; date: string; endDate?: string | null } | null;
   createdAt: string;
   source?: "invite" | "direct";
   vendorStatus?: string;
@@ -185,16 +186,19 @@ export default function MijnBruiloftenPage() {
             const linked = !!invite.weddingId;
             const pending = linked && invite.portalAccess === false;
             const canOpen = linked && !pending;
+            const dateLabel = invite.wedding
+              ? formatDateRange(new Date(invite.wedding.date), invite.wedding.endDate ? new Date(invite.wedding.endDate) : null)
+              : formatDate(invite.weddingDate);
             return (
               <div key={invite.id} className="dash-row" style={{ cursor: canOpen ? "pointer" : "default", alignItems: "flex-start" }}
                 onClick={() => { if (canOpen && invite.weddingId) window.location.href = `/weddings/${invite.weddingId}`; }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-6)", width: "100%" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-xl)" }}>
-                      {invite.weddingTitle ?? formatDate(invite.weddingDate)}
+                      {invite.weddingTitle ?? dateLabel}
                     </div>
                     <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginTop: "2px" }}>
-                      {formatDate(invite.weddingDate)} · {invite.email1}{invite.email2 ? ` & ${invite.email2}` : ""}
+                      {dateLabel} · {invite.email1}{invite.email2 ? ` & ${invite.email2}` : ""}
                     </div>
                     {invite.notes && (
                       <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginTop: "4px" }}>{invite.notes}</div>

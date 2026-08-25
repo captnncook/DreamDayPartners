@@ -24,7 +24,7 @@ function formatDateShort(iso: string) {
 type Wedding = { id: string; title: string; venue?: string | null; date: string; endDate?: string | null; status: string; days: number };
 type Task = { id: string; title: string; priority: string; dueDate?: string; weddingId: string; weddingTitle: string };
 type Stats = { total: number; upcoming30: number; thisYear: number };
-type VendorRequest = { id: string; weddingTitle: string; weddingVenue?: string | null; weddingDate: string };
+type VendorRequest = { id: string; weddingTitle: string; weddingVenue?: string | null; weddingDate: string; weddingEndDate?: string | null };
 type CoupleSetup = {
   weddingId: string;
   hasBudget: boolean;
@@ -176,7 +176,7 @@ export default function DashboardClient({ user, greeting, stats, weddings, tasks
                 <div key={r.id} style={{ borderLeft: "3px solid var(--gold)", background: "var(--sand)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1rem 1.25rem" }}>
                   <div className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, color: "var(--foreground)" }}>{r.weddingTitle}</div>
                   <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px" }}>
-                    {r.weddingVenue ? `${r.weddingVenue} · ` : ""}{formatDate(r.weddingDate)}
+                    {r.weddingVenue ? `${r.weddingVenue} · ` : ""}{formatDateRange(new Date(r.weddingDate), r.weddingEndDate ? new Date(r.weddingEndDate) : null)}
                   </div>
                   <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", margin: "0.625rem 0" }}>
                     Je bent uitgenodigd voor het Dream Team van deze bruiloft.
