@@ -228,6 +228,14 @@ export default function VendorsPage() {
               )}
             </div>
           </div>
+          {selectedVendor?.category === "weddingplanner" && (
+            <p className="text-xs" style={{ color: "var(--muted)", background: "var(--sand)", borderLeft: "3px solid var(--gold)", padding: "0.625rem 0.875rem", borderRadius: "0 8px 8px 0" }}>
+              Let op: als leverancier gekoppeld kan {selectedVendor.name} alleen hun eigen leveranciersportaal zien
+              (betaalstatus, eigen tijdlijn) — geen taken, gasten of budget bewerken. Wil je dat {selectedVendor.name}
+              namens jullie kan meebeheren, nodig diegene dan uit als teamlid via{" "}
+              <Link href={`/weddings/${id}/team`} className="underline" style={{ color: "var(--gold-deep)" }}>het Team-tabblad</Link>.
+            </p>
+          )}
           <div>
             <label className="block text-xs font-medium mb-1">Notities (optioneel)</label>
             <input

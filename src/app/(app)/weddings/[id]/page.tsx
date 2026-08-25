@@ -10,8 +10,13 @@ import { getServerLang } from "@/lib/server-lang";
 import { formatDateRange } from "@/lib/dateRange";
 
 const VENDOR_STATUS_LABELS: Record<string, string> = {
+  invited: "Uitgenodigd",
+  contacted: "Gecontacteerd",
+  quote_received: "Offerte ontvangen",
   lead: "Lead",
   booked: "Geboekt",
+  confirmed: "Bevestigd",
+  declined: "Afgewezen",
   in_progress: "In uitvoering",
   ready: "Klaar",
   completed: "Afgerond",
