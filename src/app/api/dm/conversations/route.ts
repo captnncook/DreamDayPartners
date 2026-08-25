@@ -42,6 +42,9 @@ export async function POST(req: NextRequest) {
   }
 
   // Find existing conversation between these two users
+  // messages meesturen (net als de GET-lijst hierboven) — de client leest
+  // conv.messages[0] voor de laatste-bericht-preview; zonder dit veld crasht
+  // die render zodra je voor het eerst een nieuw gesprek start.
   const existing = await prisma.directConversation.findFirst({
     where: {
       participants: { some: { userId: user.id } },
@@ -49,6 +52,7 @@ export async function POST(req: NextRequest) {
     },
     include: {
       participants: { include: { user: { select: { id: true, name: true, role: true } } } },
+      messages: { orderBy: { createdAt: "desc" }, take: 1, include: { sender: { select: { id: true, name: true } } } },
     },
   });
 
@@ -71,5 +75,5 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return NextResponse.json({ conversation: conv }, { status: 201 });
+  return NextResponse.json({ conversation: { ...conv, messages: [] } }, { status: 201 });
 }

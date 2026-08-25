@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { X, Upload } from "lucide-react";
 import { SkeletonCard } from "@/components/Skeleton";
+import InfoTip from "@/components/InfoTip";
 
 type Guest = {
   id: string;
@@ -192,7 +193,10 @@ export default function GuestsPage() {
       {rsvpToken && (
         <div className="ddp-card mb-6 flex items-center gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold mb-0.5">Aanmeldlink voor gasten (RSVP)</p>
+            <p className="text-xs font-semibold mb-0.5" style={{ display: "flex", alignItems: "center" }}>
+              Aanmeldlink voor gasten (RSVP)
+              <InfoTip label="Wat betekent RSVP?" text="RSVP betekent: laten weten of je komt. Deel deze link met je gasten zodat zij kunnen aangeven of ze aanwezig zijn." />
+            </p>
             <p className="text-xs truncate" style={{ color: "var(--muted)" }}>{typeof window !== "undefined" ? `${window.location.origin}/rsvp/${rsvpToken}` : `/rsvp/${rsvpToken}`}</p>
           </div>
           <button onClick={copyRsvpLink} className="ddp-btn-secondary flex-shrink-0 text-xs">

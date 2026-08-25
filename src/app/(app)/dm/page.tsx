@@ -396,7 +396,7 @@ export default function DmPage() {
           )}
           {convs.map(conv => {
             const other = conv.participants.find(p => p.userId !== currentUserId)?.user;
-            const lastMsg = conv.messages[0];
+            const lastMsg = conv.messages?.[0];
             const isActive = conv.id === activeConvId;
             return (
               <button key={conv.id} onClick={() => setActiveConvId(conv.id)}

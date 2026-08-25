@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Plus, X } from "lucide-react";
+import InfoTip from "@/components/InfoTip";
 
 type WeddingInfo = { id: string; title: string; date: string; venue?: string | null };
 type GuestRow = { name: string; isChild: boolean; dietary: string; allergies: string };
@@ -28,6 +29,7 @@ const STRINGS: Record<Lang, Record<string, string>> = {
     allergiesHint: "Bijv. pinda's, schaaldieren, noten — dit gaat rechtstreeks naar de cateraar.",
     addGuest: "Nog iemand toevoegen",
     submit: "RSVP versturen",
+    rsvpTip: "RSVP betekent: laten weten of je komt.",
     submitting: "Versturen…",
     thanks: "Bedankt!",
     confirmedThanks: "Je ontvangt zo een bevestiging per e-mail op",
@@ -50,6 +52,7 @@ const STRINGS: Record<Lang, Record<string, string>> = {
     allergiesHint: "E.g. peanuts, shellfish, tree nuts — this goes straight to the caterer.",
     addGuest: "Add someone else",
     submit: "Send RSVP",
+    rsvpTip: "RSVP means: let us know if you're coming.",
     submitting: "Sending…",
     thanks: "Thank you!",
     confirmedThanks: "You'll receive a confirmation email at",
@@ -187,7 +190,10 @@ export default function RsvpPage() {
               </div>
 
               <div style={{ marginBottom: "var(--space-7)" }}>
-                <label htmlFor="rsvp-status" style={{ display: "block", fontSize: "var(--text-base)", fontWeight: 600, marginBottom: "var(--space-2)", color: "var(--foreground)" }}>{t.attendance}</label>
+                <label htmlFor="rsvp-status" style={{ display: "flex", alignItems: "center", fontSize: "var(--text-base)", fontWeight: 600, marginBottom: "var(--space-2)", color: "var(--foreground)" }}>
+                  {t.attendance} (RSVP)
+                  <InfoTip label={t.rsvpTip} text={t.rsvpTip} />
+                </label>
                 <select id="rsvp-status" value={rsvpStatus} onChange={e => setRsvpStatus(e.target.value)} style={{ ...INPUT, cursor: "pointer" }}>
                   <option value="confirmed">✓ {t.coming}</option>
                   <option value="declined">✕ {t.notComing}</option>

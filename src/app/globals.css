@@ -1035,7 +1035,7 @@ h1, h2, h3, h4, h5, h6 {
    tot vlak boven de rand komt (bv. laatste rij van een checklist) oogde
    in de praktijk toch overlappend. */
 .ddp-main-content {
-  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0));
 }
 
 @media (min-width: 768px) {
@@ -1324,9 +1324,9 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   right: 0;
   bottom: 0;
-  width: 28px;
+  width: 40px;
   pointer-events: none;
-  background: linear-gradient(to right, transparent, var(--background));
+  background: linear-gradient(to right, transparent, var(--background) 75%);
 }
 .ddp-scroll-fade.ddp-scroll-fade--surface::after {
   background: linear-gradient(to right, transparent, var(--surface));
