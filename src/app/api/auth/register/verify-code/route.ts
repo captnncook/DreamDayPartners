@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   const rows = await prisma.$queryRawUnsafe<Array<{
     id: string; email: string; type: string; data: string;
-    code: string; codeExpiresAt: Date; verified: boolean;
+    code: string; codeExpiresAt: Date; verified: boolean; verifiedToken: string | null;
   }>>(
     `SELECT * FROM "pending_registrations" WHERE id = $1`,
     pendingId
@@ -26,7 +26,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Deze aanmelding is al verwerkt of verlopen. Probeer in te loggen, of start hieronder opnieuw." }, { status: 404 });
   }
   if (pending.verified) {
-    return NextResponse.json({ error: "Al geverifieerd." }, { status: 409 });
+    // Geen echte fout: als je (bv. door dubbelklikken of terugnavigeren)
+    // dezelfde al-geverifieerde code nogmaals indient, kun je gewoon door
+    // naar de volgende stap — geef daarom het bestaande token terug i.p.v.
+    // een foutmelding die de gebruiker vast laat lopen.
+    return NextResponse.json({ verifiedToken: pending.verifiedToken, alreadyVerified: true });
   }
   if (new Date() > new Date(pending.codeExpiresAt)) {
     return NextResponse.json({ error: "De code is verlopen. Vraag een nieuwe aan." }, { status: 410 });

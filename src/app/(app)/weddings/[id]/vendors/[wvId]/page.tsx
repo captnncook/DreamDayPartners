@@ -105,6 +105,18 @@ export default async function VendorBookingPage({
 
   const totalGuests = guests.length;
 
+  // Andere leveranciers op dezelfde bruiloft, zodat bv. een fotograaf en
+  // videograaf elkaar kunnen vinden voor onderlinge afstemming i.p.v. los
+  // van elkaar te moeten uitzoeken wie er nog meer bij deze bruiloft
+  // betrokken is.
+  const otherVendorBookings = user.role === "vendor"
+    ? await prisma.weddingVendor.findMany({
+        where: { weddingId, id: { not: wvId }, portalAccess: true },
+        select: { vendor: { select: { id: true, name: true, category: true, email: true, phone: true } } },
+      })
+    : [];
+  const otherVendors = otherVendorBookings.map((wv) => wv.vendor);
+
   const isBookingSerializer = (b: typeof booking) => ({
     status: b.status,
     depositAmount: b.depositAmount,
@@ -181,6 +193,27 @@ export default async function VendorBookingPage({
           )}
         </div>
       </div>
+
+      {otherVendors.length > 0 && (
+        <div className="card" style={{ padding: "1.25rem 1.5rem", marginBottom: "var(--space-6)" }}>
+          <div className="ddp-section-label" style={{ marginBottom: "var(--space-4)" }}>Andere leveranciers op deze bruiloft</div>
+          <div style={{ display: "grid", gap: 0 }}>
+            {otherVendors.map((v, i) => (
+              <div key={v.id} className="dash-row" style={{ padding: "0.625rem 0", borderTop: i > 0 ? "1px solid var(--border)" : undefined }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-4)", width: "100%" }}>
+                  <div>
+                    <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{v.name}</span>
+                    <span style={{ color: "var(--muted)", textTransform: "capitalize" }}> · {v.category}</span>
+                  </div>
+                  {v.email && (
+                    <a href={`mailto:${v.email}`} style={{ fontSize: "var(--text-sm)", color: "var(--gold-deep)", fontWeight: 600, textDecoration: "none" }}>Contact</a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <DashboardEngine
         weddingId={weddingId}

@@ -28,7 +28,9 @@ export default function VendorsPage() {
   const [addNotes, setAddNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [addError, setAddError] = useState("");
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const searchSeq = useRef(0);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const load = useCallback(async () => {
     const wvRes = await fetch(`/api/weddings/${id}/vendors`);
@@ -55,15 +57,40 @@ export default function VendorsPage() {
       if (seq !== searchSeq.current) return;
       setSearchResults((data.vendors ?? []).filter((v: Vendor) => !linkedIds.has(v.id)));
       setSearching(false);
+      setHighlightedIndex(-1);
     }, 250);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
+  useEffect(() => {
+    if (highlightedIndex >= 0) optionRefs.current[highlightedIndex]?.scrollIntoView({ block: "nearest" });
+  }, [highlightedIndex]);
+
   function pickVendor(v: Vendor) {
     setSelectedVendor(v);
     setQuery(`${v.name} · ${v.category}`);
     setShowResults(false);
+    setHighlightedIndex(-1);
+  }
+
+  function onSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!showResults || searchResults.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((i) => (i + 1) % searchResults.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((i) => (i <= 0 ? searchResults.length - 1 : i - 1));
+    } else if (e.key === "Enter") {
+      if (highlightedIndex >= 0 && highlightedIndex < searchResults.length) {
+        e.preventDefault();
+        pickVendor(searchResults[highlightedIndex]);
+      }
+    } else if (e.key === "Escape") {
+      setShowResults(false);
+      setHighlightedIndex(-1);
+    }
   }
 
   async function handleAdd(e: React.FormEvent) {
@@ -152,11 +179,18 @@ export default function VendorsPage() {
                 }}
                 onFocus={() => setShowResults(true)}
                 onBlur={() => setTimeout(() => setShowResults(false), 150)}
+                onKeyDown={onSearchKeyDown}
                 placeholder="Typ een naam om te zoeken..."
                 autoComplete="off"
+                role="combobox"
+                aria-expanded={showResults && searchResults.length > 0}
+                aria-controls="vendor-search-listbox"
+                aria-autocomplete="list"
+                aria-activedescendant={highlightedIndex >= 0 ? `vendor-option-${highlightedIndex}` : undefined}
               />
               {showResults && query.trim() && (
                 <div
+                  id="vendor-search-listbox"
                   role="listbox"
                   style={{
                     position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 20,
@@ -169,15 +203,20 @@ export default function VendorsPage() {
                   ) : searchResults.length === 0 ? (
                     <div className="text-sm" style={{ padding: "0.625rem 0.875rem", color: "var(--muted)" }}>Geen leveranciers gevonden.</div>
                   ) : (
-                    searchResults.map((v) => (
+                    searchResults.map((v, i) => (
                       <button
                         key={v.id}
+                        id={`vendor-option-${i}`}
+                        ref={(el) => { optionRefs.current[i] = el; }}
+                        role="option"
+                        aria-selected={highlightedIndex === i}
                         type="button"
                         onClick={() => pickVendor(v)}
+                        onMouseEnter={() => setHighlightedIndex(i)}
                         className="text-sm"
                         style={{
                           display: "block", width: "100%", textAlign: "left", padding: "0.625rem 0.875rem",
-                          background: "none", border: "none", cursor: "pointer", color: "var(--foreground)",
+                          background: highlightedIndex === i ? "var(--accent)" : "none", border: "none", cursor: "pointer", color: "var(--foreground)",
                         }}
                         onMouseDown={(e) => e.preventDefault()}
                       >

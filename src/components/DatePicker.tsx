@@ -98,7 +98,7 @@ export default function DatePicker({
 
   return (
     <div ref={wrapRef} style={{ position: "relative" }}>
-      <div className={className} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", ...style }}>
+      <div className={`ddp-datepicker-shell ${className ?? ""}`.trim()} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", ...style }}>
         <input
           type="text"
           inputMode="numeric"

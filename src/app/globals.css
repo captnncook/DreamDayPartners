@@ -175,6 +175,16 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
+/* DatePicker's typbare tekstveld zet zelf outline:none (inline style,
+   overschrijft de :focus-visible-regel hierboven) — dit vangt dat op met
+   een zichtbare ring rond de hele schil (tekstveld + kalenderknop) zodra
+   een van beide focus krijgt. */
+.ddp-datepicker-shell:focus-within {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
 /* Respecteer de voorkeur voor minder beweging i.p.v. alle transities/animaties
    te forceren — motion is optioneel, nooit de enige drager van informatie. */
 @media (prefers-reduced-motion: reduce) {
