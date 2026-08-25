@@ -25,6 +25,8 @@ const RSVP_LABELS: Record<string, string> = {
 };
 const SIDE_LABELS: Record<string, string> = { bride: "Partner 1", groom: "Partner 2", both: "Beiden" };
 
+const EMPTY_GUEST_FORM = { name: "", email: "", phone: "", side: "both", dietary: "", allergies: "", plusOne: false, isChild: false };
+
 export default function GuestsPage() {
   const { id } = useParams<{ id: string }>();
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -32,7 +34,7 @@ export default function GuestsPage() {
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
   const [filterRsvp, setFilterRsvp] = useState("all");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", side: "both", dietary: "", allergies: "", plusOne: false, isChild: false });
+  const [form, setForm] = useState(EMPTY_GUEST_FORM);
   const [saving, setSaving] = useState(false);
   const [csvImporting, setCsvImporting] = useState(false);
   const [rsvpToken, setRsvpToken] = useState<string | null>(null);
@@ -71,9 +73,18 @@ export default function GuestsPage() {
       }
       return;
     }
-    setForm({ name: "", email: "", phone: "", side: "both", dietary: "", allergies: "", plusOne: false, isChild: false });
+    setForm(EMPTY_GUEST_FORM);
     setShowForm(false);
     load();
+  }
+
+  // Zowel bij annuleren als bij opnieuw openen moet het formulier altijd
+  // leeg beginnen — anders neemt een volgende, ongerelateerde gast per
+  // ongeluk e-mailadres/vinkjes over van een eerdere, afgebroken of net
+  // ingediende invoer die nooit expliciet gewist werd.
+  function toggleForm() {
+    setForm(EMPTY_GUEST_FORM);
+    setShowForm((v) => !v);
   }
 
   async function updateRsvp(guest: Guest, status: string) {
@@ -183,7 +194,7 @@ export default function GuestsPage() {
             <label htmlFor="csv-import" className="ddp-btn-secondary cursor-pointer flex items-center gap-1">
               <Upload className="w-3.5 h-3.5" />{csvImporting ? "Importeren…" : "CSV import"}
             </label>
-            <button onClick={() => setShowForm(!showForm)} className="ddp-btn-primary">
+            <button onClick={toggleForm} className="ddp-btn-primary">
               {showForm ? "Annuleren" : "+ Gast toevoegen"}
             </button>
           </div>
