@@ -10,111 +10,111 @@ import { Check, ArrowRight, ChevronDown, LogOut } from "lucide-react";
 /* ─── Data ─────────────────────────────────────────────── */
 
 const FEATURES_COUPLES = [
-  { title: "Nooit hetzelfde twee keer vertellen", desc: "Gastenaantal en dieetwensen vul je één keer in. Cateraar, bakker en vervoerder lezen automatisch mee." },
-  { title: "Eén draaiboek voor iedereen",         desc: "Fotograaf, DJ, band en vervoerder werken met dezelfde actuele tijdlijn, niet acht losse kopieën." },
-  { title: "Altijd zicht op betaalstatus",        desc: "Aanbetaling, einddatum en eindbedrag van elke leverancier in één overzicht, geen losse facturen bijhouden." },
-  { title: "Contracten & offertes centraal",      desc: "Alles wat je ontvangt staat gecategoriseerd in je dossier, niet verspreid over mail en WhatsApp." },
-  { title: "Duidelijke goedkeuringen",            desc: "Weet precies welke versie van het moodboard of menu je hebt goedgekeurd, geen mailthread doorzoeken." },
-  { title: "Geen telefooncentrale meer",          desc: "Leveranciers stemmen praktische logistiek rechtstreeks met elkaar af, in plaats van via jou." },
-  { title: "Taken & deadlines op één plek",       desc: "Van verloving tot de grote dag: voortgang in één dashboard, niet drie losse apps." },
-  { title: "Altijd gratis",                       desc: "Geen abonnement, geen creditcard, geen addertjes. Voor altijd gratis voor bruidsparen." },
+  { title: "Alles maar één keer invullen", desc: "Gastenaantal en dieetwensen vul je één keer in. De cateraar, bakker en vervoerder lezen automatisch mee." },
+  { title: "Eén draaiboek, geen acht versies",         desc: "Fotograaf, DJ, band en vervoerder werken allemaal met dezelfde tijdlijn. Niemand zit meer met een verouderd exportje." },
+  { title: "Altijd weten waar je financieel staat",        desc: "Aanbetaling, einddatum en eindbedrag van elke leverancier in één overzicht. Geen losse facturen bij elkaar zoeken." },
+  { title: "Contracten & offertes op één plek",      desc: "Alles wat je ontvangt staat in je dossier, niet verspreid over je mail en drie WhatsApp-groepen." },
+  { title: "Nooit meer twijfelen over de laatste versie",            desc: "Je ziet precies welk moodboard of menu je hebt goedgekeurd. Geen mailthread meer uitpluizen." },
+  { title: "Geen doorgeefluik meer",          desc: "Leveranciers stemmen praktische zaken rechtstreeks met elkaar af. Jij hoeft niet elk bericht door te sturen." },
+  { title: "Taken en deadlines op één plek",       desc: "Van verloving tot de grote dag zie je in één dashboard hoe ver je bent, niet in drie losse apps." },
+  { title: "Gratis. Ja, echt.",                       desc: "Geen abonnement, geen creditcard, geen addertje onder het gras. Voor bruidsparen blijft dit voor altijd gratis." },
 ];
 
 const VENDOR_STORIES: { value: string; label: string; pain: string; solution: string }[] = [
   {
     value: "weddingplanner", label: "Weddingplanner",
-    pain: "Je coördineert 12+ leveranciers, vaak via vijf losse tools naast elkaar. Uit onderzoek blijkt dat tot 70% van je tijd naar administratie gaat in plaats van naar het vak zelf.",
-    solution: "DreamDay geeft je per bruiloft één overzicht: status van elke leverancier, openstaande deliverables, betalingen en het complete draaiboek, zonder dat je alles zelf handmatig hoeft te synchroniseren.",
+    pain: "Je coördineert twaalf of meer leveranciers, vaak via vijf tools naast elkaar. Onderzoek wijst uit dat tot 70% van je tijd naar administratie gaat, niet naar het vak waar je goed in bent.",
+    solution: "DreamDay geeft je per bruiloft één overzicht: status van elke leverancier, openstaande taken, betalingen en het complete draaiboek. Zelf alles handmatig bijhouden is er niet meer bij.",
   },
   {
     value: "fotograaf", label: "Fotograaf",
-    pain: "Voor elk uur achter de camera gaat er net zoveel tijd naar niet-gefactureerde administratie: offertes op maat, contracten, en steeds opnieuw het tijdschema doornemen.",
-    solution: "Je shotlist en leveringen (sneak peek, bestanden, album) staan met een duidelijke goedkeuringsstatus klaar, in hetzelfde draaiboek als de videograaf.",
+    pain: "Voor elk uur achter de camera gaat er ongeveer net zoveel tijd naar administratie die je niet factureert: offertes op maat, contracten, en dat tijdschema dat je alweer moet doorlezen.",
+    solution: "Je shotlist en leveringen, van sneak peek tot album, staan met een duidelijke status klaar, in hetzelfde draaiboek als de videograaf.",
   },
   {
     value: "videograaf", label: "Videograaf",
-    pain: "Jij en de fotograaf vragen vaak los van elkaar dezelfde ceremonie-informatie op bij het bruidspaar. Als er iets verschuift, hoort niet iedereen het tegelijk.",
-    solution: "Eén gedeeld draaiboek per fase betekent dat jullie nooit meer los van elkaar dezelfde tijden hoeven te reconstrueren.",
+    pain: "Jij en de fotograaf vragen vaak los van elkaar dezelfde ceremonie-informatie op. Verschuift er iets, dan hoort niet iedereen het tegelijk.",
+    solution: "Eén gedeeld draaiboek per fase betekent dat je nooit meer los van de fotograaf dezelfde tijden hoeft te reconstrueren.",
   },
   {
     value: "bloemist", label: "Bloemist",
-    pain: "Het lastige deel van bloemwerk is niet het boeket. Het is de aanpassing twee weken van tevoren, de gewijzigde tafelindeling, of niet weten wie het aanspreekpunt is.",
-    solution: "Gastenaantallen, tafelindeling en het opbouwschema staan centraal, inclusief de toegangstijd van de locatie, zodat je dat niet zelf hoeft na te vragen.",
+    pain: "Het lastige deel van bloemwerk zit niet in het boeket. Het zit in de wijziging twee weken van tevoren, de nieuwe tafelindeling, of niet weten wie je moet bellen.",
+    solution: "Gastenaantallen, tafelindeling en opbouwschema staan centraal, inclusief de toegangstijd van de locatie. Zelf navragen hoeft niet meer.",
   },
   {
     value: "catering", label: "Catering",
-    pain: "Het definitieve gastenaantal, allergieën en dieetwensen achterhaal je nu vaak tot op het laatste moment via losse mailtjes.",
-    solution: "DreamDay leest automatisch mee met de actuele gastenlijst van het bruidspaar, geen aparte spreadsheet meer opvragen en samenvoegen.",
+    pain: "Het definitieve gastenaantal, allergieën en dieetwensen krijg je nu vaak op het laatste moment binnen, verspreid over losse mailtjes.",
+    solution: "DreamDay leest automatisch mee met de actuele gastenlijst van het bruidspaar. Geen aparte spreadsheet meer opvragen en samenvoegen.",
   },
   {
     value: "bakker", label: "Bruidstaart & Bakker",
-    pain: "Een taart bakken op het verkeerde gastenaantal kost een hele laag, of je bakt juist te weinig voor een uitgebreidere gastenlijst.",
-    solution: "Dezelfde automatische koppeling met de gastenlijst, plus een heldere goedkeuringsstatus voor smaakproef en ontwerp.",
+    pain: "Een taart bakken op het verkeerde gastenaantal kost je een hele laag, of je bakt juist te weinig voor een langere gastenlijst.",
+    solution: "Dezelfde automatische koppeling met de gastenlijst, plus een heldere status voor smaakproef en ontwerp.",
   },
   {
     value: "dj", label: "DJ",
     pain: "Must-play-lijst, geluidsgrens van de locatie en het exacte moment van de eerste dans komen nu via drie verschillende kanalen binnen.",
-    solution: "De geluidsgrens van de locatie staat al vooraf ingevuld, en je fase-indeling hangt direct aan de rest van het draaiboek.",
+    solution: "De geluidsgrens staat al vooraf ingevuld en je fase-indeling hangt direct aan de rest van het draaiboek.",
   },
   {
     value: "liveband", label: "Liveband",
     pain: "Opbouw, stroomvoorziening en soundcheck regelen, en dan ook nog het repertoire afstemmen op het exacte moment van de speeches.",
-    solution: "Logistiek zoals vermogen, podiumafmeting en kleedkamer, plus je definitieve setlist, staan vooraf vast en hangen direct aan het draaiboek.",
+    solution: "Logistiek zoals vermogen, podiumafmeting en kleedkamer staan vooraf vast, samen met je definitieve setlist, direct gekoppeld aan het draaiboek.",
   },
   {
     value: "ceremoniespreker", label: "Ceremoniespreker",
-    pain: "Een ceremonie schrijven begint met een uitgebreide vragenlijst over het bruidspaar, en eindigt met uitzoeken wie de repetitie regelt.",
-    solution: "Het liefdesverhaal en de voorkeuren staan gestructureerd vast, met een duidelijke goedkeuringsstatus voor je concept- en definitieve script.",
+    pain: "Een ceremonie schrijven begint met een lange vragenlijst over het bruidspaar en eindigt met uitzoeken wie de repetitie regelt.",
+    solution: "Het liefdesverhaal en de voorkeuren staan gestructureerd vast, met een duidelijke status voor je concept- en definitieve script.",
   },
   {
     value: "trouwlocatie", label: "Trouwlocatie",
-    pain: "Bij tientallen tot honderden bruiloften per jaar leg je bij elke nieuwe leverancier weer dezelfde huisregels uit.",
-    solution: "Sluitingstijd, geluidsgrens en cateringbeleid staan één keer vast, en zijn automatisch zichtbaar voor elke leverancier die het bruidspaar boekt.",
+    pain: "Bij tientallen tot honderden bruiloften per jaar leg je elke nieuwe leverancier weer dezelfde huisregels uit.",
+    solution: "Sluitingstijd, geluidsgrens en cateringbeleid staan één keer vast en zijn automatisch zichtbaar voor elke leverancier die het bruidspaar boekt.",
   },
   {
     value: "haarstylist", label: "Haar & Make-up",
-    pain: "Als hair & makeup uitloopt, verschuift de rest van de hele dag. Vaak omdat niemand vooraf de tijd per persoon heeft berekend.",
-    solution: "Aantal personen en behandeltijd worden vooraf vastgelegd, met ingebouwde bufferruimte in het draaiboek.",
+    pain: "Loopt hair & makeup uit, dan schuift de rest van de dag mee. Meestal omdat niemand vooraf de tijd per persoon heeft uitgerekend.",
+    solution: "Aantal personen en behandeltijd staan vooraf vast, met ingebouwde buffer in het draaiboek.",
   },
   {
     value: "vervoer", label: "Vervoer",
-    pain: "Meerdere ophaallocaties en tijden die achterwaarts vanaf de ceremonie berekend moeten worden. Eén verkeerde inschatting verschuift de hele dag.",
-    solution: "Je rittenplanner hangt in hetzelfde draaiboek als de rest van de dag, dus een verschuiving is direct voor iedereen zichtbaar.",
+    pain: "Meerdere ophaallocaties en tijden die je terugrekent vanaf de ceremonie. Eén verkeerde inschatting en de hele dag schuift.",
+    solution: "Je rittenplanner hangt in hetzelfde draaiboek als de rest van de dag, dus een verschuiving zie je meteen, net als iedereen.",
   },
   {
     value: "decoratie", label: "Decoratie & Styling",
-    pain: "De styling kan pas als de tent staat, de bloemen komen na de styling, en één leverancier die uitloopt verschuift de hele opbouw.",
+    pain: "De styling kan pas als de tent staat, de bloemen komen na de styling, en één leverancier die uitloopt trekt de hele opbouw scheef.",
     solution: "Het gedeelde opbouwschema en de moodboard-goedkeuring laten precies zien wanneer wie aan de beurt is.",
   },
   {
     value: "fotocabine", label: "Fotocabine",
-    pain: "Wie een dag wacht met reageren op een aanvraag, is de boeking vaak al kwijt aan een concurrent.",
-    solution: "Aanvragen en bruiloftsdetails staan op één centrale plek, zodat je binnen minuten kan reageren in plaats van dagen.",
+    pain: "Wie een dag wacht met reageren op een aanvraag, is de boeking meestal al kwijt aan een concurrent.",
+    solution: "Aanvragen en bruiloftdetails staan op één plek, zodat je binnen minuten kunt reageren in plaats van dagen.",
   },
 ];
 
 const FEATURES_VENDORS = [
-  { title: "Draaiboek & planning",    desc: "Ontvang je schema direct in het portaal. Altijd up-to-date, nooit verwarring." },
-  { title: "Direct communiceren",     desc: "Chat met de planner en het bruidspaar vanuit één plek." },
-  { title: "Documenten & offertes",   desc: "Upload contracten en offertes veilig in de cloud." },
-  { title: "Meerdere bruiloften",     desc: "Beheer al je klantbruiloften vanuit één overzichtelijk dashboard." },
-  { title: "Premium profiel",         desc: "Presenteer jezelf als betrouwbare leverancier in onze catalogus." },
-  { title: "Analytisch dashboard",    desc: "Inzicht in je prestaties. Groei je bedrijf slimmer." },
+  { title: "Draaiboek & planning",    desc: "Je schema staat direct in het portaal. Altijd de laatste versie, nooit gedoe over welke telt." },
+  { title: "Direct communiceren",     desc: "Chat met de planner en het bruidspaar vanuit dezelfde plek als je bruiloftgegevens." },
+  { title: "Documenten & offertes",   desc: "Contracten en offertes upload je veilig in de cloud. Kwijtraken kan niet meer." },
+  { title: "Meerdere bruiloften",     desc: "Beheer al je klantbruiloften vanuit één overzicht, ook als het er twintig tegelijk zijn." },
+  { title: "Premium profiel",         desc: "Laat zien wie je bent en wat je doet in onze catalogus, zodat bruidsparen jou vinden." },
+  { title: "Analytisch dashboard",    desc: "Zie zwart op wit hoe je ervoor staat en waar winst te halen valt." },
 ];
 
 const HOW_IT_WORKS = [
-  { n: "01", title: "Stel je dream team samen", desc: "Kies je leveranciers uit de database met alle trouwcategorieën.", img: "/images/dreamday-button.png" },
-  { n: "02", title: "Regel alles in de app",    desc: "Contact, offertes en facturen op één plek, geen losse mailtjes meer.", img: "/images/dashboard-laptop.png" },
-  { n: "03", title: "Maak je draaiboek",        desc: "En geniet van een dag die vlekkeloos verloopt, zonder gedoe.", img: "/images/app-ipad.png" },
+  { n: "01", title: "Stel je dream team samen", desc: "Kies je leveranciers uit de database, van fotograaf tot bloemist.", img: "/images/dreamday-button.png" },
+  { n: "02", title: "Regel alles in de app",    desc: "Contact, offertes en facturen op één plek. Losse mailtjes zijn verleden tijd.", img: "/images/dashboard-laptop.png" },
+  { n: "03", title: "Maak je draaiboek",        desc: "En geniet van een dag die gewoon soepel verloopt.", img: "/images/app-ipad.png" },
 ];
 
 const FAQS = [
-  { q: "Is DreamDay Platform gratis voor bruidsparen?", a: "Ja, volledig. Bruidsparen betalen nooit iets: geen proefperiode, geen verborgen kosten. Het platform is voor altijd gratis voor jullie." },
-  { q: "Hoe vind ik leveranciers?", a: "Via de leveranciersdatabase zoek je op categorie, van fotograaf tot caterer. Je voegt ze toe aan jullie bruiloft en communiceert direct via de app." },
-  { q: "Wat zit er in premium voor leveranciers?", a: "Gratis accounts beheren maximaal 2 bruiloften tegelijk. Met Premium kies je zelf hoeveel bruiloften je tegelijk beheert, van 10 tot 100+, vanaf €15 per maand ex btw, en bewerk je daarnaast het draaiboek, upload je documenten, heb je toegang tot een analytisch dashboard en profiteer je van prioriteit support. Jaarlijks betalen levert 2 maanden gratis op." },
-  { q: "Hoe werkt het contact met leveranciers?", a: "Alles loopt via de ingebouwde chat. Geen losse apps, geen mailtjes kwijt: alle gesprekken staan in je account." },
-  { q: "Wat is een draaiboek?", a: "Het draaiboek is een minuut-voor-minuut tijdlijn van jullie trouwdag. Je vult het samen met je planner in en deelt het met alle leveranciers." },
-  { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Ja. DreamDay Platform is zo gebouwd dat bruidsparen zelf de regie kunnen houden, met of zonder professionele planner." },
+  { q: "Is DreamDay Platform gratis voor bruidsparen?", a: "Ja, volledig. Geen proefperiode, geen verborgen kosten, geen kleine lettertjes. Voor bruidsparen is en blijft het platform gratis." },
+  { q: "Hoe vind ik leveranciers?", a: "Via de leveranciersdatabase zoek je op categorie, van fotograaf tot cateraar. Je voegt ze toe aan jullie bruiloft en communiceert daarna gewoon via de app." },
+  { q: "Wat zit er in premium voor leveranciers?", a: "Met een gratis account beheer je maximaal 2 bruiloften tegelijk. Met Premium kies je zelf hoeveel, van 10 tot 100+, vanaf €15 per maand ex btw. Daar krijg je ook draaiboek bewerken, documenten uploaden, een analytisch dashboard en voorrang bij support bij. Jaarlijks betalen scheelt je 2 maanden." },
+  { q: "Hoe werkt het contact met leveranciers?", a: "Via de ingebouwde chat. Geen losse apps, geen zoekgeraakte mailtjes: elk gesprek staat gewoon in je account." },
+  { q: "Wat is een draaiboek?", a: "Een minuut-voor-minuut tijdlijn van jullie trouwdag. Je vult 'm samen met je planner in en deelt 'm met alle leveranciers." },
+  { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Ja. Je houdt zelf de regie, met of zonder professionele planner." },
 ];
 
 /* ─── Sub-components ────────────────────────────────────── */
@@ -215,7 +215,7 @@ function VendorStoryPicker() {
       <div className="flex-1 min-w-0">
         {story && (
           <div key={story.value} className="animate-fade-in" style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
-            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label}: de vervelende realiteit</p>
+            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label}: herkenbaar?</p>
             <p style={{ fontSize: "var(--text-2xl)", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "var(--space-7)" }}>
               {story.pain}
             </p>
@@ -346,20 +346,20 @@ export default function LandingPage() {
                   marginBottom: "var(--space-8)",
                 }}
               >
-                Samen naar jullie dream day,{" "}
+                Jullie trouwdag plannen,{" "}
                 <span style={{ background: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                  zonder de stress.
+                  zonder de chaos.
                 </span>
               </h1>
               <p style={{ fontSize: "clamp(1rem, 2.5vw, 1.125rem)", color: "var(--muted)", maxWidth: "440px", lineHeight: 1.7, marginBottom: "2.5rem" }}>
-                Stel je dream team van leveranciers samen, regel offertes en facturen en maak je draaiboek, alles in één app.
+                Je stelt je dream team van leveranciers samen, regelt offertes en facturen en maakt je draaiboek. Allemaal in één app, niet in tien.
               </p>
               <div className="flex flex-wrap gap-3 mb-6" style={{ position: "relative", zIndex: 1 }}>
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
                   Begin gratis
                 </Link>
                 <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
-                  Vind jouw Dream Partner!
+                  Vind je Dream Partner
                 </Link>
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function LandingPage() {
                   Wij gaan trouwen
                 </h3>
                 <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "var(--space-8)" }}>
-                  Stel je dream team samen, regel offertes en maak jullie draaiboek. Voor altijd gratis.
+                  Stel je dream team samen, regel offertes en maak jullie draaiboek. Voor altijd gratis, echt.
                 </p>
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
                   Begin gratis
@@ -417,7 +417,7 @@ export default function LandingPage() {
                   Ik ben leverancier
                 </h3>
                 <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "var(--space-8)" }}>
-                  Beheer al je bruiloften op één plek: draaiboek, communicatie en documenten, zonder losse tools.
+                  Beheer al je bruiloften op één plek: draaiboek, communicatie en documenten. Geen losse tools meer nodig.
                 </p>
                 <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
                   Bekijk voor leveranciers
@@ -441,7 +441,7 @@ export default function LandingPage() {
           <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div className="text-center px-5">
               <p style={{ fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 700, color: "white", letterSpacing: "-0.04em", lineHeight: 1.15, textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
-                De toekomst van bruiloftplanning.
+                Zo plan je een bruiloft tegenwoordig.
               </p>
               <p style={{ fontSize: "var(--text-xl)", color: "rgba(255,255,255,0.7)", marginTop: "var(--space-5)" }}>
                 Alles wat je nodig hebt, op één plek.
@@ -475,7 +475,7 @@ export default function LandingPage() {
               </ScrollReveal>
               <ScrollReveal delay={100}>
                 <p style={{ fontSize: "var(--text-2xl)", color: "var(--muted)", lineHeight: 1.75, marginBottom: "var(--space-7)" }}>
-                  Losse mailtjes, WhatsApp-groepen vol offertes en een Excel die steeds minder overzicht geeft. Je wil trouwen, geen projectmanager worden.
+                  Losse mailtjes, WhatsApp-groepen vol offertes en een Excel-bestand dat steeds minder overzicht geeft. Je wilde trouwen, geen projectmanager worden.
                 </p>
                 <p style={{ fontSize: "var(--text-2xl)", color: "var(--foreground)", lineHeight: 1.75, fontWeight: 500 }}>
                   DreamDay Platform brengt rust: alles op één plek, samen geregeld.
@@ -529,7 +529,7 @@ export default function LandingPage() {
                   Altijd gratis.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Voor altijd.</span>
                 </h2>
                 <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
-                  Maak een account en begin direct. Geen abonnement, geen proefperiode, ooit.
+                  Maak een account en begin meteen. Geen abonnement, geen proefperiode, nooit.
                 </p>
               </ScrollReveal>
 
@@ -579,7 +579,7 @@ export default function LandingPage() {
                   Beheer al je bruiloften{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>op één plek.</span>
                 </h2>
                 <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
-                  Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk. DreamDay Platform geeft je één helder overzicht.
+                  Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk lopen. DreamDay Platform geeft je daar één helder overzicht van.
                 </p>
               </ScrollReveal>
 
@@ -626,7 +626,7 @@ export default function LandingPage() {
               Wat kost jou nu tijd?{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Kies je vak.</span>
             </h2>
             <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", marginBottom: "var(--space-7)", maxWidth: "520px" }}>
-              Elke leveranciersoort heeft zijn eigen administratieve rompslomp. Klik hieronder en zie precies wat DreamDay voor jou oplost.
+              Elk vak heeft zijn eigen administratieve rompslomp. Klik hieronder en zie precies wat DreamDay voor jou oplost.
             </p>
             <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginBottom: "2.5rem", maxWidth: "520px" }}>
               Ben je een bruidspaar? Bekijk in plaats daarvan{" "}
@@ -645,7 +645,7 @@ export default function LandingPage() {
           <ScrollReveal>
             <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Ervaringen</p>
             <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3.5rem" }}>
-              Bruidsparen gingen{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>je voor.</span>
+              Andere bruidsparen{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>gingen je voor.</span>
             </h2>
           </ScrollReveal>
 
@@ -697,7 +697,7 @@ export default function LandingPage() {
               Eerlijk geprijsd.
             </h2>
             <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", marginBottom: "3.5rem" }}>
-              Bruidsparen betalen nooit iets. Leveranciers kiezen wat bij hen past.
+              Bruidsparen betalen nooit iets. Leveranciers kiezen zelf wat bij hen past.
             </p>
           </ScrollReveal>
 
@@ -798,17 +798,17 @@ export default function LandingPage() {
         <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: "560px", margin: "0 auto", padding: "5rem 1.25rem", textAlign: "center" }}>
           <ScrollReveal>
             <h2 className="font-serif" style={{ fontSize: "clamp(2.25rem, 6vw, 3.75rem)", fontWeight: 700, letterSpacing: "-0.055em", lineHeight: 1.04, color: "white", marginBottom: "var(--space-7)" }}>
-              Klaar om met plezier te plannen?
+              Klaar om te beginnen?
             </h2>
             <p style={{ fontSize: "var(--text-2xl)", color: "rgba(255,255,255,0.50)", marginBottom: "2.5rem", lineHeight: 1.6 }}>
-              Sluit je aan bij honderden koppels die hun dream day plannen zonder de stress.
+              Sluit je aan bij de koppels die hun dream day plannen zonder de stress.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link href="/aanmelden" className="inline-flex items-center gap-2 font-semibold" style={{ background: "white", color: "var(--foreground)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "var(--text-lg)", textDecoration: "none" }}>
                 Begin gratis <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/leveranciers" className="inline-flex items-center font-medium" style={{ background: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.75)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "var(--text-lg)", textDecoration: "none" }}>
-                Vind jouw Dream Partner
+                Vind je Dream Partner
               </Link>
             </div>
           </ScrollReveal>
