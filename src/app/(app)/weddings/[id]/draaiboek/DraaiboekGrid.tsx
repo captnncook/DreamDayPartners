@@ -1,6 +1,8 @@
 "use client";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { X, Check, MapPin, Briefcase, Plus } from "lucide-react";
+import { useLang } from "@/components/LangProvider";
+import type { T } from "@/lib/i18n";
 
 const PPM = 2; // pixels per minute → 120px per hour
 const DAY_START = 6 * 60;  // 06:00
@@ -42,15 +44,15 @@ function audienceOf(item: GridItem): Audience {
   return "private";
 }
 
-function audienceLabel(item: GridItem, vendors: WeddingVendorRef[]): string {
+function audienceLabel(item: GridItem, vendors: WeddingVendorRef[], td: T["draaiboek"]): string {
   const audience = audienceOf(item);
-  if (audience === "all") return "Iedereen";
-  if (audience === "private") return "Alleen bruidspaar";
+  if (audience === "all") return td.audienceAll;
+  if (audience === "private") return td.audiencePrivate;
   const ids = item.visibleVendorIds ?? [];
   const names = ids.map(id => vendors.find(v => v.vendor.id === id)?.vendor.name).filter(Boolean) as string[];
-  if (names.length === 0) return "Specifieke leverancier";
+  if (names.length === 0) return td.audienceSpecificVendor;
   if (names.length === 1) return names[0];
-  return `${names[0]} +${names.length - 1}`;
+  return td.audienceMorePattern.replace("{name}", names[0]).replace("{n}", String(names.length - 1));
 }
 
 export type WeddingVendorRef = {
@@ -144,13 +146,15 @@ function Modal({ onClose, children }: { onClose: () => void; children: React.Rea
   );
 }
 
-function ItemForm({ init, vendors, onSave, onCancel, saving }: {
+function ItemForm({ init, vendors, onSave, onCancel, saving, t }: {
   init: FormData;
   vendors: WeddingVendorRef[];
   onSave: (d: FormData) => void;
   onCancel: () => void;
   saving: boolean;
+  t: T;
 }) {
+  const td = t.draaiboek;
   const [f, setF] = useState(init);
   const set = (k: "startTime" | "endTime" | "title" | "location" | "notes", v: string) => setF(p => ({ ...p, [k]: v }));
   const setAudience = (audience: Audience) => setF(p => ({ ...p, audience, vendorIds: audience === "vendors" ? p.vendorIds : [] }));
@@ -160,16 +164,16 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
   }));
 
   const AUDIENCE_OPTIONS: { value: Audience; label: string; hint: string }[] = [
-    { value: "all", label: "Iedereen", hint: "Bruidspaar, planner en alle leveranciers zien dit" },
-    { value: "vendors", label: "Specifieke leverancier(s)", hint: "Kies wie dit item mag zien" },
-    { value: "private", label: "Alleen bruidspaar", hint: "Leveranciers zien dit niet" },
+    { value: "all", label: td.audienceAll, hint: td.audienceAllHint },
+    { value: "vendors", label: td.audienceVendorsLabel, hint: td.audienceVendorsHint },
+    { value: "private", label: td.audiencePrivate, hint: td.audiencePrivateHint },
   ];
 
   return (
     <Modal onClose={onCancel}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-6)" }}>
         <h3 style={{ fontSize: "var(--text-xl)", fontWeight: 700 }}>
-          {init.title ? "Item bewerken" : "Item toevoegen"}
+          {init.title ? td.editItem : td.addItem}
         </h3>
         <button onClick={onCancel} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted-light)", padding: "4px", display: "flex" }}>
           <X className="w-5 h-5" />
@@ -178,25 +182,25 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
       <div style={{ display: "grid", gap: "var(--space-5)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}>
           <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-            Van<br />
+            {td.from}<br />
             <input type="time" value={f.startTime} onChange={e => set("startTime", e.target.value)} style={{ ...INP, marginTop: "var(--space-1)" }} />
           </label>
           <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-            Tot<br />
+            {td.to}<br />
             <input type="time" value={f.endTime} onChange={e => set("endTime", e.target.value)} style={{ ...INP, marginTop: "var(--space-1)" }} />
           </label>
         </div>
         <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-          Titel *<br />
-          <input value={f.title} onChange={e => set("title", e.target.value)} placeholder="bijv. Huwelijksinzegening" style={{ ...INP, marginTop: "var(--space-1)" }} />
+          {td.titleLabel}<br />
+          <input value={f.title} onChange={e => set("title", e.target.value)} placeholder={td.titlePlaceholder} style={{ ...INP, marginTop: "var(--space-1)" }} />
         </label>
         <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-          Locatie<br />
-          <input value={f.location} onChange={e => set("location", e.target.value)} placeholder="bijv. Feestzaal" style={{ ...INP, marginTop: "var(--space-1)" }} />
+          {td.location}<br />
+          <input value={f.location} onChange={e => set("location", e.target.value)} placeholder={td.locationPlaceholder} style={{ ...INP, marginTop: "var(--space-1)" }} />
         </label>
 
         <div>
-          <p style={{ fontSize: "var(--text-sm)", fontWeight: 600, marginBottom: "0.4rem" }}>Zichtbaar voor</p>
+          <p style={{ fontSize: "var(--text-sm)", fontWeight: 600, marginBottom: "0.4rem" }}>{td.visibleForLabel}</p>
           <div style={{ display: "flex", flexDirection: "column", border: "1px solid var(--border)", borderRadius: "10px", overflow: "hidden" }}>
             {AUDIENCE_OPTIONS.map((opt, i) => {
               const active = f.audience === opt.value;
@@ -233,7 +237,7 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
           {f.audience === "vendors" && (
             <div style={{ marginTop: "var(--space-3)", border: "1px solid var(--border)", borderRadius: "10px", maxHeight: "180px", overflowY: "auto" }}>
               {vendors.length === 0 ? (
-                <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", padding: "0.75rem" }}>Nog geen leveranciers gekoppeld aan deze bruiloft.</p>
+                <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", padding: "0.75rem" }}>{td.noVendorsLinked}</p>
               ) : vendors.map((v, i) => {
                 const checked = f.vendorIds.includes(v.vendor.id);
                 return (
@@ -257,8 +261,8 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
         </div>
 
         <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-          Notities<br />
-          <input value={f.notes} onChange={e => set("notes", e.target.value)} placeholder="Extra info" style={{ ...INP, marginTop: "var(--space-1)" }} />
+          {td.notes}<br />
+          <input value={f.notes} onChange={e => set("notes", e.target.value)} placeholder={td.notesPlaceholder} style={{ ...INP, marginTop: "var(--space-1)" }} />
         </label>
         <div style={{ display: "flex", gap: "var(--space-3)" }}>
           <button
@@ -267,9 +271,9 @@ function ItemForm({ init, vendors, onSave, onCancel, saving }: {
             className="ddp-btn-primary"
             style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)" }}
           >
-            <Check className="w-3.5 h-3.5" />{saving ? "Opslaan…" : "Opslaan"}
+            <Check className="w-3.5 h-3.5" />{saving ? td.saving : td.save}
           </button>
-          <button onClick={onCancel} className="ddp-btn-secondary">Annuleren</button>
+          <button onClick={onCancel} className="ddp-btn-secondary">{td.cancel}</button>
         </div>
       </div>
     </Modal>
@@ -293,6 +297,8 @@ export default function DraaiboekGrid({
   items, vendors, canEditItem, isPlanner,
   onUpdateItem, onDeleteItem, onAddItem, onDragStateChange,
 }: Props) {
+  const { t } = useLang();
+  const td = t.draaiboek;
   const draftRef = useRef<GridItem[]>(items);
   const [display, setDisplay] = useState<GridItem[]>(items);
   const [selected, setSelected] = useState<string | null>(null);
@@ -407,7 +413,7 @@ export default function DraaiboekGrid({
   }
 
   async function del(id: string) {
-    if (!confirm("Item verwijderen?")) return;
+    if (!confirm(td.confirmDeleteItem)) return;
     await onDeleteItem(id);
     setSelected(null);
     setFormMode(null);
@@ -429,6 +435,7 @@ export default function DraaiboekGrid({
           onSave={saveNew}
           onCancel={() => setFormMode(null)}
           saving={saving}
+          t={t}
         />
       )}
 
@@ -448,6 +455,7 @@ export default function DraaiboekGrid({
           onSave={f => saveEdit(selItem.id, f)}
           onCancel={() => setFormMode(null)}
           saving={saving}
+          t={t}
         />
       )}
 
@@ -460,15 +468,15 @@ export default function DraaiboekGrid({
               <span>{selItem.startTime} – {endMin(selItem.startTime, selItem.duration)}</span>
               {selItem.location && <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}><MapPin className="w-3 h-3" />{selItem.location}</span>}
               <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontWeight: audienceOf(selItem) !== "all" ? 700 : 400, color: audienceOf(selItem) !== "all" ? "var(--gold-deep)" : "var(--muted)" }}>
-                <Briefcase className="w-3 h-3" />{audienceLabel(selItem, vendors)}
+                <Briefcase className="w-3 h-3" />{audienceLabel(selItem, vendors, td)}
               </span>
             </div>
           </div>
           <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexShrink: 0 }}>
             {canEditItem(selItem) && (
               <>
-                <button onClick={() => setFormMode("edit")} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)", padding: "0.3rem 0.75rem" }}>Bewerken</button>
-                <button onClick={() => del(selItem.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: "4px", display: "flex" }} title="Verwijderen">
+                <button onClick={() => setFormMode("edit")} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)", padding: "0.3rem 0.75rem" }}>{td.editBtn}</button>
+                <button onClick={() => del(selItem.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: "4px", display: "flex" }} title={td.delete}>
                   <X className="w-4 h-4" />
                 </button>
               </>
@@ -484,14 +492,14 @@ export default function DraaiboekGrid({
       {!formMode && !selItem && (
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", fontStyle: "italic" }}>
-            Tik op een item om te bewerken · Tik op het raster of gebruik de knop om iets toe te voegen
+            {td.gridHint}
           </p>
           <button
             onClick={() => { setNewTime("09:00"); setSelected(null); setFormMode("add"); }}
             className="ddp-btn-secondary"
             style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", flexShrink: 0 }}
           >
-            <Plus className="w-3.5 h-3.5" />Item toevoegen
+            <Plus className="w-3.5 h-3.5" />{td.addItemLabel}
           </button>
         </div>
       )}
@@ -609,7 +617,7 @@ export default function DraaiboekGrid({
                 {editable && (
                   <div
                     onPointerDown={e => startDrag(e, item, "top")}
-                    title="Begintijd aanpassen"
+                    title={td.adjustStartTime}
                     style={{
                       position: "absolute", top: 0, left: 0, right: 0, height: HANDLE,
                       cursor: "n-resize", zIndex: 4, touchAction: "none",
@@ -649,7 +657,7 @@ export default function DraaiboekGrid({
                 {editable && (
                   <div
                     onPointerDown={e => startDrag(e, item, "bot")}
-                    title="Eindtijd aanpassen"
+                    title={td.adjustEndTime}
                     style={{
                       position: "absolute", bottom: 0, left: 0, right: 0, height: HANDLE,
                       cursor: "s-resize", zIndex: 4, touchAction: "none",
