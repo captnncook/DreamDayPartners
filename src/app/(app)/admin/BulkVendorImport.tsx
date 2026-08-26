@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, FileSpreadsheet, Check, AlertCircle, Download } from "lucide-react";
 import * as XLSX from "xlsx";
+import { useLang } from "@/components/LangProvider";
 
 // Toegestane categorieën (zelfde set als het bewerk-formulier)
 const CATEGORIES = [
@@ -68,6 +69,8 @@ type Result = {
 };
 
 export default function BulkVendorImport() {
+  const { t } = useLang();
+  const tb = t.adminTools.bulkImport;
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [vendors, setVendors] = useState<ParsedVendor[]>([]);
@@ -95,7 +98,7 @@ export default function BulkVendorImport() {
         setVendors(vendors);
         setUnmapped(unmapped);
       } catch {
-        setError("Kon het bestand niet lezen. Gebruik een .xlsx-bestand (bijv. de gedownloade template).");
+        setError(tb.fileReadError);
       }
     };
     reader.readAsBinaryString(file);
@@ -112,7 +115,7 @@ export default function BulkVendorImport() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Import mislukt");
+      setError(data.error ?? tb.importFailed);
     } else {
       setResult(data);
       router.refresh();
@@ -129,21 +132,21 @@ export default function BulkVendorImport() {
     <div className="ddp-card">
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-semibold flex items-center gap-2">
-          <FileSpreadsheet className="w-4 h-4" style={{ color: "var(--primary)" }} /> Leveranciers importeren
+          <FileSpreadsheet className="w-4 h-4" style={{ color: "var(--primary)" }} /> {tb.importTitle}
         </h2>
         {vendors.length > 0 && (
-          <button onClick={reset} className="text-xs" style={{ color: "var(--muted)" }}>Wissen</button>
+          <button onClick={reset} className="text-xs" style={{ color: "var(--muted)" }}>{tb.clearBtn}</button>
         )}
       </div>
 
       <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
-        Upload een Excel-bestand (.xlsx). Kolommen: <code>naam</code>, <code>categorie</code> (verplicht),
-        en optioneel <code>contactpersoon, email, telefoon, website, stad, beschrijving, premium, foto</code> (link naar profielfoto). Maximaal 2000 rijen per upload.
+        {tb.uploadNotePrefix} <code>naam</code>, <code>categorie</code> {tb.uploadNoteMiddle}
+        <code>contactpersoon, email, telefoon, website, stad, beschrijving, premium, foto</code> {tb.uploadNoteSuffix}
       </p>
 
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <button onClick={downloadTemplate} className="ddp-btn-secondary inline-flex items-center gap-2">
-          <Download className="w-4 h-4" /> Template downloaden
+          <Download className="w-4 h-4" /> {tb.downloadTemplateBtn}
         </button>
         <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" style={{ display: "none" }} onChange={handleFile} />
         {vendors.length === 0 && (
@@ -151,7 +154,7 @@ export default function BulkVendorImport() {
             onClick={() => fileRef.current?.click()}
             className="ddp-btn-primary inline-flex items-center gap-2"
           >
-            <Upload className="w-4 h-4" /> Excel-bestand kiezen
+            <Upload className="w-4 h-4" /> {tb.chooseFileBtn}
           </button>
         )}
       </div>
@@ -159,21 +162,21 @@ export default function BulkVendorImport() {
       {vendors.length > 0 && (
         <>
           <div className="text-xs mb-3" style={{ color: "var(--muted)" }}>
-            <strong>{fileName}</strong> · {vendors.length} rijen ingelezen
-            {invalid.length > 0 && <span style={{ color: "#c00" }}> · {invalid.length} ongeldig (worden overgeslagen)</span>}
+            <strong>{fileName}</strong> · {tb.rowsReadLabel.replace("{n}", String(vendors.length))}
+            {invalid.length > 0 && <span style={{ color: "#c00" }}> · {tb.invalidRowsLabel.replace("{n}", String(invalid.length))}</span>}
           </div>
 
           {unmapped.length > 0 && (
             <div className="flex items-start gap-2 text-xs mb-3 p-2 rounded-lg" style={{ background: "#fff8e1", color: "#8a6d00" }}>
               <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-              <span>Niet-herkende kolommen genegeerd: {unmapped.join(", ")}</span>
+              <span>{tb.unmappedColumnsLabel.replace("{cols}", unmapped.join(", "))}</span>
             </div>
           )}
 
           <div className="ddp-card p-0 overflow-hidden mb-3" style={{ maxHeight: "260px", overflowY: "auto" }}>
             <table className="w-full">
               <thead><tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)", position: "sticky", top: 0 }}>
-                {["Naam", "Categorie", "Stad", "Email"].map((h) => (
+                {[tb.tableHeaders.name, tb.tableHeaders.category, tb.tableHeaders.city, tb.tableHeaders.email].map((h) => (
                   <th key={h} className="text-xs font-semibold text-left px-3 py-2" style={{ color: "var(--muted)" }}>{h}</th>
                 ))}
               </tr></thead>
@@ -182,9 +185,9 @@ export default function BulkVendorImport() {
                   const bad = !v.name || !v.category || !CATEGORIES.includes(v.category);
                   return (
                     <tr key={i} style={{ borderBottom: "1px solid var(--border)", background: bad ? "#fff5f5" : undefined }}>
-                      <td className="px-3 py-1.5 text-sm">{v.name || <em style={{ color: "#c00" }}>leeg</em>}</td>
+                      <td className="px-3 py-1.5 text-sm">{v.name || <em style={{ color: "#c00" }}>{tb.emptyLabel}</em>}</td>
                       <td className="px-3 py-1.5 text-sm" style={{ color: CATEGORIES.includes(v.category) ? undefined : "#c00" }}>
-                        {v.category || <em>leeg</em>}{v.category && !CATEGORIES.includes(v.category) ? " (onbekend)" : ""}
+                        {v.category || <em>{tb.emptyLabel}</em>}{v.category && !CATEGORIES.includes(v.category) ? ` ${tb.unknownSuffix}` : ""}
                       </td>
                       <td className="px-3 py-1.5 text-sm">{v.city}</td>
                       <td className="px-3 py-1.5 text-sm">{v.email}</td>
@@ -194,7 +197,7 @@ export default function BulkVendorImport() {
               </tbody>
             </table>
           </div>
-          {vendors.length > 50 && <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>… en {vendors.length - 50} meer</p>}
+          {vendors.length > 50 && <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>{tb.moreRowsLabel.replace("{n}", String(vendors.length - 50))}</p>}
 
           <button
             onClick={handleImport}
@@ -203,7 +206,7 @@ export default function BulkVendorImport() {
             style={{ opacity: importing ? 0.7 : 1 }}
           >
             <Check className="w-4 h-4" />
-            {importing ? "Importeren…" : `${vendors.length - invalid.length} leveranciers importeren`}
+            {importing ? tb.importingBtn : tb.importBtn.replace("{n}", String(vendors.length - invalid.length))}
           </button>
         </>
       )}
@@ -214,12 +217,12 @@ export default function BulkVendorImport() {
 
       {result && (
         <div className="mt-3 text-sm p-3 rounded-lg" style={{ background: "#e8f5e9", color: "#1b5e20" }}>
-          <strong>{result.created}</strong> toegevoegd
-          {result.skipped > 0 && <> · {result.skipped} overgeslagen (al aanwezig)</>}
-          {result.errors.length > 0 && <> · {result.errors.length} fout</>}
+          <strong>{result.created}</strong> {tb.createdLabel}
+          {result.skipped > 0 && <> · {result.skipped} {tb.skippedLabel}</>}
+          {result.errors.length > 0 && <> · {result.errors.length} {tb.errorsLabel}</>}
           {result.errors.length > 0 && (
             <ul className="mt-1 text-xs" style={{ color: "#c00" }}>
-              {result.errors.slice(0, 10).map((e, i) => <li key={i}>Rij {e.row}: {e.reason}</li>)}
+              {result.errors.slice(0, 10).map((e, i) => <li key={i}>{tb.rowErrorLabel.replace("{row}", String(e.row)).replace("{reason}", e.reason)}</li>)}
             </ul>
           )}
         </div>

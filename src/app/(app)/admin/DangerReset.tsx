@@ -3,10 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
+import { useLang } from "@/components/LangProvider";
 
 const CONFIRM_PHRASE = "VERWIJDER ALLES";
+const PROTECTED_EMAIL = "info@dreamdayplatform.com";
 
 export default function DangerReset() {
+  const { t } = useLang();
+  const td = t.adminTools.dangerReset;
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [typed, setTyped] = useState("");
@@ -24,7 +28,7 @@ export default function DangerReset() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Mislukt");
+      setError(data.error ?? td.genericError);
     } else {
       setResult(data);
       router.refresh();
@@ -34,14 +38,14 @@ export default function DangerReset() {
 
   return (
     <div className="mb-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
-      <h2 className="dash-section-title mb-1" style={{ color: "var(--gold-deep)" }}>Alles wissen (tijdelijk)</h2>
+      <h2 className="dash-section-title mb-1" style={{ color: "var(--gold-deep)" }}>{td.sectionTitle}</h2>
       <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
-        Verwijdert alle leveranciers, bruiloften en alle accounts behalve <strong>info@dreamdayplatform.com</strong>. Onomkeerbaar.
+        {td.warningNote.split("{email}")[0]}<strong>{PROTECTED_EMAIL}</strong>{td.warningNote.split("{email}")[1]}
       </p>
 
       {!open && !result && (
         <button onClick={() => setOpen(true)} className="text-sm underline" style={{ color: "var(--gold-deep)" }}>
-          Start verwijdering
+          {td.startBtn}
         </button>
       )}
 
@@ -49,7 +53,7 @@ export default function DangerReset() {
         <div className="max-w-md">
           <div className="flex items-start gap-2 text-xs mb-3 p-2 rounded-lg" style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)" }}>
             <AlertTriangle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "var(--gold-deep)" }} />
-            <span>Typ <strong>{CONFIRM_PHRASE}</strong> om te bevestigen. Dit kan niet ongedaan gemaakt worden.</span>
+            <span>{td.confirmNote.split("{phrase}")[0]}<strong>{CONFIRM_PHRASE}</strong>{td.confirmNote.split("{phrase}")[1]}</span>
           </div>
           <input
             value={typed}
@@ -64,10 +68,10 @@ export default function DangerReset() {
               className="ddp-btn-primary"
               style={{ opacity: busy || typed !== CONFIRM_PHRASE ? 0.5 : 1 }}
             >
-              {busy ? "Bezig…" : "Definitief verwijderen"}
+              {busy ? td.busyBtn : td.confirmBtn}
             </button>
             <button onClick={() => { setOpen(false); setTyped(""); }} className="text-sm" style={{ color: "var(--muted)" }}>
-              Annuleren
+              {td.cancelBtn}
             </button>
           </div>
           {error && <p className="text-sm mt-2" style={{ color: "var(--danger)" }}>{error}</p>}
@@ -76,7 +80,10 @@ export default function DangerReset() {
 
       {result && (
         <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
-          Klaar: {result.vendorsDeleted} leveranciers, {result.weddingsDeleted} bruiloften en {result.usersDeleted} accounts verwijderd.
+          {td.doneMsg
+            .replace("{vendors}", String(result.vendorsDeleted))
+            .replace("{weddings}", String(result.weddingsDeleted))
+            .replace("{users}", String(result.usersDeleted))}
         </p>
       )}
     </div>
