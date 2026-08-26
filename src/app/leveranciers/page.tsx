@@ -5,31 +5,15 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, LayoutGrid, Map } from "lucide-react";
+import { useLang } from "@/components/LangProvider";
 
 const VendorMap = lazy(() => import("@/components/VendorMap"));
 
-const CATEGORIES: { value: string; label: string }[] = [
-  { value: "trouwlocatie",    label: "Trouwlocaties" },
-  { value: "fotograaf",       label: "Fotografen" },
-  { value: "videograaf",      label: "Videografen" },
-  { value: "bloemist",        label: "Bloemisten" },
-  { value: "catering",        label: "Catering" },
-  { value: "bakker",          label: "Bruidstaarten" },
-  { value: "weddingplanner",  label: "Wedding planners" },
-  { value: "haarstylist",     label: "Hair & make-up" },
-  { value: "dj",              label: "Muziek & DJ" },
-  { value: "liveband",        label: "Liveband & Entertainment" },
-  { value: "ceremoniespreker",label: "Ceremoniesprekers" },
-  { value: "decoratie",       label: "Decoratie & Styling" },
-  { value: "vervoer",         label: "Vervoer" },
-  { value: "fotocabine",      label: "Fotocabine" },
-  { value: "bruidsmode",      label: "Bruidsmode" },
-  { value: "herenmode",       label: "Herenmode" },
-  { value: "juwelier",        label: "Juwelier" },
-  { value: "overig",          label: "Overig" },
-];
-
-const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.value, c.label]));
+const CATEGORY_VALUES = [
+  "trouwlocatie", "fotograaf", "videograaf", "bloemist", "catering", "bakker", "weddingplanner",
+  "haarstylist", "dj", "liveband", "ceremoniespreker", "decoratie", "vervoer", "fotocabine",
+  "bruidsmode", "herenmode", "juwelier", "overig",
+] as const;
 
 type Vendor = {
   id: string;
@@ -46,17 +30,22 @@ type Vendor = {
   avgResponseMinutes?: number | null;
 };
 
-// Geen garantie op beschikbaarheid (die kan per moment wijzigen), wel een
-// indicatie hoe snel deze leverancier normaal reageert op een eerste bericht.
-function responseTimeLabel(minutes: number): string {
-  if (minutes < 60) return "Reageert meestal binnen een uur";
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `Reageert meestal binnen ${hours} uur`;
-  const days = Math.round(hours / 24);
-  return `Reageert meestal binnen ${days} ${days === 1 ? "dag" : "dagen"}`;
-}
-
 function LeveranciersContent() {
+  const { t, toggle } = useLang();
+  const vc = t.vendorCatalog;
+  const CATEGORIES = CATEGORY_VALUES.map((value) => ({ value, label: vc.categories[value] }));
+  const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.value, c.label]));
+
+  // Geen garantie op beschikbaarheid (die kan per moment wijzigen), wel een
+  // indicatie hoe snel deze leverancier normaal reageert op een eerste bericht.
+  function responseTimeLabel(minutes: number): string {
+    if (minutes < 60) return vc.responseWithinHour;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return vc.responseWithinHours.replace("{n}", String(hours));
+    const days = Math.round(hours / 24);
+    return days === 1 ? vc.responseWithinDay : vc.responseWithinDays.replace("{n}", String(days));
+  }
+
   const searchParams = useSearchParams();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [total, setTotal] = useState(0);
@@ -138,23 +127,31 @@ function LeveranciersContent() {
                 DreamDay<span style={{ color: "var(--gold)" }}> Platform</span>
               </span>
             </Link>
-            {loggedIn ? (
-              <Link href="/dashboard" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.45rem 1.125rem", borderRadius: "var(--radius-full)", whiteSpace: "nowrap", flexShrink: 0 }}>
-                Profiel
-              </Link>
-            ) : (
-              <Link href="/login" style={{ color: "var(--ink-text)", fontSize: "var(--text-base)", fontWeight: 600, padding: "0.45rem 0.875rem", whiteSpace: "nowrap", flexShrink: 0 }}>
-                Inloggen
-              </Link>
-            )}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <button
+                onClick={toggle}
+                style={{ color: "var(--ink-muted)", fontSize: "var(--text-base)", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}
+              >
+                {t.common.switchLang}
+              </button>
+              {loggedIn ? (
+                <Link href="/dashboard" className="ddp-btn-gold" style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-base)", padding: "0.45rem 1.125rem", borderRadius: "var(--radius-full)", whiteSpace: "nowrap" }}>
+                  {vc.profile}
+                </Link>
+              ) : (
+                <Link href="/login" style={{ color: "var(--ink-text)", fontSize: "var(--text-base)", fontWeight: 600, padding: "0.45rem 0.875rem", whiteSpace: "nowrap" }}>
+                  {vc.login}
+                </Link>
+              )}
+            </div>
           </div>
 
-          <p className="ddp-section-label mb-2" style={{ color: "var(--gold)" }}>Leveranciersoverzicht</p>
+          <p className="ddp-section-label mb-2" style={{ color: "var(--gold)" }}>{vc.label}</p>
           <h1 className="font-serif" style={{ fontSize: "clamp(1.625rem, 5vw, 2.75rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.12, color: "var(--ink-text)", marginBottom: "var(--space-4)" }}>
-            Vind leveranciers die passen bij jullie dag
+            {vc.heading}
           </h1>
           <p style={{ fontSize: "var(--text-lg)", color: "var(--ink-muted)", maxWidth: "440px", lineHeight: 1.6 }}>
-            Vergelijk fotografen, bloemisten, locaties en cateraars in één overzicht.
+            {vc.sub}
           </p>
 
           {/* Search bar */}
@@ -163,7 +160,7 @@ function LeveranciersContent() {
               <Search />
               <input
                 type="text"
-                placeholder="Zoek op naam of stad…"
+                placeholder={vc.searchPlaceholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{ padding: "0.7rem 1rem 0.7rem 2.5rem", fontSize: "var(--text-lg)", border: "none" }}
@@ -175,7 +172,7 @@ function LeveranciersContent() {
                 className="flex items-center gap-1.5"
                 style={{ background: "transparent", border: "1px solid var(--ink-line)", color: "var(--ink-text)", borderRadius: "var(--radius-full)", padding: "0.6rem 1.125rem", fontSize: "var(--text-base)", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}
               >
-                <X className="w-3.5 h-3.5" /> Alles wissen
+                <X className="w-3.5 h-3.5" /> {vc.clearAll}
               </button>
             )}
           </div>
@@ -190,7 +187,7 @@ function LeveranciersContent() {
           style={{ width: "100%", scrollbarWidth: "none", paddingRight: "2rem" }}
         >
           <button onClick={() => setCategory("")} className={`ddp-cat-tab${!category ? " active" : ""}`}>
-            Alles
+            {vc.all}
           </button>
           {CATEGORIES.map((c) => (
             <button
@@ -212,21 +209,21 @@ function LeveranciersContent() {
           <div className="flex items-center justify-between mb-4" style={{ gap: "var(--space-5)" }}>
             <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", minWidth: 0 }}>
               <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{total}</span>{" "}
-              leverancier{total !== 1 ? "s" : ""}
+              {total === 1 ? vc.resultsCount : vc.resultsCountPlural}
               {category && ` · ${CATEGORY_MAP[category] ?? category}`}
-              {totalPages > 1 && ` · pagina ${page}/${totalPages}`}
+              {totalPages > 1 && ` · ${vc.page} ${page}/${totalPages}`}
             </p>
             <div style={{ display: "flex", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", overflow: "hidden", flexShrink: 0 }}>
               <button
                 onClick={() => setView("list")}
-                aria-label="Lijstweergave"
+                aria-label={vc.listView}
                 style={{ padding: "0.4rem 0.7rem", background: view === "list" ? "var(--ink)" : "transparent", color: view === "list" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setView("map")}
-                aria-label="Kaartweergave"
+                aria-label={vc.mapView}
                 style={{ padding: "0.4rem 0.7rem", background: view === "map" ? "var(--ink)" : "transparent", color: view === "map" ? "white" : "var(--muted)", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
                 <Map className="w-3.5 h-3.5" />
@@ -237,27 +234,27 @@ function LeveranciersContent() {
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "5rem 0", color: "var(--muted)" }}>
-            <p style={{ fontSize: "var(--text-lg)" }}>Leveranciers laden…</p>
+            <p style={{ fontSize: "var(--text-lg)" }}>{vc.loading}</p>
           </div>
         ) : vendors.length === 0 ? (
           <div style={{ textAlign: "center", padding: "5rem 0" }}>
-            <h3 className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-3xl)", marginBottom: "var(--space-3)", color: "var(--foreground)" }}>Geen leveranciers gevonden</h3>
+            <h3 className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-3xl)", marginBottom: "var(--space-3)", color: "var(--foreground)" }}>{vc.noneFound}</h3>
             <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>
-              Pas je filters aan of zoek op een andere naam.
+              {vc.noneFoundSub}
             </p>
             <button onClick={() => { setSearch(""); setCategory(""); }} className="ddp-btn-secondary">
-              Alles wissen
+              {vc.clearAll}
             </button>
           </div>
         ) : view === "map" ? (
           mapLoading ? (
             <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--sand)", borderRadius: "var(--radius-lg)" }}>
-              <p style={{ color: "var(--muted)" }}>Kaart laden…</p>
+              <p style={{ color: "var(--muted)" }}>{vc.mapLoading}</p>
             </div>
           ) : (
             <Suspense fallback={
               <div style={{ height: "480px", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--sand)", borderRadius: "var(--radius-lg)" }}>
-                <p style={{ color: "var(--muted)" }}>Kaart laden…</p>
+                <p style={{ color: "var(--muted)" }}>{vc.mapLoading}</p>
               </div>
             }>
               <VendorMap vendors={mapVendors} />
@@ -266,7 +263,7 @@ function LeveranciersContent() {
         ) : (
           <>
             <div style={{ borderTop: "1px solid var(--border)" }}>
-              {sorted.map((v) => <VendorRow key={v.id} vendor={v} showCategory={!category} />)}
+              {sorted.map((v) => <VendorRow key={v.id} vendor={v} showCategory={!category} categoryMap={CATEGORY_MAP} responseTimeLabel={responseTimeLabel} recommendedLabel={vc.recommended} priceFromLabel={vc.priceFrom} onRequestLabel={vc.onRequest} />)}
             </div>
 
             {totalPages > 1 && (
@@ -276,15 +273,15 @@ function LeveranciersContent() {
                   disabled={page <= 1}
                   style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--foreground)", cursor: page <= 1 ? "default" : "pointer" }}
                 >
-                  ← Vorige
+                  {vc.prevPage}
                 </button>
-                <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Pagina {page} van {totalPages}</span>
+                <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>{vc.pageOf} {page} / {totalPages}</span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
                   style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--foreground)", cursor: page >= totalPages ? "default" : "pointer" }}
                 >
-                  Volgende →
+                  {vc.nextPage}
                 </button>
               </div>
             )}
@@ -295,8 +292,11 @@ function LeveranciersContent() {
   );
 }
 
-function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boolean }) {
-  const catLabel = CATEGORY_MAP[vendor.category] ?? vendor.category;
+function VendorRow({ vendor, showCategory, categoryMap, responseTimeLabel, recommendedLabel, priceFromLabel, onRequestLabel }: {
+  vendor: Vendor; showCategory: boolean; categoryMap: Record<string, string>;
+  responseTimeLabel: (minutes: number) => string; recommendedLabel: string; priceFromLabel: string; onRequestLabel: string;
+}) {
+  const catLabel = categoryMap[vendor.category] ?? vendor.category;
   const meta = [vendor.city, showCategory ? catLabel : null].filter(Boolean).join(" · ");
 
   return (
@@ -312,7 +312,7 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
       <div style={{ minWidth: 0 }}>
         {vendor.isPremium && (
           <div style={{ fontSize: "var(--text-2xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--gold-deep)", marginBottom: "1px" }}>
-            Aanbevolen
+            {recommendedLabel}
           </div>
         )}
         <div className="vcat-name">{vendor.name}</div>
@@ -336,11 +336,11 @@ function VendorRow({ vendor, showCategory }: { vendor: Vendor; showCategory: boo
       <div className="vcat-price">
         {vendor.priceFrom != null ? (
           <>
-            <div className="label">vanaf</div>
+            <div className="label">{priceFromLabel}</div>
             <div className="amount">€{vendor.priceFrom.toLocaleString("nl-NL")}</div>
           </>
         ) : (
-          <div className="label" style={{ fontSize: "var(--text-xs)" }}>Op aanvraag</div>
+          <div className="label" style={{ fontSize: "var(--text-xs)" }}>{onRequestLabel}</div>
         )}
       </div>
     </Link>

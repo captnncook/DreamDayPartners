@@ -7,30 +7,16 @@ import Image from "next/image";
 import { ArrowRight, ArrowLeft, Check, Eye, EyeOff } from "lucide-react";
 import { APPLE_LOGIN_ENABLED } from "@/lib/featureFlags";
 import DatePicker from "@/components/DatePicker";
+import { useLang } from "@/components/LangProvider";
 
 type Account = "couple" | "vendor" | null;
 type AuthStep = "form" | "send-code" | "verify-code" | "choose-auth" | "password";
 
-const VENDOR_CATEGORIES = [
-  { value: "weddingplanner", label: "Weddingplanner" },
-  { value: "fotograaf", label: "Fotograaf" },
-  { value: "videograaf", label: "Videograaf" },
-  { value: "bloemist", label: "Bloemist" },
-  { value: "catering", label: "Catering" },
-  { value: "bakker", label: "Bruidstaart & Bakker" },
-  { value: "dj", label: "DJ" },
-  { value: "liveband", label: "Liveband & Entertainment" },
-  { value: "ceremoniespreker", label: "Ceremoniespreker" },
-  { value: "trouwlocatie", label: "Trouwlocatie" },
-  { value: "haarstylist", label: "Haar & Make-up" },
-  { value: "vervoer", label: "Vervoer" },
-  { value: "decoratie", label: "Decoratie & Styling" },
-  { value: "fotocabine", label: "Fotocabine" },
-  { value: "bruidsmode", label: "Bruidsmode" },
-  { value: "herenmode", label: "Herenmode" },
-  { value: "juwelier", label: "Juwelier" },
-  { value: "overig", label: "Overig" },
-];
+const VENDOR_CATEGORY_VALUES = [
+  "weddingplanner", "fotograaf", "videograaf", "bloemist", "catering", "bakker", "dj", "liveband",
+  "ceremoniespreker", "trouwlocatie", "haarstylist", "vervoer", "decoratie", "fotocabine",
+  "bruidsmode", "herenmode", "juwelier", "overig",
+] as const;
 
 export default function AanmeldenPage() {
   return <Suspense><AanmeldenForm /></Suspense>;
@@ -65,6 +51,9 @@ function loadStoredProgress(): Partial<StoredProgress> {
 }
 
 function AanmeldenForm() {
+  const { t, toggle } = useLang();
+  const s = t.signup;
+  const VENDOR_CATEGORIES = VENDOR_CATEGORY_VALUES.map((value) => ({ value, label: t.vendorCatalog.categories[value] }));
   const router = useRouter();
   const searchParams = useSearchParams();
   const restored = useRef(loadStoredProgress()).current;
@@ -266,7 +255,7 @@ function AanmeldenForm() {
     // exact 365 dagen vanaf vandaag in, zonder dat het bruidspaar ooit te
     // zien kreeg dat dit een gegokte placeholder was.
     if (account === "couple" && formStep === 2 && !couple.date) {
-      setError("Vul jullie trouwdatum in om verder te gaan.");
+      setError(s.errorDateRequired);
       return;
     }
     // Leverancier stap 1: controleer eerst of het bedrijf (bijna) al in de
@@ -315,7 +304,7 @@ function AanmeldenForm() {
 
   async function handleSendCode() {
     const email = getEmail();
-    if (!email) { setError("Vul je e-mailadres in"); return; }
+    if (!email) { setError(s.errorEmailRequired); return; }
     setSendingCode(true);
     setError("");
     try {
@@ -325,7 +314,7 @@ function AanmeldenForm() {
         body: JSON.stringify({ email, type: account, data: getFormData() }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Fout bij versturen"); return; }
+      if (!res.ok) { setError(data.error ?? s.errorSendCode); return; }
       setPendingId(data.pendingId);
       setAuthStep("verify-code");
     } finally {
@@ -343,7 +332,7 @@ function AanmeldenForm() {
         body: JSON.stringify({ pendingId, code }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Onjuiste code"); return; }
+      if (!res.ok) { setError(data.error ?? s.errorVerifyCode); return; }
       setVerifiedToken(data.verifiedToken);
       setAuthStep("choose-auth");
     } finally {
@@ -352,8 +341,8 @@ function AanmeldenForm() {
   }
 
   async function handlePasswordSubmit() {
-    if (password.length < 8) { setError("Wachtwoord moet minimaal 8 tekens zijn"); return; }
-    if (password !== passwordConfirm) { setError("Wachtwoorden komen niet overeen"); return; }
+    if (password.length < 8) { setError(s.errorPasswordLength); return; }
+    if (password !== passwordConfirm) { setError(s.errorPasswordMismatch); return; }
     setSaving(true);
     setError("");
     try {
@@ -363,7 +352,7 @@ function AanmeldenForm() {
         body: JSON.stringify({ verifiedToken, password }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Fout bij aanmaken"); return; }
+      if (!res.ok) { setError(data.error ?? s.errorAccountCreate); return; }
       sessionStorage.removeItem(AANMELDEN_STORAGE_KEY);
       router.push(data.redirect ?? "/dashboard");
       router.refresh();
@@ -386,21 +375,24 @@ function AanmeldenForm() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
-      <div className="px-5 md:px-10 py-4">
+      <div className="px-5 md:px-10 py-4 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-2">
           <Image src="/images/logo.svg" alt="DreamDay Platform" width={28} height={28} />
           <span className="font-serif" style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.02em", color: "var(--foreground)" }}>
             DreamDay<span style={{ color: "var(--primary)" }}> Platform</span>
           </span>
         </Link>
+        <button onClick={toggle} style={{ color: "var(--muted)", fontSize: "var(--text-base)", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}>
+          {t.common.switchLang}
+        </button>
       </div>
 
       <div className="flex items-start justify-center px-4 pb-16 pt-4">
         <div className="w-full max-w-lg">
           <div className="text-center mb-7">
-            <h1 className="font-serif text-2xl" style={{ fontWeight: 700, color: "var(--foreground)" }}>Begin gratis</h1>
+            <h1 className="font-serif text-2xl" style={{ fontWeight: 700, color: "var(--foreground)" }}>{s.pageTitle}</h1>
             <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-              {account === null ? "Voor wie maken we een account aan?" : "Nog een paar stappen. Je kunt alles later aanpassen."}
+              {account === null ? s.subChoose : s.subSteps}
             </p>
           </div>
 
@@ -424,18 +416,18 @@ function AanmeldenForm() {
             {formStep === 0 && (
               <div className="auth-choice-split">
                 <button onClick={() => chooseAccount("vendor")} className="auth-choice-pane auth-choice-pane--vendor">
-                  <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>Ik ben een leverancier</div>
-                  <div className="text-sm" style={{ color: "var(--ink-muted)" }}>Presenteer je bedrijf en beheer je bruiloften.</div>
+                  <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>{s.choiceVendorTitle}</div>
+                  <div className="text-sm" style={{ color: "var(--ink-muted)" }}>{s.choiceVendorDesc}</div>
                   <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold)", fontWeight: 600, marginTop: "var(--space-1)" }}>
-                    Kiezen <ArrowRight className="w-4 h-4" />
+                    {s.chooseCta} <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
 
                 <button onClick={() => chooseAccount("couple")} className="auth-choice-pane auth-choice-pane--couple">
-                  <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>Wij zijn een bruidspaar</div>
-                  <div className="text-sm" style={{ color: "var(--muted)" }}>Plan jullie bruiloft, gratis, voor altijd.</div>
+                  <div className="font-serif" style={{ fontWeight: 700, fontSize: "1.15rem" }}>{s.choiceCoupleTitle}</div>
+                  <div className="text-sm" style={{ color: "var(--muted)" }}>{s.choiceCoupleDesc}</div>
                   <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600, marginTop: "var(--space-1)" }}>
-                    Kiezen <ArrowRight className="w-4 h-4" />
+                    {s.chooseCta} <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
               </div>
@@ -448,18 +440,18 @@ function AanmeldenForm() {
             {account === "couple" && authStep === "form" && formStep === 1 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">Hoe heten jullie?</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>De namen van het bruidspaar</p>
+                  <h2 className="text-lg font-semibold">{s.coupleStep1Title}</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.coupleStep1Sub}</p>
                 </div>
-                <Field label="Partner 1">
-                  <input value={couple.partner1} onChange={e => setCouple({ ...couple, partner1: e.target.value })} placeholder="bijv. Emma" className="ddp-input" />
+                <Field label={s.partner1Label}>
+                  <input value={couple.partner1} onChange={e => setCouple({ ...couple, partner1: e.target.value })} placeholder={s.partner1Placeholder} className="ddp-input" />
                 </Field>
-                <Field label="Partner 2">
-                  <input value={couple.partner2} onChange={e => setCouple({ ...couple, partner2: e.target.value })} placeholder="bijv. Thomas" className="ddp-input" />
+                <Field label={s.partner2Label}>
+                  <input value={couple.partner2} onChange={e => setCouple({ ...couple, partner2: e.target.value })} placeholder={s.partner2Placeholder} className="ddp-input" />
                 </Field>
                 {couple.partner1 && couple.partner2 && (
                   <div className="font-serif p-3 rounded-xl text-center text-sm" style={{ fontWeight: 700, background: "var(--sand)", color: "var(--gold-deep)" }}>
-                    Bruiloft {couple.partner1} &amp; {couple.partner2}
+                    {s.weddingOfPrefix} {couple.partner1} &amp; {couple.partner2}
                   </div>
                 )}
               </div>
@@ -468,10 +460,10 @@ function AanmeldenForm() {
             {account === "couple" && authStep === "form" && formStep === 2 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">De grote dag</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Wanneer en waar is de bruiloft?</p>
+                  <h2 className="text-lg font-semibold">{s.coupleStep2Title}</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.coupleStep2Sub}</p>
                 </div>
-                <Field label="Trouwdatum">
+                <Field label={s.dateLabel}>
                   <DatePicker value={couple.date} onChange={v => setCouple({ ...couple, date: v })} min={new Date().toISOString().split("T")[0]} />
                 </Field>
                 <label className="flex items-center gap-2.5 text-sm cursor-pointer" style={{ fontWeight: 500 }}>
@@ -481,20 +473,20 @@ function AanmeldenForm() {
                     onChange={e => { setMultiDay(e.target.checked); if (!e.target.checked) setCouple(c => ({ ...c, endDate: "" })); }}
                     style={{ width: "1rem", height: "1rem", accentColor: "var(--gold)" }}
                   />
-                  Onze bruiloft duurt meerdere dagen
+                  {s.multiDayLabel}
                 </label>
                 {multiDay && (
-                  <Field label="Laatste dag">
+                  <Field label={s.endDateLabel}>
                     <DatePicker value={couple.endDate} onChange={v => setCouple({ ...couple, endDate: v })} min={couple.date || new Date().toISOString().split("T")[0]} />
                   </Field>
                 )}
-                <Field label="Trouwlocatie / Andere locatie">
+                <Field label={s.venueLabel}>
                   <div ref={venueWrapRef} style={{ position: "relative" }}>
                     <input
                       value={couple.venue}
                       onChange={e => { setCouple({ ...couple, venue: e.target.value }); setVenueOpen(true); }}
                       onFocus={() => setVenueOpen(true)}
-                      placeholder="bijv. Kasteel de Haar, Utrecht"
+                      placeholder={s.venuePlaceholder}
                       className="ddp-input"
                       autoComplete="off"
                     />
@@ -515,11 +507,11 @@ function AanmeldenForm() {
                     )}
                   </div>
                   <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
-                    Staat jullie locatie er niet tussen? Typ gewoon een eigen naam of adres, bijvoorbeeld bij een huisadres of tuinfeest.
+                    {s.venueHint}
                   </p>
                 </Field>
-                <Field label="Verwacht aantal gasten">
-                  <input type="number" min={1} value={couple.guestCount} onChange={e => setCouple({ ...couple, guestCount: e.target.value })} placeholder="bijv. 80" className="ddp-input" />
+                <Field label={s.guestCountLabel}>
+                  <input type="number" min={1} value={couple.guestCount} onChange={e => setCouple({ ...couple, guestCount: e.target.value })} placeholder={s.guestCountPlaceholder} className="ddp-input" />
                 </Field>
               </div>
             )}
@@ -527,11 +519,11 @@ function AanmeldenForm() {
             {account === "couple" && authStep === "form" && formStep === 3 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">Bijna klaar</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Vul je e-mailadres in om je account aan te maken.</p>
+                  <h2 className="text-lg font-semibold">{s.coupleStep3Title}</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.coupleStep3Sub}</p>
                 </div>
-                <Field label="Jouw e-mailadres *">
-                  <input type="email" value={couple.email} onChange={e => setCouple({ ...couple, email: e.target.value })} placeholder="jij@voorbeeld.nl" className="ddp-input" />
+                <Field label={s.emailLabel}>
+                  <input type="email" value={couple.email} onChange={e => setCouple({ ...couple, email: e.target.value })} placeholder={s.emailPlaceholderCouple} className="ddp-input" />
                 </Field>
               </div>
             )}
@@ -540,15 +532,15 @@ function AanmeldenForm() {
             {account === "vendor" && authStep === "form" && formStep === 1 && !(nameMatches && nameMatches.length > 0) && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">Over je bedrijf</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Hoe heet je en wat doe je?</p>
+                  <h2 className="text-lg font-semibold">{s.vendorStep1Title}</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.vendorStep1Sub}</p>
                 </div>
-                <Field label="Bedrijfsnaam *">
-                  <input value={vendor.businessName} onChange={e => { setVendor({ ...vendor, businessName: e.target.value }); setNameMatches(null); }} placeholder="bijv. Lichtvang Fotografie" className="ddp-input" />
+                <Field label={s.businessNameLabel}>
+                  <input value={vendor.businessName} onChange={e => { setVendor({ ...vendor, businessName: e.target.value }); setNameMatches(null); }} placeholder={s.businessNamePlaceholder} className="ddp-input" />
                 </Field>
-                <Field label="Categorie *">
+                <Field label={s.categoryLabel}>
                   <select value={vendor.category} onChange={e => setVendor({ ...vendor, category: e.target.value })} className="ddp-input">
-                    <option value="">Kies een categorie…</option>
+                    <option value="">{s.categoryPlaceholder}</option>
                     {VENDOR_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                 </Field>
@@ -559,10 +551,10 @@ function AanmeldenForm() {
             {account === "vendor" && authStep === "form" && formStep === 1 && nameMatches && nameMatches.length > 0 && (
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold">Staat jouw bedrijf al in de catalogus?</h2>
+                  <h2 className="text-lg font-semibold">{s.duplicateTitle}</h2>
                   <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-                    We vonden {nameMatches.length === 1 ? "een profiel dat lijkt" : "profielen die lijken"} op
-                    {" "}&ldquo;{vendor.businessName}&rdquo;. Claim je bestaande profiel in plaats van een dubbel profiel aan te maken.
+                    {nameMatches.length === 1 ? s.duplicateSubOne : s.duplicateSubMany}
+                    {" "}&ldquo;{vendor.businessName}&rdquo;. {s.duplicateSubSuffix}
                   </p>
                 </div>
                 <div style={{ borderTop: "1px solid var(--border)" }}>
@@ -578,12 +570,12 @@ function AanmeldenForm() {
                         </div>
                         {m.hasAccount ? (
                           <span className="text-xs flex-shrink-0" style={{ color: "var(--muted)" }}>
-                            Heeft al een account,{" "}
-                            <Link href="/login" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>inloggen</Link>
+                            {s.duplicateHasAccount}{" "}
+                            <Link href="/login" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{s.duplicateLoginLink}</Link>
                           </span>
                         ) : (
                           <Link href={`/leveranciers/${m.id}`} className="text-sm flex-shrink-0" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>
-                            Dit is mijn bedrijf →
+                            {s.duplicateClaimLink}
                           </Link>
                         )}
                       </div>
@@ -591,14 +583,14 @@ function AanmeldenForm() {
                   })}
                 </div>
                 <p className="text-xs" style={{ color: "var(--muted)" }}>
-                  Via &ldquo;Dit is mijn bedrijf&rdquo; kom je op het profiel, waar je het met je e-mailadres kunt claimen.
+                  {s.duplicateHint}
                 </p>
                 <div className="flex gap-3">
                   <button onClick={() => { setNameMatches(null); }} className="ddp-btn-secondary flex-1">
-                    <ArrowLeft className="w-4 h-4" /> Terug
+                    <ArrowLeft className="w-4 h-4" /> {s.duplicateBack}
                   </button>
                   <button onClick={() => { setNameMatches([]); setFormStep(2); }} className="ddp-btn-primary flex-1">
-                    Nee, nieuw bedrijf <ArrowRight className="w-4 h-4" />
+                    {s.duplicateNewBusiness} <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -607,19 +599,19 @@ function AanmeldenForm() {
             {account === "vendor" && authStep === "form" && formStep === 2 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">Contactgegevens</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Zo bereiken bruidsparen je.</p>
+                  <h2 className="text-lg font-semibold">{s.vendorStep2Title}</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.vendorStep2Sub}</p>
                 </div>
-                <Field label="Contactpersoon">
-                  <input value={vendor.contactPerson} onChange={e => setVendor({ ...vendor, contactPerson: e.target.value })} placeholder="bijv. Lara Vermeer" className="ddp-input" />
+                <Field label={s.contactPersonLabel}>
+                  <input value={vendor.contactPerson} onChange={e => setVendor({ ...vendor, contactPerson: e.target.value })} placeholder={s.contactPersonPlaceholder} className="ddp-input" />
                 </Field>
-                <Field label="Telefoon">
+                <Field label={s.phoneLabel}>
                   <input value={vendor.phone} onChange={e => setVendor({ ...vendor, phone: e.target.value })} placeholder="06-12345678" className="ddp-input" />
                 </Field>
-                <Field label="Plaats">
-                  <input value={vendor.city} onChange={e => setVendor({ ...vendor, city: e.target.value })} placeholder="bijv. Haarlem" className="ddp-input" />
+                <Field label={s.cityLabel}>
+                  <input value={vendor.city} onChange={e => setVendor({ ...vendor, city: e.target.value })} placeholder={s.cityPlaceholder} className="ddp-input" />
                 </Field>
-                <Field label="Website">
+                <Field label={s.websiteLabel}>
                   <input value={vendor.website} onChange={e => setVendor({ ...vendor, website: e.target.value })} placeholder="https://…" className="ddp-input" />
                 </Field>
               </div>
@@ -628,11 +620,11 @@ function AanmeldenForm() {
             {account === "vendor" && authStep === "form" && formStep === 3 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">E-mailadres</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>We sturen een verificatiecode naar dit adres.</p>
+                  <h2 className="text-lg font-semibold">{s.vendorStep3Title}</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.vendorStep3Sub}</p>
                 </div>
-                <Field label="Jouw e-mailadres *">
-                  <input type="email" value={vendor.email} onChange={e => setVendor({ ...vendor, email: e.target.value })} placeholder="jij@bedrijf.nl" className="ddp-input" autoFocus />
+                <Field label={s.emailLabel}>
+                  <input type="email" value={vendor.email} onChange={e => setVendor({ ...vendor, email: e.target.value })} placeholder={s.emailPlaceholderVendor} className="ddp-input" autoFocus />
                 </Field>
               </div>
             )}
@@ -641,12 +633,12 @@ function AanmeldenForm() {
             {authStep === "verify-code" && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">Controleer je inbox</h2>
+                  <h2 className="text-lg font-semibold">{s.verifyTitle}</h2>
                   <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-                    We hebben een 6-cijferige code gestuurd naar <strong>{currentEmail}</strong>.
+                    {s.verifySub} <strong>{currentEmail}</strong>.
                   </p>
                 </div>
-                <Field label="Verificatiecode">
+                <Field label={s.codeLabel}>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -663,12 +655,12 @@ function AanmeldenForm() {
                   disabled={verifyingCode || code.length !== 6}
                   className="ddp-btn-primary w-full"
                 >
-                  {verifyingCode ? "Controleren…" : "Code bevestigen"}
+                  {verifyingCode ? s.codeCheckingBtn : s.codeConfirmBtn}
                 </button>
                 <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
-                  Geen code ontvangen?{" "}
+                  {s.noCodeText}{" "}
                   <button className="underline" style={{ color: "var(--primary)" }} onClick={() => { setAuthStep("form"); setCode(""); setError(""); }}>
-                    Stuur opnieuw
+                    {s.resendBtn}
                   </button>
                 </p>
               </div>
@@ -679,9 +671,9 @@ function AanmeldenForm() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <Check className="w-5 h-5" style={{ color: "var(--success)" }} /> E-mail bevestigd
+                    <Check className="w-5 h-5" style={{ color: "var(--success)" }} /> {s.chooseAuthTitle}
                   </h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Kies hoe je wilt inloggen.</p>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.chooseAuthSub}</p>
                 </div>
 
                 <a
@@ -694,7 +686,7 @@ function AanmeldenForm() {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   </svg>
-                  Doorgaan met Google
+                  {s.googleBtn}
                 </a>
 
                 {APPLE_LOGIN_ENABLED && (
@@ -706,13 +698,13 @@ function AanmeldenForm() {
                     <svg width="16" height="16" viewBox="0 0 814 1000" fill="white">
                       <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-37.5-150.3-96.3C27.2 761.6-.5 679.9-.5 601.7c0-237.2 154.4-362.7 306.3-362.7 78.3 0 143.4 51.5 192.4 51.5 46.8 0 120.3-54.7 211.3-54.7zm-174.5-92.3c37.5-44.8 64.4-107.3 64.4-169.8 0-8.7-.6-17.4-2-25.4-61 2.3-134 40.8-178.1 91.4-34.2 38.8-66.5 101.3-66.5 164.6 0 9.6 1.6 19.2 2.3 22.4 3.9.6 10.3 1.6 16.6 1.6 54.7 0 123.4-36.6 163.3-84.8z"/>
                     </svg>
-                    Doorgaan met Apple
+                    {s.appleBtn}
                   </a>
                 )}
 
                 <div className="relative flex items-center gap-3">
                   <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-                  <span className="text-xs" style={{ color: "var(--muted)" }}>of</span>
+                  <span className="text-xs" style={{ color: "var(--muted)" }}>{s.orDivider}</span>
                   <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
                 </div>
 
@@ -720,7 +712,7 @@ function AanmeldenForm() {
                   onClick={() => setAuthStep("password")}
                   className="ddp-btn-secondary w-full"
                 >
-                  Account aanmaken met wachtwoord
+                  {s.passwordChoiceBtn}
                 </button>
               </div>
             )}
@@ -729,23 +721,23 @@ function AanmeldenForm() {
             {authStep === "password" && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-semibold">Kies een wachtwoord</h2>
-                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Minimaal 8 tekens.</p>
+                  <h2 className="text-lg font-semibold">{s.passwordTitle}</h2>
+                  <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{s.passwordSub}</p>
                 </div>
-                <Field label="Wachtwoord">
+                <Field label={s.passwordLabel}>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      placeholder="Minimaal 8 tekens"
+                      placeholder={s.passwordPlaceholder}
                       className="ddp-input pr-10"
                       autoFocus
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(s => !s)}
-                      aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                      onClick={() => setShowPassword(sp => !sp)}
+                      aria-label={showPassword ? s.hidePassword : s.showPassword}
                       className="absolute right-3 top-1/2 -translate-y-1/2"
                       style={{ color: "var(--muted)" }}
                     >
@@ -753,12 +745,12 @@ function AanmeldenForm() {
                     </button>
                   </div>
                 </Field>
-                <Field label="Wachtwoord herhalen">
+                <Field label={s.passwordConfirmLabel}>
                   <input
                     type={showPassword ? "text" : "password"}
                     value={passwordConfirm}
                     onChange={e => setPasswordConfirm(e.target.value)}
-                    placeholder="Herhaal je wachtwoord"
+                    placeholder={s.passwordConfirmPlaceholder}
                     className="ddp-input"
                   />
                 </Field>
@@ -767,10 +759,10 @@ function AanmeldenForm() {
                   disabled={saving}
                   className="ddp-btn-primary w-full"
                 >
-                  {saving ? "Account aanmaken…" : "Account aanmaken"}
+                  {saving ? s.creatingAccountBtn : s.createAccountBtn}
                 </button>
                 <button onClick={() => setAuthStep("choose-auth")} className="text-xs text-center w-full" style={{ color: "var(--muted)" }}>
-                  ← Andere inlogmethode kiezen
+                  {s.otherMethodBtn}
                 </button>
               </div>
             )}
@@ -786,7 +778,7 @@ function AanmeldenForm() {
             {authStep === "form" && formStep > 0 && !(account === "vendor" && formStep === 1 && nameMatches && nameMatches.length > 0) && (
               <div className="flex gap-3 mt-6">
                 <button onClick={prevFormStep} className="ddp-btn-secondary flex-1">
-                  <ArrowLeft className="w-4 h-4" /> Terug
+                  <ArrowLeft className="w-4 h-4" /> {s.backBtn}
                 </button>
                 {formStep < maxFormSteps ? (
                   <button
@@ -797,7 +789,7 @@ function AanmeldenForm() {
                     }
                     className="ddp-btn-primary flex-1"
                   >
-                    {checkingName ? "Controleren…" : <>Volgende <ArrowRight className="w-4 h-4" /></>}
+                    {checkingName ? s.checkingBtn : <>{s.nextBtn} <ArrowRight className="w-4 h-4" /></>}
                   </button>
                 ) : (
                   // Last form step = email step → send code
@@ -806,7 +798,7 @@ function AanmeldenForm() {
                     disabled={sendingCode || !currentEmail}
                     className="ddp-btn-primary flex-1"
                   >
-                    {sendingCode ? "Code versturen…" : "Code versturen →"}
+                    {sendingCode ? s.sendingCodeBtn : s.sendCodeBtn}
                   </button>
                 )}
               </div>
@@ -816,7 +808,7 @@ function AanmeldenForm() {
           </div>
 
           <p className="text-center text-xs mt-4" style={{ color: "var(--muted)" }}>
-            Al een account? <Link href="/login" style={{ color: "var(--primary)" }}>Inloggen</Link>
+            {s.alreadyAccount} <Link href="/login" style={{ color: "var(--primary)" }}>{s.loginLink}</Link>
           </p>
         </div>
       </div>
