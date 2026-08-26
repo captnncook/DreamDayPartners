@@ -2,11 +2,8 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-import DashboardEngine from "@/components/vendor-modules/DashboardEngine";
 import { syncIntakeTasks } from "@/lib/intakeTasks";
-import { formatDateRange } from "@/lib/dateRange";
+import VendorBookingClient from "./VendorBookingClient";
 
 export default async function VendorBookingPage({
   params,
@@ -161,98 +158,53 @@ export default async function VendorBookingPage({
   }));
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "1.5rem 1rem" }}>
-      {/* Back navigation */}
-      <div style={{ marginBottom: "var(--space-7)" }}>
-        <Link
-          href={`/weddings/${weddingId}`}
-          style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)", fontSize: "var(--text-md)", color: "var(--muted)", textDecoration: "none" }}
-        >
-          <ChevronLeft size={16} />
-          {wedding.title}
-        </Link>
-      </div>
-
-      {/* Header */}
-      <div className="card" style={{ padding: "1.5rem", marginBottom: "var(--space-6)", background: "var(--blush-soft)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-6)" }}>
-          <div style={{ width: "3rem", height: "3rem", borderRadius: "0.75rem", background: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--primary)", flexShrink: 0 }}>
-            {booking.vendor.name.charAt(0)}
-          </div>
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: "var(--text-3xl)", fontWeight: 700, color: "var(--charcoal)", letterSpacing: "-0.02em" }}>
-              {booking.vendor.name}
-            </h1>
-            <div style={{ fontSize: "var(--text-md)", color: "var(--muted)", textTransform: "capitalize" }}>
-              {booking.vendor.category}
-              {booking.vendor.city && ` · ${booking.vendor.city}`}
-            </div>
-            {wedding.endDate && (
-              <div style={{ fontSize: "var(--text-sm)", color: "var(--gold-deep)", fontWeight: 600, marginTop: "2px" }}>
-                {booking.specificDate
-                  ? `Werkt op: ${formatDateRange(booking.specificDate)}`
-                  : `Meerdaagse bruiloft (${formatDateRange(wedding.date, wedding.endDate)}) — werkt op alle dagen`}
-              </div>
-            )}
-          </div>
-          {booking.vendor.email && (
-            <a href={`mailto:${booking.vendor.email}`} style={{ fontSize: "var(--text-base)", color: "var(--primary)", textDecoration: "none" }}>
-              Contact
-            </a>
-          )}
-        </div>
-      </div>
-
-      {otherVendors.length > 0 && (
-        <div className="card" style={{ padding: "1.25rem 1.5rem", marginBottom: "var(--space-6)" }}>
-          <div className="ddp-section-label" style={{ marginBottom: "var(--space-4)" }}>Andere leveranciers op deze bruiloft</div>
-          <div style={{ display: "grid", gap: 0 }}>
-            {otherVendors.map((v, i) => (
-              <div key={v.id} className="dash-row" style={{ padding: "0.625rem 0", borderTop: i > 0 ? "1px solid var(--border)" : undefined }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-4)", width: "100%" }}>
-                  <div>
-                    <span style={{ fontWeight: 600, color: "var(--foreground)" }}>{v.name}</span>
-                    <span style={{ color: "var(--muted)", textTransform: "capitalize" }}> · {v.category}</span>
-                  </div>
-                  {v.email && (
-                    <a href={`mailto:${v.email}`} style={{ fontSize: "var(--text-sm)", color: "var(--gold-deep)", fontWeight: 600, textDecoration: "none" }}>Contact</a>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <DashboardEngine
-        weddingId={weddingId}
-        wvId={wvId}
-        vendorId={booking.vendor.id}
-        vendorType={booking.vendor.category}
-        vendorName={booking.vendor.name}
-        initialBooking={isBookingSerializer(booking)}
-        documents={serializedDocuments}
-        timelineBlocks={serializedBlocks}
-        tasks={serializedTasks}
-        guests={guests}
-        totalGuests={totalGuests}
-        userRole={user.role}
-        userId={user.id}
-        userName={user.name}
-        vendorUserId={booking.vendor.userId}
-        vendorIsPremium={booking.vendor.isPremium}
-        vendorDisabledModules={booking.vendor.disabledModules}
-        vendorExtraModules={booking.vendor.extraModules}
-        venueInfo={venueInfo}
-        logisticsDefaults={
+    <VendorBookingClient
+      weddingId={weddingId}
+      weddingTitle={wedding.title}
+      weddingDate={wedding.date.toISOString()}
+      weddingEndDate={wedding.endDate ? wedding.endDate.toISOString() : null}
+      booking={{
+        id: booking.id,
+        specificDate: booking.specificDate ? booking.specificDate.toISOString() : null,
+        vendor: {
+          id: booking.vendor.id,
+          name: booking.vendor.name,
+          category: booking.vendor.category,
+          city: booking.vendor.city,
+          email: booking.vendor.email,
+          setupTime: booking.vendor.setupTime,
+          teardownTime: booking.vendor.teardownTime,
+        },
+      }}
+      otherVendors={otherVendors}
+      dashboardEngineProps={{
+        weddingId,
+        wvId,
+        vendorId: booking.vendor.id,
+        vendorType: booking.vendor.category,
+        vendorName: booking.vendor.name,
+        initialBooking: isBookingSerializer(booking),
+        documents: serializedDocuments,
+        timelineBlocks: serializedBlocks,
+        tasks: serializedTasks,
+        guests,
+        totalGuests,
+        userRole: user.role,
+        userId: user.id,
+        userName: user.name,
+        vendorUserId: booking.vendor.userId,
+        vendorIsPremium: booking.vendor.isPremium,
+        vendorDisabledModules: booking.vendor.disabledModules,
+        vendorExtraModules: booking.vendor.extraModules,
+        venueInfo,
+        logisticsDefaults:
           booking.vendor.category === "trouwlocatie"
             ? {
                 setupTimeOverride: booking.vendor.setupTime ? `${booking.vendor.setupTime} (standaard)` : undefined,
                 teardownTimeOverride: booking.vendor.teardownTime ? `${booking.vendor.teardownTime} (standaard)` : undefined,
               }
-            : undefined
-        }
-      />
-    </div>
+            : undefined,
+      }}
+    />
   );
 }

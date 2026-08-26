@@ -6,6 +6,7 @@ import Link from "next/link";
 import { X, Search } from "lucide-react";
 import DatePicker from "@/components/DatePicker";
 import { formatDateRange } from "@/lib/dateRange";
+import { useLang } from "@/components/LangProvider";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = {
@@ -13,11 +14,8 @@ type WeddingVendor = {
   vendor: Vendor;
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  invited: "Uitgenodigd", contacted: "Gecontacteerd", quote_received: "Offerte ontvangen", booked: "Geboekt", confirmed: "Bevestigd", declined: "Afgewezen",
-};
-
 export default function VendorsPage() {
+  const { t } = useLang();
   const { id } = useParams<{ id: string }>();
   const [weddingVendors, setWeddingVendors] = useState<WeddingVendor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,7 +117,7 @@ export default function VendorsPage() {
     setSaving(false);
     if (!res.ok) {
       const data = await res.json().catch(() => null);
-      setAddError(data?.error || "Koppelen is niet gelukt. Probeer het opnieuw.");
+      setAddError(data?.error || t.vendors.linkFailed);
       return;
     }
     setSelectedVendor(null);
@@ -158,39 +156,40 @@ export default function VendorsPage() {
   }
 
   async function removeVendor(wv: WeddingVendor) {
-    if (!confirm(`${wv.vendor.name} verwijderen uit deze bruiloft?`)) return;
+    if (!confirm(t.vendors.removeConfirm.replace("{name}", wv.vendor.name))) return;
     await fetch(`/api/weddings/${id}/vendors/${wv.id}`, { method: "DELETE" });
     load();
   }
 
-  if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>Laden...</div>;
+  if (loading) return <div className="p-8" style={{ color: "var(--muted)" }}>{t.vendors.loading}</div>;
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{t.vendors.back}</Link>
         <div className="flex items-center justify-between mt-4">
-          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Leveranciers</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{t.vendors.title}</h1>
           <button onClick={() => setShowAdd(!showAdd)} className="ddp-btn-primary">
-            {showAdd ? "Annuleren" : "+ Leverancier koppelen"}
+            {showAdd ? t.vendors.cancel : t.vendors.linkVendor}
           </button>
         </div>
       </div>
 
       {showAdd && (
         <form onSubmit={handleAdd} className="ddp-card mb-6 space-y-4">
-          <h3 className="font-semibold">Leverancier koppelen</h3>
+          <h3 className="font-semibold">{t.vendors.linkVendorFormTitle}</h3>
           {addError && (
             <p className="text-sm" style={{ color: "var(--danger)", background: "var(--danger-bg)", borderRadius: "8px", padding: "0.625rem 0.875rem" }}>
               {addError}
             </p>
           )}
           <p className="text-xs" style={{ color: "var(--muted)" }}>
-            Staat een leverancier hier niet tussen? Zoek en nodig ze uit vanaf hun profiel in de{" "}
-            <Link href="/leveranciers" className="underline" style={{ color: "var(--gold-deep)" }}>catalogus</Link>.
+            {t.vendors.notInCatalogNote.split("{catalog}")[0]}
+            <Link href="/leveranciers" className="underline" style={{ color: "var(--gold-deep)" }}>{t.vendors.catalogLink}</Link>
+            {t.vendors.notInCatalogNote.split("{catalog}")[1]}
           </p>
           <div>
-            <label className="block text-xs font-medium mb-1">Leverancier</label>
+            <label className="block text-xs font-medium mb-1">{t.vendors.vendorLabel}</label>
             <div className="ddp-search" style={{ position: "relative" }}>
               <Search />
               <input
@@ -203,7 +202,7 @@ export default function VendorsPage() {
                 onFocus={() => setShowResults(true)}
                 onBlur={() => setTimeout(() => setShowResults(false), 150)}
                 onKeyDown={onSearchKeyDown}
-                placeholder="Typ een naam om te zoeken..."
+                placeholder={t.vendors.searchPlaceholder}
                 autoComplete="off"
                 role="combobox"
                 aria-expanded={showResults && searchResults.length > 0}
@@ -222,9 +221,9 @@ export default function VendorsPage() {
                   }}
                 >
                   {searching ? (
-                    <div className="text-sm" style={{ padding: "0.625rem 0.875rem", color: "var(--muted)" }}>Zoeken...</div>
+                    <div className="text-sm" style={{ padding: "0.625rem 0.875rem", color: "var(--muted)" }}>{t.vendors.searching}</div>
                   ) : searchResults.length === 0 ? (
-                    <div className="text-sm" style={{ padding: "0.625rem 0.875rem", color: "var(--muted)" }}>Geen leveranciers gevonden.</div>
+                    <div className="text-sm" style={{ padding: "0.625rem 0.875rem", color: "var(--muted)" }}>{t.vendors.noResults}</div>
                   ) : (
                     searchResults.map((v, i) => (
                       <button
@@ -253,15 +252,16 @@ export default function VendorsPage() {
           </div>
           {selectedVendor?.category === "weddingplanner" && (
             <p className="text-xs" style={{ color: "var(--muted)", background: "var(--sand)", borderLeft: "3px solid var(--gold)", padding: "0.625rem 0.875rem", borderRadius: "0 8px 8px 0" }}>
-              Let op: als leverancier gekoppeld kan {selectedVendor.name} alleen hun eigen leveranciersportaal zien
-              (betaalstatus, eigen tijdlijn) — geen taken, gasten of budget bewerken. Wil je dat {selectedVendor.name}
-              namens jullie kan meebeheren, nodig diegene dan uit als teamlid via{" "}
-              <Link href={`/weddings/${id}/team`} className="underline" style={{ color: "var(--gold-deep)" }}>het Team-tabblad</Link>.
+              {t.vendors.plannerPortalWarning
+                .split("{name}").join(selectedVendor.name)
+                .split("{teamTab}")[0]}
+              <Link href={`/weddings/${id}/team`} className="underline" style={{ color: "var(--gold-deep)" }}>{t.vendors.teamTabLink}</Link>
+              {t.vendors.plannerPortalWarning.split("{teamTab}")[1]}
             </p>
           )}
           {isMultiDay && weddingDates && (
             <div>
-              <label className="block text-xs font-medium mb-1">Werkt op specifieke dag (optioneel)</label>
+              <label className="block text-xs font-medium mb-1">{t.vendors.specificDateLabel}</label>
               <DatePicker
                 value={addSpecificDate}
                 onChange={setAddSpecificDate}
@@ -271,32 +271,31 @@ export default function VendorsPage() {
                 style={{ borderColor: "var(--border)" }}
               />
               <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>
-                Jullie bruiloft duurt meerdere dagen ({formatDateRange(new Date(weddingDates.date), weddingDates.endDate ? new Date(weddingDates.endDate) : null)}).
-                Vul dit in als deze leverancier niet op alle dagen werkt.
+                {t.vendors.multiDayNote.replace("{range}", formatDateRange(new Date(weddingDates.date), weddingDates.endDate ? new Date(weddingDates.endDate) : null))}
               </p>
             </div>
           )}
           <div>
-            <label className="block text-xs font-medium mb-1">Notities (optioneel)</label>
+            <label className="block text-xs font-medium mb-1">{t.vendors.notesLabel}</label>
             <input
               value={addNotes}
               onChange={(e) => setAddNotes(e.target.value)}
-              placeholder="bijv. menu voor 80 personen besproken"
+              placeholder={t.vendors.notesPlaceholder}
               className="w-full border rounded-lg px-3 py-2 text-sm"
               style={{ borderColor: "var(--border)" }}
             />
           </div>
           <button type="submit" disabled={saving || !selectedVendor} className="ddp-btn-primary w-full">
-            {saving ? "Koppelen..." : "Leverancier koppelen"}
+            {saving ? t.vendors.linking : t.vendors.linkSubmit}
           </button>
         </form>
       )}
 
       {weddingVendors.length === 0 ? (
         <div className="text-center py-16" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
-          <h2 className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-2xl)", marginBottom: "var(--space-3)", color: "var(--foreground)" }}>Nog geen leveranciers</h2>
-          <p className="text-sm mb-4">Koppel leveranciers aan deze bruiloft</p>
-          <button onClick={() => setShowAdd(true)} className="ddp-btn-primary">+ Leverancier koppelen</button>
+          <h2 className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-2xl)", marginBottom: "var(--space-3)", color: "var(--foreground)" }}>{t.vendors.noVendorsTitle}</h2>
+          <p className="text-sm mb-4">{t.vendors.noVendorsSub}</p>
+          <button onClick={() => setShowAdd(true)} className="ddp-btn-primary">{t.vendors.linkVendor}</button>
         </div>
       ) : (
         <div style={{ borderTop: "1px solid var(--border)" }}>
@@ -311,7 +310,7 @@ export default function VendorsPage() {
                   <Link href={`/weddings/${id}/vendors/${wv.id}`} className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-lg)", color: "var(--foreground)", textDecoration: "none" }}>
                     {wv.vendor.name}
                   </Link>
-                  {wv.portalAccess && <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Portal</span>}
+                  {wv.portalAccess && <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>{t.vendors.portalLabel}</span>}
                 </div>
                 <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", textTransform: "capitalize", marginTop: "1px" }}>
                   {wv.vendor.category}
@@ -326,13 +325,13 @@ export default function VendorsPage() {
                 {wv.notes && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", fontStyle: "italic", marginTop: "2px" }}>{wv.notes}</div>}
                 {isMultiDay && weddingDates && (
                   <div style={{ marginTop: "var(--space-3)", maxWidth: "220px" }}>
-                    <label className="block" style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--muted)", marginBottom: "2px" }}>Werkt op</label>
+                    <label className="block" style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--muted)", marginBottom: "2px" }}>{t.vendors.workingOnLabel}</label>
                     <DatePicker
                       value={wv.specificDate ?? ""}
                       onChange={(v) => updateSpecificDate(wv, v)}
                       min={weddingDates.date}
                       max={weddingDates.endDate ?? undefined}
-                      placeholder="Alle dagen"
+                      placeholder={t.vendors.allDaysPlaceholder}
                       className="w-full border rounded-lg px-2 py-1.5 text-xs"
                       style={{ borderColor: "var(--border)" }}
                     />
@@ -347,7 +346,7 @@ export default function VendorsPage() {
                   className="rounded-lg px-2 py-1.5"
                   style={{ borderColor: "var(--border)", border: "1px solid var(--border)", fontSize: "var(--text-sm)", background: "var(--surface)" }}
                 >
-                  {Object.entries(STATUS_LABELS).map(([v, l]) => (
+                  {Object.entries(t.vendors.statusOptions).map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>
                   ))}
                 </select>
@@ -355,7 +354,7 @@ export default function VendorsPage() {
                   onClick={() => togglePortal(wv)}
                   style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: wv.portalAccess ? "var(--muted)" : "var(--gold-deep)", background: "none", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}
                 >
-                  {wv.portalAccess ? "Toegang intrekken" : "Portal geven"}
+                  {wv.portalAccess ? t.vendors.revokePortal : t.vendors.givePortal}
                 </button>
                 <button onClick={() => removeVendor(wv)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex" }}><X className="w-4 h-4" /></button>
               </div>
