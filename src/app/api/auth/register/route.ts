@@ -46,6 +46,9 @@ export async function POST(req: NextRequest) {
 
   if (pending.type === "couple") {
     const { partner1, partner2, date, endDate, venue, budget, guestCount } = data;
+    if (!date) {
+      return NextResponse.json({ error: "Trouwdatum ontbreekt. Ga terug en vul jullie trouwdatum in." }, { status: 400 });
+    }
     const coupleName = partner1 && partner2 ? `${partner1} & ${partner2}` : partner1 || "Bruidspaar";
 
     const user = await prisma.user.create({
@@ -69,7 +72,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ redirect: `/weddings/${existingWedding.id}` }, { status: 201 });
     }
 
-    const weddingDate = date ? new Date(date) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+    const weddingDate = new Date(date);
     const title = partner1 && partner2 ? `Bruiloft ${partner1} & ${partner2}` : "Mijn Bruiloft";
     const email2 = `partner-${user.id.slice(0, 8)}@dreamday.local`;
     const weddingCode = generateWeddingCode(pending.email, email2, weddingDate.toISOString().split("T")[0]);

@@ -52,14 +52,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const wedding = await prisma.wedding.findFirst({ where: accessWhere, select: { id: true } });
   if (!wedding) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
-  const { vendorId, notes } = await req.json();
+  const { vendorId, notes, specificDate } = await req.json();
 
   const existing = await prisma.weddingVendor.findFirst({ where: { weddingId: id, vendorId } });
   if (existing) return NextResponse.json({ error: "Al gekoppeld" }, { status: 409 });
 
   // Maak een uitnodiging die de leverancier kan accepteren of afwijzen.
   const wv = await prisma.weddingVendor.create({
-    data: { weddingId: id, vendorId, notes: notes ?? null, status: "invited" },
+    data: { weddingId: id, vendorId, notes: notes ?? null, status: "invited", specificDate: specificDate ? new Date(specificDate) : null },
     include: { vendor: true },
   });
 

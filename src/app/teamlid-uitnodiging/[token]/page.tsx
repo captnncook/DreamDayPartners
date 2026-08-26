@@ -113,6 +113,10 @@ export default function TeamInviteAcceptPage() {
           <p style={{ color: "var(--muted)", fontSize: "var(--text-lg)" }}>
             <strong>{invitedByName}</strong> nodigt je uit om mee te helpen bij <strong>{weddingTitle}</strong> — met je eigen account, los van hun inloggegevens.
           </p>
+          <p style={{ color: "var(--muted)", fontSize: "var(--text-base)" }}>
+            Je krijgt dezelfde toegang als {invitedByName}: het draaiboek, de gastenlijst, het budget en de berichten
+            met leveranciers kun je niet alleen bekijken, maar ook net zo goed bewerken.
+          </p>
           <div>
             <label style={{ fontSize: "var(--text-base)", fontWeight: 600 }}>Je naam</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="bijv. Corrie" className="ddp-input" style={{ marginTop: "0.3rem" }} />

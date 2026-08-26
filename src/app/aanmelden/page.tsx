@@ -261,6 +261,14 @@ function AanmeldenForm() {
 
   async function nextFormStep() {
     setError("");
+    // Zonder deze check kon "Volgende" hier ook zonder ingevulde trouwdatum
+    // worden aangeklikt — de server vulde dan stilzwijgend een datum van
+    // exact 365 dagen vanaf vandaag in, zonder dat het bruidspaar ooit te
+    // zien kreeg dat dit een gegokte placeholder was.
+    if (account === "couple" && formStep === 2 && !couple.date) {
+      setError("Vul jullie trouwdatum in om verder te gaan.");
+      return;
+    }
     // Leverancier stap 1: controleer eerst of het bedrijf (bijna) al in de
     // catalogus staat, zodat we een bestaand profiel kunnen laten claimen
     // in plaats van een duplicaat aan te maken.

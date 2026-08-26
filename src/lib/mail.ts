@@ -288,8 +288,8 @@ export function teamInviteEmail(invitedByName: string, weddingTitle: string, acc
     html: emailLayout({
       heading: "Je bent uitgenodigd als teamlid",
       body: `
-        <p style="margin:0 0 12px;">${invitedByName} wil dat je meekijkt en meebeslist bij <strong>${weddingTitle}</strong> — met je eigen account, los van hun inloggegevens.</p>
-        <p style="margin:0;">Maak een eigen wachtwoord aan om direct mee te kunnen kijken in het draaiboek, de gastenlijst en de leveranciers.</p>
+        <p style="margin:0 0 12px;">${invitedByName} wil dat je meehelpt bij <strong>${weddingTitle}</strong> — met je eigen account, los van hun inloggegevens.</p>
+        <p style="margin:0;">Als teamlid krijg je dezelfde toegang als ${invitedByName} zelf: je kunt het draaiboek, de gastenlijst, het budget en de berichten met leveranciers niet alleen bekijken, maar ook net zo goed bewerken.</p>
       `,
       cta: { label: "Uitnodiging accepteren", url: acceptUrl },
       footnote: `Werkt de knop niet? Kopieer deze link: <a href="${acceptUrl}" style="color:#C49A6E;word-break:break-all;">${acceptUrl}</a>`,

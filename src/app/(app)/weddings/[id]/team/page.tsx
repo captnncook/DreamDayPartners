@@ -269,6 +269,10 @@ export default function TeamPage() {
 
           {canInvite && showInviteForm && (
             <form onSubmit={handleInvite} className="ddp-card mb-4" style={{ padding: "1.25rem", display: "flex", gap: "var(--space-5)", flexWrap: "wrap", alignItems: "flex-end" }}>
+              <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", width: "100%", margin: "0 0 0.25rem" }}>
+                Een teamlid krijgt met een eigen account dezelfde toegang als jullie zelf: gasten, budget, taken,
+                draaiboek en berichten met leveranciers kunnen net zo goed door hen bekeken én bewerkt worden.
+              </p>
               <div style={{ flex: 1, minWidth: "220px" }}>
                 <label style={{ fontSize: "var(--text-sm)", fontWeight: 600, display: "block", marginBottom: "0.3rem" }}>
                   E-mailadres van het teamlid

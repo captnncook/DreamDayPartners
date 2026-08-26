@@ -379,6 +379,9 @@ model WeddingVendor {
   status          String    @default("lead")      // lead | booked | in_progress | ready | completed
   portalAccess    Boolean   @default(false)
   notes           String?
+  // Voor een meerdaagse bruiloft: op welke specifieke dag deze leverancier
+  // werkt (leeg = de hele bruiloft/hoofddag, geen aparte toewijzing nodig).
+  specificDate    DateTime?
   contractUrl     String?
   intakeData      Json?
   requiredIntakeKeys String[] @default([]) // intake/logistics-velden die de leverancier graag ingevuld ziet — genereren automatisch een taak

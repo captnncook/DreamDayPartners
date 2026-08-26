@@ -132,6 +132,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ...(body.status !== undefined && { status: body.status }),
       ...(body.portalAccess !== undefined && { portalAccess: body.portalAccess }),
       ...(body.notes !== undefined && { notes: body.notes }),
+      ...(body.specificDate !== undefined && { specificDate: body.specificDate ? new Date(body.specificDate) : null }),
       ...(body.depositAmount !== undefined && { depositAmount: body.depositAmount }),
       ...(body.depositDue !== undefined && { depositDue: body.depositDue ? new Date(body.depositDue) : null }),
       ...(body.depositPaid !== undefined && { depositPaid: body.depositPaid }),

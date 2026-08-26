@@ -4,10 +4,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { User, Mail, Phone, X, CheckCircle2, Search } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
+import { formatDateRange } from "@/lib/dateRange";
 
 type Vendor = { id: string; name: string; category: string; email?: string; phone?: string; contactPerson?: string };
 type WeddingVendor = {
-  id: string; status: string; portalAccess: boolean; notes?: string;
+  id: string; status: string; portalAccess: boolean; notes?: string; specificDate?: string | null;
   vendor: Vendor;
 };
 
@@ -26,16 +28,27 @@ export default function VendorsPage() {
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [addNotes, setAddNotes] = useState("");
+  const [addSpecificDate, setAddSpecificDate] = useState("");
   const [saving, setSaving] = useState(false);
   const [addError, setAddError] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [isMultiDay, setIsMultiDay] = useState(false);
+  const [weddingDates, setWeddingDates] = useState<{ date: string; endDate: string | null } | null>(null);
   const searchSeq = useRef(0);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const load = useCallback(async () => {
-    const wvRes = await fetch(`/api/weddings/${id}/vendors`);
+    const [wvRes, wRes] = await Promise.all([
+      fetch(`/api/weddings/${id}/vendors`),
+      fetch(`/api/weddings/${id}`),
+    ]);
     const wvData = await wvRes.json();
     setWeddingVendors(wvData.vendors ?? []);
+    const wData = await wRes.json().catch(() => null);
+    if (wData?.wedding) {
+      setIsMultiDay(Boolean(wData.wedding.endDate));
+      setWeddingDates({ date: wData.wedding.date, endDate: wData.wedding.endDate ?? null });
+    }
     setLoading(false);
   }, [id]);
 
@@ -101,7 +114,7 @@ export default function VendorsPage() {
     const res = await fetch(`/api/weddings/${id}/vendors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ vendorId: selectedVendor.id, notes: addNotes }),
+      body: JSON.stringify({ vendorId: selectedVendor.id, notes: addNotes, specificDate: addSpecificDate || undefined }),
     });
     setSaving(false);
     if (!res.ok) {
@@ -112,6 +125,7 @@ export default function VendorsPage() {
     setSelectedVendor(null);
     setQuery("");
     setAddNotes("");
+    setAddSpecificDate("");
     setShowAdd(false);
     load();
   }
@@ -130,6 +144,15 @@ export default function VendorsPage() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
+    });
+    load();
+  }
+
+  async function updateSpecificDate(wv: WeddingVendor, specificDate: string) {
+    await fetch(`/api/weddings/${id}/vendors/${wv.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ specificDate: specificDate || null }),
     });
     load();
   }
@@ -236,6 +259,23 @@ export default function VendorsPage() {
               <Link href={`/weddings/${id}/team`} className="underline" style={{ color: "var(--gold-deep)" }}>het Team-tabblad</Link>.
             </p>
           )}
+          {isMultiDay && weddingDates && (
+            <div>
+              <label className="block text-xs font-medium mb-1">Werkt op specifieke dag (optioneel)</label>
+              <DatePicker
+                value={addSpecificDate}
+                onChange={setAddSpecificDate}
+                min={weddingDates.date}
+                max={weddingDates.endDate ?? undefined}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                style={{ borderColor: "var(--border)" }}
+              />
+              <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>
+                Jullie bruiloft duurt meerdere dagen ({formatDateRange(new Date(weddingDates.date), weddingDates.endDate ? new Date(weddingDates.endDate) : null)}).
+                Vul dit in als deze leverancier niet op alle dagen werkt.
+              </p>
+            </div>
+          )}
           <div>
             <label className="block text-xs font-medium mb-1">Notities (optioneel)</label>
             <input
@@ -288,6 +328,21 @@ export default function VendorsPage() {
                   ))}
                 </select>
               </div>
+
+              {isMultiDay && weddingDates && (
+                <div className="mt-3">
+                  <label className="block text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Werkt op</label>
+                  <DatePicker
+                    value={wv.specificDate ?? ""}
+                    onChange={(v) => updateSpecificDate(wv, v)}
+                    min={weddingDates.date}
+                    max={weddingDates.endDate ?? undefined}
+                    placeholder="Alle dagen"
+                    className="w-full border rounded-lg px-2 py-1.5 text-xs"
+                    style={{ borderColor: "var(--border)" }}
+                  />
+                </div>
+              )}
 
               <div className="mt-3 space-y-1.5 text-xs" style={{ color: "var(--muted)" }}>
                 {wv.vendor.contactPerson && <div className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</div>}

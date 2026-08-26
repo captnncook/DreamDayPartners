@@ -1081,7 +1081,7 @@ function VendorEditPage() {
               type="text"
               value={form.specializations}
               onChange={(e) => setForm({ ...form, specializations: e.target.value })}
-              placeholder={SPECIALIZATIONS_PLACEHOLDER[vendor?.category ?? ""] ?? "bijv. bruidsboeket, corsages, fotografie..."}
+              placeholder={SPECIALIZATIONS_PLACEHOLDER[vendor?.category ?? ""] ?? "bijv. de specifieke stijlen, thema's of onderdelen waar je in gespecialiseerd bent"}
               className="ddp-input"
             />
           </div>

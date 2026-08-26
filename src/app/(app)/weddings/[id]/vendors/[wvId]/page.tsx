@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import DashboardEngine from "@/components/vendor-modules/DashboardEngine";
 import { syncIntakeTasks } from "@/lib/intakeTasks";
+import { formatDateRange } from "@/lib/dateRange";
 
 export default async function VendorBookingPage({
   params,
@@ -28,7 +29,7 @@ export default async function VendorBookingPage({
 
   const wedding = await prisma.wedding.findFirst({
     where: accessWhere,
-    select: { title: true, id: true },
+    select: { title: true, id: true, date: true, endDate: true },
   });
   if (!wedding) return notFound();
 
@@ -186,6 +187,13 @@ export default async function VendorBookingPage({
               {booking.vendor.category}
               {booking.vendor.city && ` · ${booking.vendor.city}`}
             </div>
+            {wedding.endDate && (
+              <div style={{ fontSize: "var(--text-sm)", color: "var(--gold-deep)", fontWeight: 600, marginTop: "2px" }}>
+                {booking.specificDate
+                  ? `Werkt op: ${formatDateRange(booking.specificDate)}`
+                  : `Meerdaagse bruiloft (${formatDateRange(wedding.date, wedding.endDate)}) — werkt op alle dagen`}
+              </div>
+            )}
           </div>
           {booking.vendor.email && (
             <a href={`mailto:${booking.vendor.email}`} style={{ fontSize: "var(--text-base)", color: "var(--primary)", textDecoration: "none" }}>
