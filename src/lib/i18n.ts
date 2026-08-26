@@ -87,6 +87,12 @@ export const translations = {
         ctaPrimary: "Begin gratis", ctaSecondary: "Vind je Dream Partner",
         imageAlt: "Bruid plant haar bruiloft met DreamDay Platform",
       },
+      heroVendor: {
+        title1: "Al je bruiloften plannen,", titleHighlight: "zonder de chaos.",
+        sub: "Draaiboek, communicatie en documenten voor elke bruiloft vanuit één plek, ook als het er twintig tegelijk zijn.",
+        ctaPrimary: "Word leverancier", ctaSecondary: "Bekijk de prijzen",
+        imageAlt: "Weddingplanner plant meerdere bruiloften met DreamDay Platform",
+      },
       audience: {
         coupleTitle: "Wij gaan trouwen", coupleDesc: "Stel je dream team samen, regel offertes en maak jullie draaiboek. Voor altijd gratis, echt.", coupleCta: "Begin gratis",
         vendorTitle: "Ik ben leverancier", vendorDesc: "Beheer al je bruiloften op één plek: draaiboek, communicatie en documenten. Geen losse tools meer nodig.", vendorCta: "Bekijk voor leveranciers",
@@ -1576,6 +1582,12 @@ export const translations = {
         sub: "Put together your dream team of vendors, sort out quotes and invoices, and build your run sheet. All in one app, not ten.",
         ctaPrimary: "Start for free", ctaSecondary: "Find your Dream Partner",
         imageAlt: "Bride planning her wedding with DreamDay Platform",
+      },
+      heroVendor: {
+        title1: "Plan every wedding,", titleHighlight: "not a second job.",
+        sub: "Run sheet, communication and documents for every wedding from one place, even if there are twenty running at once.",
+        ctaPrimary: "Become a vendor", ctaSecondary: "See pricing",
+        imageAlt: "Wedding planner managing multiple weddings with DreamDay Platform",
       },
       audience: {
         coupleTitle: "We're getting married", coupleDesc: "Put together your dream team, sort out quotes and build your run sheet. Free, forever, really.", coupleCta: "Start for free",

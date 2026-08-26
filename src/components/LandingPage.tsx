@@ -132,12 +132,27 @@ export default function LandingPage() {
   const l: T["landing"] = t.landing;
   const [scrolled, setScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [audience, setAudience] = useState<"couple" | "vendor">("couple");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === "#leveranciers") { setAudience("vendor"); return; }
+    if (hash === "#bruidsparen") { setAudience("couple"); return; }
+    const saved = localStorage.getItem("ddp-audience");
+    if (saved === "couple" || saved === "vendor") setAudience(saved);
+  }, []);
+
+  function switchAudience(next: "couple" | "vendor") {
+    setAudience(next);
+    localStorage.setItem("ddp-audience", next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -220,14 +235,13 @@ export default function LandingPage() {
                   {l.nav.login}
                 </Link>
               </div>
-              <div className="hidden sm:block">
-                <a href="#bruidsparen" className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
-                  {l.nav.forCouples}
-                </a>
-              </div>
-              <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.45rem 0.875rem", whiteSpace: "nowrap" }}>
-                {l.nav.forVendors}
-              </a>
+              <button
+                onClick={() => switchAudience(audience === "couple" ? "vendor" : "couple")}
+                className="ddp-btn-primary"
+                style={{ fontSize: "var(--text-base)", padding: "0.45rem 0.875rem", whiteSpace: "nowrap", border: "none", cursor: "pointer" }}
+              >
+                {audience === "couple" ? l.nav.forVendors : l.nav.forCouples}
+              </button>
             </>
           )}
         </div>
@@ -250,21 +264,34 @@ export default function LandingPage() {
                   marginBottom: "var(--space-8)",
                 }}
               >
-                {l.hero.title1}{" "}
+                {audience === "couple" ? l.hero.title1 : l.heroVendor.title1}{" "}
                 <span style={{ background: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                  {l.hero.titleHighlight}
+                  {audience === "couple" ? l.hero.titleHighlight : l.heroVendor.titleHighlight}
                 </span>
               </h1>
               <p style={{ fontSize: "clamp(1rem, 2.5vw, 1.125rem)", color: "var(--muted)", maxWidth: "440px", lineHeight: 1.7, marginBottom: "2.5rem" }}>
-                {l.hero.sub}
+                {audience === "couple" ? l.hero.sub : l.heroVendor.sub}
               </p>
               <div className="flex flex-wrap gap-3 mb-6" style={{ position: "relative", zIndex: 1 }}>
-                <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  {l.hero.ctaPrimary}
-                </Link>
-                <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
-                  {l.hero.ctaSecondary}
-                </Link>
+                {audience === "couple" ? (
+                  <>
+                    <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
+                      {l.hero.ctaPrimary}
+                    </Link>
+                    <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
+                      {l.hero.ctaSecondary}
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
+                      {l.heroVendor.ctaPrimary}
+                    </Link>
+                    <a href="#prijzen" className="ddp-btn-secondary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
+                      {l.heroVendor.ctaSecondary}
+                    </a>
+                  </>
+                )}
               </div>
             </div>
 
@@ -285,8 +312,8 @@ export default function LandingPage() {
               />
               <div style={{ borderRadius: "24px", overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.15)", position: "relative" }}>
                 <Image
-                  src="/images/hero-bride-phone.png"
-                  alt={l.hero.imageAlt}
+                  src={audience === "couple" ? "/images/hero-bride-phone.png" : "/images/planner-outdoor.png"}
+                  alt={audience === "couple" ? l.hero.imageAlt : l.heroVendor.imageAlt}
                   width={700}
                   height={467}
                   style={{ width: "100%", height: "auto", display: "block" }}
@@ -294,40 +321,6 @@ export default function LandingPage() {
                 />
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Audience-splitser ─────────────────────────────── */}
-      <section className="px-5" style={{ background: "var(--background)" }}>
-        <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto", paddingBottom: "clamp(3rem, 6vw, 5rem)" }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <ScrollReveal>
-              <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
-                <h3 className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "var(--space-4)" }}>
-                  {l.audience.coupleTitle}
-                </h3>
-                <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "var(--space-8)" }}>
-                  {l.audience.coupleDesc}
-                </p>
-                <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  {l.audience.coupleCta}
-                </Link>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal delay={80}>
-              <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
-                <h3 className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "var(--space-4)" }}>
-                  {l.audience.vendorTitle}
-                </h3>
-                <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "var(--space-8)" }}>
-                  {l.audience.vendorDesc}
-                </p>
-                <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  {l.audience.vendorCta}
-                </a>
-              </div>
-            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -355,7 +348,8 @@ export default function LandingPage() {
         </div>
       </ScrollReveal>
 
-      {/* ── Herkenning ───────────────────────────────────── */}
+      {/* ── Herkenning (alleen bruidsparen) ────────────────── */}
+      {audience === "couple" && (
       <section className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-20">
@@ -389,6 +383,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Hoe het werkt ────────────────────────────────── */}
       <section id="hoe-het-werkt" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
@@ -425,6 +420,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Functies voor bruidsparen ─────────────────────── */}
+      {audience === "couple" && (
       <section id="bruidsparen" className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
@@ -473,8 +469,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Voor leveranciers ────────────────────────────── */}
+      {audience === "vendor" && (
       <section id="leveranciers" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex flex-col lg:flex-row-reverse gap-12 lg:gap-16 items-start">
@@ -523,8 +521,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Per leveranciersoort ──────────────────────────── */}
+      {audience === "vendor" && (
       <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
@@ -537,7 +537,7 @@ export default function LandingPage() {
             </p>
             <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginBottom: "2.5rem", maxWidth: "520px" }}>
               {l.perVendor.sub2Pre}{" "}
-              <a href="#bruidsparen" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline" }}>{l.perVendor.sub2Link}</a>.
+              <button onClick={() => switchAudience("couple")} style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline", background: "none", border: "none", cursor: "pointer", padding: 0, font: "inherit" }}>{l.perVendor.sub2Link}</button>.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={80}>
@@ -545,8 +545,10 @@ export default function LandingPage() {
           </ScrollReveal>
         </div>
       </section>
+      )}
 
-      {/* ── Social proof ─────────────────────────────────── */}
+      {/* ── Social proof (alleen bruidsparen) ─────────────── */}
+      {audience === "couple" && (
       <section className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
@@ -591,6 +593,7 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+      )}
 
       {/* ── Prijzen ──────────────────────────────────────── */}
       <section id="prijzen" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
@@ -605,66 +608,70 @@ export default function LandingPage() {
             </p>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-            <ScrollReveal delay={0}>
-              <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
-                <div className="ddp-badge badge-rose mb-5">{l.pricing.couple.badge}</div>
-                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.couple.price}</div>
-                <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>{l.pricing.couple.subtext}</div>
-                <ul className="space-y-3 mb-7">
-                  {l.pricing.couple.features.map((item) => (
-                    <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)" }}>
-                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/aanmelden" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                  {l.pricing.couple.cta}
-                </Link>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={80}>
-              <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
-                <div className="ddp-badge badge-neutral mb-5">{l.pricing.vendorFree.badge}</div>
-                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.vendorFree.price}</div>
-                <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>{l.pricing.vendorFree.subtext}</div>
-                <ul className="space-y-3 mb-7">
-                  {l.pricing.vendorFree.features.map((item) => (
-                    <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)" }}>
-                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/aanmelden?type=vendor" className="ddp-btn-secondary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                  {l.pricing.vendorFree.cta}
-                </Link>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={160}>
-              <div style={{ background: "var(--ink)", borderRadius: "20px", padding: "2rem", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: "1.25rem", right: "1.25rem", background: "var(--gradient-primary)", borderRadius: "999px", color: "white", fontSize: "var(--text-2xs)", fontWeight: 700, padding: "3px 10px", letterSpacing: "0.05em" }}>
-                  {l.pricing.popularBadge}
+          <div className={`grid grid-cols-1 gap-4 items-start ${audience === "couple" ? "" : "md:grid-cols-2"}`} style={audience === "couple" ? { maxWidth: "420px", margin: "0 auto" } : undefined}>
+            {audience === "couple" ? (
+              <ScrollReveal delay={0}>
+                <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
+                  <div className="ddp-badge badge-rose mb-5">{l.pricing.couple.badge}</div>
+                  <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.couple.price}</div>
+                  <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>{l.pricing.couple.subtext}</div>
+                  <ul className="space-y-3 mb-7">
+                    {l.pricing.couple.features.map((item) => (
+                      <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)" }}>
+                        <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/aanmelden" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
+                    {l.pricing.couple.cta}
+                  </Link>
                 </div>
-                <div className="ddp-badge badge-premium mb-5">{l.pricing.premium.badge}</div>
-                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.premium.price}</div>
-                <div style={{ fontSize: "var(--text-base)", color: "rgba(255,255,255,0.45)", marginBottom: "var(--space-8)" }}>{l.pricing.premium.subtext}</div>
-                <ul className="space-y-3 mb-7">
-                  {l.pricing.premium.features.map((item) => (
-                    <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)", color: "rgba(255,255,255,0.85)" }}>
-                      <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--primary-light)" }} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                  {l.pricing.premium.cta}
-                </Link>
-              </div>
-            </ScrollReveal>
+              </ScrollReveal>
+            ) : (
+              <>
+                <ScrollReveal delay={0}>
+                  <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
+                    <div className="ddp-badge badge-neutral mb-5">{l.pricing.vendorFree.badge}</div>
+                    <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.vendorFree.price}</div>
+                    <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>{l.pricing.vendorFree.subtext}</div>
+                    <ul className="space-y-3 mb-7">
+                      {l.pricing.vendorFree.features.map((item) => (
+                        <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)" }}>
+                          <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href="/aanmelden?type=vendor" className="ddp-btn-secondary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
+                      {l.pricing.vendorFree.cta}
+                    </Link>
+                  </div>
+                </ScrollReveal>
+
+                <ScrollReveal delay={80}>
+                  <div style={{ background: "var(--ink)", borderRadius: "20px", padding: "2rem", position: "relative", overflow: "hidden" }}>
+                    <div style={{ position: "absolute", top: "1.25rem", right: "1.25rem", background: "var(--gradient-primary)", borderRadius: "999px", color: "white", fontSize: "var(--text-2xs)", fontWeight: 700, padding: "3px 10px", letterSpacing: "0.05em" }}>
+                      {l.pricing.popularBadge}
+                    </div>
+                    <div className="ddp-badge badge-premium mb-5">{l.pricing.premium.badge}</div>
+                    <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.premium.price}</div>
+                    <div style={{ fontSize: "var(--text-base)", color: "rgba(255,255,255,0.45)", marginBottom: "var(--space-8)" }}>{l.pricing.premium.subtext}</div>
+                    <ul className="space-y-3 mb-7">
+                      {l.pricing.premium.features.map((item) => (
+                        <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)", color: "rgba(255,255,255,0.85)" }}>
+                          <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--primary-light)" }} />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
+                      {l.pricing.premium.cta}
+                    </Link>
+                  </div>
+                </ScrollReveal>
+              </>
+            )}
           </div>
         </div>
       </section>
