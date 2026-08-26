@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import DmChat from "./DmChat";
 import { resolveParticipantBadges } from "@/lib/participantBadge";
+import { translations } from "@/lib/i18n";
 
 export default async function DmConversationPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
@@ -39,7 +40,7 @@ export default async function DmConversationPage({ params }: { params: Promise<{
     <DmChat
       conversationId={id}
       currentUserId={user.id}
-      otherUser={otherWithBadge ?? { id: "", name: "Onbekend", role: "" }}
+      otherUser={otherWithBadge ?? { id: "", name: translations.nl.dm.unknown, role: "" }}
       initialMessages={serializedMessages}
     />
   );

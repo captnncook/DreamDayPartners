@@ -4,10 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { MessageCircle, Pencil, Search, X, ArrowLeft, Send, Check, Calendar } from "lucide-react";
 import ShieldAvatar from "@/components/ShieldAvatar";
 import { formatDateRange } from "@/lib/dateRange";
-
-const ROLE_LABELS: Record<string, string> = {
-  couple: "Bruidspaar", planner: "Trouwplanner", admin: "Beheerder", team_member: "Teamlid", vendor: "Leverancier",
-};
+import { useLang } from "@/components/LangProvider";
 
 type BadgedUser = { id: string; name: string; role: string; label?: string; photoUrl?: string | null };
 
@@ -39,6 +36,8 @@ function formatDate(iso: string) {
 }
 
 function RequestsPanel() {
+  const { t } = useLang();
+  const td = t.dm;
   const [requests, setRequests] = useState<VendorRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -62,15 +61,15 @@ function RequestsPanel() {
   }
 
   if (loading) {
-    return <div style={{ padding: "2rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>Laden…</div>;
+    return <div style={{ padding: "2rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>{td.loading}</div>;
   }
 
   if (requests.length === 0) {
     return (
       <div style={{ padding: "3rem 1.5rem", textAlign: "center", color: "var(--muted)" }}>
         <Calendar className="w-8 h-8" style={{ margin: "0 auto 0.75rem", color: "var(--border)" }} />
-        <p style={{ fontSize: "var(--text-md)" }}>Geen openstaande verzoeken</p>
-        <p style={{ fontSize: "var(--text-base)", marginTop: "var(--space-1)" }}>Nieuwe Dream Team-uitnodigingen verschijnen hier.</p>
+        <p style={{ fontSize: "var(--text-md)" }}>{td.noRequests}</p>
+        <p style={{ fontSize: "var(--text-base)", marginTop: "var(--space-1)" }}>{td.noRequestsSub}</p>
       </div>
     );
   }
@@ -86,7 +85,7 @@ function RequestsPanel() {
               {r.wedding.venue ? `${r.wedding.venue} · ` : ""}{formatDateRange(new Date(r.wedding.date), r.wedding.endDate ? new Date(r.wedding.endDate) : null)}
             </div>
             <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", margin: "0.625rem 0" }}>
-              Je bent uitgenodigd voor het Dream Team van deze bruiloft.
+              {td.invitedToTeam}
             </p>
             <div className="flex gap-2">
               <button
@@ -95,7 +94,7 @@ function RequestsPanel() {
                 className="ddp-btn-primary"
                 style={{ fontSize: "var(--text-base)", padding: "0.4rem 1rem" }}
               >
-                <Check className="w-3.5 h-3.5" /> {busy ? "Bezig…" : "Accepteren"}
+                <Check className="w-3.5 h-3.5" /> {busy ? td.busy : td.accept}
               </button>
               <button
                 onClick={() => respond(r.id, "decline")}
@@ -103,7 +102,7 @@ function RequestsPanel() {
                 className="ddp-btn-ghost"
                 style={{ fontSize: "var(--text-base)", padding: "0.4rem 0.875rem" }}
               >
-                <X className="w-3.5 h-3.5" /> Afwijzen
+                <X className="w-3.5 h-3.5" /> {td.decline}
               </button>
             </div>
           </div>
@@ -113,10 +112,10 @@ function RequestsPanel() {
   );
 }
 
-function timeAgo(iso: string) {
+function timeAgo(iso: string, justNow: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Zojuist";
+  if (mins < 1) return justNow;
   if (mins < 60) return `${mins}m`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}u`;
@@ -132,6 +131,9 @@ function formatTime(iso: string) {
 }
 
 function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conversationId: string; currentUserId: string; otherUser: BadgedUser; onBack: () => void }) {
+  const { t } = useLang();
+  const td = t.dm;
+  const ROLE_LABELS = td.roleLabels as Record<string, string>;
   const [messages, setMessages] = useState<DmMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -195,7 +197,7 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
     const optimisticTime = new Date().toISOString();
     const optimistic: DmMessage = {
       id: `tmp-${Date.now()}`, conversationId, senderId: currentUserId,
-      content: text, createdAt: optimisticTime, sender: { id: currentUserId, name: "Jij" },
+      content: text, createdAt: optimisticTime, sender: { id: currentUserId, name: td.you },
     };
     lastCreatedAt.current = optimisticTime;
     setMessages(prev => [...prev, optimistic]);
@@ -221,7 +223,7 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
           onClick={onBack}
           className="ddp-dm-back-btn"
           style={{ background: "none", border: "none", cursor: "pointer", padding: "0.25rem", margin: "-0.25rem 0 -0.25rem -0.25rem", color: "var(--muted)" }}
-          aria-label="Terug naar gesprekken"
+          aria-label={td.backToConversations}
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -238,9 +240,9 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
         </div>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "var(--space-3)", background: "var(--background)" }}>
-        {loading && <div style={{ textAlign: "center", color: "var(--muted)", marginTop: "var(--space-9)", fontSize: "var(--text-md)" }}>Laden…</div>}
+        {loading && <div style={{ textAlign: "center", color: "var(--muted)", marginTop: "var(--space-9)", fontSize: "var(--text-md)" }}>{td.loading}</div>}
         {!loading && messages.length === 0 && (
-          <div style={{ textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)", marginTop: "var(--space-10)" }}>Stuur een bericht om het gesprek te starten.</div>
+          <div style={{ textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)", marginTop: "var(--space-10)" }}>{td.startConversationPrompt}</div>
         )}
         {messages.map((msg, i) => {
           const isMine = msg.senderId === currentUserId;
@@ -270,12 +272,12 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
         <textarea
           value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-          placeholder="Bericht…" rows={1}
-          aria-label="Bericht"
+          placeholder={td.messagePlaceholder} rows={1}
+          aria-label={td.messageAria}
           style={{ flex: 1, padding: "0.625rem 0.875rem", borderRadius: "1.25rem", border: "1px solid var(--border)", fontSize: "var(--text-lg)", resize: "none", background: "var(--accent)", color: "var(--foreground)", lineHeight: 1.4, maxHeight: "120px", overflowY: "auto" }}
           onInput={e => { const el = e.currentTarget; el.style.height = "auto"; el.style.height = `${el.scrollHeight}px`; }}
         />
-        <button onClick={send} disabled={!input.trim() || sending} aria-label="Verstuur bericht" style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: input.trim() ? "var(--primary)" : "var(--border)", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s", flexShrink: 0 }}>
+        <button onClick={send} disabled={!input.trim() || sending} aria-label={td.sendMessageAria} style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: input.trim() ? "var(--primary)" : "var(--border)", border: "none", cursor: input.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s", flexShrink: 0 }}>
           <Send className="w-4 h-4" style={{ color: "white" }} />
         </button>
       </div>
@@ -284,6 +286,9 @@ function ChatPanel({ conversationId, currentUserId, otherUser, onBack }: { conve
 }
 
 export default function DmPage() {
+  const { t } = useLang();
+  const td = t.dm;
+  const ROLE_LABELS = td.roleLabels as Record<string, string>;
   const [convs, setConvs] = useState<Conv[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
   const [role, setRole] = useState("");
@@ -353,7 +358,7 @@ export default function DmPage() {
     <div className="ddp-dm-shell" style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {role === "vendor" && (
         <div style={{ display: "flex", gap: "var(--space-8)", padding: "0.75rem 1.25rem 0", borderBottom: "1px solid var(--border)", background: "white", flexShrink: 0 }}>
-          {([["gesprekken", "Gesprekken"], ["verzoeken", "Verzoeken"]] as const).map(([key, label]) => (
+          {([["gesprekken", td.tabConversations], ["verzoeken", td.tabRequests]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -380,19 +385,19 @@ export default function DmPage() {
       {/* Left: conversation list — op mobiel verborgen zodra een gesprek open staat */}
       <div className={`ddp-dm-list${activeConvId ? " ddp-dm-list-hidden-mobile" : ""}`} style={{ width: "280px", flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "white" }}>
         <div style={{ padding: "1rem", borderBottom: "1px solid var(--border)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "var(--space-3)" }}>
-          <span style={{ fontWeight: 700, fontSize: "var(--text-xl)", flexShrink: 0 }}>Berichten</span>
+          <span style={{ fontWeight: 700, fontSize: "var(--text-xl)", flexShrink: 0 }}>{t.messages.title}</span>
           <button onClick={() => { setComposing(true); setQuery(""); setResults([]); }}
             style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", padding: "0.375rem 0.75rem", borderRadius: "9999px", background: "var(--primary)", color: "white", border: "none", cursor: "pointer", fontSize: "var(--text-sm)", fontWeight: 600, whiteSpace: "nowrap", flexShrink: 0 }}>
-            <Pencil className="w-3 h-3" /> Nieuw bericht
+            <Pencil className="w-3 h-3" /> {td.newMessage}
           </button>
         </div>
 
         <div style={{ flex: 1, overflowY: "auto" }}>
-          {loading && <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>Laden…</div>}
+          {loading && <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>{td.loading}</div>}
           {!loading && convs.length === 0 && (
             <div style={{ padding: "2rem 1rem", textAlign: "center", color: "var(--muted)" }}>
               <MessageCircle className="w-6 h-6" style={{ margin: "0 auto 0.5rem", color: "var(--border)" }} />
-              <p style={{ fontSize: "var(--text-base)" }}>Nog geen gesprekken</p>
+              <p style={{ fontSize: "var(--text-base)" }}>{td.noConversations}</p>
             </div>
           )}
           {convs.map(conv => {
@@ -410,11 +415,11 @@ export default function DmPage() {
                   </div>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: "var(--text-md)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{other?.name ?? "Onbekend"}</div>
+                  <div style={{ fontWeight: 600, fontSize: "var(--text-md)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{other?.name ?? td.unknown}</div>
                   <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>{other ? (other.label ?? ROLE_LABELS[other.role] ?? other.role) : ""}</div>
-                  {lastMsg && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{lastMsg.sender.id === currentUserId ? "Jij: " : ""}{lastMsg.content}</div>}
+                  {lastMsg && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{lastMsg.sender.id === currentUserId ? `${td.you}: ` : ""}{lastMsg.content}</div>}
                 </div>
-                {lastMsg && <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", flexShrink: 0 }}>{timeAgo(lastMsg.createdAt)}</div>}
+                {lastMsg && <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", flexShrink: 0 }}>{timeAgo(lastMsg.createdAt, td.justNow)}</div>}
               </button>
             );
           })}
@@ -427,8 +432,8 @@ export default function DmPage() {
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--muted)" }}>
             <div style={{ textAlign: "center" }}>
               <MessageCircle className="w-10 h-10" style={{ margin: "0 auto 0.75rem", color: "var(--border)" }} />
-              <p style={{ fontSize: "var(--text-lg)" }}>Selecteer een gesprek</p>
-              <p style={{ fontSize: "var(--text-base)", marginTop: "var(--space-2)" }}>of start een nieuw gesprek</p>
+              <p style={{ fontSize: "var(--text-lg)" }}>{td.selectConversation}</p>
+              <p style={{ fontSize: "var(--text-base)", marginTop: "var(--space-2)" }}>{td.orStartNew}</p>
             </div>
           </div>
         ) : (
@@ -443,21 +448,21 @@ export default function DmPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 50, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "5rem 1rem" }}>
           <div style={{ background: "white", borderRadius: "16px", width: "100%", maxWidth: "480px", boxShadow: "0 20px 60px rgba(0,0,0,0.15)", overflow: "hidden" }}>
             <div style={{ padding: "1.25rem 1.25rem 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontWeight: 700, fontSize: "var(--text-xl)" }}>Nieuw bericht</span>
+              <span style={{ fontWeight: 700, fontSize: "var(--text-xl)" }}>{td.newMessageTitle}</span>
               <button onClick={() => setComposing(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex" }}><X className="w-5 h-5" /></button>
             </div>
             <div style={{ padding: "1rem 1.25rem", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-              <span style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--muted)", flexShrink: 0 }}>Aan:</span>
+              <span style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--muted)", flexShrink: 0 }}>{td.to}</span>
               <div style={{ position: "relative", flex: 1 }}>
                 <Search className="w-4 h-4" style={{ position: "absolute", left: "0.625rem", top: "50%", transform: "translateY(-50%)", color: "var(--muted)", pointerEvents: "none" }} />
-                <input ref={searchRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Zoek op naam of bedrijf…"
+                <input ref={searchRef} value={query} onChange={e => setQuery(e.target.value)} placeholder={td.searchPlaceholder}
                   style={{ width: "100%", paddingLeft: "2rem", paddingRight: "0.75rem", paddingTop: "0.5rem", paddingBottom: "0.5rem", border: "1px solid var(--border)", borderRadius: "8px", fontSize: "var(--text-md)", outline: "none", background: "var(--accent)", boxSizing: "border-box" }} />
               </div>
             </div>
             <div style={{ maxHeight: "320px", overflowY: "auto" }}>
-              {searching ? <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>Zoeken…</div>
-                : results.length === 0 && query.trim() ? <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>Geen resultaten</div>
-                : results.length === 0 ? <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>Begin te typen om te zoeken</div>
+              {searching ? <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>{td.searching}</div>
+                : results.length === 0 && query.trim() ? <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>{td.noResults}</div>
+                : results.length === 0 ? <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)" }}>{td.startTyping}</div>
                 : results.map(r => (
                   <button key={r.userId} onClick={() => !creating && startConversation(r.userId)} disabled={creating}
                     className="ddp-dm-result-row"
@@ -470,7 +475,7 @@ export default function DmPage() {
                     <div>
                       <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--charcoal)" }}>{r.name}</div>
                       <div style={{ fontSize: "var(--text-sm)", color: r.linked ? "var(--gold-deep)" : "var(--muted)", fontWeight: r.linked ? 600 : 400 }}>
-                        {r.linked ? "Gekoppeld aan jullie bruiloft" : (r.category ?? ROLE_LABELS[r.role] ?? r.role)}
+                        {r.linked ? td.linkedToWedding : (r.category ?? ROLE_LABELS[r.role] ?? r.role)}
                       </div>
                     </div>
                   </button>
