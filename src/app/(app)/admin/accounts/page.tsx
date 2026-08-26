@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Search, Trash2, Mail, Edit2, Check, X, Upload, ChevronDown, Save, Star } from "lucide-react";
+import { useLang } from "@/components/LangProvider";
 
 type User = {
   id: string;
@@ -14,27 +15,16 @@ type User = {
   createdAt: string;
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  admin: "Admin", planner: "Weddingplanner", couple: "Bruidspaar",
-  vendor: "Leverancier", team_member: "Teamlid",
-};
-
 const ROLE_COLOR: Record<string, string> = {
   admin: "var(--gold-deep)", planner: "var(--foreground)", couple: "var(--muted)",
   vendor: "var(--muted)", team_member: "var(--muted)",
 };
 
-const VENDOR_TYPE_LABELS: Record<string, string> = {
-  weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
-  bloemist: "Bloemist", dj: "DJ / Muziek", catering: "Catering", bakker: "Bruidstaart & Bakker",
-  haarstylist: "Haarstylist", visagist: "Visagist", trouwlocatie: "Trouwlocatie",
-  vervoer: "Vervoer", verhuur: "Verhuur", tentverhuur: "Tentverhuur", trouwauto: "Trouwauto",
-  bar: "Bar / Cocktails", koffiebar: "Koffiebar / Foodtruck",
-  liveband: "Liveband & Muziek", entertainment: "Entertainment / Acts",
-  fotocabine: "Fotocabine", overig: "Overig",
-};
-
 export default function AccountsPage() {
+  const { t } = useLang();
+  const ta = t.adminAccounts;
+  const ROLE_LABELS = ta.roleLabels as Record<string, string>;
+  const VENDOR_TYPE_LABELS = ta.vendorTypeLabels as Record<string, string>;
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
@@ -77,23 +67,23 @@ export default function AccountsPage() {
   }
 
   async function handleDelete(u: User) {
-    if (!confirm(`Account van ${u.name} (${u.email}) permanent verwijderen?`)) return;
+    if (!confirm(ta.deleteConfirm.replace("{name}", u.name).replace("{email}", u.email))) return;
     setSaving(u.id);
     const res = await fetch(`/api/admin/accounts/${u.id}`, { method: "DELETE" });
     if (res.ok) {
       setUsers(us => us.filter(x => x.id !== u.id));
     } else {
       const d = await res.json();
-      setMsg(u.id, d.error ?? "Fout bij verwijderen");
+      setMsg(u.id, d.error ?? ta.deleteError);
     }
     setSaving(null);
   }
 
   async function handleResetPassword(u: User) {
-    if (!confirm(`Wachtwoordreset-e-mail sturen naar ${u.email}?`)) return;
+    if (!confirm(ta.resetConfirm.replace("{email}", u.email))) return;
     setSaving(u.id);
     const res = await fetch(`/api/admin/accounts/${u.id}/reset-password`, { method: "POST" });
-    setMsg(u.id, res.ok ? "✓ E-mail verstuurd" : "Fout bij versturen");
+    setMsg(u.id, res.ok ? ta.emailSentMsg : ta.emailSendError);
     setSaving(null);
   }
 
@@ -108,9 +98,9 @@ export default function AccountsPage() {
     const d = await res.json();
     if (res.ok) {
       setUsers(us => us.map(x => x.id === u.id ? { ...x, email: editEmail } : x));
-      setMsg(u.id, "✓ E-mail bijgewerkt");
+      setMsg(u.id, ta.emailUpdated);
     } else {
-      setMsg(u.id, d.error ?? "Fout bij opslaan");
+      setMsg(u.id, d.error ?? ta.saveError);
     }
     setEditId(null);
     setSaving(null);
@@ -125,10 +115,10 @@ export default function AccountsPage() {
     });
     if (res.ok) {
       setUsers(us => us.map(x => x.id === u.id ? { ...x, vendorType } : x));
-      setMsg(u.id, "✓ Leverancierstype bijgewerkt");
+      setMsg(u.id, ta.vendorTypeUpdated);
     } else {
       const d = await res.json();
-      setMsg(u.id, d.error ?? "Fout bij opslaan");
+      setMsg(u.id, d.error ?? ta.saveError);
     }
     setEditVendorTypeId(null);
     setSaving(null);
@@ -145,10 +135,10 @@ export default function AccountsPage() {
     if (res.ok) {
       setUsers(us => us.map(x => x.id === u.id ? { ...x, isPremium: newVal } : x));
       setPendingPremium(p => { const n = { ...p }; delete n[u.id]; return n; });
-      setMsg(u.id, newVal ? "✓ Premium toegekend, e-mail verstuurd" : "✓ Premium verwijderd");
+      setMsg(u.id, newVal ? ta.premiumGranted : ta.premiumRemoved);
     } else {
       const d = await res.json();
-      setMsg(u.id, d.error ?? "Fout bij opslaan");
+      setMsg(u.id, d.error ?? ta.saveError);
     }
     setSaving(null);
   }
@@ -171,14 +161,14 @@ export default function AccountsPage() {
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Accountbeheer</h1>
-          <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>{users.length} accounts gevonden</p>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{ta.title}</h1>
+          <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>{ta.subtitleCount.replace("{n}", String(users.length))}</p>
         </div>
         <button
           onClick={() => setShowImport(s => !s)}
           className="ddp-btn-secondary flex items-center gap-2"
         >
-          <Upload className="w-4 h-4" /> CSV import
+          <Upload className="w-4 h-4" /> {ta.csvImportBtn}
           <ChevronDown className="w-3 h-3" style={{ transform: showImport ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
         </button>
       </div>
@@ -186,10 +176,10 @@ export default function AccountsPage() {
       {/* CSV import panel */}
       {showImport && (
         <div className="ddp-card mb-6 space-y-4">
-          <h2 className="font-semibold">Massa-import via CSV</h2>
+          <h2 className="font-semibold">{ta.importPanelTitle}</h2>
           <p className="text-sm" style={{ color: "var(--muted)" }}>
-            Kolommen (kommagescheiden): <code className="text-xs px-1 py-0.5 rounded" style={{ background: "var(--accent)" }}>name, email, role, vendorType, city, phone, website</code><br />
-            <span className="text-xs">Role: vendor / couple / planner / team_member. Standaard: vendor. Bestaande e-mailadressen worden overgeslagen.</span>
+            {ta.columnsLabel} <code className="text-xs px-1 py-0.5 rounded" style={{ background: "var(--accent)" }}>name, email, role, vendorType, city, phone, website</code><br />
+            <span className="text-xs">{ta.columnsNote}</span>
           </p>
           <div className="flex items-center gap-3">
             <input
@@ -202,14 +192,17 @@ export default function AccountsPage() {
           </div>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="checkbox" checked={sendInvite} onChange={e => setSendInvite(e.target.checked)} className="w-4 h-4" />
-            Activatie-e-mail sturen (link geldig 7 dagen)
+            {ta.sendInviteLabel}
           </label>
           {importResult && (
             <div className="text-sm p-3 rounded-lg space-y-1" style={{ background: "var(--accent)" }}>
-              <p><strong>{importResult.created}</strong> aangemaakt, <strong>{importResult.skipped}</strong> overgeslagen van {importResult.total} rijen.</p>
+              <p>
+                <strong>{importResult.created}</strong> {ta.importSummary.split("{created}")[1]?.split("{skipped}")[0]}
+                <strong>{importResult.skipped}</strong> {ta.importSummary.split("{skipped}")[1]?.replace("{total}", String(importResult.total))}
+              </p>
               {importResult.errors.length > 0 && (
                 <details>
-                  <summary className="cursor-pointer text-xs" style={{ color: "var(--danger)" }}>{importResult.errors.length} fouten</summary>
+                  <summary className="cursor-pointer text-xs" style={{ color: "var(--danger)" }}>{ta.errorsCount.replace("{n}", String(importResult.errors.length))}</summary>
                   <ul className="mt-1 space-y-0.5">
                     {importResult.errors.map((e, i) => <li key={i} className="text-xs" style={{ color: "var(--danger)" }}>{e}</li>)}
                   </ul>
@@ -222,7 +215,7 @@ export default function AccountsPage() {
             disabled={!csvFile || importing}
             className="ddp-btn-primary"
           >
-            {importing ? "Importeren…" : "Importeren"}
+            {importing ? ta.importingBtn : ta.importBtn}
           </button>
         </div>
       )}
@@ -234,7 +227,7 @@ export default function AccountsPage() {
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="Zoeken op naam of e-mail…"
+            placeholder={ta.searchPlaceholder}
           />
         </div>
         <select
@@ -243,7 +236,7 @@ export default function AccountsPage() {
           className="ddp-input"
           style={{ width: "180px" }}
         >
-          <option value="">Alle rollen</option>
+          <option value="">{ta.allRoles}</option>
           {Object.entries(ROLE_LABELS).map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
@@ -255,7 +248,7 @@ export default function AccountsPage() {
         <table className="w-full text-sm" style={{ minWidth: "720px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
-              {["Naam", "E-mail", "Rol", "Premium", "Aangemaakt", "Acties"].map(h => (
+              {[ta.tableHeaders.name, ta.tableHeaders.email, ta.tableHeaders.role, ta.tableHeaders.premium, ta.tableHeaders.created, ta.tableHeaders.actions].map(h => (
                 <th key={h} className="text-xs font-semibold text-left px-4 py-3" style={{ color: "var(--muted)" }}>{h}</th>
               ))}
             </tr>
@@ -272,7 +265,7 @@ export default function AccountsPage() {
                 </tr>
               ))
             ) : users.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "var(--muted)" }}>Geen accounts gevonden</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "var(--muted)" }}>{ta.noAccountsFound}</td></tr>
             ) : users.map(u => (
               <tr key={u.id} style={{ borderBottom: "1px solid var(--border)" }}>
                 <td className="px-4 py-3 font-medium">{u.name}</td>
@@ -308,7 +301,7 @@ export default function AccountsPage() {
                         className="ddp-input py-0.5 text-xs"
                         style={{ display: "inline-block", width: "auto", marginLeft: "var(--space-3)" }}
                       >
-                        <option value="">Kies…</option>
+                        <option value="">{ta.choosePlaceholder}</option>
                         {Object.entries(VENDOR_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                       </select>
                     ) : (
@@ -316,9 +309,9 @@ export default function AccountsPage() {
                         onClick={() => setEditVendorTypeId(u.id)}
                         className="capitalize"
                         style={{ fontSize: "var(--text-xs)", color: "var(--muted-light)", marginLeft: "var(--space-3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline dotted" }}
-                        title="Leverancierstype wijzigen"
+                        title={ta.changeVendorTypeTooltip}
                       >
-                        {u.vendorType ? (VENDOR_TYPE_LABELS[u.vendorType] ?? u.vendorType) : "Type instellen"}
+                        {u.vendorType ? (VENDOR_TYPE_LABELS[u.vendorType] ?? u.vendorType) : ta.setTypeLabel}
                       </button>
                     )
                   )}
@@ -350,7 +343,7 @@ export default function AccountsPage() {
                           <button
                             onClick={() => handleSavePremium(u)}
                             disabled={saving === u.id}
-                            title="Opslaan"
+                            title={ta.saveTooltip}
                             className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-semibold transition-opacity"
                             style={{ background: "var(--primary)", color: "white", opacity: saving === u.id ? 0.6 : 1 }}
                           >
@@ -369,7 +362,7 @@ export default function AccountsPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => { setEditId(u.id); setEditEmail(u.email); }}
-                      title="E-mail wijzigen"
+                      title={ta.editEmailTooltip}
                       className="p-1.5 rounded-lg hover:opacity-70 transition-opacity"
                       style={{ color: "var(--muted)" }}
                     >
@@ -378,7 +371,7 @@ export default function AccountsPage() {
                     <button
                       onClick={() => handleResetPassword(u)}
                       disabled={saving === u.id}
-                      title="Wachtwoordreset sturen"
+                      title={ta.resetPasswordTooltip}
                       className="p-1.5 rounded-lg hover:opacity-70 transition-opacity"
                       style={{ color: "var(--primary)" }}
                     >
@@ -387,7 +380,7 @@ export default function AccountsPage() {
                     <button
                       onClick={() => handleDelete(u)}
                       disabled={saving === u.id}
-                      title="Account verwijderen"
+                      title={ta.deleteAccountTooltip}
                       className="p-1.5 rounded-lg hover:opacity-70 transition-opacity"
                       style={{ color: "var(--danger)" }}
                     >

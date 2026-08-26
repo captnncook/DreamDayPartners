@@ -3,18 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { MODULE_LABELS, TOGGLEABLE_MODULE_KEYS, getVendorTypeConfig, type ModuleKey } from "@/lib/vendorTypeConfigs";
 import VendorFeatureRequestsPanel from "./VendorFeatureRequestsPanel";
-
-const CATEGORY_MAP: Record<string, string> = {
-  weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
-  bloemist: "Bloemist", catering: "Catering", bakker: "Bruidstaart & Bakker",
-  dj: "Muziek & DJ", liveband: "Liveband", ceremoniespreker: "Ceremoniespreker",
-  trouwlocatie: "Trouwlocatie", haarstylist: "Hair & make-up", vervoer: "Vervoer",
-  decoratie: "Decoratie & Styling", fotocabine: "Fotocabine", overig: "Overig",
-};
+import { useLang } from "@/components/LangProvider";
 
 type Vendor = { id: string; name: string; category: string; city: string | null; isPremium: boolean; userId: string | null; extraModules: string[] };
 
 export default function AdminVendorsPage() {
+  const { t } = useLang();
+  const tv = t.adminVendors;
+  const CATEGORY_MAP = tv.categoryLabels;
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -79,12 +75,12 @@ export default function AdminVendorsPage() {
       if (res.ok) {
         setCleanupMsg(
           data.cleared === 0
-            ? "Geen gedeelde stockfoto's gevonden."
-            : `${data.cleared} leverancier${data.cleared === 1 ? "" : "s"} met een gedeelde stockfoto opgeschoond. Toont nu het DreamDay-logo.`
+            ? tv.cleanupNoneFound
+            : tv.cleanupDone.replace("{n}", String(data.cleared)).replace("{s}", data.cleared === 1 ? "" : "s")
         );
         load();
       } else {
-        setCleanupMsg(data.error ?? "Opschonen mislukt");
+        setCleanupMsg(data.error ?? tv.cleanupError);
       }
     } finally {
       setCleaning(false);
@@ -96,21 +92,20 @@ export default function AdminVendorsPage() {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="font-serif mb-1" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>
-        Leveranciers
+        {tv.title}
       </h1>
       <p className="text-sm mb-4" style={{ color: "var(--muted)" }}>
-        Markeer een leverancier als "Aanbevolen", ook profielen zonder eigen account (bijv. uit een bulkimport).
+        {tv.subtitle}
       </p>
 
       <VendorFeatureRequestsPanel />
 
       <div className="mb-6">
         <button onClick={cleanupDuplicatePhotos} disabled={cleaning} className="ddp-btn-secondary">
-          {cleaning ? "Bezig…" : "Gedeelde stockfoto's opschonen"}
+          {cleaning ? tv.cleanupBusy : tv.cleanupBtn}
         </button>
         <p className="text-xs mt-1.5" style={{ color: "var(--muted)" }}>
-          Leveranciers uit een bulkimport delen soms dezelfde standaardfoto per categorie. Deze actie wist die gedeelde
-          foto's (unieke, echt geüploade foto's blijven staan). De leverancier toont daarna het DreamDay-logo.
+          {tv.cleanupNote}
         </p>
         {cleanupMsg && <p className="text-xs mt-1.5" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{cleanupMsg}</p>}
       </div>
@@ -118,15 +113,15 @@ export default function AdminVendorsPage() {
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Zoek op naam of stad…"
+        placeholder={tv.searchPlaceholder}
         className="ddp-input mb-4"
         style={{ maxWidth: "360px" }}
       />
 
       {loading ? (
-        <p className="text-sm" style={{ color: "var(--muted)" }}>Laden…</p>
+        <p className="text-sm" style={{ color: "var(--muted)" }}>{tv.loading}</p>
       ) : vendors.length === 0 ? (
-        <p className="text-sm" style={{ color: "var(--muted)" }}>Geen leveranciers gevonden.</p>
+        <p className="text-sm" style={{ color: "var(--muted)" }}>{tv.noneFound}</p>
       ) : (
         <>
           <div style={{ borderTop: "1px solid var(--border)" }}>
@@ -139,7 +134,7 @@ export default function AdminVendorsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{v.name}</div>
                       <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-                        {CATEGORY_MAP[v.category] ?? v.category}{v.city ? ` · ${v.city}` : ""}{!v.userId ? " · geen account" : ""}
+                        {(CATEGORY_MAP as Record<string, string>)[v.category] ?? v.category}{v.city ? ` · ${v.city}` : ""}{!v.userId ? ` · ${tv.noAccountSuffix}` : ""}
                       </div>
                     </div>
                     <button
@@ -147,7 +142,7 @@ export default function AdminVendorsPage() {
                       className="text-xs flex-shrink-0"
                       style={{ fontWeight: 600, color: "var(--muted)" }}
                     >
-                      Functies {expandedId === v.id ? "▲" : "▼"}
+                      {tv.featuresBtn} {expandedId === v.id ? "▲" : "▼"}
                     </button>
                     <button
                       onClick={() => togglePremium(v)}
@@ -155,13 +150,13 @@ export default function AdminVendorsPage() {
                       className="text-sm flex-shrink-0"
                       style={{ fontWeight: 700, color: v.isPremium ? "var(--gold-deep)" : "var(--muted)", opacity: busyId === v.id ? 0.5 : 1 }}
                     >
-                      {v.isPremium ? "Aanbevolen ✓" : "Markeer als aanbevolen"}
+                      {v.isPremium ? tv.featuredLabel : tv.markFeaturedLabel}
                     </button>
                   </div>
                   {expandedId === v.id && (
                     <div style={{ padding: "0.75rem 0.5rem 1.25rem", background: "var(--surface-2)" }}>
                       {grantable.length === 0 ? (
-                        <p className="text-xs" style={{ color: "var(--muted)" }}>Geen extra functies beschikbaar buiten het standaardpakket van deze categorie.</p>
+                        <p className="text-xs" style={{ color: "var(--muted)" }}>{tv.noExtraFeatures}</p>
                       ) : (
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
                           {grantable.map((key) => (
@@ -190,15 +185,17 @@ export default function AdminVendorsPage() {
                 disabled={page <= 1}
                 style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page <= 1 ? "var(--muted-light)" : "var(--ink-text)" }}
               >
-                ← Vorige
+                {tv.prevBtn}
               </button>
-              <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Pagina {page} van {totalPages} · {total} totaal</span>
+              <span style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>
+                {tv.pageLabel.replace("{page}", String(page)).replace("{total}", String(totalPages)).replace("{n}", String(total))}
+              </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
                 style={{ fontSize: "var(--text-base)", fontWeight: 600, color: page >= totalPages ? "var(--muted-light)" : "var(--ink-text)" }}
               >
-                Volgende →
+                {tv.nextBtn}
               </button>
             </div>
           )}
