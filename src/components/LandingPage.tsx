@@ -6,116 +6,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Check, ArrowRight, ChevronDown, LogOut } from "lucide-react";
+import { useLang } from "@/components/LangProvider";
+import type { T } from "@/lib/i18n";
 
-/* ─── Data ─────────────────────────────────────────────── */
-
-const FEATURES_COUPLES = [
-  { title: "Alles maar één keer invullen", desc: "Gastenaantal en dieetwensen vul je één keer in. De cateraar, bakker en vervoerder lezen automatisch mee." },
-  { title: "Eén draaiboek, geen acht versies",         desc: "Fotograaf, DJ, band en vervoerder werken allemaal met dezelfde tijdlijn. Niemand zit meer met een verouderd exportje." },
-  { title: "Altijd weten waar je financieel staat",        desc: "Aanbetaling, einddatum en eindbedrag van elke leverancier in één overzicht. Geen losse facturen bij elkaar zoeken." },
-  { title: "Contracten & offertes op één plek",      desc: "Alles wat je ontvangt staat in je dossier, niet verspreid over je mail en drie WhatsApp-groepen." },
-  { title: "Nooit meer twijfelen over de laatste versie",            desc: "Je ziet precies welk moodboard of menu je hebt goedgekeurd. Geen mailthread meer uitpluizen." },
-  { title: "Geen doorgeefluik meer",          desc: "Leveranciers stemmen praktische zaken rechtstreeks met elkaar af. Jij hoeft niet elk bericht door te sturen." },
-  { title: "Taken en deadlines op één plek",       desc: "Van verloving tot de grote dag zie je in één dashboard hoe ver je bent, niet in drie losse apps." },
-  { title: "Gratis. Ja, echt.",                       desc: "Geen abonnement, geen creditcard, geen addertje onder het gras. Voor bruidsparen blijft dit voor altijd gratis." },
-];
-
-const VENDOR_STORIES: { value: string; label: string; pain: string; solution: string }[] = [
-  {
-    value: "weddingplanner", label: "Weddingplanner",
-    pain: "Je coördineert twaalf of meer leveranciers, vaak via vijf tools naast elkaar. Onderzoek wijst uit dat tot 70% van je tijd naar administratie gaat, niet naar het vak waar je goed in bent.",
-    solution: "DreamDay geeft je per bruiloft één overzicht: status van elke leverancier, openstaande taken, betalingen en het complete draaiboek. Zelf alles handmatig bijhouden is er niet meer bij.",
-  },
-  {
-    value: "fotograaf", label: "Fotograaf",
-    pain: "Voor elk uur achter de camera gaat er ongeveer net zoveel tijd naar administratie die je niet factureert: offertes op maat, contracten, en dat tijdschema dat je alweer moet doorlezen.",
-    solution: "Je shotlist en leveringen, van sneak peek tot album, staan met een duidelijke status klaar, in hetzelfde draaiboek als de videograaf.",
-  },
-  {
-    value: "videograaf", label: "Videograaf",
-    pain: "Jij en de fotograaf vragen vaak los van elkaar dezelfde ceremonie-informatie op. Verschuift er iets, dan hoort niet iedereen het tegelijk.",
-    solution: "Eén gedeeld draaiboek per fase betekent dat je nooit meer los van de fotograaf dezelfde tijden hoeft te reconstrueren.",
-  },
-  {
-    value: "bloemist", label: "Bloemist",
-    pain: "Het lastige deel van bloemwerk zit niet in het boeket. Het zit in de wijziging twee weken van tevoren, de nieuwe tafelindeling, of niet weten wie je moet bellen.",
-    solution: "Gastenaantallen, tafelindeling en opbouwschema staan centraal, inclusief de toegangstijd van de locatie. Zelf navragen hoeft niet meer.",
-  },
-  {
-    value: "catering", label: "Catering",
-    pain: "Het definitieve gastenaantal, allergieën en dieetwensen krijg je nu vaak op het laatste moment binnen, verspreid over losse mailtjes.",
-    solution: "DreamDay leest automatisch mee met de actuele gastenlijst van het bruidspaar. Geen aparte spreadsheet meer opvragen en samenvoegen.",
-  },
-  {
-    value: "bakker", label: "Bruidstaart & Bakker",
-    pain: "Een taart bakken op het verkeerde gastenaantal kost je een hele laag, of je bakt juist te weinig voor een langere gastenlijst.",
-    solution: "Dezelfde automatische koppeling met de gastenlijst, plus een heldere status voor smaakproef en ontwerp.",
-  },
-  {
-    value: "dj", label: "DJ",
-    pain: "Must-play-lijst, geluidsgrens van de locatie en het exacte moment van de eerste dans komen nu via drie verschillende kanalen binnen.",
-    solution: "De geluidsgrens staat al vooraf ingevuld en je fase-indeling hangt direct aan de rest van het draaiboek.",
-  },
-  {
-    value: "liveband", label: "Liveband",
-    pain: "Opbouw, stroomvoorziening en soundcheck regelen, en dan ook nog het repertoire afstemmen op het exacte moment van de speeches.",
-    solution: "Logistiek zoals vermogen, podiumafmeting en kleedkamer staan vooraf vast, samen met je definitieve setlist, direct gekoppeld aan het draaiboek.",
-  },
-  {
-    value: "ceremoniespreker", label: "Ceremoniespreker",
-    pain: "Een ceremonie schrijven begint met een lange vragenlijst over het bruidspaar en eindigt met uitzoeken wie de repetitie regelt.",
-    solution: "Het liefdesverhaal en de voorkeuren staan gestructureerd vast, met een duidelijke status voor je concept- en definitieve script.",
-  },
-  {
-    value: "trouwlocatie", label: "Trouwlocatie",
-    pain: "Bij tientallen tot honderden bruiloften per jaar leg je elke nieuwe leverancier weer dezelfde huisregels uit.",
-    solution: "Sluitingstijd, geluidsgrens en cateringbeleid staan één keer vast en zijn automatisch zichtbaar voor elke leverancier die het bruidspaar boekt.",
-  },
-  {
-    value: "haarstylist", label: "Haar & Make-up",
-    pain: "Loopt hair & makeup uit, dan schuift de rest van de dag mee. Meestal omdat niemand vooraf de tijd per persoon heeft uitgerekend.",
-    solution: "Aantal personen en behandeltijd staan vooraf vast, met ingebouwde buffer in het draaiboek.",
-  },
-  {
-    value: "vervoer", label: "Vervoer",
-    pain: "Meerdere ophaallocaties en tijden die je terugrekent vanaf de ceremonie. Eén verkeerde inschatting en de hele dag schuift.",
-    solution: "Je rittenplanner hangt in hetzelfde draaiboek als de rest van de dag, dus een verschuiving zie je meteen, net als iedereen.",
-  },
-  {
-    value: "decoratie", label: "Decoratie & Styling",
-    pain: "De styling kan pas als de tent staat, de bloemen komen na de styling, en één leverancier die uitloopt trekt de hele opbouw scheef.",
-    solution: "Het gedeelde opbouwschema en de moodboard-goedkeuring laten precies zien wanneer wie aan de beurt is.",
-  },
-  {
-    value: "fotocabine", label: "Fotocabine",
-    pain: "Wie een dag wacht met reageren op een aanvraag, is de boeking meestal al kwijt aan een concurrent.",
-    solution: "Aanvragen en bruiloftdetails staan op één plek, zodat je binnen minuten kunt reageren in plaats van dagen.",
-  },
-];
-
-const FEATURES_VENDORS = [
-  { title: "Draaiboek & planning",    desc: "Je schema staat direct in het portaal. Altijd de laatste versie, nooit gedoe over welke telt." },
-  { title: "Direct communiceren",     desc: "Chat met de planner en het bruidspaar vanuit dezelfde plek als je bruiloftgegevens." },
-  { title: "Documenten & offertes",   desc: "Contracten en offertes upload je veilig in de cloud. Kwijtraken kan niet meer." },
-  { title: "Meerdere bruiloften",     desc: "Beheer al je klantbruiloften vanuit één overzicht, ook als het er twintig tegelijk zijn." },
-  { title: "Premium profiel",         desc: "Laat zien wie je bent en wat je doet in onze catalogus, zodat bruidsparen jou vinden." },
-  { title: "Analytisch dashboard",    desc: "Zie zwart op wit hoe je ervoor staat en waar winst te halen valt." },
-];
-
-const HOW_IT_WORKS = [
-  { n: "01", title: "Stel je dream team samen", desc: "Kies je leveranciers uit de database, van fotograaf tot bloemist.", img: "/images/dreamday-button.png" },
-  { n: "02", title: "Regel alles in de app",    desc: "Contact, offertes en facturen op één plek. Losse mailtjes zijn verleden tijd.", img: "/images/dashboard-laptop.png" },
-  { n: "03", title: "Maak je draaiboek",        desc: "En geniet van een dag die gewoon soepel verloopt.", img: "/images/app-ipad.png" },
-];
-
-const FAQS = [
-  { q: "Is DreamDay Platform gratis voor bruidsparen?", a: "Ja, volledig. Geen proefperiode, geen verborgen kosten, geen kleine lettertjes. Voor bruidsparen is en blijft het platform gratis." },
-  { q: "Hoe vind ik leveranciers?", a: "Via de leveranciersdatabase zoek je op categorie, van fotograaf tot cateraar. Je voegt ze toe aan jullie bruiloft en communiceert daarna gewoon via de app." },
-  { q: "Wat zit er in premium voor leveranciers?", a: "Met een gratis account beheer je maximaal 2 bruiloften tegelijk. Met Premium kies je zelf hoeveel, van 10 tot 100+, vanaf €15 per maand ex btw. Daar krijg je ook draaiboek bewerken, documenten uploaden, een analytisch dashboard en voorrang bij support bij. Jaarlijks betalen scheelt je 2 maanden." },
-  { q: "Hoe werkt het contact met leveranciers?", a: "Via de ingebouwde chat. Geen losse apps, geen zoekgeraakte mailtjes: elk gesprek staat gewoon in je account." },
-  { q: "Wat is een draaiboek?", a: "Een minuut-voor-minuut tijdlijn van jullie trouwdag. Je vult 'm samen met je planner in en deelt 'm met alle leveranciers." },
-  { q: "Kan ik de app ook gebruiken zonder weddingplanner?", a: "Ja. Je houdt zelf de regie, met of zonder professionele planner." },
-];
+type VendorStory = { value: string; label: string; pain: string; solution: string };
 
 /* ─── Sub-components ────────────────────────────────────── */
 
@@ -184,15 +78,15 @@ function SidebarItem({ label, isActive, onClick }: { label: string; isActive: bo
   );
 }
 
-function VendorStoryPicker() {
-  const [active, setActive] = useState<string>(VENDOR_STORIES[0].value);
-  const story = VENDOR_STORIES.find((s) => s.value === active);
+function VendorStoryPicker({ stories, painHeading, solutionHeading }: { stories: VendorStory[]; painHeading: string; solutionHeading: string }) {
+  const [active, setActive] = useState<string>(stories[0].value);
+  const story = stories.find((s) => s.value === active);
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
       {/* Sidebar — desktop only */}
       <div className="hidden lg:flex flex-col gap-1 lg:w-64 flex-shrink-0">
-        {VENDOR_STORIES.map((s) => (
+        {stories.map((s) => (
           <SidebarItem key={s.value} label={s.label} isActive={active === s.value} onClick={() => setActive(s.value)} />
         ))}
       </div>
@@ -205,7 +99,7 @@ function VendorStoryPicker() {
           className="ddp-select"
           style={{ fontWeight: 700, fontSize: "var(--text-xl)" }}
         >
-          {VENDOR_STORIES.map((s) => (
+          {stories.map((s) => (
             <option key={s.value} value={s.value}>{s.label}</option>
           ))}
         </select>
@@ -215,11 +109,11 @@ function VendorStoryPicker() {
       <div className="flex-1 min-w-0">
         {story && (
           <div key={story.value} className="animate-fade-in" style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
-            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label}: herkenbaar?</p>
+            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{story.label}: {painHeading}</p>
             <p style={{ fontSize: "var(--text-2xl)", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "var(--space-7)" }}>
               {story.pain}
             </p>
-            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>Wat DreamDay oplost</p>
+            <p className="ddp-section-label mb-3" style={{ color: "var(--primary)" }}>{solutionHeading}</p>
             <p style={{ fontSize: "var(--text-2xl)", color: "var(--muted)", lineHeight: 1.7 }}>
               {story.solution}
             </p>
@@ -234,6 +128,8 @@ function VendorStoryPicker() {
 
 export default function LandingPage() {
   const router = useRouter();
+  const { t, toggle } = useLang();
+  const l: T["landing"] = t.landing;
   const [scrolled, setScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -282,29 +178,37 @@ export default function LandingPage() {
 
         <div className="hidden md:flex items-center gap-0 flex-1 justify-center">
           {[
-            { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-            { href: "#prijzen",       label: "Prijzen" },
-            { href: "#faq",           label: "FAQ" },
-            { href: "/leveranciers",  label: "Vind leveranciers" },
-          ].map((l) => (
-            <a key={l.href} href={l.href} className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.7rem" }}>
-              {l.label}
+            { href: "#hoe-het-werkt", label: l.nav.howItWorks },
+            { href: "#prijzen",       label: l.nav.pricing },
+            { href: "#faq",           label: l.nav.faq },
+            { href: "/leveranciers",  label: l.nav.findVendors },
+          ].map((n) => (
+            <a key={n.href} href={n.href} className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.7rem" }}>
+              {n.label}
             </a>
           ))}
         </div>
 
         <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+          <button
+            onClick={toggle}
+            className="ddp-btn-ghost"
+            style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--muted)", padding: "0.35rem 0.6rem" }}
+            aria-label="Switch language"
+          >
+            {t.common.switchLang}
+          </button>
           {loggedIn ? (
             <>
               <Link href="/dashboard" className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.45rem 1.125rem" }}>
-                Profiel
+                {l.nav.profile}
               </Link>
               <button
                 onClick={handleLogout}
                 className="ddp-btn-ghost"
                 style={{ fontSize: "var(--text-base)", color: "var(--muted)", padding: "0.45rem 0.625rem" }}
-                title="Uitloggen"
-                aria-label="Uitloggen"
+                title={l.nav.logoutTitle}
+                aria-label={l.nav.logoutTitle}
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -313,16 +217,16 @@ export default function LandingPage() {
             <>
               <div className="hidden sm:block">
                 <Link href="/login" className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
-                  Inloggen
+                  {l.nav.login}
                 </Link>
               </div>
               <div className="hidden sm:block">
                 <a href="#bruidsparen" className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
-                  Voor bruidsparen
+                  {l.nav.forCouples}
                 </a>
               </div>
               <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.45rem 0.875rem", whiteSpace: "nowrap" }}>
-                Voor leveranciers
+                {l.nav.forVendors}
               </a>
             </>
           )}
@@ -346,20 +250,20 @@ export default function LandingPage() {
                   marginBottom: "var(--space-8)",
                 }}
               >
-                Jullie trouwdag plannen,{" "}
+                {l.hero.title1}{" "}
                 <span style={{ background: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                  zonder de chaos.
+                  {l.hero.titleHighlight}
                 </span>
               </h1>
               <p style={{ fontSize: "clamp(1rem, 2.5vw, 1.125rem)", color: "var(--muted)", maxWidth: "440px", lineHeight: 1.7, marginBottom: "2.5rem" }}>
-                Je stelt je dream team van leveranciers samen, regelt offertes en facturen en maakt je draaiboek. Allemaal in één app, niet in tien.
+                {l.hero.sub}
               </p>
               <div className="flex flex-wrap gap-3 mb-6" style={{ position: "relative", zIndex: 1 }}>
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  Begin gratis
+                  {l.hero.ctaPrimary}
                 </Link>
                 <Link href="/leveranciers" className="ddp-btn-secondary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem", borderColor: "var(--color-charcoal)", color: "var(--color-charcoal)" }}>
-                  Vind je Dream Partner
+                  {l.hero.ctaSecondary}
                 </Link>
               </div>
             </div>
@@ -382,7 +286,7 @@ export default function LandingPage() {
               <div style={{ borderRadius: "24px", overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.15)", position: "relative" }}>
                 <Image
                   src="/images/hero-bride-phone.png"
-                  alt="Bruid plant haar bruiloft met DreamDay Platform"
+                  alt={l.hero.imageAlt}
                   width={700}
                   height={467}
                   style={{ width: "100%", height: "auto", display: "block" }}
@@ -401,26 +305,26 @@ export default function LandingPage() {
             <ScrollReveal>
               <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
                 <h3 className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "var(--space-4)" }}>
-                  Wij gaan trouwen
+                  {l.audience.coupleTitle}
                 </h3>
                 <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "var(--space-8)" }}>
-                  Stel je dream team samen, regel offertes en maak jullie draaiboek. Voor altijd gratis, echt.
+                  {l.audience.coupleDesc}
                 </p>
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  Begin gratis
+                  {l.audience.coupleCta}
                 </Link>
               </div>
             </ScrollReveal>
             <ScrollReveal delay={80}>
               <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
                 <h3 className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "var(--space-4)" }}>
-                  Ik ben leverancier
+                  {l.audience.vendorTitle}
                 </h3>
                 <p style={{ fontSize: "var(--text-lg)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "var(--space-8)" }}>
-                  Beheer al je bruiloften op één plek: draaiboek, communicatie en documenten. Geen losse tools meer nodig.
+                  {l.audience.vendorDesc}
                 </p>
                 <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  Bekijk voor leveranciers
+                  {l.audience.vendorCta}
                 </a>
               </div>
             </ScrollReveal>
@@ -441,10 +345,10 @@ export default function LandingPage() {
           <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div className="text-center px-5">
               <p style={{ fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 700, color: "white", letterSpacing: "-0.04em", lineHeight: 1.15, textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
-                Zo plan je een bruiloft tegenwoordig.
+                {l.brandStrip.title}
               </p>
               <p style={{ fontSize: "var(--text-xl)", color: "rgba(255,255,255,0.7)", marginTop: "var(--space-5)" }}>
-                Alles wat je nodig hebt, op één plek.
+                {l.brandStrip.sub}
               </p>
             </div>
           </div>
@@ -459,7 +363,7 @@ export default function LandingPage() {
               <div style={{ borderRadius: "20px", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.10)" }}>
                 <Image
                   src="/images/bride-sofa.png"
-                  alt="Bruid plant ontspannen haar bruiloft"
+                  alt={l.recognition.imageAlt}
                   width={600}
                   height={400}
                   style={{ width: "100%", height: "auto", display: "block" }}
@@ -469,16 +373,16 @@ export default function LandingPage() {
             <div className="lg:flex-1">
               <ScrollReveal>
                 <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "var(--space-7)" }}>
-                  Een bruiloft plannen.{" "}
-                  <span style={{ color: "var(--muted)", fontWeight: 500 }}>Voelt al snel als een tweede baan.</span>
+                  {l.recognition.titleNormal}{" "}
+                  <span style={{ color: "var(--muted)", fontWeight: 500 }}>{l.recognition.titleMuted}</span>
                 </h2>
               </ScrollReveal>
               <ScrollReveal delay={100}>
                 <p style={{ fontSize: "var(--text-2xl)", color: "var(--muted)", lineHeight: 1.75, marginBottom: "var(--space-7)" }}>
-                  Losse mailtjes, WhatsApp-groepen vol offertes en een Excel-bestand dat steeds minder overzicht geeft. Je wilde trouwen, geen projectmanager worden.
+                  {l.recognition.p1}
                 </p>
                 <p style={{ fontSize: "var(--text-2xl)", color: "var(--foreground)", lineHeight: 1.75, fontWeight: 500 }}>
-                  DreamDay Platform brengt rust: alles op één plek, samen geregeld.
+                  {l.recognition.p2}
                 </p>
               </ScrollReveal>
             </div>
@@ -490,29 +394,32 @@ export default function LandingPage() {
       <section id="hoe-het-werkt" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
-            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Hoe het werkt</p>
+            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>{l.howItWorksSection.label}</p>
             <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "var(--space-11)", maxWidth: "520px" }}>
-              Drie stappen.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Dat is alles.</span>
+              {l.howItWorksSection.title1}{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>{l.howItWorksSection.title2}</span>
             </h2>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {HOW_IT_WORKS.map((step, i) => (
-              <ScrollReveal key={step.n} delay={i * 100}>
-                <div style={{ background: "white", borderRadius: "20px", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
-                  <div style={{ position: "relative", height: "200px" }}>
-                    <Image src={step.img} alt={step.title} fill style={{ objectFit: "cover" }} />
-                    <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", borderRadius: "10px", padding: "4px 10px" }}>
-                      <span style={{ fontSize: "var(--text-sm)", fontWeight: 700, color: "white", letterSpacing: "0.05em" }}>{step.n}</span>
+            {l.howItWorksSection.steps.map((step, i) => {
+              const img = ["/images/dreamday-button.png", "/images/dashboard-laptop.png", "/images/app-ipad.png"][i];
+              return (
+                <ScrollReveal key={step.n} delay={i * 100}>
+                  <div style={{ background: "white", borderRadius: "20px", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", height: "100%" }}>
+                    <div style={{ position: "relative", height: "200px" }}>
+                      <Image src={img} alt={step.title} fill style={{ objectFit: "cover" }} />
+                      <div style={{ position: "absolute", top: "1rem", left: "1rem", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", borderRadius: "10px", padding: "4px 10px" }}>
+                        <span style={{ fontSize: "var(--text-sm)", fontWeight: 700, color: "white", letterSpacing: "0.05em" }}>{step.n}</span>
+                      </div>
+                    </div>
+                    <div style={{ padding: "1.375rem 1.5rem 1.5rem" }}>
+                      <h3 style={{ fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "var(--space-3)" }}>{step.title}</h3>
+                      <p style={{ fontSize: "0.9rem", color: "var(--muted)", lineHeight: 1.65 }}>{step.desc}</p>
                     </div>
                   </div>
-                  <div style={{ padding: "1.375rem 1.5rem 1.5rem" }}>
-                    <h3 style={{ fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--foreground)", marginBottom: "var(--space-3)" }}>{step.title}</h3>
-                    <p style={{ fontSize: "0.9rem", color: "var(--muted)", lineHeight: 1.65 }}>{step.desc}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
+                </ScrollReveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -524,24 +431,24 @@ export default function LandingPage() {
             {/* Left: text + features grid */}
             <div className="flex-1">
               <ScrollReveal>
-                <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Voor bruidsparen</p>
+                <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>{l.couples.label}</p>
                 <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "var(--space-5)" }}>
-                  Altijd gratis.{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Voor altijd.</span>
+                  {l.couples.title1}{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>{l.couples.title2}</span>
                 </h2>
                 <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
-                  Maak een account en begin meteen. Geen abonnement, geen proefperiode, nooit.
+                  {l.couples.sub}
                 </p>
               </ScrollReveal>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
-                {FEATURES_COUPLES.map((f, i) => (
+                {l.couples.features.map((f, i) => (
                   <FeatureCard key={f.title} title={f.title} desc={f.desc} delay={i * 60} />
                 ))}
               </div>
 
               <ScrollReveal>
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  Begin gratis <ArrowRight className="w-4 h-4" />
+                  {l.couples.cta} <ArrowRight className="w-4 h-4" />
                 </Link>
               </ScrollReveal>
             </div>
@@ -551,14 +458,14 @@ export default function LandingPage() {
               <div style={{ borderRadius: "20px", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.12)", position: "sticky", top: "80px" }}>
                 <Image
                   src="/images/app-ipad.png"
-                  alt="DreamDay app op iPad"
+                  alt={l.couples.imageAlt}
                   width={480}
                   height={360}
                   style={{ width: "100%", height: "auto", display: "block" }}
                 />
                 <div style={{ padding: "1.25rem", background: "white" }}>
                   <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
-                    Alle functies beschikbaar op elk apparaat: telefoon, tablet of laptop.
+                    {l.couples.imageCaption}
                   </p>
                 </div>
               </div>
@@ -574,24 +481,24 @@ export default function LandingPage() {
             {/* Right (visually): features */}
             <div className="flex-1">
               <ScrollReveal>
-                <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Voor leveranciers</p>
+                <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>{l.vendorsSection.label}</p>
                 <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "var(--space-5)" }}>
-                  Beheer al je bruiloften{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>op één plek.</span>
+                  {l.vendorsSection.title1}{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>{l.vendorsSection.title2}</span>
                 </h2>
                 <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", lineHeight: 1.65, marginBottom: "2.5rem", maxWidth: "400px" }}>
-                  Als bloemist, DJ of fotograaf heb je altijd meerdere bruiloften tegelijk lopen. DreamDay Platform geeft je daar één helder overzicht van.
+                  {l.vendorsSection.sub}
                 </p>
               </ScrollReveal>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
-                {FEATURES_VENDORS.map((f, i) => (
+                {l.vendorsSection.features.map((f, i) => (
                   <FeatureCard key={f.title} title={f.title} desc={f.desc} delay={i * 60} />
                 ))}
               </div>
 
               <ScrollReveal>
                 <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ fontSize: "var(--text-lg)", padding: "0.75rem 1.875rem" }}>
-                  Word leverancier
+                  {l.vendorsSection.cta}
                 </Link>
               </ScrollReveal>
             </div>
@@ -601,14 +508,14 @@ export default function LandingPage() {
               <div style={{ borderRadius: "20px", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.12)", position: "sticky", top: "80px" }}>
                 <Image
                   src="/images/planner-outdoor.png"
-                  alt="Weddingplanner buiten met tablet"
+                  alt={l.vendorsSection.imageAlt}
                   width={480}
                   height={360}
                   style={{ width: "100%", height: "auto", display: "block" }}
                 />
                 <div style={{ padding: "1.25rem", background: "white" }}>
                   <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", lineHeight: 1.6, margin: 0 }}>
-                    Altijd up-to-date, ook onderweg op locatie.
+                    {l.vendorsSection.imageCaption}
                   </p>
                 </div>
               </div>
@@ -621,20 +528,20 @@ export default function LandingPage() {
       <section className="px-5 py-24 md:py-32" style={{ background: "#ffffff" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
-            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Voor elke leveranciersoort</p>
+            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>{l.perVendor.label}</p>
             <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "var(--space-5)", maxWidth: "640px" }}>
-              Wat kost jou nu tijd?{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>Kies je vak.</span>
+              {l.perVendor.title1}{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>{l.perVendor.title2}</span>
             </h2>
             <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", marginBottom: "var(--space-7)", maxWidth: "520px" }}>
-              Elk vak heeft zijn eigen administratieve rompslomp. Klik hieronder en zie precies wat DreamDay voor jou oplost.
+              {l.perVendor.sub1}
             </p>
             <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginBottom: "2.5rem", maxWidth: "520px" }}>
-              Ben je een bruidspaar? Bekijk in plaats daarvan{" "}
-              <a href="#bruidsparen" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline" }}>wat DreamDay voor jullie doet</a>.
+              {l.perVendor.sub2Pre}{" "}
+              <a href="#bruidsparen" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline" }}>{l.perVendor.sub2Link}</a>.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={80}>
-            <VendorStoryPicker />
+            <VendorStoryPicker stories={l.perVendor.stories} painHeading={l.perVendor.painHeading} solutionHeading={l.perVendor.solutionHeading} />
           </ScrollReveal>
         </div>
       </section>
@@ -643,9 +550,9 @@ export default function LandingPage() {
       <section className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
-            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Ervaringen</p>
+            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>{l.socialProof.label}</p>
             <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "3.5rem" }}>
-              Andere bruidsparen{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>gingen je voor.</span>
+              {l.socialProof.title1}{" "}<span style={{ color: "var(--muted)", fontWeight: 500 }}>{l.socialProof.title2}</span>
             </h2>
           </ScrollReveal>
 
@@ -654,22 +561,19 @@ export default function LandingPage() {
             <ScrollReveal delay={0} className="md:col-span-1">
               <div style={{ borderRadius: "20px", overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.08)", height: "100%", display: "flex", flexDirection: "column" }}>
                 <div style={{ position: "relative", height: "220px" }}>
-                  <Image src="/images/bride-sofa.png" alt="Tevreden bruid" fill style={{ objectFit: "cover", objectPosition: "center top" }} />
+                  <Image src="/images/bride-sofa.png" alt={l.socialProof.featuredImageAlt} fill style={{ objectFit: "cover", objectPosition: "center top" }} />
                 </div>
                 <div style={{ padding: "1.5rem", background: "white", flex: 1 }}>
                   <p style={{ fontSize: "var(--text-lg)", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "var(--space-6)", fontStyle: "italic" }}>
-                    &ldquo;Eindelijk één plek voor alles. We hadden nooit gedacht dat plannen zo overzichtelijk kon zijn.&rdquo;
+                    &ldquo;{l.socialProof.featuredQuote}&rdquo;
                   </p>
-                  <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--primary)" }}>Emma & Thomas</p>
+                  <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--primary)" }}>{l.socialProof.featuredName}</p>
                 </div>
               </div>
             </ScrollReveal>
 
             <div className="md:col-span-2 grid grid-cols-1 gap-4">
-              {[
-                { quote: "Ik hoefde niet meer heen en weer te mailen met elke leverancier apart, dat scheelde ons echt weken werk.", name: "Sophie & Lars" },
-                { quote: "Op onze trouwdag hoefden we nergens aan te denken. Alles was geregeld dankzij DreamDay.", name: "Nora & Daan" },
-              ].map((r, i) => (
+              {l.socialProof.others.map((r, i) => (
                 <ScrollReveal key={i} delay={(i + 1) * 100}>
                   <div style={{ background: "var(--sand)", borderRadius: "20px", padding: "1.75rem", border: "1px solid rgba(0,0,0,0.04)", height: "100%" }}>
                     <p style={{ fontSize: "var(--text-lg)", color: "var(--foreground)", lineHeight: 1.7, marginBottom: "var(--space-7)", fontStyle: "italic" }}>
@@ -683,7 +587,7 @@ export default function LandingPage() {
           </div>
 
           <p style={{ marginTop: "var(--space-8)", fontSize: "var(--text-sm)", color: "var(--muted)", fontStyle: "italic" }}>
-            * Reviews worden aangevuld zodra we echte ervaringen hebben ontvangen.
+            {l.socialProof.disclaimer}
           </p>
         </div>
       </section>
@@ -692,23 +596,23 @@ export default function LandingPage() {
       <section id="prijzen" className="px-5 py-24 md:py-32" style={{ background: "var(--sand)" }}>
         <div style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <ScrollReveal>
-            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Transparante prijzen</p>
+            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>{l.pricing.label}</p>
             <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "var(--space-5)" }}>
-              Eerlijk geprijsd.
+              {l.pricing.title}
             </h2>
             <p style={{ fontSize: "var(--text-xl)", color: "var(--muted)", marginBottom: "3.5rem" }}>
-              Bruidsparen betalen nooit iets. Leveranciers kiezen zelf wat bij hen past.
+              {l.pricing.sub}
             </p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
             <ScrollReveal delay={0}>
               <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
-                <div className="ddp-badge badge-rose mb-5">Bruidspaar</div>
-                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>Gratis</div>
-                <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>Voor altijd, geen creditcard nodig</div>
+                <div className="ddp-badge badge-rose mb-5">{l.pricing.couple.badge}</div>
+                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.couple.price}</div>
+                <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>{l.pricing.couple.subtext}</div>
                 <ul className="space-y-3 mb-7">
-                  {["Leveranciersdatabase", "Contact via de app", "Offertes & facturen", "Draaiboek", "Gastenlijst & RSVP", "Budgetbeheer"].map((item) => (
+                  {l.pricing.couple.features.map((item) => (
                     <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)" }}>
                       <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
                       {item}
@@ -716,18 +620,18 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/aanmelden" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                  Begin gratis
+                  {l.pricing.couple.cta}
                 </Link>
               </div>
             </ScrollReveal>
 
             <ScrollReveal delay={80}>
               <div style={{ background: "white", borderRadius: "20px", padding: "2rem", border: "1px solid rgba(0,0,0,0.05)" }}>
-                <div className="ddp-badge badge-neutral mb-5">Leverancier · Free</div>
-                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>€0</div>
-                <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>Per maand</div>
+                <div className="ddp-badge badge-neutral mb-5">{l.pricing.vendorFree.badge}</div>
+                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--foreground)", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.vendorFree.price}</div>
+                <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-8)" }}>{l.pricing.vendorFree.subtext}</div>
                 <ul className="space-y-3 mb-7">
-                  {["Portaaltoegang (2 bruiloften)", "Draaiboek inzien", "Bestanden ontvangen", "Chatten met planner", "Basisprofiel"].map((item) => (
+                  {l.pricing.vendorFree.features.map((item) => (
                     <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)" }}>
                       <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--success)" }} />
                       {item}
@@ -735,7 +639,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/aanmelden?type=vendor" className="ddp-btn-secondary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                  Word leverancier
+                  {l.pricing.vendorFree.cta}
                 </Link>
               </div>
             </ScrollReveal>
@@ -743,13 +647,13 @@ export default function LandingPage() {
             <ScrollReveal delay={160}>
               <div style={{ background: "var(--ink)", borderRadius: "20px", padding: "2rem", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", top: "1.25rem", right: "1.25rem", background: "var(--gradient-primary)", borderRadius: "999px", color: "white", fontSize: "var(--text-2xs)", fontWeight: 700, padding: "3px 10px", letterSpacing: "0.05em" }}>
-                  POPULAIRST
+                  {l.pricing.popularBadge}
                 </div>
-                <div className="ddp-badge badge-premium mb-5">Dream Day Premium</div>
-                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white", lineHeight: 1, marginBottom: "4px" }}>Vanaf €15</div>
-                <div style={{ fontSize: "var(--text-base)", color: "rgba(255,255,255,0.45)", marginBottom: "var(--space-8)" }}>Per maand ex btw · 10 t/m 100+ bruiloften, zelf te kiezen · maandelijks opzegbaar</div>
+                <div className="ddp-badge badge-premium mb-5">{l.pricing.premium.badge}</div>
+                <div style={{ fontSize: "2.75rem", fontWeight: 700, letterSpacing: "-0.04em", color: "white", lineHeight: 1, marginBottom: "4px" }}>{l.pricing.premium.price}</div>
+                <div style={{ fontSize: "var(--text-base)", color: "rgba(255,255,255,0.45)", marginBottom: "var(--space-8)" }}>{l.pricing.premium.subtext}</div>
                 <ul className="space-y-3 mb-7">
-                  {["10 tot 100+ bruiloften tegelijk", "Draaiboek bewerken", "Volledig bestandsbeheer", "Geavanceerde chat", "Premium profiel", "Analytisch dashboard", "Prioriteit support"].map((item) => (
+                  {l.pricing.premium.features.map((item) => (
                     <li key={item} className="flex items-center gap-2.5" style={{ fontSize: "var(--text-md)", color: "rgba(255,255,255,0.85)" }}>
                       <Check className="w-4 h-4 flex-shrink-0" style={{ color: "var(--primary-light)" }} />
                       {item}
@@ -757,7 +661,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/aanmelden?type=vendor" className="ddp-btn-primary" style={{ width: "100%", justifyContent: "center", padding: "0.75rem" }}>
-                  Premium starten
+                  {l.pricing.premium.cta}
                 </Link>
               </div>
             </ScrollReveal>
@@ -769,14 +673,14 @@ export default function LandingPage() {
       <section id="faq" className="px-5 py-24 md:py-32" style={{ background: "var(--background)" }}>
         <div style={{ maxWidth: "680px", margin: "0 auto" }}>
           <ScrollReveal>
-            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>Vragen</p>
+            <p style={{ fontSize: "var(--text-sm)", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--primary)", marginBottom: "var(--space-5)" }}>{l.faqSection.label}</p>
             <h2 className="font-serif" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.05, color: "var(--foreground)", marginBottom: "var(--space-10)" }}>
-              Veel gestelde vragen.
+              {l.faqSection.title}
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={80}>
             <div style={{ background: "var(--sand)", borderRadius: "20px", padding: "0 1.75rem", border: "1px solid rgba(0,0,0,0.04)" }}>
-              {FAQS.map((faq) => (
+              {l.faqSection.items.map((faq) => (
                 <FaqItem key={faq.q} q={faq.q} a={faq.a} />
               ))}
             </div>
@@ -798,17 +702,17 @@ export default function LandingPage() {
         <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: "560px", margin: "0 auto", padding: "5rem 1.25rem", textAlign: "center" }}>
           <ScrollReveal>
             <h2 className="font-serif" style={{ fontSize: "clamp(2.25rem, 6vw, 3.75rem)", fontWeight: 700, letterSpacing: "-0.055em", lineHeight: 1.04, color: "white", marginBottom: "var(--space-7)" }}>
-              Klaar om te beginnen?
+              {l.finalCta.title}
             </h2>
             <p style={{ fontSize: "var(--text-2xl)", color: "rgba(255,255,255,0.50)", marginBottom: "2.5rem", lineHeight: 1.6 }}>
-              Sluit je aan bij de koppels die hun dream day plannen zonder de stress.
+              {l.finalCta.sub}
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link href="/aanmelden" className="inline-flex items-center gap-2 font-semibold" style={{ background: "white", color: "var(--foreground)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "var(--text-lg)", textDecoration: "none" }}>
-                Begin gratis <ArrowRight className="w-4 h-4" />
+                {l.finalCta.ctaPrimary} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/leveranciers" className="inline-flex items-center font-medium" style={{ background: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.75)", borderRadius: "999px", padding: "0.875rem 2.125rem", fontSize: "var(--text-lg)", textDecoration: "none" }}>
-                Vind je Dream Partner
+                {l.finalCta.ctaSecondary}
               </Link>
             </div>
           </ScrollReveal>
@@ -820,21 +724,11 @@ export default function LandingPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-5" style={{ maxWidth: "clamp(1040px, 74vw, 1440px)", margin: "0 auto" }}>
           <div className="flex items-center gap-2">
             <Image src="/images/logo-wit.svg" alt="DreamDay Platform" width={26} height={26} />
-            <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>DreamDay Platform</span>
+            <span style={{ fontWeight: 600, fontSize: "0.9rem", color: "rgba(255,255,255,0.80)", letterSpacing: "-0.02em" }}>{l.footer.tagline}</span>
           </div>
           <div className="flex flex-wrap justify-center gap-5">
-            {[
-              { href: "#hoe-het-werkt", label: "Hoe het werkt" },
-              { href: "#prijzen",       label: "Prijzen" },
-              { href: "#faq",           label: "FAQ" },
-              { href: "/roadmap",       label: "Roadmap" },
-              { href: "/leveranciers",  label: "Vind leveranciers" },
-              { href: "/blog",          label: "Blog" },
-              { href: "/privacy",       label: "Privacybeleid" },
-              { href: "/voorwaarden",   label: "Algemene voorwaarden" },
-              { href: "/login",         label: "Inloggen" },
-            ].map((l) => (
-              <a key={l.href} href={l.href} style={{ fontSize: "var(--text-base)", color: "rgba(255,255,255,0.40)", textDecoration: "none" }}>{l.label}</a>
+            {l.footer.links.map((n) => (
+              <a key={n.href} href={n.href} style={{ fontSize: "var(--text-base)", color: "rgba(255,255,255,0.40)", textDecoration: "none" }}>{n.label}</a>
             ))}
           </div>
           <p style={{ fontSize: "var(--text-sm)", color: "rgba(255,255,255,0.25)" }}>© 2026 DreamDay Platform</p>

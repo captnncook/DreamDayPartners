@@ -6,26 +6,30 @@ import Link from "next/link";
 import Image from "next/image";
 import { DEMO_USERS, type DemoRole } from "@/lib/demo-users";
 import { APPLE_LOGIN_ENABLED } from "@/lib/featureFlags";
+import { useLang } from "@/components/LangProvider";
 import { Heart, Settings, Users, Leaf, Music, Utensils, Camera, Video, Scissors, Mic2, Cake, MapPin, Car, CalendarCheck, Eye, EyeOff } from "lucide-react";
 
-const ROLE_OPTIONS: { value: DemoRole; label: string; Icon: React.ElementType; description: string }[] = [
-  { value: "admin",               label: "Admin",              Icon: Settings,      description: "Platform beheerder" },
-  { value: "planner",             label: "Weddingplanner",     Icon: Heart,         description: "Sophie van der Berg" },
-  { value: "couple",              label: "Bruidspaar",         Icon: Users,         description: "Emma de Vries" },
-  { value: "bloemist",            label: "Bloemist",           Icon: Leaf,          description: "Roos Janssen" },
-  { value: "dj",                  label: "DJ",                 Icon: Music,         description: "DJ Marco" },
-  { value: "catering",            label: "Catering",           Icon: Utensils,      description: "Tasty Events" },
-  { value: "fotograaf",           label: "Fotograaf",          Icon: Camera,        description: "Lara Vermeer" },
-  { value: "videograaf",          label: "Videograaf",         Icon: Video,         description: "Tom de Wit" },
-  { value: "haarstylist",         label: "Haarstylist",        Icon: Scissors,      description: "Noa Pieters" },
-  { value: "liveband",            label: "Liveband",           Icon: Mic2,          description: "Daan Kroon" },
-  { value: "bakker",              label: "Bakker",             Icon: Cake,          description: "Sanne Bakker" },
-  { value: "trouwlocatie",        label: "Trouwlocatie",       Icon: MapPin,        description: "Kasteel de Haar" },
-  { value: "vervoer",             label: "Vervoer",            Icon: Car,           description: "Henk Visser" },
-  { value: "weddingplanner_vendor", label: "WP (leverancier)", Icon: CalendarCheck, description: "Isa Mulder" },
+const ROLE_META: { value: DemoRole; Icon: React.ElementType; description: string }[] = [
+  { value: "admin",               Icon: Settings,      description: "Platform beheerder" },
+  { value: "planner",             Icon: Heart,         description: "Sophie van der Berg" },
+  { value: "couple",              Icon: Users,         description: "Emma de Vries" },
+  { value: "bloemist",            Icon: Leaf,          description: "Roos Janssen" },
+  { value: "dj",                  Icon: Music,         description: "DJ Marco" },
+  { value: "catering",            Icon: Utensils,      description: "Tasty Events" },
+  { value: "fotograaf",           Icon: Camera,        description: "Lara Vermeer" },
+  { value: "videograaf",          Icon: Video,         description: "Tom de Wit" },
+  { value: "haarstylist",         Icon: Scissors,      description: "Noa Pieters" },
+  { value: "liveband",            Icon: Mic2,          description: "Daan Kroon" },
+  { value: "bakker",              Icon: Cake,          description: "Sanne Bakker" },
+  { value: "trouwlocatie",        Icon: MapPin,        description: "Kasteel de Haar" },
+  { value: "vervoer",             Icon: Car,           description: "Henk Visser" },
+  { value: "weddingplanner_vendor", Icon: CalendarCheck, description: "Isa Mulder" },
 ];
 
 export default function LoginPage() {
+  const { t, toggle } = useLang();
+  const lo = t.login;
+  const ROLE_OPTIONS = ROLE_META.map((r) => ({ ...r, label: lo.roles[r.value as keyof typeof lo.roles] }));
   const [selectedRole, setSelectedRole] = useState<DemoRole>("planner");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -52,14 +56,14 @@ export default function LoginPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error ?? "Inloggen mislukt");
+        setError(data.error ?? lo.errorGeneric);
         return;
       }
 
       router.push("/dashboard");
       router.refresh();
     } catch {
-      setError("Verbindingsfout, probeer opnieuw");
+      setError(lo.errorConnection);
     } finally {
       setLoading(false);
     }
@@ -76,11 +80,11 @@ export default function LoginPage() {
         body: JSON.stringify({ email: emailLogin, password: passwordLogin }),
       });
       const data = await res.json();
-      if (!res.ok) { setRealError(data.error ?? "Inloggen mislukt"); return; }
+      if (!res.ok) { setRealError(data.error ?? lo.errorGeneric); return; }
       router.push("/dashboard");
       router.refresh();
     } catch {
-      setRealError("Verbindingsfout, probeer opnieuw");
+      setRealError(lo.errorConnection);
     } finally {
       setRealLoading(false);
     }
@@ -100,6 +104,14 @@ export default function LoginPage() {
           DreamDay<span className="font-serif" style={{ color: "var(--gold)" }}> Platform</span>
         </span>
       </Link>
+
+      <button
+        onClick={toggle}
+        className="fixed top-4 right-5 md:right-10 z-20 text-sm font-semibold"
+        style={{ color: "var(--ink-muted)", background: "none", border: "none", cursor: "pointer" }}
+      >
+        {t.common.switchLang}
+      </button>
 
       {/* Zachte gouden gloed — geen decoratieve roze blob meer */}
       <div
@@ -122,7 +134,7 @@ export default function LoginPage() {
             </div>
           </Link>
           <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
-            Jouw dream day, zonder de stress. Demo
+            {lo.logoTagline}
           </p>
         </div>
 
@@ -139,7 +151,7 @@ export default function LoginPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            Inloggen met Google
+            {lo.googleLogin}
           </a>
           {APPLE_LOGIN_ENABLED && (
             <a
@@ -150,7 +162,7 @@ export default function LoginPage() {
               <svg width="16" height="18" viewBox="0 0 814 1000" fill="currentColor">
                 <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.7C199.4 718 128 583 128 462.9c0-0-96.5-197.9 0-288.2C174.5 128.4 221.2 128 224 128c6.8 0 25.5 2.5 31 4.1 25.3 7.3 51.9 27.7 72.9 44.6 24.9 20.1 49.2 54.3 57.7 87.5 7.7 30.9 9.6 62.9 5.8 95.5 48.8 9.4 115.7 7.5 162.1-45.5 19.3-22.1 35.6-55.1 41.5-86.2z"/>
               </svg>
-              Inloggen met Apple
+              {lo.appleLogin}
             </a>
           )}
         </div>
@@ -158,15 +170,15 @@ export default function LoginPage() {
         {/* Divider */}
         <div className="flex items-center gap-3 my-4">
           <div className="flex-1" style={{ height: "1px", background: "var(--ink-line)" }} />
-          <span className="text-xs" style={{ color: "var(--ink-muted)" }}>of kies een andere manier</span>
+          <span className="text-xs" style={{ color: "var(--ink-muted)" }}>{lo.orDivider}</span>
           <div className="flex-1" style={{ height: "1px", background: "var(--ink-line)" }} />
         </div>
 
         {/* Login card */}
         <div style={{ background: "var(--surface)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-lg)", padding: "1.75rem" }}>
-          <h1 className="font-serif text-xl font-bold mb-1">Inloggen</h1>
+          <h1 className="font-serif text-xl font-bold mb-1">{lo.heading}</h1>
           <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
-            Kies een rol om de demo te verkennen
+            {lo.sub}
           </p>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -174,7 +186,7 @@ export default function LoginPage() {
             {/* Role select */}
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: "var(--foreground)" }}>
-                Inloggen als
+                {lo.loginAsLabel}
               </label>
               <div className="relative">
                 <select
@@ -214,11 +226,11 @@ export default function LoginPage() {
 
             {/* Role description */}
             <div className="text-xs leading-relaxed" style={{ color: "var(--muted)" }}>
-              {selectedRole === "admin"   && <p>Overzicht alle bruiloften, gebruikers en platformbeheer</p>}
-              {selectedRole === "planner" && <p>Volledig bruiloftsbeheer: taken, gasten, budget, draaiboek, communicatie</p>}
-              {selectedRole === "couple"  && <p>Overzicht van de eigen bruiloft, taken en communicatie met het team</p>}
+              {selectedRole === "admin"   && <p>{lo.roleDescAdmin}</p>}
+              {selectedRole === "planner" && <p>{lo.roleDescPlanner}</p>}
+              {selectedRole === "couple"  && <p>{lo.roleDescCouple}</p>}
               {!["admin","planner","couple"].includes(selectedRole) && (
-                <p>Leveranciersportaal: intake, betalingen, deliverables en draaiboek. <span style={{ color: "var(--gold-deep)", fontWeight: 700, textTransform: "uppercase", fontSize: "var(--text-xs)", letterSpacing: "0.05em" }}>Premium</span></p>
+                <p>{lo.roleDescVendor} <span style={{ color: "var(--gold-deep)", fontWeight: 700, textTransform: "uppercase", fontSize: "var(--text-xs)", letterSpacing: "0.05em" }}>{lo.premiumBadge}</span></p>
               )}
             </div>
 
@@ -233,21 +245,21 @@ export default function LoginPage() {
               disabled={loading}
               className="ddp-btn-primary w-full py-3 text-base mt-2"
             >
-              {loading ? "Bezig…" : `Inloggen als ${selected.label}`}
+              {loading ? lo.loadingBtn : `${lo.loginAsBtn} ${selected.label}`}
             </button>
           </form>
         </div>
 
         {/* Email + wachtwoord inloggen */}
         <div style={{ background: "var(--surface)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-md)", padding: "1.75rem" }} className="mt-4">
-          <h2 className="font-semibold text-sm mb-3">Inloggen met e-mail &amp; wachtwoord</h2>
+          <h2 className="font-semibold text-sm mb-3">{lo.emailPasswordHeading}</h2>
           <form onSubmit={handleRealLogin} className="space-y-3">
             <input
               type="email"
               required
               value={emailLogin}
               onChange={e => setEmailLogin(e.target.value)}
-              placeholder="jouw@emailadres.nl"
+              placeholder={lo.emailPlaceholder}
               className="ddp-input w-full"
             />
             <div className="relative">
@@ -256,7 +268,7 @@ export default function LoginPage() {
                 required
                 value={passwordLogin}
                 onChange={e => setPasswordLogin(e.target.value)}
-                placeholder="Wachtwoord"
+                placeholder={lo.passwordPlaceholder}
                 className="ddp-input w-full pr-10"
               />
               <button
@@ -274,10 +286,10 @@ export default function LoginPage() {
               </div>
             )}
             <button type="submit" disabled={realLoading} className="ddp-btn-primary w-full py-2.5 text-sm">
-              {realLoading ? "Bezig…" : "Inloggen"}
+              {realLoading ? lo.loadingBtn : lo.loginBtn}
             </button>
             <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
-              <Link href="/wachtwoord-vergeten" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>Wachtwoord vergeten?</Link>
+              <Link href="/wachtwoord-vergeten" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{lo.forgotPassword}</Link>
             </p>
           </form>
         </div>
@@ -285,21 +297,21 @@ export default function LoginPage() {
         {/* Register CTA — donker paneel met gouden knop, consistent met dash-hero */}
         <div className="dash-hero text-center" style={{ padding: "1.5rem" }}>
           <Image src="/images/logo-wit.svg" alt="DreamDay" width={36} height={36} className="mx-auto mb-3" />
-          <h2 className="font-serif font-bold mb-1" style={{ fontSize: "var(--text-2xl)", color: "var(--ink-text)" }}>Jullie dream day plannen?</h2>
+          <h2 className="font-serif font-bold mb-1" style={{ fontSize: "var(--text-2xl)", color: "var(--ink-text)" }}>{lo.registerHeading}</h2>
           <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
-            Stel jullie dream team samen en regel alles op één plek, gratis voor bruidsparen.
+            {lo.registerSub}
           </p>
           <Link
             href="/aanmelden"
             className="ddp-btn-gold w-full inline-flex items-center justify-center py-2.5 text-sm font-bold"
             style={{ background: "var(--gold)", color: "var(--ink)", borderRadius: "var(--radius-full)" }}
           >
-            Begin gratis
+            {lo.registerBtn}
           </Link>
         </div>
 
         <p className="text-center text-xs mt-5" style={{ color: "var(--ink-muted)" }}>
-          Dit is een demo-omgeving. Geen echte inloggegevens nodig.
+          {lo.demoNotice}
         </p>
       </div>
     </div>
