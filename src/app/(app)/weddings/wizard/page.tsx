@@ -5,17 +5,19 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import DatePicker from "@/components/DatePicker";
+import { useLang } from "@/components/LangProvider";
 
 type Step = 1 | 2 | 3 | 4;
 
-const STEPS = [
-  { n: 1, label: "Jullie namen" },
-  { n: 2, label: "De grote dag" },
-  { n: 3, label: "Budget" },
-  { n: 4, label: "Bevestigen" },
-];
-
 export default function WeddingWizardPage() {
+  const { t } = useLang();
+  const tw = t.weddingWizard;
+  const STEPS = [
+    { n: 1, label: tw.steps.names },
+    { n: 2, label: tw.steps.bigDay },
+    { n: 3, label: tw.steps.budget },
+    { n: 4, label: tw.steps.confirm },
+  ];
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [saving, setSaving] = useState(false);
@@ -86,8 +88,8 @@ export default function WeddingWizardPage() {
           <div className="flex justify-center">
             <Image src="/images/logo.svg" alt="DreamDay Platform" width={56} height={56} />
           </div>
-          <h1 className="font-serif mt-3" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Begin jullie dream day</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>In een paar stappen klaar. Alles kun je later aanpassen</p>
+          <h1 className="font-serif mt-3" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{tw.heading}</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{tw.subheading}</p>
         </div>
 
         {/* Progress */}
@@ -122,26 +124,26 @@ export default function WeddingWizardPage() {
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold">Hoe heten jullie?</h2>
-                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>De namen van het bruidspaar</p>
+                <h2 className="text-lg font-semibold">{tw.step1Title}</h2>
+                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{tw.step1Sub}</p>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Partner 1</label>
+                  <label className="block text-sm font-medium mb-1.5">{tw.partner1Label}</label>
                   <input
                     value={form.partner1}
                     onChange={(e) => set("partner1", e.target.value)}
-                    placeholder="bijv. Emma"
+                    placeholder={tw.partner1Placeholder}
                     className="w-full border rounded-xl px-4 py-3 text-sm"
                     style={{ borderColor: "var(--border)" }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Partner 2</label>
+                  <label className="block text-sm font-medium mb-1.5">{tw.partner2Label}</label>
                   <input
                     value={form.partner2}
                     onChange={(e) => set("partner2", e.target.value)}
-                    placeholder="bijv. Thomas"
+                    placeholder={tw.partner2Placeholder}
                     className="w-full border rounded-xl px-4 py-3 text-sm"
                     style={{ borderColor: "var(--border)" }}
                   />
@@ -149,7 +151,7 @@ export default function WeddingWizardPage() {
               </div>
               {form.partner1 && form.partner2 && (
                 <div className="font-serif p-3 rounded-xl text-center text-sm" style={{ fontWeight: 700, background: "var(--accent)", color: "var(--primary)" }}>
-                  Bruiloft {form.partner1} & {form.partner2}
+                  {tw.weddingOf.replace("{p1}", form.partner1).replace("{p2}", form.partner2)}
                 </div>
               )}
             </div>
@@ -159,11 +161,11 @@ export default function WeddingWizardPage() {
           {step === 2 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold">De grote dag</h2>
-                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Wanneer en waar is de bruiloft?</p>
+                <h2 className="text-lg font-semibold">{tw.step2Title}</h2>
+                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{tw.step2Sub}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Trouwdatum *</label>
+                <label className="block text-sm font-medium mb-1.5">{tw.dateLabel}</label>
                 <DatePicker
                   value={form.date}
                   onChange={(v) => set("date", v)}
@@ -179,11 +181,11 @@ export default function WeddingWizardPage() {
                   onChange={(e) => { setMultiDay(e.target.checked); if (!e.target.checked) set("endDate", ""); }}
                   style={{ width: "1rem", height: "1rem", accentColor: "var(--gold)" }}
                 />
-                De bruiloft duurt meerdere dagen
+                {tw.multiDayLabel}
               </label>
               {multiDay && (
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Laatste dag</label>
+                  <label className="block text-sm font-medium mb-1.5">{tw.lastDayLabel}</label>
                   <DatePicker
                     value={form.endDate}
                     onChange={(v) => set("endDate", v)}
@@ -194,22 +196,22 @@ export default function WeddingWizardPage() {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium mb-1.5">Locatie / Trouwzaal</label>
+                <label className="block text-sm font-medium mb-1.5">{tw.venueLabel}</label>
                 <input
                   value={form.venue}
                   onChange={(e) => set("venue", e.target.value)}
-                  placeholder="bijv. Kasteel de Haar, Utrecht"
+                  placeholder={tw.venuePlaceholder}
                   className="w-full border rounded-xl px-4 py-3 text-sm"
                   style={{ borderColor: "var(--border)" }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Verwacht aantal gasten</label>
+                <label className="block text-sm font-medium mb-1.5">{tw.guestCountLabel}</label>
                 <input
                   type="number"
                   value={form.guestCount}
                   onChange={(e) => set("guestCount", e.target.value)}
-                  placeholder="bijv. 80"
+                  placeholder={tw.guestCountPlaceholder}
                   min={1}
                   className="w-full border rounded-xl px-4 py-3 text-sm"
                   style={{ borderColor: "var(--border)" }}
@@ -222,18 +224,18 @@ export default function WeddingWizardPage() {
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold">Budget</h2>
-                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Een indicatie helpt ons bij de planning. Je kunt dit later aanpassen.</p>
+                <h2 className="text-lg font-semibold">{tw.step3Title}</h2>
+                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{tw.step3Sub}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Totaalbudget (€)</label>
+                <label className="block text-sm font-medium mb-1.5">{tw.totalBudgetLabel}</label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium" style={{ color: "var(--muted)" }}>€</span>
                   <input
                     type="number"
                     value={form.budget}
                     onChange={(e) => set("budget", e.target.value)}
-                    placeholder="15.000"
+                    placeholder={tw.budgetPlaceholder}
                     min={0}
                     step={500}
                     className="w-full border rounded-xl pl-8 pr-4 py-3 text-sm"
@@ -259,11 +261,11 @@ export default function WeddingWizardPage() {
                 ))}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5">Notities / wensen</label>
+                <label className="block text-sm font-medium mb-1.5">{tw.notesLabel}</label>
                 <textarea
                   value={form.notes}
                   onChange={(e) => set("notes", e.target.value)}
-                  placeholder="bijv. Stijl: Romantisch en sfeervol. We willen graag live muziek..."
+                  placeholder={tw.notesPlaceholder}
                   rows={3}
                   className="w-full border rounded-xl px-4 py-3 text-sm resize-none"
                   style={{ borderColor: "var(--border)" }}
@@ -276,48 +278,48 @@ export default function WeddingWizardPage() {
           {step === 4 && (
             <div className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold">Klaar voor jullie dream day?</h2>
-                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Controleer de gegevens en start jullie bruiloft.</p>
+                <h2 className="text-lg font-semibold">{tw.step4Title}</h2>
+                <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{tw.step4Sub}</p>
               </div>
               <div className="space-y-3 rounded-xl p-4" style={{ background: "var(--accent)" }}>
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: "var(--muted)" }}>Bruidspaar</span>
+                  <span style={{ color: "var(--muted)" }}>{tw.summaryCouple}</span>
                   <span className="font-medium">
-                    {form.partner1 && form.partner2 ? `${form.partner1} & ${form.partner2}` : "Nog niet ingevuld"}
+                    {form.partner1 && form.partner2 ? `${form.partner1} & ${form.partner2}` : tw.notFilledIn}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span style={{ color: "var(--muted)" }}>Datum</span>
+                  <span style={{ color: "var(--muted)" }}>{tw.summaryDate}</span>
                   <span className="font-medium">
-                    {form.date ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(form.date)) : "Nog niet ingevuld"}
+                    {form.date ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(form.date)) : tw.notFilledIn}
                   </span>
                 </div>
                 {form.venue && (
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: "var(--muted)" }}>Locatie</span>
+                    <span style={{ color: "var(--muted)" }}>{tw.summaryVenue}</span>
                     <span className="font-medium">{form.venue}</span>
                   </div>
                 )}
                 {form.guestCount && (
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: "var(--muted)" }}>Gasten</span>
-                    <span className="font-medium">{form.guestCount} personen</span>
+                    <span style={{ color: "var(--muted)" }}>{tw.summaryGuests}</span>
+                    <span className="font-medium">{form.guestCount} {tw.summaryGuestsUnit}</span>
                   </div>
                 )}
                 {form.budget && (
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: "var(--muted)" }}>Budget</span>
+                    <span style={{ color: "var(--muted)" }}>{tw.summaryBudget}</span>
                     <span className="font-medium">€{parseFloat(form.budget).toLocaleString("nl-NL")}</span>
                   </div>
                 )}
                 {form.notes && (
                   <div className="text-sm pt-2 border-t" style={{ borderColor: "var(--border)" }}>
-                    <span style={{ color: "var(--muted)" }}>Notities: </span>{form.notes}
+                    <span style={{ color: "var(--muted)" }}>{tw.summaryNotes} </span>{form.notes}
                   </div>
                 )}
               </div>
               <p className="text-xs" style={{ color: "var(--muted)" }}>
-                Je wordt ingelogd als bruidspaar en krijgt direct toegang tot jouw bruiloftspagina.
+                {tw.loginNotice}
               </p>
             </div>
           )}
@@ -326,7 +328,7 @@ export default function WeddingWizardPage() {
           <div className="flex gap-3 mt-6">
             {step > 1 && (
               <button onClick={prev} className="ddp-btn-secondary flex-1">
-                ← Terug
+                {tw.back}
               </button>
             )}
             {step < 4 ? (
@@ -335,7 +337,7 @@ export default function WeddingWizardPage() {
                 disabled={step === 2 && !form.date}
                 className="ddp-btn-primary flex-1"
               >
-                Volgende →
+                {tw.next}
               </button>
             ) : (
               <button
@@ -343,14 +345,14 @@ export default function WeddingWizardPage() {
                 disabled={saving}
                 className="ddp-btn-primary flex-1 py-3"
               >
-                {saving ? "Aanmaken..." : "Bruiloft aanmaken"}
+                {saving ? tw.creating : tw.create}
               </button>
             )}
           </div>
         </div>
 
         <p className="text-center text-xs mt-4" style={{ color: "var(--muted)" }}>
-          <Link href="/login">← Terug naar inloggen</Link>
+          <Link href="/login">{tw.backToLogin}</Link>
         </p>
       </div>
     </div>

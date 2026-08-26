@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
 import DatePicker from "@/components/DatePicker";
 import { formatDateRange } from "@/lib/dateRange";
+import { useLang } from "@/components/LangProvider";
 
 type Invite = {
   id: string;
@@ -21,11 +22,6 @@ type Invite = {
   portalAccess?: boolean | null;
 };
 
-const VENDOR_STATUS_LABELS: Record<string, string> = {
-  lead: "Interesse", confirmed: "Bevestigd", booked: "Geboekt", quote_received: "Offerte ontvangen",
-  declined: "Afgewezen", ready: "Klaar voor de dag", in_progress: "In voorbereiding",
-  invited: "Uitgenodigd", contacted: "Gecontacteerd", interest: "Interesse", completed: "Afgerond", pending: "In behandeling",
-};
 const VENDOR_STATUS_COLORS: Record<string, string> = {
   lead: "var(--gold-deep)", confirmed: "var(--gold-deep)", booked: "var(--gold-deep)", quote_received: "var(--foreground)",
   declined: "var(--muted-light)", interest: "var(--muted)", ready: "var(--gold-deep)", in_progress: "var(--foreground)",
@@ -43,6 +39,9 @@ function formatDate(iso: string) {
 }
 
 export default function MijnBruiloftenPage() {
+  const { t } = useLang();
+  const tm = t.myWeddings;
+  const VENDOR_STATUS_LABELS: Record<string, string> = tm.vendorStatusLabels;
   const [invites, setInvites] = useState<Invite[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -73,16 +72,16 @@ export default function MijnBruiloftenPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Er is iets misgegaan");
+      setError(data.error ?? tm.genericError);
     } else {
       setInvites(prev => [data.invite, ...prev]);
       setForm({ email1: "", email2: "", weddingDate: "", weddingTitle: "", notes: "" });
       setShowForm(false);
       setSuccess(data.pendingApproval
-        ? "Bruiloft gevonden! Dit account bestaat al — het bruidspaar moet je eerst toegang geven bij hun Leveranciers-pagina voor je het dashboard kunt zien."
+        ? tm.pendingApprovalMsg
         : data.matched
-        ? "Bruiloft gevonden en direct gekoppeld aan een bestaand account!"
-        : "Bruiloft aangemaakt. Je hebt nu meteen toegang tot het dashboard. Zodra het bruidspaar zich aanmeldt worden ze automatisch gekoppeld."
+        ? tm.matchedMsg
+        : tm.createdMsg
       );
     }
     setSaving(false);
@@ -93,14 +92,14 @@ export default function MijnBruiloftenPage() {
     try {
       const res = await fetch(`/api/vendor/weddings/wedding/${weddingId}/invite`, { method: "POST" });
       if (res.ok) setInvitedIds(prev => new Set(prev).add(weddingId));
-      else { const d = await res.json().catch(() => ({})); alert(d.error ?? "Uitnodigen mislukt"); }
+      else { const d = await res.json().catch(() => ({})); alert(d.error ?? tm.inviteFailed); }
     } finally {
       setInvitingId(null);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Registratie verwijderen?")) return;
+    if (!confirm(tm.confirmDeleteInvite)) return;
     await fetch(`/api/vendor/weddings/${id}`, { method: "DELETE" });
     setInvites(prev => prev.filter(i => i.id !== id));
   }
@@ -111,18 +110,16 @@ export default function MijnBruiloftenPage() {
     <div style={{ maxWidth: "760px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
         <div>
-          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Mijn bruiloften</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{tm.title}</h1>
           <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginTop: "2px" }}>
-            Vul het e-mailadres van het bruidspaar in: heeft het bruidspaar al een account, dan word je
-            direct gekoppeld. Nog geen account? Dan zetten we alvast een bruiloft voor je klaar en koppelen
-            we automatisch zodra ze zich aanmelden.
+            {tm.intro}
           </p>
         </div>
         <button
           onClick={() => { setShowForm(!showForm); setSuccess(""); }}
           className="ddp-btn-primary inline-flex items-center gap-1.5"
         >
-          <Plus className="w-3.5 h-3.5" /> Bruiloft registreren
+          <Plus className="w-3.5 h-3.5" /> {tm.register}
         </button>
       </div>
 
@@ -135,38 +132,38 @@ export default function MijnBruiloftenPage() {
       {/* Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="ddp-card mb-6" style={{ padding: "1.5rem" }}>
-          <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-7)" }}>Bruiloft registreren</h2>
+          <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-7)" }}>{tm.formTitle}</h2>
           <div style={{ display: "grid", gap: "var(--space-6)" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}>
               <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-                E-mail partner 1 *<br />
-                <input type="email" required value={form.email1} onChange={e => set("email1", e.target.value)} placeholder="partner1@email.nl" style={{ ...INP, marginTop: "0.3rem" }} />
+                {tm.email1Label}<br />
+                <input type="email" required value={form.email1} onChange={e => set("email1", e.target.value)} placeholder={tm.email1Placeholder} style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
               <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-                E-mail partner 2<br />
-                <input type="email" value={form.email2} onChange={e => set("email2", e.target.value)} placeholder="partner2@email.nl" style={{ ...INP, marginTop: "0.3rem" }} />
+                {tm.email2Label}<br />
+                <input type="email" value={form.email2} onChange={e => set("email2", e.target.value)} placeholder={tm.email2Placeholder} style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}>
               <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-                Trouwdatum *<br />
+                {tm.dateLabel}<br />
                 <DatePicker value={form.weddingDate} onChange={v => set("weddingDate", v)} className="" style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
               <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-                Naam bruiloft (optioneel)<br />
-                <input value={form.weddingTitle} onChange={e => set("weddingTitle", e.target.value)} placeholder="bijv. Bruiloft Emma & Thomas" style={{ ...INP, marginTop: "0.3rem" }} />
+                {tm.weddingTitleLabel}<br />
+                <input value={form.weddingTitle} onChange={e => set("weddingTitle", e.target.value)} placeholder={tm.weddingTitlePlaceholder} style={{ ...INP, marginTop: "0.3rem" }} />
               </label>
             </div>
             <label style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>
-              Notities<br />
-              <input value={form.notes} onChange={e => set("notes", e.target.value)} placeholder="Bijv. decoratie kerk + diner" style={{ ...INP, marginTop: "0.3rem" }} />
+              {tm.notesLabel}<br />
+              <input value={form.notes} onChange={e => set("notes", e.target.value)} placeholder={tm.notesPlaceholder} style={{ ...INP, marginTop: "0.3rem" }} />
             </label>
             {error && <p style={{ fontSize: "var(--text-md)", color: "var(--danger)" }}>{error}</p>}
             <div style={{ display: "flex", gap: "var(--space-3)" }}>
               <button type="submit" disabled={saving} className="ddp-btn-primary">
-                {saving ? "Opslaan…" : "Registreren"}
+                {saving ? tm.saving : tm.registerSubmit}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="ddp-btn-secondary">Annuleren</button>
+              <button type="button" onClick={() => setShowForm(false)} className="ddp-btn-secondary">{tm.cancel}</button>
             </div>
           </div>
         </form>
@@ -174,11 +171,11 @@ export default function MijnBruiloftenPage() {
 
       {/* List */}
       {loading ? (
-        <p style={{ color: "var(--muted)", fontSize: "var(--text-md)" }}>Laden…</p>
+        <p style={{ color: "var(--muted)", fontSize: "var(--text-md)" }}>{tm.loading}</p>
       ) : invites.length === 0 ? (
         <div className="text-center py-16" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
-          <p style={{ fontWeight: 600, marginBottom: "var(--space-3)" }}>Nog geen bruiloften geregistreerd</p>
-          <p style={{ fontSize: "var(--text-md)" }}>Voeg een bruiloft toe om automatisch gekoppeld te worden zodra het bruidspaar zich aanmeldt.</p>
+          <p style={{ fontWeight: 600, marginBottom: "var(--space-3)" }}>{tm.noneTitle}</p>
+          <p style={{ fontSize: "var(--text-md)" }}>{tm.noneHint}</p>
         </div>
       ) : (
         <div style={{ borderTop: "1px solid var(--border)" }}>
@@ -206,15 +203,15 @@ export default function MijnBruiloftenPage() {
                     <div style={{ marginTop: "6px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       {pending ? (
                         <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
-                          Wacht op goedkeuring bruidspaar
+                          {tm.waitingApproval}
                         </span>
                       ) : linked ? (
                         <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>
-                          Bruidspaar gekoppeld
+                          {tm.linkedStatus}
                         </span>
                       ) : (
                         <span style={{ fontSize: "var(--text-xs)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--muted-light)" }}>
-                          Bruidspaar nog niet aangemeld
+                          {tm.notLinkedStatus}
                         </span>
                       )}
                       {invite.vendorStatus && (
@@ -230,7 +227,7 @@ export default function MijnBruiloftenPage() {
                         href={`/weddings/${invite.weddingId}`}
                         style={{ fontSize: "var(--text-base)", color: "var(--gold-deep)", fontWeight: 600, textDecoration: "none" }}
                       >
-                        Dashboard
+                        {tm.dashboard}
                       </Link>
                     )}
                     {canOpen && (
@@ -239,7 +236,7 @@ export default function MijnBruiloftenPage() {
                         disabled={invitingId === invite.weddingId || invitedIds.has(invite.weddingId!)}
                         style={{ fontSize: "var(--text-base)", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
                       >
-                        {invitedIds.has(invite.weddingId!) ? "Uitnodiging verstuurd" : invitingId === invite.weddingId ? "Bezig…" : "Uitnodigen"}
+                        {invitedIds.has(invite.weddingId!) ? tm.inviteSent : invitingId === invite.weddingId ? tm.invitingBusy : tm.invite}
                       </button>
                     )}
                     <button onClick={() => handleDelete(invite.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: "4px", display: "flex" }}>
