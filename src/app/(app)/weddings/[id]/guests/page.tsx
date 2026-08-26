@@ -6,6 +6,7 @@ import Link from "next/link";
 import { X, Upload } from "lucide-react";
 import { SkeletonCard } from "@/components/Skeleton";
 import InfoTip from "@/components/InfoTip";
+import { useLang } from "@/components/LangProvider";
 
 type Guest = {
   id: string;
@@ -20,15 +21,16 @@ type Guest = {
   isChild: boolean;
 };
 
-const RSVP_LABELS: Record<string, string> = {
-  confirmed: "Bevestigd", declined: "Afgemeld", invited: "Uitgenodigd", no_response: "Geen reactie",
-};
-const SIDE_LABELS: Record<string, string> = { bride: "Partner 1", groom: "Partner 2", both: "Beiden" };
-
 const EMPTY_GUEST_FORM = { name: "", email: "", phone: "", side: "both", dietary: "", allergies: "", plusOne: false, isChild: false };
 
 export default function GuestsPage() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useLang();
+  const tg = t.guests;
+  const RSVP_LABELS: Record<string, string> = {
+    confirmed: tg.rsvp.confirmed, declined: tg.rsvp.declined, invited: tg.rsvp.invited, no_response: tg.rsvp.no_response,
+  };
+  const SIDE_LABELS: Record<string, string> = { bride: tg.sidePartner1, groom: tg.sidePartner2, both: tg.sideBoth };
   const [guests, setGuests] = useState<Guest[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -68,7 +70,7 @@ export default function GuestsPage() {
     setSaving(false);
     if (res.status === 409) {
       const data = await res.json().catch(() => null);
-      if (data?.error === "duplicate" && window.confirm(`${data.message} Toch nog een keer toevoegen?`)) {
+      if (data?.error === "duplicate" && window.confirm(`${data.message} ${tg.confirmDuplicateSuffix}`)) {
         return handleAdd(e, true);
       }
       return;
@@ -150,7 +152,7 @@ export default function GuestsPage() {
     const duplicates: string[] = [];
     for (const row of rows) {
       const name = colByKeywords(row, ["naam", "name"]);
-      if (!name) { skipped.push(`(rij zonder naam)`); continue; }
+      if (!name) { skipped.push(tg.csvNoName); continue; }
       const email = colByKeywords(row, ["email", "e-mail"]) || "";
       const key = normalizeGuestKey(name);
       const isDuplicate = existingKeys.has(key) || seenInBatch.has(key) || (email && existingEmails.has(email.toLowerCase()));
@@ -176,14 +178,14 @@ export default function GuestsPage() {
     if (csvRef.current) csvRef.current.value = "";
     setCsvImporting(false);
     load();
-    const parts = [`${imported} gast(en) geïmporteerd`];
-    if (duplicates.length > 0) parts.push(`${duplicates.length} overgeslagen als duplicaat (${duplicates.slice(0, 10).join(", ")}${duplicates.length > 10 ? "…" : ""})`);
-    if (skipped.length > 0) parts.push(`${skipped.length} overgeslagen: ${skipped.slice(0, 10).join(", ")}${skipped.length > 10 ? "…" : ""}`);
+    const parts = [tg.csvImportedSummary.replace("{n}", String(imported))];
+    if (duplicates.length > 0) parts.push(tg.csvDuplicatesSummary.replace("{n}", String(duplicates.length)).replace("{list}", `${duplicates.slice(0, 10).join(", ")}${duplicates.length > 10 ? "…" : ""}`));
+    if (skipped.length > 0) parts.push(tg.csvSkippedSummary.replace("{n}", String(skipped.length)).replace("{list}", `${skipped.slice(0, 10).join(", ")}${skipped.length > 10 ? "…" : ""}`));
     alert(parts.join("\n"));
   }
 
   async function deleteGuest(guestId: string) {
-    if (!confirm("Gast verwijderen?")) return;
+    if (!confirm(tg.confirmDelete)) return;
     await fetch(`/api/weddings/${id}/guests/${guestId}`, { method: "DELETE" });
     load();
   }
@@ -207,16 +209,16 @@ export default function GuestsPage() {
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{tg.back}</Link>
         <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
-          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Gastenlijst</h1>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{tg.listTitle}</h1>
           <div className="flex gap-2">
             <input ref={csvRef} type="file" accept=".csv" onChange={handleCsvImport} className="hidden" id="csv-import" />
             <label htmlFor="csv-import" className="ddp-btn-secondary cursor-pointer flex items-center gap-1">
-              <Upload className="w-3.5 h-3.5" />{csvImporting ? "Importeren…" : "CSV import"}
+              <Upload className="w-3.5 h-3.5" />{csvImporting ? tg.csvImporting : tg.csvImport}
             </label>
             <button onClick={toggleForm} className="ddp-btn-primary">
-              {showForm ? "Annuleren" : "+ Gast toevoegen"}
+              {showForm ? tg.cancel : tg.addGuestBtn}
             </button>
           </div>
         </div>
@@ -226,13 +228,13 @@ export default function GuestsPage() {
         <div className="ddp-card mb-6 flex items-center gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold mb-0.5" style={{ display: "flex", alignItems: "center" }}>
-              Aanmeldlink voor gasten (RSVP)
-              <InfoTip label="Wat betekent RSVP?" text="RSVP betekent: laten weten of je komt. Deel deze link met je gasten zodat zij kunnen aangeven of ze aanwezig zijn." />
+              {tg.rsvpLinkLabel}
+              <InfoTip label={tg.rsvpTipLabel} text={tg.rsvpTipText} />
             </p>
             <p className="text-xs truncate" style={{ color: "var(--muted)" }}>{typeof window !== "undefined" ? `${window.location.origin}/rsvp/${rsvpToken}` : `/rsvp/${rsvpToken}`}</p>
           </div>
           <button onClick={copyRsvpLink} className="ddp-btn-secondary flex-shrink-0 text-xs">
-            {rsvpCopied ? "Gekopieerd!" : "Kopieer link"}
+            {rsvpCopied ? tg.linkCopied : tg.copyLink}
           </button>
         </div>
       )}
@@ -253,64 +255,64 @@ export default function GuestsPage() {
 
       {showForm && (
         <form onSubmit={handleAdd} className="ddp-card mb-6 space-y-4">
-          <h3 className="font-semibold">Gast toevoegen</h3>
+          <h3 className="font-semibold">{tg.formTitle}</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium mb-1">Naam *</label>
+              <label className="block text-xs font-medium mb-1">{tg.nameLabel}</label>
               <input required value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="Volledige naam" className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+                placeholder={tg.namePlaceholder} className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">E-mail</label>
+              <label className="block text-xs font-medium mb-1">{tg.emailLabel}</label>
               <input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                placeholder="email@voorbeeld.nl" className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+                placeholder={tg.emailPlaceholder} className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Telefoon</label>
+              <label className="block text-xs font-medium mb-1">{tg.phoneLabel}</label>
               <input value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                placeholder="06-..." className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+                placeholder={tg.phonePlaceholder} className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Kant</label>
+              <label className="block text-xs font-medium mb-1">{tg.sideLabel}</label>
               <select value={form.side} onChange={(e) => setForm((p) => ({ ...p, side: e.target.value }))}
                 className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
-                <option value="both">Beiden</option>
-                <option value="bride">Partner 1</option>
-                <option value="groom">Partner 2</option>
+                <option value="both">{tg.sideBoth}</option>
+                <option value="bride">{tg.sidePartner1}</option>
+                <option value="groom">{tg.sidePartner2}</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Dieetwensen</label>
+              <label className="block text-xs font-medium mb-1">{tg.dietaryLabel}</label>
               <input value={form.dietary} onChange={(e) => setForm((p) => ({ ...p, dietary: e.target.value }))}
-                placeholder="Vegetarisch, vegan, etc." className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
+                placeholder={tg.dietaryPlaceholder} className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Allergieën</label>
+              <label className="block text-xs font-medium mb-1">{tg.allergiesLabel}</label>
               <input value={form.allergies} onChange={(e) => setForm((p) => ({ ...p, allergies: e.target.value }))}
-                placeholder="Pinda's, schaaldieren, etc." className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: form.allergies.trim() ? "var(--gold-deep)" : "var(--border)" }} />
+                placeholder={tg.allergiesPlaceholder} className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: form.allergies.trim() ? "var(--gold-deep)" : "var(--border)" }} />
             </div>
             <div className="flex items-center gap-2 pt-5">
               <input type="checkbox" id="plusOne" checked={form.plusOne} onChange={(e) => setForm((p) => ({ ...p, plusOne: e.target.checked }))} />
-              <label htmlFor="plusOne" className="text-sm">Plus één meenemen</label>
+              <label htmlFor="plusOne" className="text-sm">{tg.plusOneLabel}</label>
             </div>
             <div className="flex items-center gap-2 pt-5">
               <input type="checkbox" id="isChild" checked={form.isChild} onChange={(e) => setForm((p) => ({ ...p, isChild: e.target.checked }))} />
-              <label htmlFor="isChild" className="text-sm">Kind</label>
+              <label htmlFor="isChild" className="text-sm">{tg.childLabel}</label>
             </div>
           </div>
           <button type="submit" disabled={saving} className="ddp-btn-primary w-full">
-            {saving ? "Opslaan..." : "Gast toevoegen"}
+            {saving ? tg.saving : tg.formTitle}
           </button>
         </form>
       )}
 
       <div className="flex gap-3 mb-4">
         <input value={search} onChange={(e) => setSearch(e.target.value)}
-          placeholder="Zoek op naam of e-mail..."
+          placeholder={tg.searchPlaceholder}
           className="flex-1 border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
         <select value={filterRsvp} onChange={(e) => setFilterRsvp(e.target.value)}
           className="border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }}>
-          <option value="all">Alle statussen</option>
+          <option value="all">{tg.allStatuses}</option>
           {Object.entries(RSVP_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
         </select>
       </div>
@@ -320,7 +322,7 @@ export default function GuestsPage() {
         <table className="w-full" style={{ minWidth: "640px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--background)" }}>
-              {["Naam", "Contact", "Kant", "Aanwezig", "Dieet", "Allergie", ""].map((h) => (
+              {[tg.colName, tg.colContact, tg.colSide, tg.colAttending, tg.colDiet, tg.colAllergy, ""].map((h) => (
                 <th key={h} className="text-xs font-semibold text-left px-4 py-3" style={{ color: "var(--muted)" }}>{h}</th>
               ))}
             </tr>
@@ -337,8 +339,8 @@ export default function GuestsPage() {
                     <div>
                       <div className="text-sm font-medium">{guest.name}</div>
                       <div className="flex gap-1.5">
-                        {guest.isChild && <span className="text-xs" style={{ color: "var(--muted)" }}>kind</span>}
-                        {guest.plusOne && <span className="text-xs" style={{ color: "var(--muted)" }}>+1</span>}
+                        {guest.isChild && <span className="text-xs" style={{ color: "var(--muted)" }}>{tg.childTag}</span>}
+                        {guest.plusOne && <span className="text-xs" style={{ color: "var(--muted)" }}>{tg.plusOneTag}</span>}
                       </div>
                     </div>
                   </div>
@@ -365,13 +367,13 @@ export default function GuestsPage() {
         </table>
         {filtered.length === 0 && (
           <div className="text-center py-10" style={{ color: "var(--muted)" }}>
-            <p>Geen gasten gevonden</p>
+            <p>{tg.noResults}</p>
           </div>
         )}
       </div>
       </div>
       <div className="text-xs mt-2 text-right" style={{ color: "var(--muted)" }}>
-        {filtered.length} van {guests.length} gasten
+        {tg.filteredOf.replace("{n}", String(filtered.length)).replace("{m}", String(guests.length))}
       </div>
     </div>
   );

@@ -4,62 +4,18 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Plus, X } from "lucide-react";
 import InfoTip from "@/components/InfoTip";
+import { translations, type Lang } from "@/lib/i18n";
 
 type WeddingInfo = { id: string; title: string; date: string; venue?: string | null };
 type GuestRow = { name: string; isChild: boolean; dietary: string; allergies: string };
 
 const EMPTY_GUEST: GuestRow = { name: "", isChild: false, dietary: "", allergies: "" };
 
-type Lang = "nl" | "en";
-
-const STRINGS: Record<Lang, Record<string, string>> = {
-  nl: {
-    email: "E-mailadres",
-    emailPlaceholder: "voor je bevestiging per mail",
-    attendance: "Aanwezigheid",
-    yourName: "Jouw naam",
-    guestName: "Naam",
-    coming: "Ik kom!",
-    notComing: "Ik kan helaas niet",
-    whoComes: "Wie komen er?",
-    adult: "Volwassene",
-    child: "Kind",
-    dietary: "Dieetwensen (optioneel)",
-    allergies: "Allergieën (optioneel)",
-    allergiesHint: "Bijv. pinda's, schaaldieren, noten — dit gaat rechtstreeks naar de cateraar.",
-    addGuest: "Nog iemand toevoegen",
-    submit: "RSVP versturen",
-    rsvpTip: "RSVP betekent: laten weten of je komt.",
-    submitting: "Versturen…",
-    thanks: "Bedankt!",
-    confirmedThanks: "Je ontvangt zo een bevestiging per e-mail op",
-    notFound: "Uitnodiging niet gevonden.",
-    loading: "Laden…",
-  },
-  en: {
-    email: "Email address",
-    emailPlaceholder: "for your confirmation email",
-    attendance: "Attendance",
-    yourName: "Your name",
-    guestName: "Name",
-    coming: "I'll be there!",
-    notComing: "Sorry, I can't make it",
-    whoComes: "Who's coming?",
-    adult: "Adult",
-    child: "Child",
-    dietary: "Dietary preferences (optional)",
-    allergies: "Allergies (optional)",
-    allergiesHint: "E.g. peanuts, shellfish, tree nuts — this goes straight to the caterer.",
-    addGuest: "Add someone else",
-    submit: "Send RSVP",
-    rsvpTip: "RSVP means: let us know if you're coming.",
-    submitting: "Sending…",
-    thanks: "Thank you!",
-    confirmedThanks: "You'll receive a confirmation email at",
-    notFound: "Invitation not found.",
-    loading: "Loading…",
-  },
-};
+// Deze pagina wordt bezocht door gasten zonder eigen account, die niet
+// per se dezelfde taalvoorkeur hebben als het bruidspaar/de instelling in
+// hun browser — daarom een eigen taalschakelaar in de pagina zelf i.p.v.
+// de globale LangProvider (cookie/localStorage), met dezelfde vertalingen
+// uit i18n.ts (namespace "rsvp").
 
 export default function RsvpPage() {
   const { token } = useParams<{ token: string }>();
@@ -72,7 +28,7 @@ export default function RsvpPage() {
   const [rsvpStatus, setRsvpStatus] = useState("confirmed");
   const [guests, setGuests] = useState<GuestRow[]>([{ ...EMPTY_GUEST }]);
   const [lang, setLang] = useState<Lang>("nl");
-  const t = STRINGS[lang];
+  const t = translations[lang].rsvp;
 
   useEffect(() => {
     fetch(`/api/rsvp/${token}`)
