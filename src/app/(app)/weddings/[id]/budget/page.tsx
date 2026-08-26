@@ -299,7 +299,8 @@ export default function BudgetPage() {
               <h3 className="dash-section-title">{category}</h3>
               <span className="text-xs" style={{ color: "var(--muted)" }}>{euro(catActual)} / {euro(catEstimated)}</span>
             </div>
-            <div style={{ borderTop: "1px solid var(--border)", overflowX: "auto" }}>
+            <div className="ddp-scroll-fade ddp-scroll-fade--surface" style={{ borderTop: "1px solid var(--border)" }}>
+            <div style={{ overflowX: "auto" }}>
               <table className="w-full" style={{ minWidth: "560px" }}>
                 <tbody>
                   {items.map((item) => (
@@ -336,6 +337,7 @@ export default function BudgetPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
             </div>
           </div>
         );

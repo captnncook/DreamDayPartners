@@ -433,9 +433,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .ddp-chip[aria-pressed="true"],
 .ddp-chip.active {
-  background: var(--color-blush);
-  border-color: var(--color-charcoal);
-  color: var(--color-charcoal);
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--ink-text, #fff);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1040,6 +1040,19 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 768px) {
   .ddp-main-content { padding-bottom: 0; }
+}
+
+/* Berichten-overzicht (/dm) rekent zijn eigen hoogte uit i.p.v. .ddp-main-content
+   se padding-bottom te gebruiken (het vult zelf de resterende viewport-hoogte
+   voor een vaste chat-layout) — moet daarom op mobiel ook ruimte overlaten
+   voor de vaste onderbalk, anders schuift het invoerveld er half onder. */
+.ddp-dm-shell {
+  height: calc(100dvh - 60px);
+}
+@media (max-width: 767px) {
+  .ddp-dm-shell {
+    height: calc(100dvh - 60px - 56px - env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

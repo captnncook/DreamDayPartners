@@ -198,10 +198,10 @@ export default function LoginPage() {
             {/* Role preview — geen kaart-in-kaart, dunne scheidingslijn */}
             <div className="flex items-center gap-3 py-3" style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
               <div
-                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: "var(--gold)" }}
+                className="font-serif w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-lg)" }}
               >
-                <selected.Icon className="w-5 h-5" style={{ color: "var(--ink)" }} />
+                {selected.label.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm">{selected.label}</div>

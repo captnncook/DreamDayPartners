@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLang } from "@/components/LangProvider";
-import { User, Mail, Phone, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ShieldAvatar from "@/components/ShieldAvatar";
 
@@ -171,7 +170,7 @@ export default function TeamPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div style={{ borderTop: "1px solid var(--border)" }}>
           {visibleVendors.map((wv) => {
             const statusLabel = tm.statusLabels[wv.status as keyof typeof tm.statusLabels] ?? wv.status;
             const statusColor =
@@ -179,56 +178,47 @@ export default function TeamPage() {
               : wv.status === "quote_received" ? "var(--foreground)"
               : "var(--muted)";
             const isDiscovery = access === "discovery";
+            const canContact = Boolean(wv.vendor.userId);
 
-            const cardBody = (
+            const rowBody = (
               <>
-                {/* Top: icon + name */}
-                <div className="flex items-start gap-4 mb-4">
-                  <ShieldAvatar photoUrl={wv.vendor.photoUrl} clipId={wv.vendor.id} size={44} />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-serif text-base truncate" style={{ fontWeight: 700, color: "var(--foreground)" }}>
-                      {wv.vendor.name}
-                    </h3>
-                    <div className="text-xs capitalize mt-0.5" style={{ color: "var(--muted)" }}>
-                      {wv.vendor.category}
-                    </div>
-                    {!isDiscovery && (
-                      <div className="mt-2 flex items-center gap-2 flex-wrap">
-                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor }}>{statusLabel}</span>
-                        {wv.portalAccess && (
-                          <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>{tm.portal}</span>
-                        )}
-                      </div>
-                    )}
+                <ShieldAvatar photoUrl={wv.vendor.photoUrl} clipId={wv.vendor.id} size={40} />
+                <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+                  <h3 className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-lg)", color: "var(--foreground)" }}>
+                    {wv.vendor.name}
+                  </h3>
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", textTransform: "capitalize", marginTop: "1px" }}>
+                    {wv.vendor.category}
+                    {wv.vendor.contactPerson && ` · ${wv.vendor.contactPerson}`}
                   </div>
-                </div>
-
-                {/* Contact info */}
-                <div className="space-y-1.5 text-xs border-t pt-3" style={{ color: "var(--muted)", borderColor: "var(--border)" }}>
-                  {wv.vendor.contactPerson && <div className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</div>}
-                  {wv.vendor.email && (
-                    <div className="flex items-center gap-1 truncate" style={{ color: "var(--primary)" }}>
-                      <Mail className="w-3 h-3 flex-shrink-0" /> {wv.vendor.email}
+                  {(wv.vendor.email || wv.vendor.phone) && (
+                    <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px", display: "flex", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                      {wv.vendor.email && <span style={{ color: "var(--primary)" }}>{wv.vendor.email}</span>}
+                      {wv.vendor.phone && <span>{wv.vendor.phone}</span>}
                     </div>
                   )}
-                  {wv.vendor.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {wv.vendor.phone}</div>}
-                  {!isDiscovery && wv.notes && <div className="italic pt-1">{wv.notes}</div>}
+                  {!isDiscovery && wv.notes && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", fontStyle: "italic", marginTop: "2px" }}>{wv.notes}</div>}
+                  {!isDiscovery && (
+                    <div className="mt-1 flex items-center gap-2 flex-wrap">
+                      <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor }}>{statusLabel}</span>
+                      {wv.portalAccess && (
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>{tm.portal}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </>
             );
 
             if (isDiscovery) {
-              const canContact = Boolean(wv.vendor.userId);
               return (
-                <div key={wv.id} className="ddp-card">
-                  {cardBody}
+                <div key={wv.id} className="dash-row" style={{ flexWrap: "wrap" }}>
+                  {rowBody}
                   <button
                     onClick={() => canContact && startConversation(wv.vendor.userId!)}
                     disabled={!canContact || startingWith === wv.vendor.userId}
-                    className="mt-3 pt-3 border-t text-xs font-medium flex items-center justify-end gap-1 w-full"
-                    style={{ borderColor: "var(--border)", color: canContact ? "var(--primary)" : "var(--muted)", background: "none", cursor: canContact ? "pointer" : "default" }}
+                    style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: canContact ? "var(--gold-deep)" : "var(--muted)", background: "none", border: "none", cursor: canContact ? "pointer" : "default", flexShrink: 0, whiteSpace: "nowrap" }}
                   >
-                    <MessageCircle className="w-3.5 h-3.5" />
                     {startingWith === wv.vendor.userId ? "Bezig…" : "Contact opnemen"}
                   </button>
                 </div>
@@ -236,19 +226,11 @@ export default function TeamPage() {
             }
 
             return (
-              <Link
-                key={wv.id}
-                href={`/weddings/${id}/vendors/${wv.id}`}
-                className="ddp-card group hover:shadow-md transition-shadow block"
-              >
-                {cardBody}
-                {/* CTA */}
-                <div
-                  className="mt-3 pt-3 border-t text-xs font-medium flex items-center justify-end gap-1"
-                  style={{ borderColor: "var(--border)", color: "var(--primary)" }}
-                >
+              <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="dash-row" style={{ flexWrap: "wrap" }}>
+                {rowBody}
+                <span style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--gold-deep)", flexShrink: 0, whiteSpace: "nowrap" }}>
                   {tm.viewDetail} →
-                </div>
+                </span>
               </Link>
             );
           })}
@@ -306,25 +288,20 @@ export default function TeamPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div style={{ borderTop: "1px solid var(--border)" }}>
             {members.map(m => {
               const roleLabel = m.role === "couple" ? "Bruidspaar" : m.role === "planner" ? "Trouwplanner" : m.role === "admin" ? "Beheerder" : "Teamlid";
               return (
-                <div key={m.id} className="ddp-card" style={{ padding: "1rem" }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold" style={{ background: "var(--gold)", color: "var(--ink)" }}>
-                      {m.name.charAt(0)}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-semibold text-sm truncate">{m.name}</div>
-                      <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{roleLabel}</div>
+                <div key={m.id} className="dash-row">
+                  <div className="font-serif" style={{ width: "2.25rem", height: "2.25rem", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontWeight: 700, fontSize: "var(--text-lg)", background: "var(--gold)", color: "var(--ink)" }}>
+                    {m.name.charAt(0)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-lg)", color: "var(--foreground)" }}>{m.name}</div>
+                    <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "1px" }}>
+                      {roleLabel}{m.email && ` · ${m.email}`}
                     </div>
                   </div>
-                  {m.email && (
-                    <div className="mt-2 flex items-center gap-1 text-xs truncate" style={{ color: "var(--primary)" }}>
-                      <Mail className="w-3 h-3 flex-shrink-0" /> {m.email}
-                    </div>
-                  )}
                 </div>
               );
             })}

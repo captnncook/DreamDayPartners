@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { User, Mail, Phone, X, CheckCircle2, Search } from "lucide-react";
+import { X, Search } from "lucide-react";
 import DatePicker from "@/components/DatePicker";
 import { formatDateRange } from "@/lib/dateRange";
 
@@ -293,84 +293,71 @@ export default function VendorsPage() {
       )}
 
       {weddingVendors.length === 0 ? (
-        <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
-          <h2 className="font-semibold text-lg mb-2">Nog geen leveranciers</h2>
+        <div className="text-center py-16" style={{ color: "var(--muted)", borderTop: "1px solid var(--border)" }}>
+          <h2 className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-2xl)", marginBottom: "var(--space-3)", color: "var(--foreground)" }}>Nog geen leveranciers</h2>
           <p className="text-sm mb-4">Koppel leveranciers aan deze bruiloft</p>
           <button onClick={() => setShowAdd(true)} className="ddp-btn-primary">+ Leverancier koppelen</button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div style={{ borderTop: "1px solid var(--border)" }}>
           {weddingVendors.map((wv) => (
-            <div key={wv.id} className="ddp-card">
-              <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 font-serif" style={{ background: "var(--sand)", color: "var(--ink)", fontWeight: 700, fontSize: "1.125rem" }}>
-                  {wv.vendor.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-semibold text-sm">{wv.vendor.name}</h3>
-                    {wv.portalAccess && <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Portal</span>}
-                  </div>
-                  <div className="text-xs capitalize mt-0.5" style={{ color: "var(--muted)" }}>{wv.vendor.category}</div>
-                </div>
-                <button onClick={() => removeVendor(wv)} className="text-xs hover:opacity-70 flex-shrink-0" style={{ color: "var(--muted)" }}><X className="w-4 h-4" /></button>
+            <div key={wv.id} className="dash-row" style={{ alignItems: "flex-start", flexWrap: "wrap" }}>
+              <div className="font-serif" style={{ width: "2rem", height: "2rem", borderRadius: "50%", background: "var(--sand)", color: "var(--ink)", fontWeight: 700, fontSize: "var(--text-lg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {wv.vendor.name.charAt(0)}
               </div>
 
-              <div className="mt-3">
+              <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Link href={`/weddings/${id}/vendors/${wv.id}`} className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-lg)", color: "var(--foreground)", textDecoration: "none" }}>
+                    {wv.vendor.name}
+                  </Link>
+                  {wv.portalAccess && <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>Portal</span>}
+                </div>
+                <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", textTransform: "capitalize", marginTop: "1px" }}>
+                  {wv.vendor.category}
+                  {wv.vendor.contactPerson && ` · ${wv.vendor.contactPerson}`}
+                </div>
+                {(wv.vendor.email || wv.vendor.phone) && (
+                  <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "2px", display: "flex", gap: "var(--space-4)", flexWrap: "wrap" }}>
+                    {wv.vendor.email && <a href={`mailto:${wv.vendor.email}`} style={{ color: "var(--primary)" }}>{wv.vendor.email}</a>}
+                    {wv.vendor.phone && <span>{wv.vendor.phone}</span>}
+                  </div>
+                )}
+                {wv.notes && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", fontStyle: "italic", marginTop: "2px" }}>{wv.notes}</div>}
+                {isMultiDay && weddingDates && (
+                  <div style={{ marginTop: "var(--space-3)", maxWidth: "220px" }}>
+                    <label className="block" style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--muted)", marginBottom: "2px" }}>Werkt op</label>
+                    <DatePicker
+                      value={wv.specificDate ?? ""}
+                      onChange={(v) => updateSpecificDate(wv, v)}
+                      min={weddingDates.date}
+                      max={weddingDates.endDate ?? undefined}
+                      placeholder="Alle dagen"
+                      className="w-full border rounded-lg px-2 py-1.5 text-xs"
+                      style={{ borderColor: "var(--border)" }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", flexShrink: 0, flexWrap: "wrap" }}>
                 <select
                   value={wv.status}
                   onChange={(e) => updateStatus(wv, e.target.value)}
-                  className="w-full border rounded-lg px-2 py-1.5 text-xs"
-                  style={{ borderColor: "var(--border)" }}
+                  className="rounded-lg px-2 py-1.5"
+                  style={{ borderColor: "var(--border)", border: "1px solid var(--border)", fontSize: "var(--text-sm)", background: "var(--surface)" }}
                 >
                   {Object.entries(STATUS_LABELS).map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>
                   ))}
                 </select>
-              </div>
-
-              {isMultiDay && weddingDates && (
-                <div className="mt-3">
-                  <label className="block text-xs font-medium mb-1" style={{ color: "var(--muted)" }}>Werkt op</label>
-                  <DatePicker
-                    value={wv.specificDate ?? ""}
-                    onChange={(v) => updateSpecificDate(wv, v)}
-                    min={weddingDates.date}
-                    max={weddingDates.endDate ?? undefined}
-                    placeholder="Alle dagen"
-                    className="w-full border rounded-lg px-2 py-1.5 text-xs"
-                    style={{ borderColor: "var(--border)" }}
-                  />
-                </div>
-              )}
-
-              <div className="mt-3 space-y-1.5 text-xs" style={{ color: "var(--muted)" }}>
-                {wv.vendor.contactPerson && <div className="flex items-center gap-1"><User className="w-3 h-3" /> {wv.vendor.contactPerson}</div>}
-                {wv.vendor.email && (
-                  <div className="flex items-center gap-1"><Mail className="w-3 h-3" /><a href={`mailto:${wv.vendor.email}`} className="" style={{ color: "var(--primary)" }}>{wv.vendor.email}</a></div>
-                )}
-                {wv.vendor.phone && <div className="flex items-center gap-1"><Phone className="w-3 h-3" /> {wv.vendor.phone}</div>}
-                {wv.notes && <div className="italic">{wv.notes}</div>}
-              </div>
-
-              <div className="mt-3 pt-3 border-t flex items-center justify-between gap-2" style={{ borderColor: "var(--border)" }}>
-                <Link
-                  href={`/weddings/${id}/vendors/${wv.id}`}
-                  className="text-xs px-3 py-1.5 rounded-lg font-medium flex-1 text-center"
-                  style={{ background: "var(--primary)", color: "white", textDecoration: "none" }}
-                >
-                  Dashboard →
-                </Link>
                 <button
                   onClick={() => togglePortal(wv)}
-                  className="text-xs px-2 py-1 rounded-md transition-colors flex-shrink-0"
-                  style={{
-                    background: wv.portalAccess ? "var(--danger-bg)" : "var(--accent)",
-                    color: wv.portalAccess ? "var(--danger)" : "var(--primary)",
-                  }}
+                  style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: wv.portalAccess ? "var(--muted)" : "var(--gold-deep)", background: "none", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}
                 >
-                  {wv.portalAccess ? "Toegang intrekken" : "Portal"}
+                  {wv.portalAccess ? "Toegang intrekken" : "Portal geven"}
                 </button>
+                <button onClick={() => removeVendor(wv)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "flex" }}><X className="w-4 h-4" /></button>
               </div>
             </div>
           ))}

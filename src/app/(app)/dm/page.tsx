@@ -350,7 +350,7 @@ export default function DmPage() {
   const otherUser = activeConv?.participants.find(p => p.userId !== currentUserId)?.user;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 60px)", overflow: "hidden" }}>
+    <div className="ddp-dm-shell" style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {role === "vendor" && (
         <div style={{ display: "flex", gap: "var(--space-8)", padding: "0.75rem 1.25rem 0", borderBottom: "1px solid var(--border)", background: "white", flexShrink: 0 }}>
           {([["gesprekken", "Gesprekken"], ["verzoeken", "Verzoeken"]] as const).map(([key, label]) => (
@@ -401,7 +401,7 @@ export default function DmPage() {
             const isActive = conv.id === activeConvId;
             return (
               <button key={conv.id} onClick={() => setActiveConvId(conv.id)}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: "var(--space-5)", padding: "0.875rem 1rem", border: "none", textAlign: "left", cursor: "pointer", background: isActive ? "var(--color-blush-soft)" : "transparent", borderLeft: isActive ? "3px solid var(--primary)" : "3px solid transparent", transition: "background 0.1s" }}>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: "var(--space-5)", padding: "0.875rem 1rem", border: "none", textAlign: "left", cursor: "pointer", background: isActive ? "var(--sand)" : "transparent", borderLeft: isActive ? "3px solid var(--gold-deep)" : "3px solid transparent", transition: "background 0.1s" }}>
                 {other?.role === "vendor" ? (
                   <ShieldAvatar photoUrl={other.photoUrl} clipId={other.id} size={34} />
                 ) : (

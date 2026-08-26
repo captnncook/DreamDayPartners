@@ -347,7 +347,8 @@ export default function DraaiboekClient({
 
       {/* Dag-tabs (meerdaagse bruiloft) */}
       {isMultiDay && (
-        <div className="flex gap-2 mb-5 overflow-x-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+        <div className="ddp-scroll-fade ddp-scroll-fade--surface" style={{ marginBottom: "var(--space-7)" }}>
+        <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
           {days.map((day, idx) => {
             const active = idx === activeDayIndex;
             return (
@@ -367,6 +368,7 @@ export default function DraaiboekClient({
               </button>
             );
           })}
+        </div>
         </div>
       )}
 
