@@ -6,23 +6,9 @@ import { useRouter } from "next/navigation";
 import { SkeletonBlock } from "@/components/Skeleton";
 import VendorDashboardModulesSection from "@/components/VendorDashboardModulesSection";
 import CoupleDeleteSection from "@/components/CoupleDeleteSection";
+import { useLang } from "@/components/LangProvider";
 
 type UserInfo = { id: string; name: string; email: string; role: string; vendorType?: string | null };
-
-const ROLE_LABELS: Record<string, string> = {
-  admin: "Beheerder", planner: "Trouwplanner", team_member: "Teamlid", couple: "Bruidspaar", vendor: "Leverancier",
-};
-
-const VENDOR_TYPE_LABELS: Record<string, string> = {
-  weddingplanner: "Weddingplanner", fotograaf: "Fotograaf", videograaf: "Videograaf",
-  bloemist: "Bloemist", dj: "DJ / Muziek", catering: "Catering", bakker: "Bruidstaart & Bakker",
-  haarstylist: "Haarstylist", visagist: "Visagist", trouwlocatie: "Trouwlocatie",
-  vervoer: "Vervoer", verhuur: "Verhuur", tentverhuur: "Tentverhuur", trouwauto: "Trouwauto",
-  bar: "Bar / Cocktails", koffiebar: "Koffiebar / Foodtruck",
-  liveband: "Liveband & Entertainment", entertainment: "Entertainment / Acts",
-  fotocabine: "Fotocabine", dj_live: "DJ Live", band: "Band",
-  bruidsmode: "Bruidsmode", herenmode: "Herenmode", juwelier: "Juwelier",
-};
 
 const NOTIF_DEFAULTS = {
   emailNewMessage: true,
@@ -44,6 +30,10 @@ function Toast({ msg, onDone }: { msg: string; onDone: () => void }) {
 }
 
 export default function InstellingenPage() {
+  const { t } = useLang();
+  const ts = t.settings;
+  const ROLE_LABELS: Record<string, string> = ts.roleLabels;
+  const VENDOR_TYPE_LABELS: Record<string, string> = ts.vendorTypeLabels;
   const router = useRouter();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,7 +77,7 @@ export default function InstellingenPage() {
       const d = await res.json();
       setUser(d.user);
       setEmailDraft(d.user?.email ?? "");
-      setToast("Profielinstellingen opgeslagen");
+      setToast(ts.profileSaved);
     }
   }
 
@@ -109,7 +99,7 @@ export default function InstellingenPage() {
     <div className="p-8 max-w-xl mx-auto">
       {toast && <Toast msg={toast} onDone={() => setToast("")} />}
 
-      <h1 className="font-serif mb-6" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Profielinstellingen</h1>
+      <h1 className="font-serif mb-6" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{ts.title}</h1>
 
       {/* Account */}
       <div className="ddp-card mb-6">
@@ -117,16 +107,16 @@ export default function InstellingenPage() {
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "var(--primary)" }}>
             <User className="w-4 h-4 text-white" />
           </div>
-          <h2 className="font-semibold">Mijn account</h2>
+          <h2 className="font-semibold">{ts.myAccount}</h2>
         </div>
         <form onSubmit={saveName} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium mb-1">Naam</label>
+            <label className="block text-xs font-medium mb-1">{ts.nameLabel}</label>
             <input value={nameDraft} onChange={e => setNameDraft(e.target.value)} required
               className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)" }} />
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1">E-mailadres</label>
+            <label className="block text-xs font-medium mb-1">{ts.emailLabel}</label>
             {user?.role === "admin" ? (
               <input
                 type="email"
@@ -142,7 +132,7 @@ export default function InstellingenPage() {
             )}
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1">Rol</label>
+            <label className="block text-xs font-medium mb-1">{ts.roleLabel}</label>
             <div className="w-full border rounded-lg px-3 py-2 text-sm" style={{ borderColor: "var(--border)", background: "var(--accent)", color: "var(--muted)" }}>
               {user?.role === "vendor" && user.vendorType
                 ? (VENDOR_TYPE_LABELS[user.vendorType] ?? user.vendorType)
@@ -150,7 +140,7 @@ export default function InstellingenPage() {
             </div>
           </div>
           <button type="submit" disabled={saving} className="ddp-btn-primary">
-            {saving ? "Opslaan…" : "Naam opslaan"}
+            {saving ? ts.saving : ts.saveName}
           </button>
         </form>
       </div>
@@ -163,14 +153,14 @@ export default function InstellingenPage() {
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "var(--primary)" }}>
             <Bell className="w-4 h-4 text-white" />
           </div>
-          <h2 className="font-semibold">Meldingen</h2>
+          <h2 className="font-semibold">{ts.notifications}</h2>
         </div>
         <div className="space-y-3">
           {([
-            { key: "emailNewMessage", label: "Nieuw bericht ontvangen", sub: "E-mail bij elk nieuw direct bericht" },
-            { key: "emailNewTask", label: "Nieuwe taak aangemaakt", sub: "E-mail als er een taak aan jou wordt toegewezen" },
-            { key: "emailWeddingUpdate", label: "Bruiloft-updates", sub: "E-mail bij wijzigingen in de planning" },
-            { key: "emailWeeklyDigest", label: "Wekelijks overzicht", sub: "Elke maandag een samenvatting van openstaande punten" },
+            { key: "emailNewMessage", label: ts.notifNewMessage, sub: ts.notifNewMessageSub },
+            { key: "emailNewTask", label: ts.notifNewTask, sub: ts.notifNewTaskSub },
+            { key: "emailWeddingUpdate", label: ts.notifWeddingUpdate, sub: ts.notifWeddingUpdateSub },
+            { key: "emailWeeklyDigest", label: ts.notifWeeklyDigest, sub: ts.notifWeeklyDigestSub },
           ] as { key: keyof typeof NOTIF_DEFAULTS; label: string; sub: string }[]).map(({ key, label, sub }) => (
             <label key={key} className="flex items-start gap-3 cursor-pointer">
               <div className="relative mt-0.5 flex-shrink-0">
@@ -194,18 +184,18 @@ export default function InstellingenPage() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(notifs),
             });
-            setToast("Meldingsinstellingen opgeslagen");
+            setToast(ts.notificationsSaved);
           }}
           className="ddp-btn-primary mt-4">
-          Voorkeuren opslaan
+          {ts.savePreferences}
         </button>
       </div>}
 
       {/* Logout */}
       <div className="ddp-card">
-        <h2 className="font-semibold mb-3">Account</h2>
+        <h2 className="font-semibold mb-3">{ts.account}</h2>
         <button onClick={handleLogout} className="flex items-center gap-2 text-sm" style={{ color: "var(--danger)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-          <LogOut className="w-4 h-4" /> Uitloggen
+          <LogOut className="w-4 h-4" /> {ts.logout}
         </button>
         {user?.role === "couple" && <CoupleDeleteSection />}
       </div>

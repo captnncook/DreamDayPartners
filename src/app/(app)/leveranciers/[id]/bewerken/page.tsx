@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Upload, Trash2, Save, Check, Star } from "lucide-react";
 import ShieldPhotoCropper from "@/components/ShieldPhotoCropper";
+import { useLang } from "@/components/LangProvider";
 import { getVendorProfileSection, type ProfileField } from "@/lib/vendorProfileSections";
 import {
   WEDDING_TIERS, HOURS_SAVED_PER_WEDDING, tierMonthlyPriceEur, tierAnnualPriceEur,
@@ -75,6 +76,8 @@ function TierSlider({
   disabled: boolean;
   dark?: boolean;
 }) {
+  const { t } = useLang();
+  const tv = t.vendorProfile;
   const tier = WEDDING_TIERS[selectedTierIndex];
   const monthly = tierMonthlyPriceEur(tier);
   const price = billingInterval === "year" ? tierAnnualPriceEur(tier) : monthly;
@@ -92,10 +95,10 @@ function TierSlider({
     <div>
       <div className="flex items-center justify-between mb-1">
         <span style={{ fontSize: "var(--text-base)", fontWeight: 600, color: textColor }}>
-          Tot {tierLabel(tier)} bruiloften tegelijk
+          {tv.tierUpTo.replace("{n}", String(tierLabel(tier)))}
         </span>
         <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, color: "var(--gold)" }}>
-          €{price}<span style={{ fontSize: "var(--text-sm)", fontWeight: 500, color: mutedColor }}>/{billingInterval === "year" ? "jaar" : "maand"} ex btw</span>
+          €{price}<span style={{ fontSize: "var(--text-sm)", fontWeight: 500, color: mutedColor }}>/{billingInterval === "year" ? tv.perYear : tv.perMonth} {tv.exVat}</span>
         </span>
       </div>
       <input
@@ -113,10 +116,12 @@ function TierSlider({
       </div>
 
       <p style={{ fontSize: "var(--text-sm)", color: mutedColor, marginBottom: "var(--space-1)" }}>
-        Dat is €{perWeddingPerMonth.toFixed(2).replace(".", ",")} per bruiloft per maand.
+        {tv.perWeddingPerMonth.replace("{n}", perWeddingPerMonth.toFixed(2).replace(".", ","))}
       </p>
       <p style={{ fontSize: "var(--text-sm)", color: mutedColor, marginBottom: "var(--space-6)" }}>
-        Bespaart naar schatting minimaal {HOURS_SAVED_PER_WEDDING} uur per bruiloft. Bij {tierLabel(tier)} bruiloften per maand is dat <strong style={{ color: textColor }}>{hoursPerMonth}+ uur</strong> aan tijd die je terugkrijgt.
+        {tv.hoursSavedIntro.replace("{hours}", String(HOURS_SAVED_PER_WEDDING)).replace("{n}", String(tierLabel(tier)))}{" "}
+        <strong style={{ color: textColor }}>{hoursPerMonth}+ {tv.hoursUnit}</strong>{" "}
+        {tv.hoursSavedOutro}
       </p>
 
       <div style={{ display: "flex", border: `1px solid ${dark ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "var(--space-5)", maxWidth: "260px" }}>
@@ -130,7 +135,7 @@ function TierSlider({
             color: billingInterval === "month" ? (dark ? "var(--ink-text)" : "white") : mutedColor,
           }}
         >
-          Maandelijks
+          {tv.monthly}
         </button>
         <button
           type="button"
@@ -142,7 +147,7 @@ function TierSlider({
             color: billingInterval === "year" ? "var(--gold)" : mutedColor,
           }}
         >
-          Jaarlijks · 2 maanden gratis
+          {tv.yearly}
         </button>
       </div>
 
@@ -197,6 +202,8 @@ function ProfileDetailField({ field, value, onChange }: {
   value: unknown;
   onChange: (v: unknown) => void;
 }) {
+  const { t } = useLang();
+  const tv = t.vendorProfile;
   if (field.type === "boolean") {
     return (
       <label style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", cursor: "pointer" }}>
@@ -218,7 +225,7 @@ function ProfileDetailField({ field, value, onChange }: {
       <div>
         <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{field.label}</label>
         <select value={typeof value === "string" ? value : ""} onChange={(e) => onChange(e.target.value)} className="ddp-select">
-          <option value="">Kies…</option>
+          <option value="">{tv.choose}</option>
           {(field.options ?? []).map((opt) => <option key={opt} value={opt}>{opt}</option>)}
         </select>
       </div>
@@ -257,6 +264,8 @@ function BusyCalendar({ busyDates, onToggle }: {
   busyDates: string[];
   onToggle: (date: string) => void;
 }) {
+  const { t } = useLang();
+  const tv = t.vendorProfile;
   const [calMonth, setCalMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -306,7 +315,7 @@ function BusyCalendar({ busyDates, onToggle }: {
           );
         })}
       </div>
-      <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-5)" }}>Klik op een dag in de kalender om hem te blokkeren of deblokkeren.</p>
+      <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-5)" }}>{tv.calendarHint}</p>
       {busyDates.length > 0 && (
         <div style={{ marginTop: "var(--space-5)", display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
           {busyDates.sort().map(d => (
@@ -326,6 +335,8 @@ export default function VendorEditPageWrapper() {
 }
 
 function VendorEditPage() {
+  const { t } = useLang();
+  const tv = t.vendorProfile;
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -505,7 +516,7 @@ function VendorEditPage() {
     });
     if (!res.ok) {
       const d = await res.json();
-      setError(d.error ?? "Opslaan mislukt");
+      setError(d.error ?? tv.saveFailed);
     } else {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -564,13 +575,13 @@ function VendorEditPage() {
       let data: Record<string, unknown> = {};
       try { data = await res.json(); } catch { /* non-JSON */ }
       if (!res.ok) {
-        setError((data.error as string) ?? `Upload mislukt (${res.status})`);
+        setError((data.error as string) ?? tv.uploadFailed.replace("{status}", String(res.status)));
       } else {
         setCoverUrl(data.url as string);
         setCoverKey(data.key as string);
       }
     } catch {
-      setError("Verbindingsfout tijdens upload");
+      setError(tv.uploadConnectionError);
     } finally {
       setUploadingCover(false);
       if (coverInputRef.current) coverInputRef.current.value = "";
@@ -598,10 +609,10 @@ function VendorEditPage() {
       const res = await fetch(`/api/catalogus/${id}/emblem-photo`, { method: "POST", body: fd });
       let data: Record<string, unknown> = {};
       try { data = await res.json(); } catch { /* non-JSON */ }
-      if (!res.ok) setError((data.error as string) ?? `Upload mislukt (${res.status})`);
+      if (!res.ok) setError((data.error as string) ?? tv.uploadFailed.replace("{status}", String(res.status)));
       else setEmblemUrl(data.url as string);
     } catch {
-      setError("Verbindingsfout tijdens upload");
+      setError(tv.uploadConnectionError);
     } finally {
       setUploadingEmblem(false);
       if (emblemInputRef.current) emblemInputRef.current.value = "";
@@ -635,13 +646,13 @@ function VendorEditPage() {
       let data: Record<string, unknown> = {};
       try { data = await res.json(); } catch { /* non-JSON */ }
       if (!res.ok) {
-        setError((data.error as string) ?? `Upload mislukt (${res.status})`);
+        setError((data.error as string) ?? tv.uploadFailed.replace("{status}", String(res.status)));
       } else {
         setPhotoUrls((data.photos as string[]) ?? []);
         setPhotoKeys((data.keys as string[]) ?? []);
       }
     } catch {
-      setError("Verbindingsfout tijdens upload");
+      setError(tv.uploadConnectionError);
     } finally {
       setUploadingGallery(false);
       if (galleryInputRef.current) galleryInputRef.current.value = "";
@@ -670,9 +681,9 @@ function VendorEditPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error ?? "Kan niet verbinden met betaalservice");
+      setError(data.error ?? tv.billingConnectionError);
     } catch {
-      setError("Kan niet verbinden met betaalservice");
+      setError(tv.billingConnectionError);
     }
     setBillingLoading(false);
   }
@@ -690,10 +701,10 @@ function VendorEditPage() {
       if (res.ok) {
         setCurrentWeddingLimit(data.weddingLimit ?? null);
       } else {
-        setError(data.error ?? "Wijzigen mislukt");
+        setError(data.error ?? tv.changeFailed);
       }
     } catch {
-      setError("Wijzigen mislukt");
+      setError(tv.changeFailed);
     } finally {
       setBillingLoading(false);
     }
@@ -705,15 +716,15 @@ function VendorEditPage() {
       const res = await fetch("/api/billing/portal", { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (data.url) { window.location.href = data.url; return; }
-      setError(data.error ?? "Kan niet verbinden met betaalservice");
+      setError(data.error ?? tv.billingConnectionError);
     } catch {
-      setError("Kan niet verbinden met betaalservice");
+      setError(tv.billingConnectionError);
     }
     setBillingLoading(false);
   }
 
   async function handleCancelSubscription() {
-    if (!confirm("Abonnement opzeggen? Je blijft Premium tot het einde van de huidige betaalperiode.")) return;
+    if (!confirm(tv.cancelConfirm)) return;
     setBillingLoading(true);
     setError("");
     try {
@@ -723,10 +734,10 @@ function VendorEditPage() {
         setCancelAtPeriodEnd(true);
         if (data.currentPeriodEnd) setCurrentPeriodEnd(data.currentPeriodEnd);
       } else {
-        setError(data.error ?? "Opzeggen mislukt");
+        setError(data.error ?? tv.cancelFailed);
       }
     } catch {
-      setError("Opzeggen mislukt");
+      setError(tv.cancelFailed);
     } finally {
       setBillingLoading(false);
     }
@@ -739,9 +750,9 @@ function VendorEditPage() {
       const res = await fetch("/api/billing/resume", { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (res.ok) setCancelAtPeriodEnd(false);
-      else setError(data.error ?? "Heractiveren mislukt");
+      else setError(data.error ?? tv.resumeFailed);
     } catch {
-      setError("Heractiveren mislukt");
+      setError(tv.resumeFailed);
     } finally {
       setBillingLoading(false);
     }
@@ -753,7 +764,7 @@ function VendorEditPage() {
     try {
       const res = await fetch(`/api/vendor/delete-info`);
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Er ging iets mis"); return; }
+      if (!res.ok) { setError(data.error ?? tv.genericError); return; }
       setDeleteInfo(data);
     } finally {
       setDeleteLoading(false);
@@ -766,7 +777,7 @@ function VendorEditPage() {
     try {
       const res = await fetch(`/api/vendor/delete-request`, { method: "POST" });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Er ging iets mis"); return; }
+      if (!res.ok) { setError(data.error ?? tv.genericError); return; }
       setDeleteSent(true);
       setDeleteInfo(null);
     } finally {
@@ -792,7 +803,7 @@ function VendorEditPage() {
       <div className="dash-hero" style={{ borderRadius: 0, padding: "1.75rem 1.25rem 2rem" }}>
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
           <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>
-            Profiel bewerken
+            {tv.title}
           </h1>
           <p style={{ fontSize: "0.9rem", color: "var(--ink-muted)", marginTop: "var(--space-1)" }}>{vendor.name}</p>
         </div>
@@ -803,17 +814,17 @@ function VendorEditPage() {
         {isUserPremium && (
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.75rem 1rem", marginBottom: "var(--space-6)", fontSize: "var(--text-md)", color: "var(--foreground)", fontWeight: 600 }}>
             <Star className="w-4 h-4" style={{ color: "var(--gold-deep)", flexShrink: 0 }} />
-            Premium actief. Je profiel staat bovenaan de zoekresultaten.
+            {tv.premiumBanner}
           </div>
         )}
         {upgradeStatus === "success" && (
           <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "var(--text-md)", color: "var(--foreground)", marginBottom: "var(--space-6)" }}>
-            Premium actief, welkom bij DreamDay Platform Pro!
+            {tv.upgradeSuccess}
           </div>
         )}
         {upgradeStatus === "cancelled" && (
           <div style={{ background: "var(--sand)", borderLeft: "3px solid var(--gold)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "0.875rem 1rem", fontSize: "var(--text-md)", color: "var(--foreground)", marginBottom: "var(--space-6)" }}>
-            Betaling geannuleerd. Je kunt het altijd opnieuw proberen.
+            {tv.upgradeCancelled}
           </div>
         )}
         {error && (
@@ -825,12 +836,12 @@ function VendorEditPage() {
         {/* Profielsterkte — live berekend uit wat er al ingevuld is */}
         {(() => {
           const criteria = [
-            { label: "Profielfoto", done: !!coverKey },
-            { label: "Beschrijving", done: form.description.trim().length > 0 },
-            { label: "Plaats", done: form.city.trim().length > 0 },
-            { label: "Prijsindicatie", done: form.priceFrom.trim().length > 0 },
-            { label: "Galerijfoto's", done: photoKeys.length > 0 },
-            { label: "Specialisaties", done: form.specializations.trim().length > 0 },
+            { label: tv.criteriaPhoto, done: !!coverKey },
+            { label: tv.criteriaDescription, done: form.description.trim().length > 0 },
+            { label: tv.criteriaCity, done: form.city.trim().length > 0 },
+            { label: tv.criteriaPrice, done: form.priceFrom.trim().length > 0 },
+            { label: tv.criteriaGallery, done: photoKeys.length > 0 },
+            { label: tv.criteriaSpecializations, done: form.specializations.trim().length > 0 },
           ];
           const doneCount = criteria.filter((c) => c.done).length;
           if (doneCount === criteria.length) return null;
@@ -838,16 +849,16 @@ function VendorEditPage() {
           return (
             <section className="mb-8">
               <div className="flex items-baseline justify-between mb-2 gap-3 flex-wrap">
-                <h2 className="dash-section-title">Profielsterkte</h2>
+                <h2 className="dash-section-title">{tv.strengthTitle}</h2>
                 <span className="text-sm" style={{ color: "var(--muted)" }}>
-                  <strong style={{ color: "var(--foreground)" }}>{doneCount}</strong> van {criteria.length} onderdelen
+                  <strong style={{ color: "var(--foreground)" }}>{doneCount}</strong> {tv.strengthOf} {criteria.length} {tv.strengthParts}
                 </span>
               </div>
               <div className="h-1 rounded-full overflow-hidden mb-2" style={{ background: "var(--border)" }}>
                 <div className="h-full rounded-full" style={{ width: `${(doneCount / criteria.length) * 100}%`, background: "var(--gold)", transition: "width 500ms var(--ease-out)" }} />
               </div>
               <p className="text-sm" style={{ color: "var(--muted)" }}>
-                Bruidsparen kiezen vrijwel altijd voor profielen met foto's en een prijsindicatie. Vul hieronder nog aan:{" "}
+                {tv.strengthHint}{" "}
                 <span style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{missing.join(" · ")}</span>
               </p>
             </section>
@@ -856,14 +867,14 @@ function VendorEditPage() {
 
         {/* Profielfoto (cover) */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <h2 className="dash-section-title mb-1">Profielfoto</h2>
+          <h2 className="dash-section-title mb-1">{tv.coverTitle}</h2>
           <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-            Wordt getoond op de leverancierskaart in het overzicht. Kies een opvallende foto die jullie werk goed vertegenwoordigt.
+            {tv.coverHint}
           </p>
 
           {coverUrl ? (
             <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", aspectRatio: "4/3", maxWidth: "280px" }}>
-              <Image src={coverUrl} alt="Profielfoto" fill style={{ objectFit: "cover" }} />
+              <Image src={coverUrl} alt={tv.coverAlt} fill style={{ objectFit: "cover" }} />
               <button
                 onClick={handleDeleteCover}
                 style={{
@@ -882,7 +893,7 @@ function VendorEditPage() {
                   padding: "5px 10px", cursor: "pointer", color: "white", fontSize: "var(--text-sm)", fontWeight: 600,
                 }}
               >
-                Vervangen
+                {tv.replace}
               </button>
             </div>
           ) : (
@@ -897,18 +908,18 @@ function VendorEditPage() {
               }}
             >
               <Upload className="w-5 h-5" />
-              {uploadingCover ? "Uploaden…" : "Profielfoto toevoegen"}
+              {uploadingCover ? tv.uploading : tv.addCover}
             </button>
           )}
           <input ref={coverInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
-          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-5)" }}>Max 10 MB · JPG, PNG, WebP</p>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-5)" }}>{tv.maxSizeCover}</p>
         </section>
 
         {/* Embleem foto */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <h2 className="dash-section-title mb-1">Embleem foto</h2>
+          <h2 className="dash-section-title mb-1">{tv.emblemTitle}</h2>
           <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-            Portretfoto die verschijnt in het Dream Team overzicht van het bruidspaar en in de chat. Gebruik een foto waarbij je gezicht goed zichtbaar is.
+            {tv.emblemHint}
           </p>
           <div style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-8)", flexWrap: "wrap" }}>
             {/* Shield preview */}
@@ -932,15 +943,15 @@ function VendorEditPage() {
               <button onClick={() => emblemInputRef.current?.click()} disabled={uploadingEmblem}
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--ink)", color: "white", border: "none", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-base)" }}>
                 <Upload className="w-4 h-4" />
-                {uploadingEmblem ? "Uploaden…" : emblemUrl ? "Vervangen" : "Foto uploaden"}
+                {uploadingEmblem ? tv.uploading : emblemUrl ? tv.replace : tv.uploadPhoto}
               </button>
               {emblemUrl && (
                 <button onClick={handleDeleteEmblem}
                   style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "none", color: "var(--danger)", border: "1px solid var(--border)", borderRadius: "8px", padding: "0.5rem 1rem", cursor: "pointer", fontSize: "var(--text-base)" }}>
-                  <Trash2 className="w-4 h-4" /> Verwijderen
+                  <Trash2 className="w-4 h-4" /> {tv.delete}
                 </button>
               )}
-              <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>Max 10 MB · JPG, PNG, WebP</p>
+              <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{tv.maxSizeCover}</p>
             </div>
           </div>
           <input ref={emblemInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleEmblemFileSelected} />
@@ -951,15 +962,15 @@ function VendorEditPage() {
 
         {/* Galerij */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <h2 className="dash-section-title mb-1">Galerij</h2>
+          <h2 className="dash-section-title mb-1">{tv.galleryTitle}</h2>
           <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-            Tot 12 foto&apos;s die worden getoond op jullie profielpagina. Laat zien wat jullie kunnen!
+            {tv.galleryHint}
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             {photoUrls.map((url, i) => (
               <div key={i} style={{ position: "relative", borderRadius: "10px", overflow: "hidden", aspectRatio: "4/3" }}>
-                <Image src={url} alt={`Foto ${i + 1}`} fill style={{ objectFit: "cover" }} />
+                <Image src={url} alt={tv.photoAlt.replace("{n}", String(i + 1))} fill style={{ objectFit: "cover" }} />
                 <button
                   onClick={() => handleDeletePhoto(photoKeys[i], i)}
                   style={{
@@ -984,40 +995,40 @@ function VendorEditPage() {
                 }}
               >
                 <Upload className="w-5 h-5" />
-                {uploadingGallery ? "Uploaden…" : "Foto toevoegen"}
+                {uploadingGallery ? tv.uploading : tv.addPhoto}
               </button>
             )}
           </div>
 
           <input ref={galleryInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleGalleryUpload} />
-          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>Max 12 foto&apos;s · Max 10 MB per foto</p>
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)" }}>{tv.maxPhotos}</p>
         </section>
 
         {/* Tekst & info */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <h2 className="dash-section-title mb-4">Informatie</h2>
+          <h2 className="dash-section-title mb-4">{tv.infoTitle}</h2>
 
           <div className="flex flex-col gap-4">
             <div>
               <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>
-                Over ons / beschrijving
+                {tv.descriptionLabel}
               </label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={5}
-                placeholder="Schrijf een beschrijving over jullie diensten, aanpak en wat jullie uniek maakt…"
+                placeholder={tv.descriptionPlaceholder}
                 className="ddp-input resize-none"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { key: "city", label: "Stad / regio", placeholder: "bijv. Amsterdam" },
-                { key: "contactPerson", label: "Contactpersoon", placeholder: "Voornaam achternaam" },
-                { key: "phone", label: "Telefoonnummer", placeholder: "+31 6 12345678" },
-                { key: "website", label: "Website", placeholder: "https://www.example.nl" },
-                { key: "reviewLinkUrl", label: "Externe reviewlink (bijv. Google)", placeholder: "https://g.page/r/...../review" },
+                { key: "city", label: tv.cityLabel, placeholder: "bijv. Amsterdam" },
+                { key: "contactPerson", label: tv.contactPersonLabel, placeholder: tv.contactPersonPlaceholder },
+                { key: "phone", label: tv.phoneLabel, placeholder: "+31 6 12345678" },
+                { key: "website", label: tv.websiteLabel, placeholder: "https://www.example.nl" },
+                { key: "reviewLinkUrl", label: tv.reviewLinkLabel, placeholder: "https://g.page/r/...../review" },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
                   <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>
@@ -1038,14 +1049,14 @@ function VendorEditPage() {
 
         {/* Prijzen & specialisaties */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <h2 className="dash-section-title mb-1">Prijsindicatie & specialisaties</h2>
+          <h2 className="dash-section-title mb-1">{tv.pricingTitle}</h2>
           <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-            Geef bruidsparen een richtprijs en vertel in welke specialisaties jullie uitblinken.
+            {tv.pricingHint}
           </p>
           <div className="grid grid-cols-2 gap-4 mb-4">
             {[
-              { key: "priceFrom", label: "Startprijs (€)", placeholder: "bijv. 45" },
-              { key: "priceTo", label: "Tot (€)", placeholder: "bijv. 120" },
+              { key: "priceFrom", label: tv.priceFromLabel, placeholder: "bijv. 45" },
+              { key: "priceTo", label: tv.priceToLabel, placeholder: "bijv. 120" },
             ].map(({ key, label, placeholder }) => (
               <div key={key}>
                 <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{label}</label>
@@ -1060,13 +1071,13 @@ function VendorEditPage() {
             ))}
           </div>
           <div className="mb-4">
-            <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Prijseenheid</label>
+            <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.priceUnitLabel}</label>
             <select
               value={form.priceUnit}
               onChange={(e) => setForm({ ...form, priceUnit: e.target.value })}
               className="ddp-select"
             >
-              <option value="">Geen eenheid</option>
+              <option value="">{tv.noUnit}</option>
               <option value="per persoon">per persoon</option>
               <option value="per couvert">per couvert</option>
               <option value="per event">per event</option>
@@ -1076,12 +1087,12 @@ function VendorEditPage() {
             </select>
           </div>
           <div>
-            <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Specialisaties (komma-gescheiden)</label>
+            <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.specializationsLabel}</label>
             <input
               type="text"
               value={form.specializations}
               onChange={(e) => setForm({ ...form, specializations: e.target.value })}
-              placeholder={SPECIALIZATIONS_PLACEHOLDER[vendor?.category ?? ""] ?? "bijv. de specifieke stijlen, thema's of onderdelen waar je in gespecialiseerd bent"}
+              placeholder={SPECIALIZATIONS_PLACEHOLDER[vendor?.category ?? ""] ?? tv.specializationsPlaceholderDefault}
               className="ddp-input"
             />
           </div>
@@ -1095,7 +1106,7 @@ function VendorEditPage() {
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
               <h2 className="dash-section-title mb-1">{section.title}</h2>
               <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-                Deze gegevens helpen bruidsparen om snel te zien of jullie bij elkaar passen.
+                {tv.categorySectionHint}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {section.fields.map((field) => (
@@ -1116,12 +1127,12 @@ function VendorEditPage() {
           <>
             {/* Gemiddelde bruiloftprijs */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-              <h2 className="dash-section-title mb-1">Gemiddelde bruiloftprijs</h2>
+              <h2 className="dash-section-title mb-1">{tv.avgPriceTitle}</h2>
               <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-                Naast de startprijs hierboven: wat geeft een gemiddeld bruidspaar in totaal uit bij jullie?
+                {tv.avgPriceHint}
               </p>
               <div style={{ maxWidth: "200px" }}>
-                <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Gemiddeld totaalbedrag (€)</label>
+                <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.avgPriceLabel}</label>
                 <input
                   type="number"
                   value={form.averageWeddingPrice}
@@ -1134,16 +1145,16 @@ function VendorEditPage() {
 
             {/* Capaciteit */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-              <h2 className="dash-section-title mb-1">Capaciteit</h2>
+              <h2 className="dash-section-title mb-1">{tv.capacityTitle}</h2>
               <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-                Aantal gasten per moment van de dag. Bruidsparen filteren hier direct op.
+                {tv.capacityHint}
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 {([
-                  ["ceremonyMinGuests", "ceremonyMaxGuests", "Ceremonie"],
-                  ["receptionMinGuests", "receptionMaxGuests", "Receptie"],
-                  ["dinnerMinGuests", "dinnerMaxGuests", "Diner"],
-                  ["partyMinGuests", "partyMaxGuests", "Feest"],
+                  ["ceremonyMinGuests", "ceremonyMaxGuests", tv.ceremony],
+                  ["receptionMinGuests", "receptionMaxGuests", tv.reception],
+                  ["dinnerMinGuests", "dinnerMaxGuests", tv.dinner],
+                  ["partyMinGuests", "partyMaxGuests", tv.party],
                 ] as const).map(([minKey, maxKey, label]) => (
                   <div key={label}>
                     <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{label}</label>
@@ -1156,16 +1167,16 @@ function VendorEditPage() {
                 ))}
               </div>
               <div style={{ maxWidth: "200px" }}>
-                <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Aantal hotelkamers</label>
+                <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.hotelRoomsLabel}</label>
                 <input type="number" value={form.hotelRooms} onChange={(e) => setForm({ ...form, hotelRooms: e.target.value })} placeholder="bijv. 20" className="ddp-input" />
               </div>
             </section>
 
             {/* Zalen */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-              <h2 className="dash-section-title mb-1">Zalen</h2>
+              <h2 className="dash-section-title mb-1">{tv.roomsTitle}</h2>
               <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-                Heb je meerdere ruimtes? Voeg ze los toe met eigen oppervlakte en capaciteit.
+                {tv.roomsHint}
               </p>
               <div className="space-y-4 mb-4">
                 {venueRooms.map((room) => (
@@ -1176,30 +1187,30 @@ function VendorEditPage() {
                         value={room.name}
                         onChange={(e) => updateVenueRoomLocal(room.id, { name: e.target.value })}
                         onBlur={() => saveVenueRoom(room)}
-                        placeholder="Naam van de zaal"
+                        placeholder={tv.roomNamePlaceholder}
                         className="ddp-input"
                         style={{ flex: 1, fontWeight: 700 }}
                       />
-                      <button type="button" onClick={() => deleteVenueRoom(room.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)" }} aria-label="Zaal verwijderen">
+                      <button type="button" onClick={() => deleteVenueRoom(room.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger)" }} aria-label={tv.deleteRoomAria}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
                       <div>
-                        <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>Oppervlakte (m²)</label>
+                        <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>{tv.surfaceAreaLabel}</label>
                         <input type="number" value={room.surfaceArea ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { surfaceArea: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} className="ddp-input" />
                       </div>
                       <div>
-                        <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>Hoogte (m)</label>
+                        <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>{tv.ceilingHeightLabel}</label>
                         <input type="number" value={room.ceilingHeight ?? ""} onChange={(e) => updateVenueRoomLocal(room.id, { ceilingHeight: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveVenueRoom(room)} className="ddp-input" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {([
-                        ["ceremonyMin", "ceremonyMax", "Ceremonie"],
-                        ["receptionMin", "receptionMax", "Receptie"],
-                        ["dinnerMin", "dinnerMax", "Diner"],
-                        ["partyMin", "partyMax", "Feest"],
+                        ["ceremonyMin", "ceremonyMax", tv.ceremony],
+                        ["receptionMin", "receptionMax", tv.reception],
+                        ["dinnerMin", "dinnerMax", tv.dinner],
+                        ["partyMin", "partyMax", tv.party],
                       ] as const).map(([minKey, maxKey, label]) => (
                         <div key={label}>
                           <label style={{ fontSize: "var(--text-sm)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>{label}</label>
@@ -1214,89 +1225,89 @@ function VendorEditPage() {
                 ))}
               </div>
               <button type="button" onClick={addVenueRoom} className="ddp-btn-secondary">
-                + Zaal toevoegen
+                {tv.addRoom}
               </button>
             </section>
 
             {/* Eigenschappen */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-              <h2 className="dash-section-title mb-4">Eigenschappen</h2>
+              <h2 className="dash-section-title mb-4">{tv.propertiesTitle}</h2>
 
               <div className="flex flex-wrap gap-4 mb-5">
                 <label className="flex items-center gap-2" style={{ fontSize: "var(--text-md)", cursor: "pointer" }}>
                   <input type="checkbox" checked={isOfficialCeremonyLocation} onChange={(e) => setIsOfficialCeremonyLocation(e.target.checked)} />
-                  Officiële trouwlocatie
+                  {tv.officialCeremony}
                 </label>
                 <label className="flex items-center gap-2" style={{ fontSize: "var(--text-md)", cursor: "pointer" }}>
                   <input type="checkbox" checked={outdoorCeremonyPossible} onChange={(e) => setOutdoorCeremonyPossible(e.target.checked)} />
-                  Buiten trouwen mogelijk
+                  {tv.outdoorCeremony}
                 </label>
               </div>
 
               <div className="mb-5">
-                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Toegankelijkheid</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>{tv.accessibilityLabel}</p>
                 <CheckboxGroup options={ACCESSIBILITY_OPTIONS} selected={accessibility} onChange={setAccessibility} />
               </div>
               <div className="mb-5">
-                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Faciliteiten</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>{tv.facilitiesLabel}</p>
                 <CheckboxGroup options={VENUE_FACILITIES_OPTIONS} selected={venueFacilities} onChange={setVenueFacilities} />
               </div>
               <div className="mb-5">
-                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Dinermogelijkheden</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>{tv.cateringLabel}</p>
                 <CheckboxGroup options={CATERING_OPTIONS_LIST} selected={cateringOptions} onChange={setCateringOptions} />
               </div>
               <div className="mb-5">
-                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Barmogelijkheden</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>{tv.barLabel}</p>
                 <CheckboxGroup options={BAR_OPTIONS_LIST} selected={barOptions} onChange={setBarOptions} />
               </div>
               <div>
-                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>Omgeving</p>
+                <p style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", marginBottom: "var(--space-3)" }}>{tv.environmentLabel}</p>
                 <CheckboxGroup options={ENVIRONMENT_OPTIONS} selected={environment} onChange={setEnvironment} />
               </div>
             </section>
 
             {/* Regels */}
             <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-              <h2 className="dash-section-title mb-1">Regels</h2>
+              <h2 className="dash-section-title mb-1">{tv.rulesTitle}</h2>
               <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)" }}>
-                Praktische afspraken die bruidsparen vaak vroeg willen weten.
+                {tv.rulesHint}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Sluitingstijd</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.closingTimeLabel}</label>
                   <input type="time" value={form.closingTime} onChange={(e) => setForm({ ...form, closingTime: e.target.value })} className="ddp-input" />
                 </div>
                 <div>
-                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Geluidslimiet</label>
-                  <input type="text" value={form.soundLimit} onChange={(e) => setForm({ ...form, soundLimit: e.target.value })} placeholder="bijv. 90 dB na 23:00" className="ddp-input" />
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.soundLimitLabel}</label>
+                  <input type="text" value={form.soundLimit} onChange={(e) => setForm({ ...form, soundLimit: e.target.value })} placeholder={tv.soundLimitPlaceholder} className="ddp-input" />
                 </div>
                 <div>
-                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Standaard opbouwtijd</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.setupTimeLabel}</label>
                   <input type="time" value={form.setupTime} onChange={(e) => setForm({ ...form, setupTime: e.target.value })} className="ddp-input" />
-                  <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-1)" }}>Vanaf hoelaat mogen leveranciers standaard opbouwen. Per bruiloft kan de leverancier dit desgewenst aanpassen.</p>
+                  <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-1)" }}>{tv.setupTimeHint}</p>
                 </div>
                 <div>
-                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Standaard afbouwtijd</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.teardownTimeLabel}</label>
                   <input type="time" value={form.teardownTime} onChange={(e) => setForm({ ...form, teardownTime: e.target.value })} className="ddp-input" />
-                  <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-1)" }}>Tot hoelaat er standaard afgebouwd mag worden.</p>
+                  <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", marginTop: "var(--space-1)" }}>{tv.teardownTimeHint}</p>
                 </div>
                 <div className="col-span-2">
-                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Geluid buiten</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.outdoorSoundLabel}</label>
                   <input
                     type="text"
                     value={form.outdoorSoundRule}
                     onChange={(e) => setForm({ ...form, outdoorSoundRule: e.target.value })}
-                    placeholder="bijv. Tot 22:00 buiten geluid toegestaan, daarna alleen binnen (of: geen geluid buiten toegestaan)"
+                    placeholder={tv.outdoorSoundPlaceholder}
                     className="ddp-input"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>Slechtweer-scenario</label>
+                  <label style={{ fontSize: "var(--text-base)", fontWeight: 600, color: "var(--foreground)", display: "block", marginBottom: "var(--space-2)" }}>{tv.badWeatherLabel}</label>
                   <textarea
                     value={form.badWeatherPlan}
                     onChange={(e) => setForm({ ...form, badWeatherPlan: e.target.value })}
                     rows={2}
-                    placeholder="bijv. Bij regen verplaatsen we de ceremonie naar de oranjerie, capaciteit 120 personen."
+                    placeholder={tv.badWeatherPlaceholder}
                     className="ddp-input resize-none"
                   />
                 </div>
@@ -1307,7 +1318,7 @@ function VendorEditPage() {
 
         {/* Beschikbaarheid */}
         <section className="pt-6 mb-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <h2 className="dash-section-title mb-4">Beschikbaarheid</h2>
+          <h2 className="dash-section-title mb-4">{tv.availabilityTitle}</h2>
           <BusyCalendar busyDates={busyDates} onToggle={toggleBusyDate} />
         </section>
 
@@ -1315,7 +1326,7 @@ function VendorEditPage() {
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-2)" }}>
             <Star className="w-4 h-4" style={{ color: "var(--gold)", flexShrink: 0 }} />
             <span className="font-serif" style={{ fontWeight: 700, fontSize: "var(--text-2xl)", color: isUserPremium ? "var(--foreground)" : "var(--ink-text)" }}>
-              {isUserPremium ? (cancelAtPeriodEnd ? "Premium opgezegd" : "Premium actief") : "Upgrade naar Premium"}
+              {isUserPremium ? (cancelAtPeriodEnd ? tv.premiumCancelled : tv.premiumActive) : tv.premiumUpgrade}
             </span>
           </div>
 
@@ -1323,8 +1334,8 @@ function VendorEditPage() {
             <>
               <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", maxWidth: "440px", marginBottom: "var(--space-6)" }}>
                 {cancelAtPeriodEnd
-                  ? `Je blijft Premium tot ${currentPeriodEnd ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(currentPeriodEnd)) : "het einde van je huidige periode"}. Daarna wordt je profiel niet meer verlengd.`
-                  : `Je huidige plan: tot ${tierLabel((currentWeddingLimit ?? 100) as WeddingTier)} bruiloften. Je profiel staat bovenaan de zoekresultaten en is gemarkeerd als Aanbevolen.`}
+                  ? tv.premiumCancelledText.replace("{date}", currentPeriodEnd ? new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(currentPeriodEnd)) : tv.periodEndFallback)
+                  : tv.premiumActiveText.replace("{n}", String(tierLabel((currentWeddingLimit ?? 100) as WeddingTier)))}
               </p>
 
               {!cancelAtPeriodEnd && (
@@ -1333,7 +1344,7 @@ function VendorEditPage() {
                   setSelectedTierIndex={setSelectedTierIndex}
                   billingInterval={billingInterval}
                   setBillingInterval={setBillingInterval}
-                  actionLabel={billingLoading ? "Bezig…" : "Plan wijzigen"}
+                  actionLabel={billingLoading ? tv.changingPlan : tv.changePlan}
                   onAction={() => handleChangePlan(billingInterval, WEDDING_TIERS[selectedTierIndex])}
                   disabled={billingLoading || WEDDING_TIERS[selectedTierIndex] === currentWeddingLimit || (currentWeddingLimit === null && WEDDING_TIERS[selectedTierIndex] === 100)}
                 />
@@ -1341,7 +1352,7 @@ function VendorEditPage() {
 
               <div style={{ display: "flex", gap: "var(--space-5)", marginTop: "var(--space-7)", flexWrap: "wrap" }}>
                 <button onClick={handlePortal} disabled={billingLoading} className="ddp-btn-secondary">
-                  {billingLoading ? "Laden…" : "Betaalgegevens beheren"}
+                  {billingLoading ? tv.loadingBtn : tv.managePayment}
                 </button>
                 {cancelAtPeriodEnd ? (
                   <button
@@ -1349,7 +1360,7 @@ function VendorEditPage() {
                     disabled={billingLoading}
                     style={{ fontSize: "var(--text-sm)", color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0, alignSelf: "center" }}
                   >
-                    Opzegging ongedaan maken
+                    {tv.undoCancel}
                   </button>
                 ) : (
                   <button
@@ -1357,7 +1368,7 @@ function VendorEditPage() {
                     disabled={billingLoading}
                     style={{ fontSize: "var(--text-sm)", color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline", alignSelf: "center" }}
                   >
-                    Abonnement opzeggen
+                    {tv.cancelSubscription}
                   </button>
                 )}
               </div>
@@ -1366,16 +1377,16 @@ function VendorEditPage() {
             <>
               {profileViews !== null && profileViews > 0 && (
                 <p style={{ fontSize: "var(--text-base)", color: "var(--gold)", fontWeight: 600, marginBottom: "var(--space-2)" }}>
-                  Je profiel is al {profileViews}× bekeken door bruidsparen.
+                  {tv.alreadyViewed.replace("{n}", String(profileViews))}
                 </p>
               )}
               <ul style={{ margin: "0 0 1.25rem", padding: 0, listStyle: "none", display: "grid", gap: "0.3rem" }}>
                 {[
-                  `Meer dan ${FREE_WEDDING_LIMIT} bruiloften tegelijk in je dashboard`,
-                  "Bovenaan de zoekresultaten in jouw categorie",
-                  "Aanbevolen-label op je profiel",
-                  "Dashboard zelf inrichten + extra functies aanvragen",
-                  "Analytisch overzicht van weergaven en boekingen",
+                  tv.benefit1.replace("{n}", String(FREE_WEDDING_LIMIT)),
+                  tv.benefit2,
+                  tv.benefit3,
+                  tv.benefit4,
+                  tv.benefit5,
                 ].map((b) => (
                   <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-3)", fontSize: "var(--text-base)", color: "var(--ink-muted)" }}>
                     <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--gold)", marginTop: "2px" }} />
@@ -1389,7 +1400,7 @@ function VendorEditPage() {
                 setSelectedTierIndex={setSelectedTierIndex}
                 billingInterval={billingInterval}
                 setBillingInterval={setBillingInterval}
-                actionLabel={billingLoading ? "Laden…" : "Upgrade"}
+                actionLabel={billingLoading ? tv.loadingBtn : tv.upgradeAction}
                 onAction={() => handleUpgrade(billingInterval, WEDDING_TIERS[selectedTierIndex])}
                 disabled={billingLoading}
                 dark
@@ -1400,7 +1411,7 @@ function VendorEditPage() {
 
         <div className="flex gap-3 justify-end">
           <Link href={`/leveranciers/${id}`} className="ddp-btn-secondary">
-            Bekijk publiek profiel
+            {tv.viewPublicProfile}
           </Link>
           <button
             onClick={handleSave}
@@ -1408,42 +1419,42 @@ function VendorEditPage() {
             className="ddp-btn-primary inline-flex items-center gap-2"
             style={{ opacity: saving ? 0.7 : 1 }}
           >
-            {saved ? <><Check className="w-4 h-4" /> Opgeslagen!</> : <><Save className="w-4 h-4" /> {saving ? "Opslaan…" : "Opslaan"}</>}
+            {saved ? <><Check className="w-4 h-4" /> {tv.saved}</> : <><Save className="w-4 h-4" /> {saving ? tv.saving : tv.save}</>}
           </button>
         </div>
 
         {/* Profiel verwijderen */}
         <section className="mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
-          <h3 className="dash-section-title mb-1" style={{ color: "var(--danger)" }}>Profiel verwijderen</h3>
+          <h3 className="dash-section-title mb-1" style={{ color: "var(--danger)" }}>{tv.deleteProfileTitle}</h3>
           <p className="text-xs" style={{ color: "var(--muted)" }}>
-            Je account en alle bijbehorende gegevens worden permanent verwijderd. Je ontvangt eerst een bevestigingse-mail.
+            {tv.deleteProfileHint}
           </p>
           {deleteSent ? (
             <p className="text-xs mt-3 font-medium" style={{ color: "var(--danger)" }}>
-              Bevestigingsmail verstuurd. Controleer je inbox en klik op de link om de verwijdering te voltooien.
+              {tv.deleteSentText}
             </p>
           ) : deleteInfo ? (
             <div className="mt-3" style={{ borderLeft: "3px solid var(--danger)", background: "var(--danger-bg)", borderRadius: "0 var(--radius-md) var(--radius-md) 0", padding: "1rem 1.25rem" }}>
-              <p className="text-sm font-semibold mb-2">Weet je het zeker? Dit is wat je achterlaat op DreamDay:</p>
+              <p className="text-sm font-semibold mb-2">{tv.deleteConfirmTitle}</p>
               <ul className="text-sm space-y-1 mb-3" style={{ margin: 0, paddingLeft: "1.25rem" }}>
                 {deleteInfo.upcomingWeddings > 0 && (
-                  <li><strong>{deleteInfo.upcomingWeddings}</strong> geplande bruiloft{deleteInfo.upcomingWeddings === 1 ? "" : "en"} waar je nog aan meewerkt</li>
+                  <li><strong>{deleteInfo.upcomingWeddings}</strong> {tv.upcomingWeddingsLine.replace("{s}", deleteInfo.upcomingWeddings === 1 ? "" : "en")}</li>
                 )}
-                <li><strong>{deleteInfo.totalWeddings}</strong> bruiloft{deleteInfo.totalWeddings === 1 ? "" : "en"} in totaal via DreamDay</li>
-                <li><strong>{deleteInfo.profileViews}</strong> profielweergave{deleteInfo.profileViews === 1 ? "" : "n"} door bruidsparen</li>
-                <li><strong>{deleteInfo.documents}</strong> gedeelde document{deleteInfo.documents === 1 ? "" : "en"}</li>
+                <li><strong>{deleteInfo.totalWeddings}</strong> {tv.totalWeddingsLine.replace("{s}", deleteInfo.totalWeddings === 1 ? "" : "en")}</li>
+                <li><strong>{deleteInfo.profileViews}</strong> {tv.profileViewsLine.replace("{s}", deleteInfo.profileViews === 1 ? "" : "n")}</li>
+                <li><strong>{deleteInfo.documents}</strong> {tv.documentsLine.replace("{s}", deleteInfo.documents === 1 ? "" : "en")}</li>
               </ul>
               {deleteInfo.upcomingWeddings > 0 && (
                 <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
-                  De bruidsparen van je geplande bruiloften behouden hun draaiboek, afspraken en documenten; zij krijgen bericht dat je bent gestopt met DreamDay.
+                  {tv.coupleKeepData}
                 </p>
               )}
               <div className="flex gap-2 flex-wrap">
                 <button onClick={handleRequestDelete} disabled={deleteLoading} className="ddp-btn-secondary" style={{ color: "var(--danger)", borderColor: "var(--danger)", fontSize: "var(--text-base)" }}>
-                  {deleteLoading ? "Versturen…" : "Bevestig: stuur verwijdermail"}
+                  {deleteLoading ? tv.sending : tv.confirmDelete}
                 </button>
                 <button onClick={() => setDeleteInfo(null)} className="ddp-btn-secondary" style={{ fontSize: "var(--text-base)" }}>
-                  Annuleren
+                  {tv.cancel}
                 </button>
               </div>
             </div>
@@ -1454,7 +1465,7 @@ function VendorEditPage() {
               className="mt-3 text-xs font-semibold"
               style={{ color: "var(--danger)", background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}
             >
-              {deleteLoading ? "Laden…" : "Profiel verwijderen"}
+              {deleteLoading ? tv.loadingBtn : tv.deleteProfileBtn}
             </button>
           )}
         </section>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLang } from "@/components/LangProvider";
 
 type AnalyticsData = {
   total: number;
@@ -20,6 +21,8 @@ function euro(n: number) {
 }
 
 export default function VendorAnalyticsPage() {
+  const { t } = useLang();
+  const ta = t.vendorAnalytics;
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,9 +31,9 @@ export default function VendorAnalyticsPage() {
     fetch("/api/vendor/analytics")
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(d => setData(d))
-      .catch(() => setError("Kan analytics niet laden"))
+      .catch(() => setError(ta.error))
       .finally(() => setLoading(false));
-  }, []);
+  }, [ta.error]);
 
   const maxMonth = data ? Math.max(...data.monthsData.map(m => m.count), 1) : 1;
   const maxMonthRevenue = data ? Math.max(...data.monthsData.map(m => m.revenue), 1) : 1;
@@ -40,13 +43,13 @@ export default function VendorAnalyticsPage() {
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <div className="dash-hero" style={{ borderRadius: 0, padding: "1.25rem 1.25rem 2rem" }}>
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>Analytisch overzicht</h1>
-          <p style={{ fontSize: "0.9rem", color: "var(--ink-muted)", marginTop: "var(--space-1)" }}>Jouw prestaties als leverancier</p>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink-text)" }}>{ta.title}</h1>
+          <p style={{ fontSize: "0.9rem", color: "var(--ink-muted)", marginTop: "var(--space-1)" }}>{ta.subtitle}</p>
         </div>
       </div>
 
       <div style={{ maxWidth: "760px", margin: "0 auto", padding: "2rem 1.25rem 3rem" }}>
-        {loading && <p className="text-sm" style={{ color: "var(--muted)" }}>Laden…</p>}
+        {loading && <p className="text-sm" style={{ color: "var(--muted)" }}>{ta.loading}</p>}
         {error && <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p>}
 
         {data && (
@@ -54,11 +57,11 @@ export default function VendorAnalyticsPage() {
             {/* Kerncijfers — inline, geen kaartgrid */}
             <div className="flex flex-wrap gap-x-8 gap-y-4 mb-8 pb-6" style={{ borderBottom: "1px solid var(--border)" }}>
               {[
-                { value: data.profileViews, label: "profielweergaven" },
-                { value: data.total, label: "bruiloften totaal" },
-                { value: data.thisYear, label: "dit jaar" },
-                { value: data.upcoming, label: "aankomend" },
-                { value: euro(data.totalRevenue), label: "totale omzet" },
+                { value: data.profileViews, label: ta.profileViews },
+                { value: data.total, label: ta.totalWeddings },
+                { value: data.thisYear, label: ta.thisYear },
+                { value: data.upcoming, label: ta.upcoming },
+                { value: euro(data.totalRevenue), label: ta.totalRevenue },
               ].map((s) => (
                 <div key={s.label}>
                   <span className="font-serif" style={{ fontSize: "var(--text-5xl)", fontWeight: 700, color: "var(--foreground)", letterSpacing: "-0.01em" }}>{s.value}</span>
@@ -69,7 +72,7 @@ export default function VendorAnalyticsPage() {
 
             {/* Bruiloften per maand */}
             <section className="mb-8">
-              <h2 className="dash-section-title mb-4">Bruiloften per maand</h2>
+              <h2 className="dash-section-title mb-4">{ta.perMonthTitle}</h2>
               <div className="flex items-end gap-1.5" style={{ height: "140px" }}>
                 {data.monthsData.map(m => (
                   <div key={m.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: "4px", height: "100%" }}>
@@ -89,7 +92,7 @@ export default function VendorAnalyticsPage() {
             {/* Omzet per maand */}
             {data.monthsData.some(m => m.revenue > 0) && (
               <section className="mb-8">
-                <h2 className="dash-section-title mb-4">Omzet per maand</h2>
+                <h2 className="dash-section-title mb-4">{ta.revenuePerMonthTitle}</h2>
                 <div className="flex items-end gap-1.5" style={{ height: "140px" }}>
                   {data.monthsData.map(m => (
                     <div key={m.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", gap: "4px", height: "100%" }}>
@@ -110,7 +113,7 @@ export default function VendorAnalyticsPage() {
             {/* Per jaar */}
             {data.byYear.length > 1 && (
               <section className="mb-8">
-                <h2 className="dash-section-title mb-3">Per jaar</h2>
+                <h2 className="dash-section-title mb-3">{ta.perYearTitle}</h2>
                 <div style={{ borderTop: "1px solid var(--border)" }}>
                   {data.byYear.map(({ year, count }) => (
                     <div key={year} className="dash-row">
@@ -128,8 +131,8 @@ export default function VendorAnalyticsPage() {
             {/* Samenwerkingen */}
             {data.topCollaborators.length > 0 && (
               <section>
-                <h2 className="dash-section-title mb-1">Vaakst mee samengewerkt</h2>
-                <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>Andere leveranciers op dezelfde bruiloften</p>
+                <h2 className="dash-section-title mb-1">{ta.collaboratorsTitle}</h2>
+                <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>{ta.collaboratorsHint}</p>
                 <div style={{ borderTop: "1px solid var(--border)" }}>
                   {data.topCollaborators.map((c) => (
                     <div key={c.id} className="dash-row">

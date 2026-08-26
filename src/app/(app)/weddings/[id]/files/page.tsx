@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Palette, ClipboardList, Receipt, FileSignature, FolderOpen, Image as ImageIcon, FileText, File, Upload, X, AlertCircle } from "lucide-react";
 import { SkeletonCard } from "@/components/Skeleton";
+import { useLang } from "@/components/LangProvider";
 
 type Document = {
   id: string;
@@ -17,15 +18,6 @@ type Document = {
   createdAt: string;
   uploader: { id: string; name: string; role: string };
 };
-
-const CATEGORIES = [
-  { value: "all", label: "Alles", Icon: FolderOpen },
-  { value: "inspiratie", label: "Inspiratie", Icon: Palette },
-  { value: "offerte", label: "Offertes", Icon: ClipboardList },
-  { value: "factuur", label: "Facturen", Icon: Receipt },
-  { value: "contract", label: "Contracten", Icon: FileSignature },
-  { value: "overig", label: "Overig", Icon: FolderOpen },
-];
 
 function FileIcon({ mimeType, className, style }: { mimeType: string; className?: string; style?: React.CSSProperties }) {
   if (mimeType.startsWith("image/")) return <ImageIcon className={className} style={style} />;
@@ -45,6 +37,16 @@ function formatDate(iso: string) {
 }
 
 export default function FilesPage() {
+  const { t } = useLang();
+  const tf = t.files;
+  const CATEGORIES = [
+    { value: "all", label: tf.categories.all, Icon: FolderOpen },
+    { value: "inspiratie", label: tf.categories.inspiratie, Icon: Palette },
+    { value: "offerte", label: tf.categories.offerte, Icon: ClipboardList },
+    { value: "factuur", label: tf.categories.factuur, Icon: Receipt },
+    { value: "contract", label: tf.categories.contract, Icon: FileSignature },
+    { value: "overig", label: tf.categories.overig, Icon: FolderOpen },
+  ];
   const { id } = useParams<{ id: string }>();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,10 +104,10 @@ export default function FilesPage() {
         setShowUpload(false);
         if (fileInputRef.current) fileInputRef.current.value = "";
       } else {
-        setUploadError(data.error ?? "Upload mislukt");
+        setUploadError(data.error ?? tf.uploadFailed);
       }
     } catch {
-      setUploadError("Netwerkfout, probeer opnieuw");
+      setUploadError(tf.networkError);
     } finally {
       setUploadProgress(100);
       setTimeout(() => { setUploading(false); setUploadProgress(0); }, 500);
@@ -119,7 +121,7 @@ export default function FilesPage() {
   }
 
   async function handleDelete(doc: Document) {
-    if (!confirm(`"${doc.name}" verwijderen?`)) return;
+    if (!confirm(tf.confirmDelete.replace("{name}", doc.name))) return;
     await fetch(`/api/weddings/${id}/files/${doc.id}`, { method: "DELETE" });
     setDocuments((prev) => prev.filter((d) => d.id !== doc.id));
   }
@@ -141,16 +143,16 @@ export default function FilesPage() {
     <div className="p-8 max-w-5xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>← Terug</Link>
+        <Link href={`/weddings/${id}`} className="text-sm" style={{ color: "var(--gold-deep)", fontWeight: 600 }}>{tf.back}</Link>
         <div className="flex items-center justify-between mt-4">
           <div>
-            <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Bestanden</h1>
+            <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{tf.title}</h1>
             <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
-              Inspiratie, offertes, facturen en contracten
+              {tf.subtitle}
             </p>
           </div>
           <button onClick={() => setShowUpload(!showUpload)} className="ddp-btn-primary">
-            {showUpload ? "Annuleren" : "+ Uploaden"}
+            {showUpload ? tf.cancel : tf.addFile}
           </button>
         </div>
       </div>
@@ -158,7 +160,7 @@ export default function FilesPage() {
       {/* Upload form */}
       {showUpload && (
         <form onSubmit={handleUpload} className="ddp-card mb-6">
-          <h3 className="font-semibold mb-4">Bestand uploaden</h3>
+          <h3 className="font-semibold mb-4">{tf.uploadFormTitle}</h3>
 
           {/* File drop zone */}
           <div
@@ -182,9 +184,9 @@ export default function FilesPage() {
             ) : (
               <div>
                 <div className="flex justify-center mb-2"><Upload className="w-10 h-10" style={{ color: "var(--muted-light)" }} /></div>
-                <div className="text-sm font-medium">Klik om bestand te kiezen</div>
+                <div className="text-sm font-medium">{tf.dropSelected}</div>
                 <div className="text-xs mt-1" style={{ color: "var(--muted)" }}>
-                  Afbeeldingen, PDF, Word, Excel, max 50 MB
+                  {tf.dropHint}
                 </div>
               </div>
             )}
@@ -193,17 +195,17 @@ export default function FilesPage() {
           {selectedFile && (
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-xs font-medium mb-1">Naam</label>
+                <label className="block text-xs font-medium mb-1">{tf.nameLabel}</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                  placeholder="Naam van het bestand"
+                  placeholder={tf.namePlaceholder}
                   className="w-full border rounded-lg px-3 py-2 text-sm"
                   style={{ borderColor: "var(--border)" }}
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium mb-1">Categorie</label>
+                <label className="block text-xs font-medium mb-1">{tf.categoryLabel}</label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
@@ -228,7 +230,7 @@ export default function FilesPage() {
                 />
               </div>
               <div className="text-xs mt-1 text-center" style={{ color: "var(--muted)" }}>
-                Uploaden naar Cloudflare R2...
+                {tf.uploadingToR2}
               </div>
             </div>
           )}
@@ -244,7 +246,7 @@ export default function FilesPage() {
             disabled={!selectedFile || uploading}
             className="ddp-btn-primary w-full"
           >
-            {uploading ? "Bezig met uploaden..." : "Bestand uploaden"}
+            {uploading ? tf.uploading : tf.uploadSubmit}
           </button>
         </form>
       )}
@@ -273,14 +275,14 @@ export default function FilesPage() {
       {filtered.length === 0 ? (
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
           <div className="flex justify-center mb-3"><FolderOpen className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
-          <h2 className="font-semibold text-lg mb-2">Nog geen bestanden</h2>
+          <h2 className="font-semibold text-lg mb-2">{tf.noFilesTitle}</h2>
           <p className="text-sm mb-4">
             {activeCategory === "all"
-              ? "Upload inspiratie, offertes, facturen of contracten"
-              : `Geen ${CATEGORIES.find((c) => c.value === activeCategory)?.label.toLowerCase()} gevonden`}
+              ? tf.noFilesAll
+              : tf.noFilesCategory.replace("{category}", (CATEGORIES.find((c) => c.value === activeCategory)?.label ?? "").toLowerCase())}
           </p>
           <button onClick={() => setShowUpload(true)} className="ddp-btn-primary">
-            Eerste bestand uploaden
+            {tf.uploadFirst}
           </button>
         </div>
       ) : (
@@ -332,7 +334,7 @@ export default function FilesPage() {
                         onClick={() => handleDownload(doc)}
                         className="text-xs px-2 py-1 rounded-md transition-colors hover:opacity-80"
                         style={{ background: "var(--accent)", color: "var(--primary)" }}
-                        title="Downloaden / bekijken"
+                        title={tf.downloadTooltip}
                       >
                         ↓
                       </button>
@@ -340,7 +342,7 @@ export default function FilesPage() {
                         onClick={() => handleDelete(doc)}
                         className="text-xs px-2 py-1 rounded-md transition-colors hover:opacity-80"
                         style={{ background: "var(--danger-bg)", color: "var(--danger)" }}
-                        title="Verwijderen"
+                        title={tf.deleteTooltip}
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
