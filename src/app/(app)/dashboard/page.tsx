@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import DashboardClient from "./DashboardClient";
 import { FREE_WEDDING_LIMIT } from "@/lib/pricing";
+import { getServerLang } from "@/lib/server-lang";
 
 function daysUntil(date: Date) {
   const now = new Date();
@@ -13,6 +14,7 @@ function daysUntil(date: Date) {
 export default async function DashboardPage() {
   const user = await getSession();
   if (!user) redirect("/login");
+  const { t } = await getServerLang();
 
   let weddings: Awaited<ReturnType<typeof prisma.wedding.findMany>>;
 
@@ -69,12 +71,13 @@ export default async function DashboardPage() {
     weddingEndDate: wv.wedding.endDate?.toISOString() ?? null,
   }));
 
+  const firstName = user.name.split(" ")[0];
   const greetings: Record<string, string> = {
-    admin: "Platform overzicht",
-    planner: `Goedemorgen, ${user.name.split(" ")[0]}`,
-    team_member: `Goedemorgen, ${user.name.split(" ")[0]}`,
-    couple: `Welkom bij jullie dream day`,
-    vendor: `Welkom in het dream team`,
+    admin: t.dashboardPage.greetingAdmin,
+    planner: t.dashboardPage.greetingMorning.replace("{name}", firstName),
+    team_member: t.dashboardPage.greetingMorning.replace("{name}", firstName),
+    couple: t.dashboardPage.greetingCoupleWelcome,
+    vendor: t.dashboardPage.greetingVendorWelcome,
   };
 
   const stats = {
@@ -132,10 +135,10 @@ export default async function DashboardPage() {
     });
     for (const b of bookings) {
       if (!b.depositPaid && b.depositDue && b.depositDue <= horizon) {
-        paymentDeadlines.push({ wvId: b.id, weddingId: b.weddingId, vendorName: b.vendor.name, label: "Aanbetaling", due: b.depositDue.toISOString(), days: daysUntil(b.depositDue) });
+        paymentDeadlines.push({ wvId: b.id, weddingId: b.weddingId, vendorName: b.vendor.name, label: t.dashboardPage.deposit, due: b.depositDue.toISOString(), days: daysUntil(b.depositDue) });
       }
       if (!b.finalPaid && b.finalDue && b.finalDue <= horizon) {
-        paymentDeadlines.push({ wvId: b.id, weddingId: b.weddingId, vendorName: b.vendor.name, label: "Eindbetaling", due: b.finalDue.toISOString(), days: daysUntil(b.finalDue) });
+        paymentDeadlines.push({ wvId: b.id, weddingId: b.weddingId, vendorName: b.vendor.name, label: t.dashboardPage.finalPayment, due: b.finalDue.toISOString(), days: daysUntil(b.finalDue) });
       }
     }
     paymentDeadlines = paymentDeadlines.sort((a, b) => a.days - b.days).slice(0, 4);
@@ -200,7 +203,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       user={{ id: user.id, name: user.name, role: user.role }}
-      greeting={greetings[user.role] ?? "Welkom"}
+      greeting={greetings[user.role] ?? t.dashboardPage.greetingDefault}
       stats={stats}
       weddings={weddingsData}
       tasks={tasksData}

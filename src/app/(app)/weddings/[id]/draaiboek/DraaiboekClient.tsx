@@ -7,6 +7,7 @@ import { CalendarPlus, ClipboardList, Plus, Printer } from "lucide-react";
 import DraaiboekGrid, { type GridItem, type WeddingVendorRef } from "./DraaiboekGrid";
 import { eachDay, sameDay } from "@/lib/dateRange";
 import DatePicker from "@/components/DatePicker";
+import { useLang } from "@/components/LangProvider";
 
 type DraaiboekItem = GridItem;
 
@@ -66,6 +67,8 @@ const INPUT_STYLE: React.CSSProperties = {
 export default function DraaiboekClient({
   weddingId, weddingTitle, weddingDate, weddingEndDate, draaiboeken: initial, vendors, currentUser, ownVendorId,
 }: Props) {
+  const { t, lang } = useLang();
+  const td = t.draaiboek;
   // Meerdaagse bruiloft: één tab per dag; elk draaiboek hoort bij één dag.
   // Draaiboeken zonder datum (van vóór deze feature) horen bij dag 1.
   const days = useMemo(() => eachDay(new Date(weddingDate), new Date(weddingEndDate ?? weddingDate)), [weddingDate, weddingEndDate]);
@@ -217,7 +220,7 @@ export default function DraaiboekClient({
 
   async function insertTemplate() {
     if (!activeDraaiboekId) return;
-    if (!confirm("Standaardtijdlijn invoegen? Je kunt elk onderdeel daarna aanpassen of verwijderen.")) return;
+    if (!confirm(td.confirmInsertTemplate)) return;
     setInsertingTemplate(true);
     try {
       const sorted = [...DRAAIBOEK_TEMPLATE].sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
@@ -283,30 +286,30 @@ export default function DraaiboekClient({
   }
 
   const dayLabel = (d: Date) =>
-    new Intl.DateTimeFormat("nl-NL", { weekday: "short", day: "numeric", month: "short" }).format(d);
+    new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "nl-NL", { weekday: "short", day: "numeric", month: "short" }).format(d);
 
   return (
     <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       {/* Header */}
       <div className="mb-6">
         <Link href={`/weddings/${weddingId}`} className="inline-flex items-center gap-1 text-sm mb-4" style={{ color: "var(--muted)" }}>
-          ← Terug naar {weddingTitle}
+          {td.backToWedding.replace("{name}", weddingTitle)}
         </Link>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="font-serif" style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.01em" }}>Draaiboek</h1>
+            <h1 className="font-serif" style={{ fontSize: "clamp(1.375rem, 4vw, 1.875rem)", fontWeight: 700, letterSpacing: "-0.01em" }}>{td.title}</h1>
             <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginTop: "2px" }}>{weddingTitle}</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             <button onClick={openCalendarLink} className="ddp-btn-secondary">
-              <CalendarPlus className="inline w-3.5 h-3.5 mr-1" />Koppel aan agenda
+              <CalendarPlus className="inline w-3.5 h-3.5 mr-1" />{td.linkCalendar}
             </button>
             <button onClick={exportPdf} disabled={exporting || !activeDraaiboekId} className="ddp-btn-secondary" style={{ whiteSpace: "nowrap" }}>
-              <Printer className="inline w-3.5 h-3.5 mr-1" />{exporting ? "Bezig…" : "Exporteren als pdf"}
+              <Printer className="inline w-3.5 h-3.5 mr-1" />{exporting ? td.busy : td.exportPdf}
             </button>
             {isPlanner && (
               <button onClick={() => setShowNewDraaiboek(!showNewDraaiboek)} className="ddp-btn-secondary">
-                <Plus className="inline w-3.5 h-3.5 mr-1" />Nieuw draaiboek
+                <Plus className="inline w-3.5 h-3.5 mr-1" />{td.newDraaiboekBtn}
               </button>
             )}
           </div>
@@ -326,20 +329,20 @@ export default function DraaiboekClient({
                 style={{ ...INPUT_STYLE, width: "auto" }}
               />
               <button onClick={() => saveEndDate(false)} disabled={savingEndDate || !endDateDraft} className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.5rem 1rem" }}>
-                {savingEndDate ? "Opslaan…" : "Opslaan"}
+                {savingEndDate ? td.saving : td.save}
               </button>
               {isMultiDay && (
                 <button onClick={() => saveEndDate(true)} disabled={savingEndDate} className="text-xs" style={{ color: "var(--muted)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
-                  Terug naar eendaags
+                  {td.backToSingleDay}
                 </button>
               )}
               <button onClick={() => setShowDateEditor(false)} className="text-xs" style={{ color: "var(--muted)", background: "none", border: "none", cursor: "pointer" }}>
-                Annuleren
+                {td.cancel}
               </button>
             </div>
           ) : (
             <button onClick={() => setShowDateEditor(true)} className="text-xs" style={{ color: "var(--gold-deep)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-              {isMultiDay ? "Einddatum aanpassen" : "Meerdaagse bruiloft? Einddatum toevoegen"}
+              {isMultiDay ? td.editEndDate : td.addEndDatePrompt}
             </button>
           )}
         </div>
@@ -364,7 +367,7 @@ export default function DraaiboekClient({
                   transition: "background 180ms var(--ease-out), color 180ms var(--ease-out)",
                 }}
               >
-                Dag {idx + 1} · {dayLabel(day)}
+                {td.dayLabel.replace("{n}", String(idx + 1))} · {dayLabel(day)}
               </button>
             );
           })}
@@ -376,8 +379,8 @@ export default function DraaiboekClient({
       {showNewDraaiboek && isPlanner && (
         <form onSubmit={createDraaiboek} className="ddp-card mb-5 flex gap-3">
           <input required value={newDraaiboekTitle} onChange={e => setNewDraaiboekTitle(e.target.value)}
-            placeholder="Naam draaiboek (bijv. Draaiboek Trouwdag)" style={{ ...INPUT_STYLE, flex: 1 }} />
-          <button type="submit" disabled={saving} className="ddp-btn-primary">Aanmaken</button>
+            placeholder={td.namePlaceholder} style={{ ...INPUT_STYLE, flex: 1 }} />
+          <button type="submit" disabled={saving} className="ddp-btn-primary">{td.create}</button>
         </form>
       )}
 
@@ -385,22 +388,22 @@ export default function DraaiboekClient({
         <div className="ddp-card text-center py-16" style={{ color: "var(--muted)" }}>
           <ClipboardList className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--color-rose)" }} />
           <h2 style={{ fontWeight: 700, fontSize: "var(--text-2xl)", marginBottom: "var(--space-3)" }}>
-            {isMultiDay ? `Nog geen draaiboek voor dag ${activeDayIndex + 1}` : "Nog geen draaiboek"}
+            {isMultiDay ? td.noDraaiboekForDay.replace("{n}", String(activeDayIndex + 1)) : td.noDraaiboek}
           </h2>
           <p className="text-sm mb-4">
             {isMultiDay
-              ? `Maak een draaiboek aan voor ${dayLabel(days[activeDayIndex])}`
-              : "Maak een draaiboek aan om de tijdlijn van de trouwdag te plannen"}
+              ? td.createForDay.replace("{date}", dayLabel(days[activeDayIndex]))
+              : td.noDraaiboekSub}
           </p>
           {isPlanner && (
-            <button onClick={() => setShowNewDraaiboek(true)} className="ddp-btn-primary">Draaiboek aanmaken</button>
+            <button onClick={() => setShowNewDraaiboek(true)} className="ddp-btn-primary">{td.createDraaiboekBtn}</button>
           )}
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar: version picker */}
           <div style={{ width: "100%", maxWidth: "200px", flexShrink: 0 }}>
-            <p style={{ fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted-light)", marginBottom: "var(--space-5)" }}>Versies</p>
+            <p style={{ fontSize: "var(--text-xs)", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--muted-light)", marginBottom: "var(--space-5)" }}>{td.versionsLabel}</p>
             <div className="flex flex-col gap-1.5">
               {visibleDraaiboeken.map(d => (
                 <button
@@ -421,7 +424,7 @@ export default function DraaiboekClient({
                   <div style={{ fontSize: "var(--text-md)", fontWeight: 600, color: "var(--foreground)" }} className="truncate">{d.title}</div>
                   <div className="flex items-center gap-1.5 mt-1">
                     <span style={{ fontSize: "var(--text-2xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: d.status === "final" ? "var(--gold-deep)" : "var(--muted-light)" }}>
-                      {d.status === "final" ? "Definitief" : "Concept"}
+                      {d.status === "final" ? td.final : td.status.draft}
                     </span>
                   </div>
                 </button>
@@ -434,11 +437,11 @@ export default function DraaiboekClient({
             {isPlanner && activeDraaiboek && activeDraaiboek.items.length === 0 && (
               <div className="mb-4" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-6)", flexWrap: "wrap", padding: "1rem 1.25rem", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--sand)" }}>
                 <div>
-                  <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--foreground)" }}>Nog leeg</div>
-                  <div style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Begin met een standaard trouwdag-tijdlijn, je past daarna zelf alles aan.</div>
+                  <div style={{ fontSize: "var(--text-md)", fontWeight: 700, color: "var(--foreground)" }}>{td.emptyTitle}</div>
+                  <div style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>{td.emptyHint}</div>
                 </div>
                 <button onClick={insertTemplate} disabled={insertingTemplate} className="ddp-btn-secondary" style={{ flexShrink: 0 }}>
-                  {insertingTemplate ? "Bezig…" : "Standaardtijdlijn invoegen"}
+                  {insertingTemplate ? td.busy : td.insertTemplateBtn}
                 </button>
               </div>
             )}
@@ -467,12 +470,12 @@ export default function DraaiboekClient({
             onClick={e => e.stopPropagation()}
             style={{ background: "var(--background)", borderRadius: "16px", padding: "1.75rem", maxWidth: "460px", width: "100%", boxShadow: "0 24px 64px rgba(0,0,0,0.3)" }}
           >
-            <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "var(--space-3)" }}>Koppel aan agenda</h2>
+            <h2 className="font-serif" style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "var(--space-3)" }}>{td.linkCalendar}</h2>
             <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)", lineHeight: 1.5 }}>
-              Abonneer je op dit draaiboek in Google Calendar, Apple Kalender of Outlook. Nieuwe of gewijzigde onderdelen verschijnen automatisch; de agenda-app bepaalt zelf hoe vaak hij ververst.
+              {td.calendarModalIntro}
             </p>
             {loadingCalendarLink ? (
-              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Bezig…</p>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>{td.busy}</p>
             ) : calendarLink ? (
               <>
                 <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-6)" }}>
@@ -486,22 +489,22 @@ export default function DraaiboekClient({
                       setTimeout(() => setCalendarLinkCopied(false), 2000);
                     }}
                   >
-                    {calendarLinkCopied ? "Gekopieerd" : "Kopiëren"}
+                    {calendarLinkCopied ? td.copied : td.copy}
                   </button>
                 </div>
                 <a href={calendarLink.webcalUrl} className="ddp-btn-primary" style={{ display: "inline-block", marginBottom: "var(--space-6)", textDecoration: "none" }}>
-                  Direct openen in agenda-app
+                  {td.openInCalendarApp}
                 </a>
                 <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", lineHeight: 1.6 }}>
-                  <strong>Google Calendar:</strong> Instellingen → Agenda toevoegen → Op URL → plak de link.<br />
-                  <strong>Apple Kalender:</strong> Archief → Nieuw agenda-abonnement → plak de link.<br />
-                  <strong>Outlook:</strong> Agenda toevoegen → Abonneren via internet → plak de link.
+                  <strong>{td.googleCalendarLabel}</strong> {td.googleCalendarText}<br />
+                  <strong>{td.appleCalendarLabel}</strong> {td.appleCalendarText}<br />
+                  <strong>{td.outlookLabel}</strong> {td.outlookText}
                 </p>
               </>
             ) : (
-              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>Kon de link niet ophalen.</p>
+              <p style={{ fontSize: "var(--text-base)", color: "var(--muted)" }}>{td.linkFetchFailed}</p>
             )}
-            <button onClick={() => setShowCalendarLink(false)} className="ddp-btn-secondary mt-4">Sluiten</button>
+            <button onClick={() => setShowCalendarLink(false)} className="ddp-btn-secondary mt-4">{td.close}</button>
           </div>
         </div>
       )}

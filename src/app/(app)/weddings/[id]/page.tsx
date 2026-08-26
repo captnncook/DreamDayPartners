@@ -9,19 +9,6 @@ import TabNav from "./TabNav";
 import { getServerLang } from "@/lib/server-lang";
 import { formatDateRange } from "@/lib/dateRange";
 
-const VENDOR_STATUS_LABELS: Record<string, string> = {
-  invited: "Uitgenodigd",
-  contacted: "Gecontacteerd",
-  quote_received: "Offerte ontvangen",
-  lead: "Lead",
-  booked: "Geboekt",
-  confirmed: "Bevestigd",
-  declined: "Afgewezen",
-  in_progress: "In uitvoering",
-  ready: "Klaar",
-  completed: "Afgerond",
-};
-
 function formatDate(date: Date, lang: string) {
   return new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(new Date(date));
 }
@@ -233,7 +220,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                         {task.title}
                       </span>
                       {task.status === "in_progress" && (
-                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)", flexShrink: 0 }}>Bezig</span>
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)", flexShrink: 0 }}>{t.tasks.status.in_progress}</span>
                       )}
                       {task.assignedUser && (
                         <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "var(--gold)", color: "var(--ink)", fontSize: "var(--text-2xs)" }}>
@@ -301,7 +288,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
                   {/* Eén rij per leverancier die doorklikt naar het eigen dashboard —
                       géén gestapelde volledige dashboards meer op deze pagina. */}
                   {wedding.vendors.map((wv) => {
-                    const statusLabel = VENDOR_STATUS_LABELS[wv.status] ?? wv.status;
+                    const statusLabel = tw.vendorStatusLabels[wv.status as keyof typeof tw.vendorStatusLabels] ?? wv.status;
                     const needsAttention = wv.status === "lead";
                     return (
                       <Link key={wv.id} href={`/weddings/${id}/vendors/${wv.id}`} className="dash-row">
@@ -359,7 +346,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
               op de leverancierscatalogus (dichtstbijzijnde eerst). */}
           {user.role === "couple" && (
             <section className="mb-8">
-              <h3 className="dash-section-title mb-1">Locatie</h3>
+              <h3 className="dash-section-title mb-1">{tw.location}</h3>
               <WeddingLocationEditor
                 weddingId={id}
                 initialCity={wedding.locationCity ?? ""}
@@ -381,7 +368,7 @@ export default async function WeddingDetailPage({ params }: { params: Promise<{ 
             if (!ownWv) return null;
             return (
               <section>
-                <h3 className="dash-section-title mb-1">Mijn notities</h3>
+                <h3 className="dash-section-title mb-1">{tw.myNotes}</h3>
                 <VendorNotesEditor weddingId={id} wvId={ownWv.id} initialNotes={ownWv.notes ?? ""} />
               </section>
             );
