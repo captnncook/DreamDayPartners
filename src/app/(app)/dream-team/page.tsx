@@ -4,48 +4,41 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, X } from "lucide-react";
 import { getVendorTypeConfig } from "@/lib/vendorTypeConfigs";
+import { useLang } from "@/components/LangProvider";
+import type { T } from "@/lib/i18n";
 
-const SLOTS = [
-  { category: "weddingplanner", label: "Weddingplanner" },
-  { category: "fotograaf",      label: "Fotograaf" },
-  { category: "videograaf",     label: "Videograaf" },
-  { category: "trouwlocatie",   label: "Trouwlocatie" },
-  { category: "catering",       label: "Catering" },
-  { category: "bloemist",       label: "Bloemist" },
-  { category: "dj",             label: "DJ / Muziek" },
-  { category: "liveband",       label: "Liveband & Entertainment" },
-  { category: "haarstylist",    label: "Haar & Make-up" },
-  { category: "bakker",         label: "Bruidstaart" },
-  { category: "vervoer",        label: "Vervoer" },
-  { category: "decoratie",      label: "Decoratie & Styling" },
-  { category: "fotocabine",     label: "Fotocabine" },
-  { category: "bruidsmode",     label: "Bruidsmode" },
-  { category: "herenmode",      label: "Herenmode" },
-  { category: "juwelier",       label: "Juwelier" },
-];
+const SLOT_CATEGORIES = [
+  "weddingplanner", "fotograaf", "videograaf", "trouwlocatie", "catering", "bloemist",
+  "dj", "liveband", "haarstylist", "bakker", "vervoer", "decoratie",
+  "fotocabine", "bruidsmode", "herenmode", "juwelier",
+] as const;
 
 type TeamMember = { vendorId: string; wvId: string; name: string; category: string; photo: string | null };
 
 const SHIELD_PATH = "M50 4 L92 20 L92 62 C92 88 72 108 50 118 C28 108 8 88 8 62 L8 20 Z";
 
 function ShieldCard({
-  slot,
+  category,
+  slotLabel,
   member,
   weddingId,
   onRemove,
+  t,
 }: {
-  slot: typeof SLOTS[number];
+  category: string;
+  slotLabel: string;
   member: TeamMember | undefined;
   weddingId: string | null;
   onRemove: (m: TeamMember) => void;
+  t: T;
 }) {
   // Bij een bevestigde leverancier gaan we naar het bruiloft-specifieke
   // dashboard (waar je bijv. de DJ-playlist of bloemist-inspiratie invult),
   // niet naar het algemene, publieke leveranciersprofiel.
   const href = member
     ? (weddingId ? `/weddings/${weddingId}/vendors/${member.wvId}` : `/leveranciers/${member.vendorId}`)
-    : `/leveranciers?category=${slot.category}`;
-  const label = member ? member.name : slot.label;
+    : `/leveranciers?category=${category}`;
+  const label = member ? member.name : slotLabel;
   const [firstName, ...rest] = label.split(" ");
 
   return (
@@ -54,7 +47,7 @@ function ShieldCard({
       {member && (
         <button
           onClick={() => onRemove(member)}
-          title={`${member.name} verwijderen`}
+          title={t.dreamTeam.removeTooltip.replace("{name}", member.name)}
           style={{
             position: "absolute",
             top: 0,
@@ -81,7 +74,7 @@ function ShieldCard({
         <div style={{ width: "100%", maxWidth: "180px", position: "relative" }}>
           <svg viewBox="0 0 100 120" style={{ width: "100%", display: "block", filter: member ? "drop-shadow(0 4px 12px rgba(0,0,0,0.15))" : "none" }}>
             <defs>
-              <clipPath id={`shield-${slot.category}`}>
+              <clipPath id={`shield-${category}`}>
                 <path d={SHIELD_PATH} />
               </clipPath>
             </defs>
@@ -92,7 +85,7 @@ function ShieldCard({
                 <image
                   href={member.photo}
                   x="8" y="4" width="84" height="114"
-                  clipPath={`url(#shield-${slot.category})`}
+                  clipPath={`url(#shield-${category})`}
                   preserveAspectRatio="xMidYMid slice"
                 />
               ) : (
@@ -122,14 +115,14 @@ function ShieldCard({
                 {rest.join(" ") || firstName}
               </div>
               <div style={{ fontSize: "var(--text-xs)", color: "var(--primary)", fontWeight: 600, marginTop: "2px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                {slot.label}
+                {slotLabel}
               </div>
             </>
           ) : (
             <>
-              <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", fontWeight: 500 }}>{slot.label}</div>
+              <div style={{ fontSize: "var(--text-base)", color: "var(--muted)", fontWeight: 500 }}>{slotLabel}</div>
               <div style={{ fontSize: "var(--text-sm)", color: "var(--primary)", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: "3px", marginTop: "2px" }}>
-                <Plus style={{ width: "11px", height: "11px" }} /> Toevoegen
+                <Plus style={{ width: "11px", height: "11px" }} /> {t.dreamTeam.add}
               </div>
             </>
           )}
@@ -140,6 +133,7 @@ function ShieldCard({
 }
 
 export default function DreamTeamPage() {
+  const { t } = useLang();
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [weddingId, setWeddingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -161,7 +155,7 @@ export default function DreamTeamPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ weddingId }),
     });
-    setTeam(t => t.filter(m => m.vendorId !== confirmMember.vendorId));
+    setTeam(prev => prev.filter(m => m.vendorId !== confirmMember.vendorId));
     setConfirmMember(null);
     setRemoving(false);
   }
@@ -169,26 +163,28 @@ export default function DreamTeamPage() {
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       <div className="mb-8">
-        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>Dream Team</h1>
+        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{t.dreamTeam.title}</h1>
         <p style={{ fontSize: "var(--text-md)", color: "var(--muted)", marginTop: "4px" }}>
-          Jullie leveranciers per categorie
+          {t.dreamTeam.subtitle}
         </p>
       </div>
 
       {loading ? (
-        <p style={{ color: "var(--muted)", fontSize: "var(--text-md)" }}>Laden…</p>
+        <p style={{ color: "var(--muted)", fontSize: "var(--text-md)" }}>{t.dreamTeam.loading}</p>
       ) : (
         <div
           style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "2rem 1.25rem" }}
           className="dream-team-grid"
         >
-          {SLOTS.map(slot => (
+          {SLOT_CATEGORIES.map(category => (
             <ShieldCard
-              key={slot.category}
-              slot={slot}
-              member={team.find(m => m.category === slot.category)}
+              key={category}
+              category={category}
+              slotLabel={t.dreamTeam.slots[category]}
+              member={team.find(m => m.category === category)}
               weddingId={weddingId}
               onRemove={setConfirmMember}
+              t={t}
             />
           ))}
         </div>
@@ -199,12 +195,12 @@ export default function DreamTeamPage() {
           overzicht ondanks dat ze wél gekoppeld zijn — hier alsnog tonen
           i.p.v. stil negeren. */}
       {!loading && (() => {
-        const slotCategories = new Set(SLOTS.map(s => s.category));
+        const slotCategories = new Set<string>(SLOT_CATEGORIES);
         const extra = team.filter(m => !slotCategories.has(m.category));
         if (extra.length === 0) return null;
         return (
           <div style={{ marginTop: "var(--space-10)" }}>
-            <p className="ddp-section-label" style={{ marginBottom: "var(--space-3)" }}>Overige gekoppelde leveranciers</p>
+            <p className="ddp-section-label" style={{ marginBottom: "var(--space-3)" }}>{t.dreamTeam.otherLinkedTitle}</p>
             <div>
               {extra.map(m => (
                 <Link key={m.vendorId} href={weddingId ? `/weddings/${weddingId}/vendors/${m.wvId}` : `/leveranciers/${m.vendorId}`} className="dash-row" style={{ textDecoration: "none", justifyContent: "space-between" }}>
@@ -240,10 +236,10 @@ export default function DreamTeamPage() {
             }}
           >
             <h2 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "var(--space-3)" }}>
-              Verwijderen uit Dream Team?
+              {t.dreamTeam.removeConfirmTitle}
             </h2>
             <p style={{ fontSize: "0.9rem", color: "var(--muted)", marginBottom: "var(--space-8)", lineHeight: 1.5 }}>
-              Weet je zeker dat je <strong>{confirmMember.name}</strong> wilt verwijderen uit je Dream Team?
+              {t.dreamTeam.removeConfirmBody.split("{name}")[0]}<strong>{confirmMember.name}</strong>{t.dreamTeam.removeConfirmBody.split("{name}")[1]}
             </p>
             <div style={{ display: "flex", gap: "var(--space-5)", justifyContent: "flex-end" }}>
               <button
@@ -251,7 +247,7 @@ export default function DreamTeamPage() {
                 disabled={removing}
                 className="ddp-btn-secondary"
               >
-                Annuleren
+                {t.dreamTeam.cancel}
               </button>
               <button
                 onClick={handleRemoveConfirmed}
@@ -268,7 +264,7 @@ export default function DreamTeamPage() {
                   fontSize: "var(--text-md)",
                 }}
               >
-                {removing ? "Verwijderen…" : "Ja, verwijderen"}
+                {removing ? t.dreamTeam.removing : t.dreamTeam.confirmRemove}
               </button>
             </div>
           </div>
