@@ -316,10 +316,10 @@ export default function LandingPage() {
                   Inloggen
                 </Link>
               </div>
-              <a href="#bruidsparen" className="ddp-btn-ghost" style={{ fontSize: "var(--text-base)", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
+              <a href="#bruidsparen" className="ddp-btn-ghost hidden sm:inline-flex" style={{ fontSize: "var(--text-base)", fontWeight: 500, color: "var(--foreground)", padding: "0.35rem 0.75rem" }}>
                 Voor bruidsparen
               </a>
-              <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.45rem 0.875rem" }}>
+              <a href="#leveranciers" className="ddp-btn-primary" style={{ fontSize: "var(--text-base)", padding: "0.45rem 0.875rem", whiteSpace: "nowrap" }}>
                 Voor leveranciers
               </a>
             </>
