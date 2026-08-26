@@ -1,4 +1,11 @@
 import { Resend } from "resend";
+import { translations, type Lang } from "@/lib/i18n";
+
+// Simpele "{key}"-interpolatie voor e-mailcopy — de vertaalstrings in
+// i18n.ts bevatten placeholders zoals {vendorName} die hier worden ingevuld.
+function fmt(str: string, vars: Record<string, string> = {}): string {
+  return str.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? "");
+}
 
 const FROM = process.env.MAIL_FROM ?? "DreamDay Platform <onboarding@resend.dev>";
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -109,118 +116,138 @@ function emailLayout(opts: {
 // Templates
 // ---------------------------------------------------------------------------
 
-export function verificationCodeEmail(code: string): { subject: string; html: string } {
+export function verificationCodeEmail(code: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.verificationCode;
   return {
-    subject: `Je verificatiecode: ${code}`,
+    subject: fmt(t.subject, { code }),
     html: emailLayout({
-      heading: "Bevestig je e-mailadres",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 8px;">Gebruik de onderstaande code om je e-mailadres te bevestigen.</p>
+        <p style="margin:0 0 8px;">${t.intro}</p>
         <div style="font-size:36px;font-weight:700;letter-spacing:0.35em;text-align:center;padding:24px 16px;background:#f4f1ee;border-radius:10px;margin:20px 0;color:#1a1a1a;">${code}</div>
-        <p style="margin:0;">De code is <strong>10 minuten</strong> geldig.</p>
+        <p style="margin:0;">${t.validFor}</p>
       `,
-      footnote: "Als je dit niet hebt aangevraagd, kun je deze e-mail negeren.",
+      footnote: t.footnote,
     }),
   };
 }
 
-export function claimRequestAdminEmail(vendorName: string, claimantEmail: string): { subject: string; html: string } {
+export function claimRequestAdminEmail(vendorName: string, claimantEmail: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.claimRequestAdmin;
   return {
-    subject: `Nieuwe profiel-claim aanvraag: ${vendorName}`,
+    subject: fmt(t.subject, { vendorName }),
     html: emailLayout({
-      heading: "Nieuwe profiel-claim",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">Er is een aanvraag binnengekomen om het profiel van <strong>${vendorName}</strong> te claimen.</p>
-        <p style="margin:0;"><strong>E-mailadres aanvrager:</strong> ${claimantEmail}</p>
+        <p style="margin:0 0 12px;">${fmt(t.body, { vendorName })}</p>
+        <p style="margin:0;"><strong>${t.requesterLabel}</strong> ${claimantEmail}</p>
       `,
-      footnote: "Beoordeel deze aanvraag in het admin-paneel onder &ldquo;Profiel-claims&rdquo;.",
+      footnote: t.footnote,
     }),
   };
 }
 
-export function claimApprovedEmail(vendorName: string, verifyUrl: string): { subject: string; html: string } {
+export function claimApprovedEmail(vendorName: string, verifyUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.claimApproved;
   return {
-    subject: `Je aanvraag voor "${vendorName}" is goedgekeurd`,
+    subject: fmt(t.subject, { vendorName }),
     html: emailLayout({
-      heading: "Aanvraag goedgekeurd",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">Goed nieuws! Je aanvraag om het profiel van <strong>${vendorName}</strong> te claimen is goedgekeurd.</p>
-        <p style="margin:0;">Klik op de knop hieronder om je account in te stellen. De link is <strong>48 uur</strong> geldig en eenmalig te gebruiken.</p>
+        <p style="margin:0 0 12px;">${fmt(t.body1, { vendorName })}</p>
+        <p style="margin:0;">${t.body2}</p>
       `,
-      cta: { label: "Account instellen", url: verifyUrl },
-      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${verifyUrl}" style="color:#C49A6E;word-break:break-all;">${verifyUrl}</a>`,
+      cta: { label: t.cta, url: verifyUrl },
+      footnote: `${t.footnotePrefix} <a href="${verifyUrl}" style="color:#C49A6E;word-break:break-all;">${verifyUrl}</a>`,
     }),
   };
 }
 
-export function newDirectMessageEmail(senderName: string, preview: string, appUrl: string): { subject: string; html: string } {
+export function newDirectMessageEmail(senderName: string, preview: string, appUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.newDirectMessage;
   return {
-    subject: `Nieuw bericht van ${senderName}`,
+    subject: fmt(t.subject, { senderName }),
     html: emailLayout({
-      heading: `Nieuw bericht`,
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 16px;"><strong>${senderName}</strong> heeft je een bericht gestuurd:</p>
+        <p style="margin:0 0 16px;">${fmt(t.body, { senderName })}</p>
         <blockquote style="margin:0;padding:14px 18px;background:#f4f1ee;border-left:3px solid #C49A6E;border-radius:6px;color:#4b5563;font-style:italic;">${preview}</blockquote>
       `,
-      cta: { label: "Bericht bekijken", url: `${appUrl}/dm` },
+      cta: { label: t.cta, url: `${appUrl}/dm` },
     }),
   };
 }
 
-const PREMIUM_BENEFITS: Record<string, string[]> = {
-  fotograaf:       ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkte fotogalerij", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  videograaf:      ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkte fotogalerij", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  bloemist:        ["Uitgelicht profiel bovenaan zoekresultaten", "Uitgebreide specialisaties tonen", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  catering:        ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  dj:              ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  liveband:        ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  trouwlocatie:    ["Uitgelicht profiel bovenaan zoekresultaten", "Kaartweergave met prominente pin", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  weddingplanner:  ["Uitgelicht profiel bovenaan zoekresultaten", "10 tot 100+ bruiloften tegelijk beheren", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
-  default:         ["Uitgelicht profiel bovenaan zoekresultaten", "Directe aanvraagknop voor bruidsparen", "Beschikbaarheidskalender zichtbaar", "Statistieken & profielbezoeken"],
+const PREMIUM_BENEFITS: Record<Lang, Record<string, string[]>> = {
+  nl: {
+    fotograaf:       ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkte fotogalerij", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    videograaf:      ["Uitgelicht profiel bovenaan zoekresultaten", "Onbeperkte fotogalerij", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    bloemist:        ["Uitgelicht profiel bovenaan zoekresultaten", "Uitgebreide specialisaties tonen", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    catering:        ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    dj:              ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    liveband:        ["Uitgelicht profiel bovenaan zoekresultaten", "Beschikbaarheidskalender zichtbaar", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    trouwlocatie:    ["Uitgelicht profiel bovenaan zoekresultaten", "Kaartweergave met prominente pin", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    weddingplanner:  ["Uitgelicht profiel bovenaan zoekresultaten", "10 tot 100+ bruiloften tegelijk beheren", "Directe aanvraagknop voor bruidsparen", "Statistieken & profielbezoeken"],
+    default:         ["Uitgelicht profiel bovenaan zoekresultaten", "Directe aanvraagknop voor bruidsparen", "Beschikbaarheidskalender zichtbaar", "Statistieken & profielbezoeken"],
+  },
+  en: {
+    fotograaf:       ["Featured profile at the top of search results", "Unlimited photo gallery", "Direct request button for couples", "Stats & profile visits"],
+    videograaf:      ["Featured profile at the top of search results", "Unlimited photo gallery", "Direct request button for couples", "Stats & profile visits"],
+    bloemist:        ["Featured profile at the top of search results", "Show extended specialties", "Direct request button for couples", "Stats & profile visits"],
+    catering:        ["Featured profile at the top of search results", "Visible availability calendar", "Direct request button for couples", "Stats & profile visits"],
+    dj:              ["Featured profile at the top of search results", "Visible availability calendar", "Direct request button for couples", "Stats & profile visits"],
+    liveband:        ["Featured profile at the top of search results", "Visible availability calendar", "Direct request button for couples", "Stats & profile visits"],
+    trouwlocatie:    ["Featured profile at the top of search results", "Map view with prominent pin", "Direct request button for couples", "Stats & profile visits"],
+    weddingplanner:  ["Featured profile at the top of search results", "Manage 10 to 100+ weddings at once", "Direct request button for couples", "Stats & profile visits"],
+    default:         ["Featured profile at the top of search results", "Direct request button for couples", "Visible availability calendar", "Stats & profile visits"],
+  },
 };
 
-export function premiumGrantedEmail(name: string, vendorType: string | null): { subject: string; html: string } {
-  const benefits = PREMIUM_BENEFITS[vendorType ?? ""] ?? PREMIUM_BENEFITS.default;
+export function premiumGrantedEmail(name: string, vendorType: string | null, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.premiumGranted;
+  const benefits = PREMIUM_BENEFITS[lang][vendorType ?? ""] ?? PREMIUM_BENEFITS[lang].default;
   const benefitList = benefits
     .map(b => `<li style="margin:6px 0;padding-left:4px;">✓&nbsp; ${b}</li>`)
     .join("");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
   return {
-    subject: "Gefeliciteerd, je hebt nu Premium toegang op DreamDay Platform!",
+    subject: t.subject,
     html: emailLayout({
-      heading: "Welkom bij Premium",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 20px;">Hallo ${name}, je profiel is zojuist opgewaardeerd naar <strong>Premium</strong>. Dit zijn je voordelen:</p>
+        <p style="margin:0 0 20px;">${fmt(t.body, { name })}</p>
         <ul style="margin:0;padding-left:20px;color:#4b5563;line-height:1.8;">${benefitList}</ul>
       `,
-      cta: { label: "Bekijk je premium profiel", url: `${appUrl}/leveranciers/mijn-profiel` },
-      footnote: "Vragen? Stuur een e-mail naar <a href=\"mailto:info@dreamdaypartners.com\" style=\"color:#C49A6E;\">info@dreamdaypartners.com</a>",
+      cta: { label: t.cta, url: `${appUrl}/leveranciers/mijn-profiel` },
+      footnote: t.footnote,
     }),
   };
 }
 
-export function newTaskEmail(taskTitle: string, weddingTitle: string, appUrl: string): { subject: string; html: string } {
+export function newTaskEmail(taskTitle: string, weddingTitle: string, appUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.newTask;
   return {
-    subject: `Nieuwe taak: ${taskTitle}`,
+    subject: fmt(t.subject, { taskTitle }),
     html: emailLayout({
-      heading: "Nieuwe taak toegewezen",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 8px;">Er is een nieuwe taak aan jou toegewezen voor <strong>${weddingTitle}</strong>:</p>
+        <p style="margin:0 0 8px;">${fmt(t.body, { weddingTitle })}</p>
         <p style="margin:0;font-size:17px;font-weight:600;color:#1a1a1a;">${taskTitle}</p>
       `,
-      cta: { label: "Taak bekijken", url: `${appUrl}/tasks` },
+      cta: { label: t.cta, url: `${appUrl}/tasks` },
     }),
   };
 }
 
-export function claimWelcomeEmail(vendorName: string): { subject: string; html: string } {
+export function claimWelcomeEmail(vendorName: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.claimWelcome;
   return {
-    subject: `Welkom op DreamDay Platform, ${vendorName}!`,
+    subject: fmt(t.subject, { vendorName }),
     html: emailLayout({
-      heading: `Welkom, ${vendorName}!`,
+      heading: fmt(t.heading, { vendorName }),
       body: `
-        <p style="margin:0 0 12px;">Je account is actief. Via het dashboard kun je bruidsparen bereiken, je profiel aanvullen en aanvragen beheren.</p>
-        <p style="margin:0;">Veel succes!</p>
+        <p style="margin:0 0 12px;">${t.body1}</p>
+        <p style="margin:0;">${t.body2}</p>
       `,
     }),
   };
@@ -230,129 +257,137 @@ export function claimWelcomeEmail(vendorName: string): { subject: string; html: 
 // Standalone helpers used directly in API routes
 // ---------------------------------------------------------------------------
 
-export function accountActivationEmail(name: string, activateUrl: string): { subject: string; html: string } {
+export function accountActivationEmail(name: string, activateUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.accountActivation;
   return {
-    subject: "Je account op DreamDay Platform is aangemaakt",
+    subject: t.subject,
     html: emailLayout({
-      heading: "Account activeren",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">Welkom op DreamDay Platform${name ? `, ${name}` : ""}!</p>
-        <p style="margin:0;">Er is een account voor je aangemaakt. Klik op de knop om je wachtwoord in te stellen en in te loggen. De link is <strong>7 dagen</strong> geldig.</p>
+        <p style="margin:0 0 12px;">${fmt(t.welcome, { namePart: name ? `, ${name}` : "" })}</p>
+        <p style="margin:0;">${t.body}</p>
       `,
-      cta: { label: "Account activeren", url: activateUrl },
-      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${activateUrl}" style="color:#C49A6E;word-break:break-all;">${activateUrl}</a>`,
+      cta: { label: t.cta, url: activateUrl },
+      footnote: `${t.footnotePrefix} <a href="${activateUrl}" style="color:#C49A6E;word-break:break-all;">${activateUrl}</a>`,
     }),
   };
 }
 
 export function rsvpConfirmationEmail(
-  weddingTitle: string, weddingDate: Date, venue: string | null, attending: boolean, guestNames: string[]
+  weddingTitle: string, weddingDate: Date, venue: string | null, attending: boolean, guestNames: string[], lang: Lang = "nl"
 ): { subject: string; html: string } {
-  const dateStr = new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(weddingDate);
+  const t = translations[lang].emails.rsvpConfirmation;
+  const dateStr = new Intl.DateTimeFormat(lang === "nl" ? "nl-NL" : "en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(weddingDate);
   const names = guestNames.filter(Boolean);
   const namesList = names.map((n) => `<li style="margin:2px 0;">${n}</li>`).join("");
   return {
-    subject: attending ? `Je aanmelding voor ${weddingTitle} is bevestigd` : `Je afmelding voor ${weddingTitle} is ontvangen`,
+    subject: attending ? fmt(t.subjectAttending, { weddingTitle }) : fmt(t.subjectDeclined, { weddingTitle }),
     html: emailLayout({
-      heading: attending ? "Jullie komst is bevestigd" : "Bedankt voor je reactie",
+      heading: attending ? t.headingAttending : t.headingDeclined,
       body: `
         <p style="margin:0 0 4px;font-weight:600;">${weddingTitle}</p>
         <p style="margin:0 0 16px;color:#6b6b6b;text-transform:capitalize;">${dateStr}${venue ? ` &middot; ${venue}` : ""}</p>
         ${attending
-          ? `<p style="margin:0 0 8px;">We hebben je aanmelding genoteerd voor:</p><ul style="margin:0 0 16px;padding-left:20px;">${namesList || `<li>${names[0] ?? "Jou"}</li>`}</ul><p style="margin:0;">We kijken ernaar uit jullie te zien! Wijzigen je plannen alsnog, gebruik dan opnieuw de uitnodigingslink om je reactie aan te passen.</p>`
-          : `<p style="margin:0;">Jammer dat je er niet bij kunt zijn — bedankt voor het laten weten. Kun je onverwacht toch komen, gebruik dan opnieuw de uitnodigingslink om je reactie aan te passen.</p>`
+          ? `<p style="margin:0 0 8px;">${t.registeredIntro}</p><ul style="margin:0 0 16px;padding-left:20px;">${namesList || `<li>${names[0] ?? t.you}</li>`}</ul><p style="margin:0;">${t.registeredOutro}</p>`
+          : `<p style="margin:0;">${t.declinedBody}</p>`
         }
       `,
     }),
   };
 }
 
-export function coupleWeddingInviteEmail(vendorName: string, weddingTitle: string, inviteUrl: string): { subject: string; html: string } {
+export function coupleWeddingInviteEmail(vendorName: string, weddingTitle: string, inviteUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.coupleWeddingInvite;
   return {
-    subject: `${vendorName} heeft jullie bruiloft al klaargezet op DreamDay`,
+    subject: fmt(t.subject, { vendorName }),
     html: emailLayout({
-      heading: "Jullie bruiloft staat klaar",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">${vendorName} werkt met DreamDay Platform en heeft alvast een plek voor <strong>${weddingTitle}</strong> aangemaakt.</p>
-        <p style="margin:0;">Maak gratis een eigen account aan om alles te bekijken en te beheren: draaiboek, gastenlijst, budget en al jullie leveranciers op één plek.</p>
+        <p style="margin:0 0 12px;">${fmt(t.body1, { vendorName, weddingTitle })}</p>
+        <p style="margin:0;">${t.body2}</p>
       `,
-      cta: { label: "Account aanmaken", url: inviteUrl },
-      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${inviteUrl}" style="color:#C49A6E;word-break:break-all;">${inviteUrl}</a>`,
+      cta: { label: t.cta, url: inviteUrl },
+      footnote: `${t.footnotePrefix} <a href="${inviteUrl}" style="color:#C49A6E;word-break:break-all;">${inviteUrl}</a>`,
     }),
   };
 }
 
-export function teamInviteEmail(invitedByName: string, weddingTitle: string, acceptUrl: string): { subject: string; html: string } {
+export function teamInviteEmail(invitedByName: string, weddingTitle: string, acceptUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.teamInvite;
   return {
-    subject: `${invitedByName} nodigt je uit om mee te helpen op DreamDay`,
+    subject: fmt(t.subject, { invitedByName }),
     html: emailLayout({
-      heading: "Je bent uitgenodigd als teamlid",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">${invitedByName} wil dat je meehelpt bij <strong>${weddingTitle}</strong> — met je eigen account, los van hun inloggegevens.</p>
-        <p style="margin:0;">Als teamlid krijg je dezelfde toegang als ${invitedByName} zelf: je kunt het draaiboek, de gastenlijst, het budget en de berichten met leveranciers niet alleen bekijken, maar ook net zo goed bewerken.</p>
+        <p style="margin:0 0 12px;">${fmt(t.body1, { invitedByName, weddingTitle })}</p>
+        <p style="margin:0;">${fmt(t.body2, { invitedByName })}</p>
       `,
-      cta: { label: "Uitnodiging accepteren", url: acceptUrl },
-      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${acceptUrl}" style="color:#C49A6E;word-break:break-all;">${acceptUrl}</a>`,
+      cta: { label: t.cta, url: acceptUrl },
+      footnote: `${t.footnotePrefix} <a href="${acceptUrl}" style="color:#C49A6E;word-break:break-all;">${acceptUrl}</a>`,
     }),
   };
 }
 
-export function passwordResetEmail(resetUrl: string): { subject: string; html: string } {
+export function passwordResetEmail(resetUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.passwordReset;
   return {
-    subject: "Wachtwoord opnieuw instellen",
+    subject: t.subject,
     html: emailLayout({
-      heading: "Nieuw wachtwoord instellen",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">Je hebt gevraagd om je wachtwoord opnieuw in te stellen voor DreamDay Platform.</p>
-        <p style="margin:0;">Klik op de knop hieronder om een nieuw wachtwoord te kiezen. De link is <strong>1 uur</strong> geldig.</p>
+        <p style="margin:0 0 12px;">${t.body1}</p>
+        <p style="margin:0;">${t.body2}</p>
       `,
-      cta: { label: "Nieuw wachtwoord instellen", url: resetUrl },
-      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${resetUrl}" style="color:#C49A6E;word-break:break-all;">${resetUrl}</a><br>Als je dit niet hebt aangevraagd, kun je deze e-mail negeren.`,
+      cta: { label: t.cta, url: resetUrl },
+      footnote: `${t.footnotePrefix} <a href="${resetUrl}" style="color:#C49A6E;word-break:break-all;">${resetUrl}</a><br>${t.footnoteSuffix}`,
     }),
   };
 }
 
-export function adminPasswordResetEmail(resetUrl: string): { subject: string; html: string } {
+export function adminPasswordResetEmail(resetUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.adminPasswordReset;
   return {
-    subject: "Stel je wachtwoord in voor DreamDay Platform",
+    subject: t.subject,
     html: emailLayout({
-      heading: "Wachtwoord instellen",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">Je ontvangt deze e-mail omdat een beheerder een wachtwoordreset heeft aangevraagd voor jouw account.</p>
-        <p style="margin:0;">Klik op de knop hieronder om een (nieuw) wachtwoord in te stellen. De link is <strong>1 uur</strong> geldig.</p>
+        <p style="margin:0 0 12px;">${t.body1}</p>
+        <p style="margin:0;">${t.body2}</p>
       `,
-      cta: { label: "Wachtwoord instellen", url: resetUrl },
-      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${resetUrl}" style="color:#C49A6E;word-break:break-all;">${resetUrl}</a>`,
+      cta: { label: t.cta, url: resetUrl },
+      footnote: `${t.footnotePrefix} <a href="${resetUrl}" style="color:#C49A6E;word-break:break-all;">${resetUrl}</a>`,
     }),
   };
 }
 
-export function deleteRequestEmail(vendorName: string, confirmUrl: string): { subject: string; html: string } {
+export function deleteRequestEmail(vendorName: string, confirmUrl: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.deleteRequest;
   return {
-    subject: "Bevestig verwijdering van je profiel",
+    subject: t.subject,
     html: emailLayout({
-      heading: "Profiel verwijderen",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">Hallo ${vendorName}, je hebt gevraagd om je profiel op DreamDay Platform te verwijderen.</p>
-        <p style="margin:0;">Klik op de knop hieronder om de verwijdering te bevestigen. De link is <strong>24 uur</strong> geldig. <strong>Deze actie kan niet ongedaan worden gemaakt.</strong></p>
+        <p style="margin:0 0 12px;">${fmt(t.body1, { vendorName })}</p>
+        <p style="margin:0;">${t.body2}</p>
       `,
-      cta: { label: "Profiel definitief verwijderen", url: confirmUrl, danger: true },
-      footnote: `Werkt de knop niet? Kopieer deze link: <a href="${confirmUrl}" style="color:#C49A6E;word-break:break-all;">${confirmUrl}</a><br>Als je dit niet hebt aangevraagd, kun je deze e-mail negeren.`,
+      cta: { label: t.cta, url: confirmUrl, danger: true },
+      footnote: `${t.footnotePrefix} <a href="${confirmUrl}" style="color:#C49A6E;word-break:break-all;">${confirmUrl}</a><br>${t.footnoteSuffix}`,
     }),
   };
 }
 
 // Naar het bruidspaar/team van een geplande bruiloft wanneer een gekoppelde
 // leverancier zijn DreamDay-account verwijdert. Boekingsdata blijft bewaard.
-export function vendorLeftWeddingEmail(vendorName: string, weddingTitle: string): { subject: string; html: string } {
+export function vendorLeftWeddingEmail(vendorName: string, weddingTitle: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.vendorLeftWedding;
   return {
-    subject: `${vendorName} is gestopt met DreamDay Platform`,
+    subject: fmt(t.subject, { vendorName }),
     html: emailLayout({
-      heading: "Een leverancier heeft DreamDay verlaten",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;"><strong>${vendorName}</strong> heeft zijn account op DreamDay Platform verwijderd.</p>
-        <p style="margin:0 0 12px;">Voor <strong>${weddingTitle}</strong> verandert er in jullie planning niets: de gemaakte afspraken, draaiboek-onderdelen, documenten en betaalafspraken blijven gewoon in DreamDay staan.</p>
-        <p style="margin:0;">Alleen chatten via het platform kan niet meer met deze leverancier. Neem voor nieuwe afspraken rechtstreeks contact op via de contactgegevens die jullie eerder hebben uitgewisseld.</p>
+        <p style="margin:0 0 12px;">${fmt(t.body1, { vendorName })}</p>
+        <p style="margin:0 0 12px;">${fmt(t.body2, { weddingTitle })}</p>
+        <p style="margin:0;">${t.body3}</p>
       `,
     }),
   };
@@ -360,30 +395,32 @@ export function vendorLeftWeddingEmail(vendorName: string, weddingTitle: string)
 
 // Naar alle gekoppelde leveranciers wanneer een bruidspaar zijn account (en
 // daarmee de bruiloft) verwijdert voor de trouwdag.
-export function weddingCancelledEmail(vendorName: string, weddingTitle: string, weddingDate: string): { subject: string; html: string } {
+export function weddingCancelledEmail(vendorName: string, weddingTitle: string, weddingDate: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.weddingCancelled;
   return {
-    subject: `Bruiloft geannuleerd in DreamDay: ${weddingTitle}`,
+    subject: fmt(t.subject, { weddingTitle }),
     html: emailLayout({
-      heading: "Bruiloft geannuleerd",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 12px;">Beste ${vendorName},</p>
-        <p style="margin:0 0 12px;">Het bruidspaar van <strong>${weddingTitle}</strong> (${weddingDate}) heeft zijn account op DreamDay Platform verwijderd. De bruiloft en het bijbehorende draaiboek zijn daarmee uit het platform verdwenen.</p>
-        <p style="margin:0;">Let op: dit zegt alleen iets over het platform, niet automatisch over jullie onderlinge overeenkomst. Neem bij twijfel rechtstreeks contact op met het bruidspaar.</p>
+        <p style="margin:0 0 12px;">${fmt(t.greeting, { vendorName })}</p>
+        <p style="margin:0 0 12px;">${fmt(t.body1, { weddingTitle, weddingDate })}</p>
+        <p style="margin:0;">${t.body2}</p>
       `,
     }),
   };
 }
 
-export function deleteAdminNotificationEmail(vendorName: string, userEmail: string): { subject: string; html: string } {
+export function deleteAdminNotificationEmail(vendorName: string, userEmail: string, lang: Lang = "nl"): { subject: string; html: string } {
+  const t = translations[lang].emails.deleteAdminNotification;
   return {
-    subject: `Leveranciersprofiel verwijderd: ${vendorName}`,
+    subject: fmt(t.subject, { vendorName }),
     html: emailLayout({
-      heading: "Profiel verwijderd",
+      heading: t.heading,
       body: `
-        <p style="margin:0 0 16px;">Het leveranciersprofiel van <strong>${vendorName}</strong> is definitief verwijderd.</p>
+        <p style="margin:0 0 16px;">${fmt(t.body, { vendorName })}</p>
         <table style="border-collapse:collapse;font-size:14px;width:100%;">
-          <tr><td style="padding:6px 12px 6px 0;color:#9ca3af;">E-mailadres</td><td style="padding:6px 0;">${userEmail}</td></tr>
-          <tr><td style="padding:6px 12px 6px 0;color:#9ca3af;">Tijdstip</td><td style="padding:6px 0;">${new Date().toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam" })}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;color:#9ca3af;">${t.emailLabel}</td><td style="padding:6px 0;">${userEmail}</td></tr>
+          <tr><td style="padding:6px 12px 6px 0;color:#9ca3af;">${t.timeLabel}</td><td style="padding:6px 0;">${new Date().toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam" })}</td></tr>
         </table>
       `,
     }),

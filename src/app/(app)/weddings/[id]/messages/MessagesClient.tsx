@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Lock, Heart, Handshake, MessageCircle } from "lucide-react";
+import { useLang } from "@/components/LangProvider";
 
 type Message = {
   id: string;
@@ -29,13 +30,15 @@ interface Props {
 }
 
 const THREAD_ICONS: Record<string, React.ElementType> = { internal: Lock, couple: Heart, vendor: Handshake };
-const THREAD_LABELS: Record<string, string> = { internal: "Intern team", couple: "Bruidspaar", vendor: "Leverancier" };
 
 function formatTime(iso: string) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
 export default function MessagesClient({ weddingId, weddingTitle, threads: initial, currentUser, linkedVendors = [] }: Props) {
+  const { t } = useLang();
+  const tm = t.messages;
+  const THREAD_LABELS: Record<string, string> = { internal: tm.typeInternal, couple: tm.typeCouple, vendor: tm.typeVendor };
   const [threads, setThreads] = useState<Thread[]>(initial);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(initial[0]?.id ?? null);
   const [message, setMessage] = useState("");
@@ -105,8 +108,8 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
   return (
     <div className="h-screen flex flex-col">
       <div className="px-8 py-5 border-b flex items-center gap-4" style={{ borderColor: "var(--border)", background: "white" }}>
-        <Link href={`/weddings/${weddingId}`} className="text-sm" style={{ color: "var(--muted)" }}>← Terug</Link>
-        <h1 className="font-bold text-lg">Berichten: {weddingTitle}</h1>
+        <Link href={`/weddings/${weddingId}`} className="text-sm" style={{ color: "var(--muted)" }}>{tm.back}</Link>
+        <h1 className="font-bold text-lg">{tm.title}: {weddingTitle}</h1>
       </div>
 
       <div className="flex flex-1 min-h-0">
@@ -117,14 +120,14 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
               className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium mb-2 transition-colors"
               style={{ background: "var(--primary)", color: "white" }}
             >
-              Nieuw bericht
+              {tm.newThread}
             </button>
             {showNewThread && (
               <form onSubmit={createThread} className="mb-3 space-y-2">
                 <input
                   value={newSubject}
                   onChange={(e) => setNewSubject(e.target.value)}
-                  placeholder="Onderwerp"
+                  placeholder={tm.subject}
                   className="w-full border rounded-lg px-2 py-1.5 text-xs"
                   style={{ borderColor: "var(--border)" }}
                 />
@@ -134,9 +137,9 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                   className="w-full border rounded-lg px-2 py-1.5 text-xs"
                   style={{ borderColor: "var(--border)" }}
                 >
-                  <option value="internal">Intern team</option>
-                  <option value="couple">Bruidspaar</option>
-                  <option value="vendor">Leverancier</option>
+                  <option value="internal">{tm.typeInternal}</option>
+                  <option value="couple">{tm.typeCouple}</option>
+                  <option value="vendor">{tm.typeVendor}</option>
                 </select>
                 {newType === "vendor" && (
                   linkedVendors.length > 0 ? (
@@ -147,22 +150,22 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                       className="w-full border rounded-lg px-2 py-1.5 text-xs"
                       style={{ borderColor: "var(--border)" }}
                     >
-                      <option value="">Kies een leverancier...</option>
+                      <option value="">{tm.chooseVendorPlaceholder}</option>
                       {linkedVendors.map((v) => (
                         <option key={v.id} value={v.id}>{v.name}</option>
                       ))}
                     </select>
                   ) : (
-                    <p className="text-xs" style={{ color: "var(--muted)" }}>Nog geen leveranciers gekoppeld aan deze bruiloft.</p>
+                    <p className="text-xs" style={{ color: "var(--muted)" }}>{tm.noVendorsLinked}</p>
                   )
                 )}
                 <button type="submit" disabled={newType === "vendor" && !newVendorId} className="w-full text-xs py-1.5 rounded-lg" style={{ background: "var(--accent)", color: "var(--primary)" }}>
-                  Aanmaken
+                  {tm.createBtn}
                 </button>
               </form>
             )}
             {threads.length === 0 && (
-              <p className="text-xs text-center pt-4" style={{ color: "var(--muted)" }}>Geen gesprekken</p>
+              <p className="text-xs text-center pt-4" style={{ color: "var(--muted)" }}>{tm.noThreads}</p>
             )}
             {threads.map((thread) => {
               const lastMsg = thread.messages[thread.messages.length - 1];
@@ -192,7 +195,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
             <div className="flex-1 flex items-center justify-center" style={{ color: "var(--muted)" }}>
               <div className="text-center">
                 <div className="flex justify-center mb-3"><MessageCircle className="w-10 h-10" style={{ color: "var(--accent-dark)" }} /></div>
-                <p>Selecteer een gesprek</p>
+                <p>{tm.selectThread}</p>
               </div>
             </div>
           ) : (
@@ -202,7 +205,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
                   {(() => { const Icon = THREAD_ICONS[activeThread.type] ?? MessageCircle; return <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted)" }} />; })()}
                   <div>
                     <div className="font-medium text-sm">{threadLabel(activeThread)}</div>
-                    <div className="text-xs" style={{ color: "var(--muted)" }}>{activeThread.messages.length} berichten</div>
+                    <div className="text-xs" style={{ color: "var(--muted)" }}>{activeThread.messages.length} {tm.messagesCountSuffix}</div>
                   </div>
                 </div>
               </div>
@@ -210,7 +213,7 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
               <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4" style={{ background: "var(--background)" }}>
                 {activeThread.messages.length === 0 && (
                   <div className="text-center py-8" style={{ color: "var(--muted)" }}>
-                    <p className="text-sm">Nog geen berichten. Stuur het eerste bericht!</p>
+                    <p className="text-sm">{tm.noMessagesStartFirst}</p>
                   </div>
                 )}
                 {activeThread.messages.map((msg) => {
@@ -248,11 +251,11 @@ export default function MessagesClient({ weddingId, weddingTitle, threads: initi
 
               <form onSubmit={sendMessage} className="px-6 py-4 border-t flex gap-3" style={{ borderColor: "var(--border)", background: "white" }}>
                 <input value={message} onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Typ een bericht..."
+                  placeholder={tm.sendPlaceholder}
                   className="flex-1 border rounded-full px-4 py-2.5 text-sm focus:outline-none"
                   style={{ borderColor: "var(--border)" }} />
                 <button type="submit" disabled={sending || !message.trim()} className="ddp-btn-primary px-5 rounded-full">
-                  {sending ? "..." : "Sturen"}
+                  {sending ? tm.sendingBtn : tm.send}
                 </button>
               </form>
             </>

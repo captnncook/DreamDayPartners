@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import ShieldAvatar from "@/components/ShieldAvatar";
+import { useLang } from "@/components/LangProvider";
 
 interface DmMessage {
   id: string;
@@ -20,10 +21,6 @@ interface Props {
   initialMessages: DmMessage[];
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  couple: "Bruidspaar", planner: "Trouwplanner", admin: "Beheerder", team_member: "Teamlid", vendor: "Leverancier",
-};
-
 function formatTime(iso: string) {
   const d = new Date(iso);
   const today = new Date();
@@ -33,6 +30,9 @@ function formatTime(iso: string) {
 }
 
 export default function DmChat({ conversationId, currentUserId, otherUser, initialMessages }: Props) {
+  const { t } = useLang();
+  const td = t.dm;
+  const ROLE_LABELS = td.roleLabels as Record<string, string>;
   const [messages, setMessages] = useState<DmMessage[]>(initialMessages);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -106,7 +106,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
       senderId: currentUserId,
       content: text,
       createdAt: optimisticTime,
-      sender: { id: currentUserId, name: "Jij" },
+      sender: { id: currentUserId, name: td.you },
     };
     setMessages(prev => [...prev, optimistic]);
 
@@ -147,7 +147,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
         padding: "1rem 1.25rem", borderBottom: "1px solid var(--border)",
         background: "var(--card)", position: "sticky", top: 0, zIndex: 10,
       }}>
-        <Link href="/dm" style={{ color: "var(--muted)", display: "flex", alignItems: "center" }}>
+        <Link href="/dm" aria-label={td.backToConversations} style={{ color: "var(--muted)", display: "flex", alignItems: "center" }}>
           <ArrowLeft className="w-5 h-5" />
         </Link>
         {otherUser.role === "vendor" ? (
@@ -171,7 +171,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
       <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
         {messages.length === 0 && (
           <div style={{ textAlign: "center", color: "var(--muted)", fontSize: "var(--text-md)", marginTop: "var(--space-10)" }}>
-            Stuur een bericht om het gesprek te starten.
+            {td.startConversationPrompt}
           </div>
         )}
         {messages.map((msg, i) => {
@@ -213,7 +213,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={onKey}
-          placeholder="Bericht..."
+          placeholder={td.messagePlaceholderDots}
           rows={1}
           style={{
             flex: 1, padding: "0.625rem 0.875rem", borderRadius: "1.25rem",
@@ -230,6 +230,7 @@ export default function DmChat({ conversationId, currentUserId, otherUser, initi
         <button
           onClick={send}
           disabled={!input.trim() || sending}
+          aria-label={td.sendMessageAria}
           style={{
             width: "2.5rem", height: "2.5rem", borderRadius: "50%",
             background: input.trim() ? "var(--primary)" : "var(--border)",
