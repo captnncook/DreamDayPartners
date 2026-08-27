@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 export const config = { api: { bodyParser: false } };
 
@@ -18,7 +19,7 @@ function weddingLimitOf(metadata: Stripe.Metadata | null | undefined): number | 
   return Number.isFinite(n) ? n : undefined;
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 
@@ -107,3 +108,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

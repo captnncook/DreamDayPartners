@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendMail, claimRequestAdminEmail } from "@/lib/mail";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_NOTIFY_EMAIL ?? "info@dreamdayplatform.com";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { email } = await req.json();
 
@@ -48,3 +49,5 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

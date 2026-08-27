@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getDownloadUrl } from "@/lib/r2";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function GETImpl(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const vendor = await prisma.vendor.findUnique({ where: { id }, select: { photos: true, coverPhoto: true, emblemPhoto: true } });
   if (!vendor) return NextResponse.json({ urls: [], coverUrl: null, emblemUrl: null });
@@ -21,3 +22,5 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({ urls, coverUrl, emblemUrl });
 }
+
+export const GET = withErrorLogging(GETImpl);

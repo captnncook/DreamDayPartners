@@ -3,10 +3,11 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { sendMail, deleteRequestEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Bruidspaar vraagt accountverwijdering aan: bevestiging via e-maillink,
 // zelfde token-mechanisme als bij leveranciers.
-export async function POST() {
+async function POSTImpl() {
   const user = await getSession();
   if (!user || user.role !== "couple") {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -32,3 +33,5 @@ export async function POST() {
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

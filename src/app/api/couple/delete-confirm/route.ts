@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { clearSession } from "@/lib/session";
 import { sendMail, deleteAdminNotificationEmail, weddingCancelledEmail } from "@/lib/mail";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "long", year: "numeric" }).format(date);
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const { token } = await req.json();
   if (!token) return NextResponse.json({ error: "Token ontbreekt" }, { status: 400 });
 
@@ -74,3 +75,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

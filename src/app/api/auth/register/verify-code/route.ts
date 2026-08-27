@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const body = await req.json();
   const { pendingId, code } = body as { pendingId: string; code: string };
 
@@ -49,3 +50,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ verifiedToken });
 }
+
+export const POST = withErrorLogging(POSTImpl);

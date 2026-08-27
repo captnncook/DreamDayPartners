@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Live-zoeken naar trouwlocaties tijdens het typen (aanmeldflow). Fuzzy per
 // woord, zodat kleine typfouten of een andere schrijfwijze ("4 reasons" i.p.v.
@@ -62,7 +63,7 @@ function matchScore(query: string, name: string, city: string | null): number | 
   return misses <= allowedMisses ? misses : null;
 }
 
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const search = req.nextUrl.searchParams.get("search")?.trim() ?? "";
   if (search.length < 2) return NextResponse.json({ vendors: [] });
 
@@ -80,3 +81,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ vendors: matches });
 }
+
+export const GET = withErrorLogging(GETImpl);

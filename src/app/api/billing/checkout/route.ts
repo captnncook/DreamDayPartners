@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getStripe, tierPriceData, isWeddingTier, tierToWeddingLimit, type BillingInterval, type WeddingTier } from "@/lib/stripe";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   if (user.role !== "vendor") return NextResponse.json({ error: "Alleen voor leveranciers" }, { status: 403 });
@@ -54,3 +55,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ url: session.url });
 }
+
+export const POST = withErrorLogging(POSTImpl);

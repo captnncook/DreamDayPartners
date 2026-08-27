@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Controleert bij leveranciers-registratie of de bedrijfsnaam (bijna) al in de
 // catalogus staat, zodat we een duplicaat of een claimbaar profiel kunnen
@@ -49,7 +50,7 @@ function isSimilar(input: string, candidate: string): boolean {
   return levenshtein(input, candidate) <= maxDistance;
 }
 
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const name = req.nextUrl.searchParams.get("name")?.trim() ?? "";
   if (name.length < 3) return NextResponse.json({ matches: [] });
 
@@ -74,3 +75,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ matches });
 }
+
+export const GET = withErrorLogging(GETImpl);
