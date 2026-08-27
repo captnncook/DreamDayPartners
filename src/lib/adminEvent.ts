@@ -8,6 +8,8 @@ export type AdminEventType =
   | "claim_rejected"
   | "claim_reminder"
   | "account_created"
+  | "payment_failed"
+  | "payment_recovered"
   | "error";
 
 export async function logAdminEvent(type: AdminEventType, message: string, targetEmail?: string) {

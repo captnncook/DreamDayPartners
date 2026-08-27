@@ -3,6 +3,7 @@ import { getStripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { withErrorLogging } from "@/lib/apiErrorLogging";
+import { logAdminEvent } from "@/lib/adminEvent";
 
 export const config = { api: { bodyParser: false } };
 
@@ -82,7 +83,7 @@ async function POSTImpl(req: NextRequest) {
       if (affectedIds.length === 0) break;
       await prisma.user.updateMany({
         where: { id: { in: affectedIds } },
-        data: { isPremium: false, stripeSubscriptionId: null, stripeCancelAtPeriodEnd: false, stripeCurrentPeriodEnd: null },
+        data: { isPremium: false, stripeSubscriptionId: null, stripeCancelAtPeriodEnd: false, stripeCurrentPeriodEnd: null, stripePaymentFailedAt: null },
       });
       await prisma.vendor.updateMany({ where: { userId: { in: affectedIds } }, data: { isPremium: false } });
       break;
@@ -93,15 +94,38 @@ async function POSTImpl(req: NextRequest) {
       const obj = event.data.object as Stripe.Invoice | Stripe.Subscription;
       const subId = "subscription" in obj ? obj.subscription as string : obj.id;
       const existing = await prisma.user.findFirst({ where: { stripeSubscriptionId: subId } });
-      if (existing && !existing.isPremium) {
-        await prisma.user.update({ where: { id: existing.id }, data: { isPremium: true } });
-        await prisma.vendor.updateMany({ where: { userId: existing.id }, data: { isPremium: true } });
+      if (existing) {
+        const wasFailing = existing.stripePaymentFailedAt !== null;
+        await prisma.user.update({
+          where: { id: existing.id },
+          data: { isPremium: true, stripePaymentFailedAt: null },
+        });
+        if (!existing.isPremium) {
+          await prisma.vendor.updateMany({ where: { userId: existing.id }, data: { isPremium: true } });
+        }
+        if (wasFailing) {
+          await logAdminEvent("payment_recovered", `Betaling van ${existing.name} is alsnog gelukt, premium blijft actief`, existing.email);
+        }
       }
       break;
     }
 
     case "invoice.payment_failed": {
-      // Optional: notify user but don't immediately revoke — Stripe retries first
+      // Stripe retries eerst zelf een paar keer; we ontnemen de toegang niet
+      // meteen, maar zetten wel een zichtbaar signaal neer voor de admin —
+      // anders is het enige spoor van een mislukte betaling in Stripe's
+      // eigen dashboard, en verliest een leverancier stilletjes premium
+      // zonder dat iemand het ziet aankomen.
+      const invoice = event.data.object as Stripe.Invoice;
+      const subDetails = invoice.parent?.subscription_details;
+      const subId = subDetails ? (typeof subDetails.subscription === "string" ? subDetails.subscription : subDetails.subscription?.id) : null;
+      if (subId) {
+        const existing = await prisma.user.findFirst({ where: { stripeSubscriptionId: subId } });
+        if (existing) {
+          await prisma.user.update({ where: { id: existing.id }, data: { stripePaymentFailedAt: new Date() } });
+          await logAdminEvent("payment_failed", `Betaling van ${existing.name} is mislukt — Stripe probeert het opnieuw`, existing.email);
+        }
+      }
       break;
     }
   }

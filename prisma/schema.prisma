@@ -26,6 +26,7 @@ model User {
   stripeSubscriptionId String?
   stripeCancelAtPeriodEnd Boolean  @default(false)
   stripeCurrentPeriodEnd  DateTime?
+  stripePaymentFailedAt   DateTime? // laatste mislukte betaling; null zodra een betaling weer slaagt
   loginCount           Int      @default(0)
   lastLoginAt          DateTime?
   createdAt  DateTime @default(now())

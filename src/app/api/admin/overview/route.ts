@@ -11,6 +11,8 @@ const EVENT_LABELS: Record<string, string> = {
   claim_rejected: "Claim afgewezen",
   claim_reminder: "Herinnering verstuurd",
   account_created: "Account geactiveerd",
+  payment_failed: "Betaling mislukt",
+  payment_recovered: "Betaling hersteld",
   error: "Foutmelding",
 };
 
@@ -21,7 +23,7 @@ async function GETImpl() {
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [recentEvents, topVendors, loginsToday, loginsWeek, errorCount] = await Promise.all([
+  const [recentEvents, topVendors, loginsToday, loginsWeek, openErrorCount] = await Promise.all([
     prisma.adminEvent.findMany({ orderBy: { createdAt: "desc" }, take: 10 }),
     prisma.vendor.findMany({
       where: { viewCount: { gt: 0 } },
@@ -31,7 +33,7 @@ async function GETImpl() {
     }),
     prisma.user.count({ where: { lastLoginAt: { gte: since24h } } }),
     prisma.user.count({ where: { lastLoginAt: { gte: since7d } } }),
-    prisma.adminEvent.count({ where: { type: "error", createdAt: { gte: since7d } } }),
+    prisma.errorLog.count({ where: { status: "new" } }),
   ]);
 
   return NextResponse.json({
@@ -46,7 +48,7 @@ async function GETImpl() {
     topVendors,
     loginsToday,
     loginsWeek,
-    errorCount7d: errorCount,
+    openErrorCount,
   });
 }
 

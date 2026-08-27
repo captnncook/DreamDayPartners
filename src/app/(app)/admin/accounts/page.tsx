@@ -13,6 +13,10 @@ type User = {
   isPremium: boolean;
   hasPassword: boolean;
   createdAt: string;
+  stripeSubscriptionId: string | null;
+  stripeCancelAtPeriodEnd: boolean;
+  stripeCurrentPeriodEnd: string | null;
+  stripePaymentFailedAt: string | null;
 };
 
 const ROLE_COLOR: Record<string, string> = {
@@ -320,36 +324,61 @@ export default function AccountsPage() {
                   {(() => {
                     const current = pendingPremium[u.id] ?? u.isPremium;
                     const isDirty = u.id in pendingPremium;
+
+                    let stripeLine: string | null = null;
+                    let stripeAttention = false;
+                    if (u.stripePaymentFailedAt) {
+                      stripeLine = ta.stripePaymentFailed.replace("{date}", new Date(u.stripePaymentFailedAt).toLocaleDateString("nl-NL"));
+                      stripeAttention = true;
+                    } else if (u.stripeSubscriptionId && u.stripeCancelAtPeriodEnd) {
+                      stripeLine = ta.stripeCancelled.replace("{date}", u.stripeCurrentPeriodEnd ? new Date(u.stripeCurrentPeriodEnd).toLocaleDateString("nl-NL") : "?");
+                      stripeAttention = true;
+                    } else if (u.stripeSubscriptionId && u.stripeCurrentPeriodEnd) {
+                      stripeLine = ta.stripeActiveUntil.replace("{date}", new Date(u.stripeCurrentPeriodEnd).toLocaleDateString("nl-NL"));
+                    } else if (u.isPremium && !u.stripeSubscriptionId) {
+                      stripeLine = ta.stripeManual;
+                    }
+
                     return (
-                      <div className="flex items-center gap-2">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="sr-only"
-                            checked={current}
-                            onChange={e => setPendingPremium(p => ({ ...p, [u.id]: e.target.checked }))}
-                          />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              className="sr-only"
+                              checked={current}
+                              onChange={e => setPendingPremium(p => ({ ...p, [u.id]: e.target.checked }))}
+                            />
+                            <div
+                              className="w-9 h-5 rounded-full transition-colors"
+                              style={{ background: current ? "var(--primary)" : "var(--border)" }}
+                            />
+                            <div
+                              className="absolute w-4 h-4 bg-white rounded-full shadow transition-transform"
+                              style={{ left: "2px", top: "2px", transform: current ? "translateX(16px)" : "translateX(0)" }}
+                            />
+                          </label>
+                          {current && !isDirty && <Star className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />}
+                          {isDirty && (
+                            <button
+                              onClick={() => handleSavePremium(u)}
+                              disabled={saving === u.id}
+                              title={ta.saveTooltip}
+                              className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-semibold transition-opacity"
+                              style={{ background: "var(--primary)", color: "white", opacity: saving === u.id ? 0.6 : 1 }}
+                            >
+                              <Save className="w-3 h-3" />
+                              <Check className="w-3 h-3" />
+                            </button>
+                          )}
+                        </div>
+                        {stripeLine && (
                           <div
-                            className="w-9 h-5 rounded-full transition-colors"
-                            style={{ background: current ? "var(--primary)" : "var(--border)" }}
-                          />
-                          <div
-                            className="absolute w-4 h-4 bg-white rounded-full shadow transition-transform"
-                            style={{ left: "2px", top: "2px", transform: current ? "translateX(16px)" : "translateX(0)" }}
-                          />
-                        </label>
-                        {current && !isDirty && <Star className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />}
-                        {isDirty && (
-                          <button
-                            onClick={() => handleSavePremium(u)}
-                            disabled={saving === u.id}
-                            title={ta.saveTooltip}
-                            className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-semibold transition-opacity"
-                            style={{ background: "var(--primary)", color: "white", opacity: saving === u.id ? 0.6 : 1 }}
+                            className="text-xs mt-1"
+                            style={{ color: stripeAttention ? "var(--gold-deep)" : "var(--muted-light)", fontWeight: stripeAttention ? 600 : 400 }}
                           >
-                            <Save className="w-3 h-3" />
-                            <Check className="w-3 h-3" />
-                          </button>
+                            {stripeLine}
+                          </div>
                         )}
                       </div>
                     );

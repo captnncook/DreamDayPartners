@@ -19,6 +19,8 @@ async function GETImpl(req: NextRequest) {
     select: {
       id: true, name: true, email: true, role: true, vendorType: true,
       isPremium: true, createdAt: true, passwordHash: true,
+      stripeSubscriptionId: true, stripeCancelAtPeriodEnd: true,
+      stripeCurrentPeriodEnd: true, stripePaymentFailedAt: true,
     },
     orderBy: { createdAt: "desc" },
     take: 100,

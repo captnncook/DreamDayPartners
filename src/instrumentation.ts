@@ -155,6 +155,8 @@ export async function register() {
       )`,
       `CREATE INDEX IF NOT EXISTS "error_logs_status_idx" ON "error_logs" ("status")`,
       `CREATE INDEX IF NOT EXISTS "error_logs_createdAt_idx" ON "error_logs" ("createdAt")`,
+
+      `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "stripePaymentFailedAt" TIMESTAMP(3)`,
     ];
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });

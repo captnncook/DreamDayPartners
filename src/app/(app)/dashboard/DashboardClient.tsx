@@ -516,7 +516,7 @@ function AdminOverview({ t }: { t: T }) {
   const [topVendors, setTopVendors] = useState<TopVendor[]>([]);
   const [loginsToday, setLoginsToday] = useState(0);
   const [loginsWeek, setLoginsWeek] = useState(0);
-  const [errorCount7d, setErrorCount7d] = useState(0);
+  const [openErrorCount, setOpenErrorCount] = useState(0);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -526,7 +526,7 @@ function AdminOverview({ t }: { t: T }) {
         setTopVendors(d.topVendors ?? []);
         setLoginsToday(d.loginsToday ?? 0);
         setLoginsWeek(d.loginsWeek ?? 0);
-        setErrorCount7d(d.errorCount7d ?? 0);
+        setOpenErrorCount(d.openErrorCount ?? 0);
       }
       setLoaded(true);
     });
@@ -540,10 +540,10 @@ function AdminOverview({ t }: { t: T }) {
       <div className="flex flex-wrap gap-x-8 gap-y-3 mb-8 pb-5" style={{ borderBottom: "1px solid var(--border)" }}>
         <StatInline value={loginsToday} label={t.dashboardPage.loginsToday} />
         <StatInline value={loginsWeek} label={t.dashboardPage.loginsWeek} />
-        <div>
-          <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.01em", color: errorCount7d > 0 ? "var(--gold-deep)" : "var(--foreground)" }}>{errorCount7d}</span>
+        <Link href="/admin/errors" style={{ textDecoration: "none" }}>
+          <span className="font-serif" style={{ fontSize: "var(--text-4xl)", fontWeight: 700, letterSpacing: "-0.01em", color: openErrorCount > 0 ? "var(--gold-deep)" : "var(--foreground)" }}>{openErrorCount}</span>
           <span style={{ display: "block", fontSize: "var(--text-2xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginTop: "1px" }}>{t.dashboardPage.errorsThisWeek}</span>
-        </div>
+        </Link>
       </div>
 
       <ClaimRequests />
