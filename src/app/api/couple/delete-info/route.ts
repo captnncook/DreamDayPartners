@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Feitelijke gegevens voor de rol-specifieke "weet je het zeker?"-stap van
 // het bruidspaar: vóór de trouwdag tonen we wat er verloren gaat (loss
 // aversion, eerlijk); ná de trouwdag vragen we om een afscheidscijfer en
 // reviews per leverancier.
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user || user.role !== "couple") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -58,3 +59,5 @@ export async function GET() {
     dreamTeam: vendors.map((wv) => ({ vendorId: wv.vendor.id, name: wv.vendor.name, category: wv.vendor.category })),
   });
 }
+
+export const GET = withErrorLogging(GETImpl);

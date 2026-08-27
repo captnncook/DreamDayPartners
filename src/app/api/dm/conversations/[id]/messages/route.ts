@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { sendMail, newDirectMessageEmail } from "@/lib/mail";
 import { getOwnVendorId } from "@/lib/vendorAuth";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -14,7 +15,7 @@ async function authorize(userId: string, convId: string) {
 }
 
 // GET /api/dm/conversations/[id]/messages
-export async function GET(req: NextRequest, { params }: Params) {
+async function GETImpl(req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 }
 
 // POST /api/dm/conversations/[id]/messages
-export async function POST(req: NextRequest, { params }: Params) {
+async function POSTImpl(req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -106,3 +107,6 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ message }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

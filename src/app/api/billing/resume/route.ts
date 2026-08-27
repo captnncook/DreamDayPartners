@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Maakt een geplande opzegging ongedaan zolang de huidige betaalperiode nog loopt.
-export async function POST() {
+async function POSTImpl() {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -24,3 +25,5 @@ export async function POST() {
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

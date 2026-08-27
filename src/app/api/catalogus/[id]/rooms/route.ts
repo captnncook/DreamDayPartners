@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 async function canEdit(vendorId: string) {
   const user = await getSession();
@@ -12,7 +13,7 @@ async function canEdit(vendorId: string) {
 }
 
 // POST — nieuwe zaal toevoegen aan een trouwlocatie
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const vendor = await canEdit(id);
   if (!vendor) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -43,3 +44,5 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({ room }, { status: 201 });
 }
+
+export const POST = withErrorLogging(POSTImpl);

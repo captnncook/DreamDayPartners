@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // POST /api/catalogus/[id]/dream-team  body: { weddingId }
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 // DELETE /api/catalogus/[id]/dream-team  body: { weddingId }
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function DELETEImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -78,3 +79,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);
+export const DELETE = withErrorLogging(DELETEImpl);

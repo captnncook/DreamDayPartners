@@ -4,8 +4,9 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { r2, R2_BUCKET, getDownloadUrl, deleteFile } from "@/lib/r2";
 import { v4 as uuidv4 } from "uuid";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json({ url, key: fileKey });
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function DELETEImpl(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -70,3 +71,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);
+export const DELETE = withErrorLogging(DELETEImpl);

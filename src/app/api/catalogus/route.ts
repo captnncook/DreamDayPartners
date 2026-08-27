@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getDownloadUrl } from "@/lib/r2";
 import { geocodeCity } from "@/lib/geocode";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 const VENDOR_LIST_SELECT = {
   id: true,
@@ -51,7 +52,7 @@ async function findUserLocation(userId: string): Promise<{ latitude: number; lon
   return { latitude: wedding.latitude, longitude: wedding.longitude };
 }
 
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const category = searchParams.get("category");
   const search = searchParams.get("search");
@@ -144,7 +145,7 @@ export async function GET(req: NextRequest) {
 }
 
 // Admin-only: nieuwe leverancier toevoegen aan de catalogus
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   if (user.role !== "admin") return NextResponse.json({ error: "Alleen admins kunnen leveranciers toevoegen" }, { status: 403 });
@@ -175,3 +176,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ vendor }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

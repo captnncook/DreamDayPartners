@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
 import { hash } from "bcryptjs";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const { token, password } = await req.json();
   if (!token || !password) return NextResponse.json({ error: "Ongeldige aanvraag" }, { status: 400 });
   if (password.length < 8) return NextResponse.json({ error: "Wachtwoord moet minimaal 8 tekens zijn" }, { status: 400 });
@@ -36,3 +37,5 @@ export async function POST(req: NextRequest) {
   await setSession(row.userId);
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

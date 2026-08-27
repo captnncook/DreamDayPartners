@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 async function canEdit(vendorId: string) {
   const user = await getSession();
@@ -18,7 +19,7 @@ const NUMERIC_FIELDS = [
 ] as const;
 
 // PATCH — zaal bewerken
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string; roomId: string }> }) {
+async function PATCHImpl(req: NextRequest, { params }: { params: Promise<{ id: string; roomId: string }> }) {
   const { id, roomId } = await params;
   const vendor = await canEdit(id);
   if (!vendor) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -38,7 +39,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 // DELETE — zaal verwijderen
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string; roomId: string }> }) {
+async function DELETEImpl(_req: NextRequest, { params }: { params: Promise<{ id: string; roomId: string }> }) {
   const { id, roomId } = await params;
   const vendor = await canEdit(id);
   if (!vendor) return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -49,3 +50,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   await prisma.venueRoom.delete({ where: { id: roomId } });
   return NextResponse.json({ ok: true });
 }
+
+export const PATCH = withErrorLogging(PATCHImpl);
+export const DELETE = withErrorLogging(DELETEImpl);

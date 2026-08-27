@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type IncomingVendor = {
   name?: string;
@@ -46,7 +47,7 @@ function toBool(v: boolean | string | undefined): boolean {
 }
 
 // Admin-only: leveranciers in bulk toevoegen aan de catalogus
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   if (user.role !== "admin") {
@@ -124,3 +125,5 @@ export async function POST(req: NextRequest) {
     total: rows.length,
   }, { status: 201 });
 }
+
+export const POST = withErrorLogging(POSTImpl);

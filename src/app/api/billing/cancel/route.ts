@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Zegt het abonnement op tegen het einde van de lopende (betaalde) periode —
 // niet meteen. De leverancier blijft dus Premium tot de datum waarop
 // anders opnieuw was afgeschreven.
-export async function POST() {
+async function POSTImpl() {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -30,3 +31,5 @@ export async function POST() {
 
   return NextResponse.json({ ok: true, currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000).toISOString() : null });
 }
+
+export const POST = withErrorLogging(POSTImpl);
