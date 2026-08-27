@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Trash2, Mail, Edit2, Check, X, Upload, ChevronDown, Save, Star } from "lucide-react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { Search, Trash2, Mail, Edit2, Check, X, Upload, ChevronDown, Save, Star, Eye, MessageSquare } from "lucide-react";
 import { useLang } from "@/components/LangProvider";
+import AdminNotes from "@/components/AdminNotes";
 
 type User = {
   id: string;
@@ -25,6 +27,7 @@ const ROLE_COLOR: Record<string, string> = {
 };
 
 export default function AccountsPage() {
+  const router = useRouter();
   const { t } = useLang();
   const ta = t.adminAccounts;
   const ROLE_LABELS = ta.roleLabels as Record<string, string>;
@@ -40,6 +43,8 @@ export default function AccountsPage() {
   const [feedback, setFeedback] = useState<Record<string, string>>({});
   // Track pending premium changes: userId -> new value
   const [pendingPremium, setPendingPremium] = useState<Record<string, boolean>>({});
+  const [notesOpenId, setNotesOpenId] = useState<string | null>(null);
+  const [impersonating, setImpersonating] = useState<string | null>(null);
 
   // CSV import state
   const [showImport, setShowImport] = useState(false);
@@ -145,6 +150,24 @@ export default function AccountsPage() {
       setMsg(u.id, d.error ?? ta.saveError);
     }
     setSaving(null);
+  }
+
+  async function handleImpersonate(u: User) {
+    if (!confirm(`Meekijken als ${u.name} (${u.email})?`)) return;
+    setImpersonating(u.id);
+    const res = await fetch("/api/admin/impersonate/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: u.id }),
+    });
+    if (res.ok) {
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      const d = await res.json();
+      setMsg(u.id, d.error ?? ta.saveError);
+      setImpersonating(null);
+    }
   }
 
   async function handleImport() {
@@ -271,7 +294,8 @@ export default function AccountsPage() {
             ) : users.length === 0 ? (
               <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: "var(--muted)" }}>{ta.noAccountsFound}</td></tr>
             ) : users.map(u => (
-              <tr key={u.id} style={{ borderBottom: "1px solid var(--border)" }}>
+              <React.Fragment key={u.id}>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
                 <td className="px-4 py-3 font-medium">{u.name}</td>
                 <td className="px-4 py-3" style={{ color: "var(--muted)", maxWidth: "220px" }}>
                   {editId === u.id ? (
@@ -389,6 +413,25 @@ export default function AccountsPage() {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">
+                    {u.role !== "admin" && (
+                      <button
+                        onClick={() => handleImpersonate(u)}
+                        disabled={impersonating === u.id}
+                        title="Bekijk als deze gebruiker"
+                        className="p-1.5 rounded-lg hover:opacity-70 transition-opacity"
+                        style={{ color: "var(--gold-deep)" }}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setNotesOpenId(notesOpenId === u.id ? null : u.id)}
+                      title="Interne notities"
+                      className="p-1.5 rounded-lg hover:opacity-70 transition-opacity"
+                      style={{ color: notesOpenId === u.id ? "var(--foreground)" : "var(--muted)" }}
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => { setEditId(u.id); setEditEmail(u.email); }}
                       title={ta.editEmailTooltip}
@@ -418,6 +461,14 @@ export default function AccountsPage() {
                   </div>
                 </td>
               </tr>
+              {notesOpenId === u.id && (
+                <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                  <td colSpan={6} className="px-4 py-3">
+                    <AdminNotes targetType="user" targetId={u.id} />
+                  </td>
+                </tr>
+              )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>

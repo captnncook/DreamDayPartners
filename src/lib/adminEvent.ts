@@ -10,6 +10,8 @@ export type AdminEventType =
   | "account_created"
   | "payment_failed"
   | "payment_recovered"
+  | "impersonate_start"
+  | "impersonate_stop"
   | "error";
 
 export async function logAdminEvent(type: AdminEventType, message: string, targetEmail?: string) {

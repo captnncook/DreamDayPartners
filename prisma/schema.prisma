@@ -653,6 +653,18 @@ model AdminEvent {
   @@map("admin_events")
 }
 
+model AdminNote {
+  id         String   @id @default(uuid())
+  targetType String   // user | wedding
+  targetId   String
+  authorId   String
+  text       String
+  createdAt  DateTime @default(now())
+
+  @@map("admin_notes")
+  @@index([targetType, targetId])
+}
+
 model ErrorLog {
   id         String   @id @default(uuid())
   message    String

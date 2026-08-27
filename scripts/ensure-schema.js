@@ -299,6 +299,17 @@ const STATEMENTS = [
   `CREATE INDEX IF NOT EXISTS "error_logs_createdAt_idx" ON "error_logs" ("createdAt")`,
 
   `ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "stripePaymentFailedAt" TIMESTAMP(3)`,
+
+  `CREATE TABLE IF NOT EXISTS "admin_notes" (
+    "id" TEXT NOT NULL,
+    "targetType" TEXT NOT NULL,
+    "targetId" TEXT NOT NULL,
+    "authorId" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "admin_notes_pkey" PRIMARY KEY ("id")
+  )`,
+  `CREATE INDEX IF NOT EXISTS "admin_notes_targetType_targetId_idx" ON "admin_notes" ("targetType", "targetId")`,
 ];
 
 const CLEANUP = [

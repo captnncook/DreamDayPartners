@@ -1513,6 +1513,17 @@ export const translations = {
       stackTrace: "Stacktrace", context: "Context", noUser: "Niet ingelogd",
       copyBtn: "Kopiëren voor programmeur", copiedMsg: "Gekopieerd",
     },
+    adminDocuments: {
+      pageTitle: "Documenten",
+      subtitle: "Alle geüploade documenten, over alle bruiloften heen.",
+      searchPlaceholder: "Zoek op bestandsnaam of bruiloft…",
+      allCategories: "Alle categorieën",
+      empty: "Geen documenten gevonden.",
+      loading: "Laden…",
+      tableHeaders: { name: "Naam", wedding: "Bruiloft", category: "Categorie", uploader: "Geüpload door", size: "Grootte", date: "Datum" },
+      visibilityTeam: "Team", visibilityCouple: "Bruidspaar", visibilityVendor: "Leverancier", visibilityPrivate: "Privé",
+      downloadTooltip: "Downloaden / bekijken",
+    },
   },
   en: {
     nav: {
@@ -3027,6 +3038,17 @@ export const translations = {
       message: "Message",
       stackTrace: "Stack trace", context: "Context", noUser: "Not logged in",
       copyBtn: "Copy for developer", copiedMsg: "Copied",
+    },
+    adminDocuments: {
+      pageTitle: "Documents",
+      subtitle: "Every uploaded document, across all weddings.",
+      searchPlaceholder: "Search by file name or wedding…",
+      allCategories: "All categories",
+      empty: "No documents found.",
+      loading: "Loading…",
+      tableHeaders: { name: "Name", wedding: "Wedding", category: "Category", uploader: "Uploaded by", size: "Size", date: "Date" },
+      visibilityTeam: "Team", visibilityCouple: "Couple", visibilityVendor: "Vendor", visibilityPrivate: "Private",
+      downloadTooltip: "Download / view",
     },
   },
 };

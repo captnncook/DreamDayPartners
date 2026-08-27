@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { MessageSquare } from "lucide-react";
 import { useLang } from "@/components/LangProvider";
 import BulkVendorImport from "./BulkVendorImport";
 import GeocodeVendors from "./GeocodeVendors";
 import DangerReset from "./DangerReset";
+import AdminNotes from "@/components/AdminNotes";
 
 type WeddingRow = {
   id: string;
@@ -27,6 +30,7 @@ export default function AdminOverviewClient({
 }) {
   const { t } = useLang();
   const ta = t.admin;
+  const [notesOpenId, setNotesOpenId] = useState<string | null>(null);
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -56,17 +60,32 @@ export default function AdminOverviewClient({
         <h2 className="dash-section-title mb-1">{ta.weddings}</h2>
         <div style={{ borderTop: "1px solid var(--border)" }}>
           {weddings.map((w) => (
-            <div key={w.id} className="dash-row">
-              <div className="flex-1 min-w-0">
-                <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{w.title}</div>
-                <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-                  {w.weddingCode} · {w.ownerName}
+            <div key={w.id}>
+              <div className="dash-row">
+                <div className="flex-1 min-w-0">
+                  <div className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{w.title}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
+                    {w.weddingCode} · {w.ownerName}
+                  </div>
                 </div>
+                <div className="text-xs text-right flex-shrink-0" style={{ color: "var(--muted)" }}>
+                  <div>{ta.guestsCount.replace("{n}", String(w.guestCount))}</div>
+                  <div>{ta.vendorsCountLabel.replace("{n}", String(w.vendorCount))}</div>
+                </div>
+                <button
+                  onClick={() => setNotesOpenId(notesOpenId === w.id ? null : w.id)}
+                  title="Interne notities"
+                  className="p-1.5 rounded-lg hover:opacity-70 transition-opacity flex-shrink-0"
+                  style={{ color: notesOpenId === w.id ? "var(--foreground)" : "var(--muted)" }}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </button>
               </div>
-              <div className="text-xs text-right flex-shrink-0" style={{ color: "var(--muted)" }}>
-                <div>{ta.guestsCount.replace("{n}", String(w.guestCount))}</div>
-                <div>{ta.vendorsCountLabel.replace("{n}", String(w.vendorCount))}</div>
-              </div>
+              {notesOpenId === w.id && (
+                <div className="pb-3">
+                  <AdminNotes targetType="wedding" targetId={w.id} />
+                </div>
+              )}
             </div>
           ))}
         </div>

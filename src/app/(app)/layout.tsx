@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
+import ImpersonationBanner from "@/components/ImpersonationBanner";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getSession();
@@ -23,6 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen">
       <Sidebar user={user} coupleWeddingId={coupleWeddingId} />
       <div className="flex-1 min-w-0 flex flex-col">
+        <ImpersonationBanner />
         <MobileNav user={user} />
         <main className="ddp-main-content flex-1 min-w-0 overflow-auto" style={{ background: "var(--background)" }}>
           {children}

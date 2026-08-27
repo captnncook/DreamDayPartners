@@ -505,6 +505,10 @@ const EVENT_META: Record<string, { color: string }> = {
   claim_rejected:     { color: "var(--muted-light)" },
   claim_reminder:     { color: "var(--gold-deep)" },
   account_created:    { color: "var(--gold-deep)" },
+  payment_failed:     { color: "var(--gold-deep)" },
+  payment_recovered:  { color: "var(--muted)" },
+  impersonate_start:  { color: "var(--gold-deep)" },
+  impersonate_stop:   { color: "var(--muted)" },
   error:               { color: "var(--gold-deep)" },
 };
 
