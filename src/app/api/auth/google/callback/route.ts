@@ -4,7 +4,8 @@ import { setSession } from "@/lib/session";
 import { completeClaimViaOAuth } from "@/lib/complete-claim";
 import { completePendingRegistrationViaOAuth } from "@/lib/complete-pending-registration";
 
-export async function GET(req: NextRequest) {
+import { withErrorLogging } from "@/lib/apiErrorLogging";
+async function GETImpl(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
   const error = searchParams.get("error");
@@ -77,3 +78,5 @@ export async function GET(req: NextRequest) {
   await setSession(user.id);
   return NextResponse.redirect(`${appUrl}/dashboard`);
 }
+
+export const GET = withErrorLogging(GETImpl);

@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { TOGGLEABLE_MODULE_KEYS } from "@/lib/vendorTypeConfigs";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 // Admin-only: isPremium direct op de Vendor zetten. Los van User.isPremium
 // (Stripe-abonnement) — nodig voor leveranciers zonder gekoppeld account.
 // Ook: extraModules — functies die de admin los van het functieverzoek-
 // systeem rechtstreeks aan een leverancier kan toekennen of intrekken.
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function PATCHImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Niet toegestaan" }, { status: 403 });
@@ -45,3 +46,5 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   return NextResponse.json(vendor);
 }
+
+export const PATCH = withErrorLogging(PATCHImpl);

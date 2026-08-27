@@ -5,7 +5,8 @@ import { sendMail, adminPasswordResetEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
 import { logAdminEvent } from "@/lib/adminEvent";
 
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+import { withErrorLogging } from "@/lib/apiErrorLogging";
+async function POSTImpl(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await getSession();
   if (!admin || admin.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -35,3 +36,5 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

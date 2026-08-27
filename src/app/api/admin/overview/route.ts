@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 const EVENT_LABELS: Record<string, string> = {
   password_reset: "Wachtwoordreset",
   email_change: "E-mailwijziging",
@@ -13,7 +14,7 @@ const EVENT_LABELS: Record<string, string> = {
   error: "Foutmelding",
 };
 
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -48,3 +49,5 @@ export async function GET() {
     errorCount7d: errorCount,
   });
 }
+
+export const GET = withErrorLogging(GETImpl);

@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { sendMail, verificationCodeEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 function generateCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const body = await req.json();
   const { email, type, data } = body as { email: string; type: string; data: Record<string, unknown> };
 
@@ -45,3 +46,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ pendingId: id });
 }
+
+export const POST = withErrorLogging(POSTImpl);

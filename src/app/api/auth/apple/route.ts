@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+import { withErrorLogging } from "@/lib/apiErrorLogging";
+async function GETImpl(req: NextRequest) {
   const clientId = process.env.APPLE_CLIENT_ID;
   if (!clientId) {
     return NextResponse.json({ error: "Apple OAuth niet geconfigureerd" }, { status: 503 });
@@ -23,3 +24,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.redirect(`https://appleid.apple.com/auth/authorize?${params}`);
 }
+
+export const GET = withErrorLogging(GETImpl);

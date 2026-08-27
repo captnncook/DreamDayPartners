@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { setSession } from "@/lib/session";
 import { compare } from "bcryptjs";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 async function bumpLogin(userId: string) {
   try {
     await prisma.user.update({ where: { id: userId }, data: { loginCount: { increment: 1 }, lastLoginAt: new Date() } });
@@ -21,7 +22,7 @@ const DEMO_DEFAULTS: Record<string, { name: string; role: string; vendorType?: s
   "info@tasty.nl":       { name: "Tasty Events Catering",  role: "vendor", vendorType: "catering" },
 };
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const body = await req.json();
   const { email, password } = body as { email: string; password?: string };
 
@@ -60,3 +61,5 @@ export async function POST(req: NextRequest) {
   await bumpLogin(user.id);
   return NextResponse.json({ user });
 }
+
+export const POST = withErrorLogging(POSTImpl);

@@ -2,14 +2,16 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { logError } from "@/lib/errorLog";
 
-type RouteHandler<Ctx> = (req: Request, ctx: Ctx) => Promise<Response> | Response;
+type RouteHandler<Ctx, Req extends Request = Request> = (req: Req, ctx: Ctx) => Promise<Response> | Response;
 
 // Wrapt een API-routehandler zodat ELKE onverwachte fout (niet alleen de
 // fouten die de route zelf al met try/catch afvangt) automatisch met volle
 // context in error_logs terechtkomt: route, method, wie was ingelogd, en de
 // stacktrace. De aanroeper krijgt een nette generieke 500 i.p.v. dat Next.js
 // zijn eigen kale foutpagina toont.
-export function withErrorLogging<Ctx = unknown>(handler: RouteHandler<Ctx>): RouteHandler<Ctx> {
+export function withErrorLogging<Ctx = unknown, Req extends Request = Request>(
+  handler: RouteHandler<Ctx, Req>
+): RouteHandler<Ctx, Req> {
   return async (req, ctx) => {
     try {
       return await handler(req, ctx);

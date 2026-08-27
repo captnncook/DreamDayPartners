@@ -5,6 +5,7 @@ import { completeClaimViaOAuth } from "@/lib/complete-claim";
 import { completePendingRegistrationViaOAuth } from "@/lib/complete-pending-registration";
 import { createPrivateKey, createSign } from "crypto";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 const appUrl = () => process.env.NEXT_PUBLIC_APP_URL ?? "";
 
 function makeAppleClientSecret(): string {
@@ -38,7 +39,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 }
 
 // Apple sends a form POST
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const base = appUrl();
   try {
     const form = await req.formData();
@@ -128,3 +129,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${base}/login?error=apple_failed`);
   }
 }
+
+export const POST = withErrorLogging(POSTImpl);

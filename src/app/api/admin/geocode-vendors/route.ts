@@ -3,8 +3,9 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { geocodeCity } from "@/lib/geocode";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 // Geocode all vendors that have a city but no coordinates
-export async function POST() {
+async function POSTImpl() {
   const user = await getSession();
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -29,3 +30,5 @@ export async function POST() {
 
   return NextResponse.json({ total: vendors.length, updated });
 }
+
+export const POST = withErrorLogging(POSTImpl);

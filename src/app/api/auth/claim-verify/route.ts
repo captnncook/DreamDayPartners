@@ -5,6 +5,7 @@ import { sendMail, claimWelcomeEmail } from "@/lib/mail";
 import { logAdminEvent } from "@/lib/adminEvent";
 import bcrypt from "bcryptjs";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 const MAX_ATTEMPTS = 10;
 
 async function loadValidRequest(token: string) {
@@ -15,7 +16,7 @@ async function loadValidRequest(token: string) {
   return { request };
 }
 
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token") ?? "";
   const result = await loadValidRequest(token);
   if ("error" in result) return NextResponse.json({ error: result.error }, { status: 400 });
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
   });
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const { token, password } = await req.json();
   if (!token) return NextResponse.json({ error: "Token verplicht" }, { status: 400 });
 
@@ -77,3 +78,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true, redirect: "/leveranciers/mijn-profiel" });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

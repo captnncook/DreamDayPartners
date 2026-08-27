@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 const PAGE_SIZE = 40;
 
 // Admin-only: leveranciers doorzoeken om ze als "Aanbevolen" (premium) te
 // markeren, ook als ze geen gekoppeld account hebben (bijv. bulk-import).
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const user = await getSession();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Niet toegestaan" }, { status: 403 });
@@ -38,3 +39,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ vendors, total, page, pageSize: PAGE_SIZE });
 }
+
+export const GET = withErrorLogging(GETImpl);

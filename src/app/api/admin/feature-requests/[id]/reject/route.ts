@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
-export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+import { withErrorLogging } from "@/lib/apiErrorLogging";
+async function POSTImpl(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -18,3 +19,5 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   return NextResponse.json({ request: updated });
 }
+
+export const POST = withErrorLogging(POSTImpl);
