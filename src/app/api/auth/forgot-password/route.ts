@@ -4,7 +4,8 @@ import { sendMail, passwordResetEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
 import { logAdminEvent } from "@/lib/adminEvent";
 
-export async function POST(req: NextRequest) {
+import { withErrorLogging } from "@/lib/apiErrorLogging";
+async function POSTImpl(req: NextRequest) {
   const { email } = await req.json();
   if (!email) return NextResponse.json({ error: "E-mailadres verplicht" }, { status: 400 });
 
@@ -35,3 +36,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);

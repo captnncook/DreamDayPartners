@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { sendMail, premiumGrantedEmail } from "@/lib/mail";
 import { logAdminEvent } from "@/lib/adminEvent";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 // DELETE — verwijder account
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function DELETEImpl(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -17,7 +18,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 }
 
 // PATCH — e-mailadres en/of isPremium wijzigen
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function PATCHImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -75,3 +76,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   return NextResponse.json({ user: updated });
 }
+
+export const DELETE = withErrorLogging(DELETEImpl);
+export const PATCH = withErrorLogging(PATCHImpl);

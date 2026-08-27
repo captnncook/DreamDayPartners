@@ -7,7 +7,8 @@ import { sendMail, claimWelcomeEmail } from "@/lib/mail";
 import { geocodeCity } from "@/lib/geocode";
 import { seedStarterTasks } from "@/lib/starterTasks";
 
-export async function POST(req: NextRequest) {
+import { withErrorLogging } from "@/lib/apiErrorLogging";
+async function POSTImpl(req: NextRequest) {
   const body = await req.json();
   const { verifiedToken, password } = body as { verifiedToken: string; password?: string };
 
@@ -174,3 +175,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ error: "Ongeldig type" }, { status: 400 });
 }
+
+export const POST = withErrorLogging(POSTImpl);

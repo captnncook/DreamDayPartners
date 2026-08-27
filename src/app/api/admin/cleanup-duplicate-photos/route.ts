@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 // Vendors die via bulk-import zijn toegevoegd kregen vaak een generieke
 // stockfoto-URL per leverancierssoort mee, waardoor meerdere leveranciers
 // exact dezelfde profielfoto delen. Een écht geüploade foto staat altijd
@@ -9,7 +10,7 @@ import { getSession } from "@/lib/session";
 // leveranciers), dus elke coverPhoto-waarde die bij 2+ leveranciers
 // voorkomt is per definitie zo'n generieke stockfoto. Die wordt hier
 // gewist zodat de UI in plaats daarvan het DreamDay-logo toont.
-export async function POST() {
+async function POSTImpl() {
   const user = await getSession();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -40,3 +41,5 @@ export async function POST() {
     vendors: affected.map((v) => ({ id: v.id, name: v.name })),
   });
 }
+
+export const POST = withErrorLogging(POSTImpl);

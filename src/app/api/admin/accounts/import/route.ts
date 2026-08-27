@@ -5,6 +5,7 @@ import { geocodeCity } from "@/lib/geocode";
 import { randomBytes } from "crypto";
 import { sendMail, accountActivationEmail } from "@/lib/mail";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 // Expected CSV columns (case-insensitive): name, email, role, vendorType, city, phone, website
 // role defaults to "vendor", vendorType defaults to "overig"
 function parseCSV(text: string): Record<string, string>[] {
@@ -21,7 +22,7 @@ function parseCSV(text: string): Record<string, string>[] {
   });
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const admin = await getSession();
   if (!admin || admin.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -95,3 +96,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ total: rows.length, created, skipped, errors });
 }
+
+export const POST = withErrorLogging(POSTImpl);

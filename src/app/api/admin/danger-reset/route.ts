@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 const ADMIN_EMAIL = "info@dreamdayplatform.com";
 const CONFIRM_PHRASE = "VERWIJDER ALLES";
 
 // Tijdelijke, admin-only endpoint om alle vendors, weddings en niet-admin
 // accounts te wissen. Verwijderen na gebruik.
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Niet toegestaan" }, { status: 403 });
@@ -33,3 +34,5 @@ export async function POST(req: NextRequest) {
     usersDeleted: userResult.count,
   });
 }
+
+export const POST = withErrorLogging(POSTImpl);

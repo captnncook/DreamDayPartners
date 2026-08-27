@@ -5,8 +5,9 @@ import { sendMail, claimApprovedEmail } from "@/lib/mail";
 import { generateClaimToken, CLAIM_TOKEN_TTL_MS } from "@/lib/claim-token";
 import { logAdminEvent } from "@/lib/adminEvent";
 
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 // Stuur een herinneringsmail voor een goedgekeurde, nog niet geactiveerde claim.
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -32,3 +33,5 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({ ok: true });
 }
+
+export const POST = withErrorLogging(POSTImpl);
