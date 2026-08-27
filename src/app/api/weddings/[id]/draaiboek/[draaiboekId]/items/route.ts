@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function POST(
+async function POSTHandler(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; draaiboekId: string }> }
 ) {
@@ -49,3 +50,5 @@ export async function POST(
 
   return NextResponse.json({ item }, { status: 201 });
 }
+
+export const POST = withErrorLogging(POSTHandler);

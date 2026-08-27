@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Returns all people assignable to tasks for this wedding:
 // team members (planner, couple, team_member) + linked vendors who have a user account
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function GETHandler(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -48,3 +49,5 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   return NextResponse.json({ members });
 }
+
+export const GET = withErrorLogging(GETHandler);

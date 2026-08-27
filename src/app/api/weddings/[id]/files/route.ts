@@ -4,8 +4,9 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { r2, R2_BUCKET } from "@/lib/r2";
 import { v4 as uuidv4 } from "uuid";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function GETHandler(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -20,7 +21,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return Response.json({ documents });
 }
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function POSTHandler(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -80,3 +81,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   return Response.json({ document }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETHandler);
+export const POST = withErrorLogging(POSTHandler);

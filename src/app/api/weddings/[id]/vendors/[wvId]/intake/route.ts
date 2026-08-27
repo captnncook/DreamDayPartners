@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { authorizeWeddingVendor } from "@/lib/vendorAuth";
 import { syncIntakeTasks } from "@/lib/intakeTasks";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
-export async function PATCH(req: NextRequest, { params }: Params) {
+async function PATCHHandler(req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -24,3 +25,5 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ booking: updated });
 }
+
+export const PATCH = withErrorLogging(PATCHHandler);

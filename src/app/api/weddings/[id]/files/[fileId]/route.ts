@@ -2,10 +2,11 @@ import { NextRequest } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { deleteFile, getDownloadUrl } from "@/lib/r2";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ id: string; fileId: string }> };
 
-export async function GET(_req: NextRequest, { params }: Params) {
+async function GETHandler(_req: NextRequest, { params }: Params) {
   const session = await getSession();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -18,7 +19,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   return Response.json({ url });
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+async function DELETEHandler(_req: NextRequest, { params }: Params) {
   const session = await getSession();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -36,3 +37,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
   return Response.json({ ok: true });
 }
+
+export const GET = withErrorLogging(GETHandler);
+export const DELETE = withErrorLogging(DELETEHandler);
