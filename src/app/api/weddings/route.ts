@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { generateWeddingCode, generateRsvpSlug } from "@/lib/wedding-id";
 import { canGrantVendorPortalAccess } from "@/lib/vendorAuth";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETHandler() {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -36,7 +37,7 @@ export async function GET() {
   return NextResponse.json({ weddings });
 }
 
-export async function POST(req: NextRequest) {
+async function POSTHandler(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -154,3 +155,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ wedding }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETHandler);
+export const POST = withErrorLogging(POSTHandler);

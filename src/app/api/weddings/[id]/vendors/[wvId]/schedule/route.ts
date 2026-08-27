@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { authorizeWeddingVendor } from "@/lib/vendorAuth";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ id: string; wvId: string }> };
 
-export async function GET(_req: NextRequest, { params }: Params) {
+async function GETHandler(_req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -34,7 +35,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   return NextResponse.json({ items, draaiboeken });
 }
 
-export async function POST(req: NextRequest, { params }: Params) {
+async function POSTHandler(req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -82,3 +83,6 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ item }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETHandler);
+export const POST = withErrorLogging(POSTHandler);

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildIcsCalendar, type IcsEvent } from "@/lib/ics";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Publieke, token-geauthenticeerde .ics-feed voor een draaiboek — bedoeld
 // om te abonneren vanuit Google Calendar / Apple Kalender / Outlook.
 // Geen sessie-cookie nodig: agenda-apps pollen server-naar-server.
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function GETHandler(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const token = req.nextUrl.searchParams.get("token");
   if (!token) return NextResponse.json({ error: "Token ontbreekt" }, { status: 401 });
@@ -66,3 +67,5 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     },
   });
 }
+
+export const GET = withErrorLogging(GETHandler);

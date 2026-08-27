@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getDownloadUrl } from "@/lib/r2";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETHandler() {
   const user = await getSession();
   if (!user || user.role !== "couple") return NextResponse.json({ team: [] });
 
@@ -46,3 +47,5 @@ export async function GET() {
 
   return NextResponse.json({ weddingId: wedding.id, team });
 }
+
+export const GET = withErrorLogging(GETHandler);
