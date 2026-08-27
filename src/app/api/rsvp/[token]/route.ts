@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendMail, rsvpConfirmationEmail } from "@/lib/mail";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
+async function GETImpl(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const wedding = await prisma.wedding.findUnique({
     where: { rsvpToken: token },
@@ -29,7 +30,7 @@ function levenshtein(a: string, b: string): number {
   return prev[b.length];
 }
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
+async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const body = await req.json();
   const { email, rsvpStatus, guests } = body as { email?: string; rsvpStatus: string; guests: GuestInput[] };
@@ -114,3 +115,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
 
   return NextResponse.json({ guests: created });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

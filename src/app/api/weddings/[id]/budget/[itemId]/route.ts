@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ id: string; itemId: string }> };
 
-export async function PATCH(req: NextRequest, { params }: Params) {
+async function PATCHImpl(req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -25,7 +26,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   return NextResponse.json({ item });
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+async function DELETEImpl(_req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -33,3 +34,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   await prisma.budgetItem.delete({ where: { id: itemId } });
   return NextResponse.json({ ok: true });
 }
+
+export const PATCH = withErrorLogging(PATCHImpl);
+export const DELETE = withErrorLogging(DELETEImpl);

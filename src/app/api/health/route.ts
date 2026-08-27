@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETImpl() {
   try {
     const userCount = await prisma.user.count();
     return NextResponse.json({ ok: true, userCount, dbUrl: process.env.DATABASE_URL ? "set" : "missing" });
@@ -9,3 +10,5 @@ export async function GET() {
     return NextResponse.json({ ok: false, error: String(err), dbUrl: process.env.DATABASE_URL ? "set" : "missing" }, { status: 500 });
   }
 }
+
+export const GET = withErrorLogging(GETImpl);

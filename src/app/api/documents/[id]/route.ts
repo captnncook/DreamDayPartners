@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { deleteFile } from "@/lib/r2";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ id: string }> };
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+async function DELETEImpl(_req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -24,3 +25,5 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   await prisma.document.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }
+
+export const DELETE = withErrorLogging(DELETEImpl);

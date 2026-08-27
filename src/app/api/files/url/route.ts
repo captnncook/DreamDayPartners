@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { getDownloadUrl } from "@/lib/r2";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // GET /api/files/url?key=weddings/xxx/yyy.jpg
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -17,3 +18,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Kan URL niet genereren" }, { status: 502 });
   }
 }
+
+export const GET = withErrorLogging(GETImpl);

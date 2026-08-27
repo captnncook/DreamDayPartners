@@ -3,13 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getOwnVendorId } from "@/lib/vendorAuth";
 import { sendMail, coupleWeddingInviteEmail } from "@/lib/mail";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ weddingId: string }> };
 
 // Stuurt met één klik een uitnodiging naar het bruidspaar om een DreamDay-
 // account aan te maken voor een bruiloft die de leverancier zelf al heeft
 // geregistreerd (zie /mijn-bruiloften).
-export async function POST(_req: NextRequest, { params }: Params) {
+async function POSTImpl(_req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   if (user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -51,3 +52,5 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ ok: true, sentTo: recipients });
 }
+
+export const POST = withErrorLogging(POSTImpl);

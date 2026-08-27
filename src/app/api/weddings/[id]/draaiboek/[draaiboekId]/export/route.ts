@@ -4,8 +4,9 @@ import { getSession } from "@/lib/session";
 import { renderToBuffer, type DocumentProps } from "@react-pdf/renderer";
 import { DraaiboekPdf, getLogoDataUri } from "./DraaiboekPdf";
 import React, { type ReactElement } from "react";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET(
+async function GETImpl(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string; draaiboekId: string }> }
 ) {
@@ -69,3 +70,5 @@ export async function GET(
     },
   });
 }
+
+export const GET = withErrorLogging(GETImpl);

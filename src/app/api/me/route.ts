@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { logAdminEvent } from "@/lib/adminEvent";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   return NextResponse.json({ user });
 }
 
-export async function PATCH(req: NextRequest) {
+async function PATCHImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   const body = await req.json();
@@ -39,3 +40,6 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ user: updated });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const PATCH = withErrorLogging(PATCHImpl);

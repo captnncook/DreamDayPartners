@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getOwnVendorId, canGrantVendorPortalAccess } from "@/lib/vendorAuth";
 import { generateWeddingCode, generateRsvpSlug } from "@/lib/wedding-id";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   if (user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -56,7 +57,7 @@ export async function GET() {
   return NextResponse.json({ invites: allInvites });
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   if (user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -172,3 +173,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ invite, matched: alreadyExisted, pendingApproval: !grantPortalNow }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

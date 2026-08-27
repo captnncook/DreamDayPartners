@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user || user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -66,3 +67,5 @@ export async function GET() {
     topCollaborators,
   });
 }
+
+export const GET = withErrorLogging(GETImpl);
