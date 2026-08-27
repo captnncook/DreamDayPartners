@@ -3,6 +3,7 @@ import { Geist, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { LangProvider } from "@/components/LangProvider";
 import CookieBanner from "@/components/CookieBanner";
+import ClientErrorReporter from "@/components/ClientErrorReporter";
 
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const playfair = Playfair_Display({
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full">
         <LangProvider>{children}</LangProvider>
         <CookieBanner />
+        <ClientErrorReporter />
       </body>
     </html>
   );

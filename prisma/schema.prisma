@@ -651,3 +651,25 @@ model AdminEvent {
 
   @@map("admin_events")
 }
+
+model ErrorLog {
+  id         String   @id @default(uuid())
+  message    String
+  stack      String?
+  digest     String?  // Next.js error digest (server component/render errors)
+  source     String   @default("api") // api | server | client
+  route      String?
+  method     String?
+  statusCode Int?
+  userId     String?
+  userEmail  String?
+  userRole   String?
+  requestId  String?
+  context    String?  // JSON string: query/body (redacted) or extra client-side context
+  status     String   @default("new") // new | seen | resolved
+  createdAt  DateTime @default(now())
+
+  @@map("error_logs")
+  @@index([status])
+  @@index([createdAt])
+}

@@ -134,6 +134,27 @@ export async function register() {
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "vendor_wedding_invites_pkey" PRIMARY KEY ("id")
       )`,
+
+      `CREATE TABLE IF NOT EXISTS "error_logs" (
+        "id" TEXT NOT NULL,
+        "message" TEXT NOT NULL,
+        "stack" TEXT,
+        "digest" TEXT,
+        "source" TEXT NOT NULL DEFAULT 'api',
+        "route" TEXT,
+        "method" TEXT,
+        "statusCode" INTEGER,
+        "userId" TEXT,
+        "userEmail" TEXT,
+        "userRole" TEXT,
+        "requestId" TEXT,
+        "context" TEXT,
+        "status" TEXT NOT NULL DEFAULT 'new',
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "error_logs_pkey" PRIMARY KEY ("id")
+      )`,
+      `CREATE INDEX IF NOT EXISTS "error_logs_status_idx" ON "error_logs" ("status")`,
+      `CREATE INDEX IF NOT EXISTS "error_logs_createdAt_idx" ON "error_logs" ("createdAt")`,
     ];
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });

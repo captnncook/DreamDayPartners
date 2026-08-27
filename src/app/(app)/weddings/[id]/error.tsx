@@ -1,10 +1,16 @@
 "use client";
 
+import { useEffect } from "react";
 import { useLang } from "@/components/LangProvider";
+import { reportClientError } from "@/lib/reportClientError";
 
 export default function WeddingError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const { lang } = useLang();
   const isEn = lang === "en";
+
+  useEffect(() => {
+    reportClientError(error, undefined, { digest: error.digest, boundary: "weddings/[id]" });
+  }, [error]);
 
   return (
     <div className="px-4 py-12 max-w-xl mx-auto text-center">

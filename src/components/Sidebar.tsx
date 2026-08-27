@@ -38,6 +38,7 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/admin",                     label: n.admin,             roles: ["admin"] },
     { href: "/admin/accounts",            label: "Accounts",          roles: ["admin"] },
     { href: "/admin/vendors",             label: "Leveranciers",      roles: ["admin"] },
+    { href: "/admin/errors",              label: "Foutmeldingen",     roles: ["admin"] },
   ];
 
   async function handleLogout() {
