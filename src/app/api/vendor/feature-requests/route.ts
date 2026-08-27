@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getVendorTypeConfig, TOGGLEABLE_MODULE_KEYS } from "@/lib/vendorTypeConfigs";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user || user.role !== "vendor") return NextResponse.json({ error: "Alleen voor leveranciers" }, { status: 403 });
 
@@ -18,7 +19,7 @@ export async function GET() {
   return NextResponse.json({ requests });
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user || user.role !== "vendor") return NextResponse.json({ error: "Alleen voor leveranciers" }, { status: 403 });
 
@@ -59,3 +60,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ request }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

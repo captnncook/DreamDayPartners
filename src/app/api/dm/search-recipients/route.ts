@@ -4,9 +4,10 @@ import { getSession } from "@/lib/session";
 import { getDownloadUrl } from "@/lib/r2";
 import { getVendorTypeConfig } from "@/lib/vendorTypeConfigs";
 import { getOwnVendorId } from "@/lib/vendorAuth";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // GET /api/dm/search-recipients?q=... — search vendors and planners by name
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -157,3 +158,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ recipients });
 }
+
+export const GET = withErrorLogging(GETImpl);

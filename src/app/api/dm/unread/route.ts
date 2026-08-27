@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // GET /api/dm/unread — returns total count of unread DM messages
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user) return NextResponse.json({ count: 0 });
 
@@ -28,3 +29,5 @@ export async function GET() {
 
   return NextResponse.json({ count: total });
 }
+
+export const GET = withErrorLogging(GETImpl);

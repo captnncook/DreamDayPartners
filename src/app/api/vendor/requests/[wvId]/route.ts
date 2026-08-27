@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { canGrantVendorPortalAccess } from "@/lib/vendorAuth";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 type Params = { params: Promise<{ wvId: string }> };
 
 // POST /api/vendor/requests/[wvId]  body: { action: "accept" | "decline" }
 // De ingelogde leverancier accepteert of wijst een Dream Team-uitnodiging af.
-export async function POST(req: NextRequest, { params }: Params) {
+async function POSTImpl(req: NextRequest, { params }: Params) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   if (user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
@@ -67,3 +68,5 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ booking: updated });
 }
+
+export const POST = withErrorLogging(POSTImpl);

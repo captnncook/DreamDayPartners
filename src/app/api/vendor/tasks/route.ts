@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user || user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -16,7 +17,7 @@ export async function GET() {
   return NextResponse.json({ tasks: tasks.map(t => ({ ...t, weddingTitle: t.wedding.title })) });
 }
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user || user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -36,3 +37,6 @@ export async function POST(req: NextRequest) {
   });
   return NextResponse.json({ task: { ...task, weddingTitle: task.wedding.title } });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

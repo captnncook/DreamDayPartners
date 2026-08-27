@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { clearSession } from "@/lib/session";
 import { sendMail, deleteAdminNotificationEmail, vendorLeftWeddingEmail } from "@/lib/mail";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const { token } = await req.json();
   if (!token) return NextResponse.json({ error: "Token ontbreekt" }, { status: 400 });
 
@@ -69,3 +70,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true, archived: upcomingBookings.length > 0 });
 }
+
+export const POST = withErrorLogging(POSTImpl);

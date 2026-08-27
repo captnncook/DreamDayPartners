@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Rangschikt kandidaten op relevantie t.o.v. de zoekterm: een woordgrens-match
 // ("Tom" in "Tom Beeldregie") moet altijd boven een toevallige substring-match
@@ -16,7 +17,7 @@ function rankScore(name: string, q: string): number {
   return 3;
 }
 
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -38,3 +39,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ vendors });
 }
+
+export const GET = withErrorLogging(GETImpl);

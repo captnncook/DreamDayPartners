@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/session";
 import { buildIcsCalendar } from "@/lib/ics";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Genereert een los .ics-bestand voor één datum (bijv. een proefsessie of
 // pasafspraak) zodat die met één klik in de eigen agenda-app gezet kan
 // worden — los van het draaiboek-abonnement, dat over de hele bruiloftsdag
 // gaat en niet over dit soort losse, vooraf geplande momenten.
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -32,3 +33,5 @@ export async function POST(req: NextRequest) {
     },
   });
 }
+
+export const POST = withErrorLogging(POSTImpl);

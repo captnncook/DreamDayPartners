@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Afscheidscijfer voor het platform (1 t/m 10), bijv. bij accountverwijdering.
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -23,3 +24,5 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ feedback }, { status: 201 });
 }
+
+export const POST = withErrorLogging(POSTImpl);

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Geeft de persoonlijke agenda-abonnee-URL (.ics) terug voor een bruiloft,
 // en genereert lazy een calendarToken voor de gebruiker als die nog ontbreekt.
-export async function GET(req: NextRequest) {
+async function GETImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -26,3 +27,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ httpsUrl, webcalUrl });
 }
+
+export const GET = withErrorLogging(GETImpl);

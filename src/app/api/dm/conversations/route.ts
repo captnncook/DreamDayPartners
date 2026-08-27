@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { resolveParticipantBadges } from "@/lib/participantBadge";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // GET /api/dm/conversations — list all DM conversations for current user
-export async function GET(_req: NextRequest) {
+async function GETImpl(_req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -32,7 +33,7 @@ export async function GET(_req: NextRequest) {
 }
 
 // POST /api/dm/conversations — get or create a DM conversation with another user
-export async function POST(req: NextRequest) {
+async function POSTImpl(req: NextRequest) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
@@ -77,3 +78,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ conversation: { ...conv, messages: [] } }, { status: 201 });
 }
+
+export const GET = withErrorLogging(GETImpl);
+export const POST = withErrorLogging(POSTImpl);

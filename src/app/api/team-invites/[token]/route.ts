@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
+async function GETImpl(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
 
   const invite = await prisma.weddingTeamInvite.findUnique({
@@ -22,3 +23,5 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tok
     email: invite.email,
   });
 }
+
+export const GET = withErrorLogging(GETImpl);

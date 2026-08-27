@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { withErrorLogging } from "@/lib/apiErrorLogging";
 
 // Feitelijke cijfers voor de "weet je het zeker?"-stap bij het verwijderen
 // van een leveranciersaccount.
-export async function GET() {
+async function GETImpl() {
   const user = await getSession();
   if (!user || user.role !== "vendor") return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
 
@@ -24,3 +25,5 @@ export async function GET() {
     documents,
   });
 }
+
+export const GET = withErrorLogging(GETImpl);
