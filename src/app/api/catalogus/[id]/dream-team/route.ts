@@ -3,13 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { withErrorLogging } from "@/lib/apiErrorLogging";
 
-// POST /api/catalogus/[id]/dream-team  body: { weddingId }
+// POST /api/catalogus/[id]/dream-team  body: { weddingId, message? }
 async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const { id: vendorId } = await params;
-  const { weddingId } = await req.json();
+  const { weddingId, message } = await req.json();
+  const trimmedMessage: string | null = typeof message === "string" && message.trim() ? message.trim() : null;
 
   if (!weddingId) return NextResponse.json({ error: "weddingId ontbreekt" }, { status: 400 });
 
@@ -35,9 +36,11 @@ async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: st
   }
 
   // Maak een uitnodiging die de leverancier kan accepteren of afwijzen.
-  // portalAccess blijft false totdat de leverancier accepteert.
+  // portalAccess blijft false totdat de leverancier accepteert. Een optioneel
+  // bericht van het bruidspaar (bv. "we zoeken nog een datum-check voor mei")
+  // gaat mee als notes, zodat de leverancier context heeft bij het reageren.
   const weddingVendor = await prisma.weddingVendor.create({
-    data: { weddingId, vendorId, status: "invited" },
+    data: { weddingId, vendorId, status: "invited", notes: trimmedMessage },
   });
 
   // Stuur de gekoppelde leverancier-account een melding.
@@ -47,7 +50,9 @@ async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: st
         userId: vendor.userId,
         weddingId,
         type: "vendor_invite",
-        content: `Je bent uitgenodigd voor het Dream Team van "${wedding.title}".`,
+        content: trimmedMessage
+          ? `Je bent uitgenodigd voor het Dream Team van "${wedding.title}": "${trimmedMessage}"`
+          : `Je bent uitgenodigd voor het Dream Team van "${wedding.title}".`,
         relatedType: "weddingVendor",
         relatedId: weddingVendor.id,
       },

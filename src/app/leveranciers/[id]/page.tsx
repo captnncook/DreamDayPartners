@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Globe, Phone, Mail, ArrowLeft, Check, ChevronDown, Pencil, User } from "lucide-react";
+import { MapPin, Globe, Phone, Mail, ArrowLeft, Check, ChevronDown, Pencil, User, X } from "lucide-react";
 import { getVendorProfileSection } from "@/lib/vendorProfileSections";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -73,6 +73,8 @@ export default function VendorProfilePage() {
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
   const [addError, setAddError] = useState("");
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
   const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", message: "", weddingDate: "" });
   const [contactSent, setContactSent] = useState(false);
@@ -155,12 +157,12 @@ export default function VendorProfilePage() {
       const res = await fetch(`/api/catalogus/${id}/dream-team`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ weddingId: selectedWedding }),
+        body: JSON.stringify({ weddingId: selectedWedding, message: inviteMessage }),
       });
       let data: { error?: string } = {};
       try { data = await res.json(); } catch { /* geen JSON-body, val terug op generieke melding */ }
       if (!res.ok) setAddError(data.error ?? "Er ging iets mis");
-      else setAdded(true);
+      else { setAdded(true); setShowInviteModal(false); }
     } catch {
       // Netwerkfout: zonder deze catch bleef de knop hier permanent op
       // "Bezig…" staan omdat setAdding(false) nooit werd bereikt.
@@ -583,8 +585,10 @@ export default function VendorProfilePage() {
               </section>
             )}
 
-            {/* Contact form */}
-            {!isVendorOwner && (
+            {/* Contact form — voor bruidsparen met een account loopt dit nu via
+                de "Voeg toe aan Dream Team"-knop hierboven; dit formulier is
+                voor bezoekers die nog geen account hebben of geen bruidspaar zijn. */}
+            {!isVendorOwner && !isCouple && (
               <section className="pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                 <h2 className="dash-section-title mb-1">Stuur een aanvraag</h2>
                 <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginBottom: "var(--space-6)", lineHeight: 1.6 }}>
@@ -660,38 +664,14 @@ export default function VendorProfilePage() {
                 <div className="flex items-center gap-2" style={{ color: "var(--gold)", fontSize: "0.9rem", fontWeight: 600 }}>
                   <Check className="w-4 h-4" /> Uitnodiging verstuurd!
                 </div>
-              ) : isCouple && weddings.length === 0 ? (
-                <p style={{ fontSize: "var(--text-md)", color: "var(--ink-muted)" }}>
-                  Je hebt nog geen bruiloft om aan toe te voegen.
-                </p>
               ) : isCouple ? (
-                <div className="flex flex-col gap-2.5">
-                  {weddings.length > 1 && (
-                    <div style={{ position: "relative" }}>
-                      <select
-                        value={selectedWedding}
-                        onChange={(e) => setSelectedWedding(e.target.value)}
-                        className="ddp-select appearance-none pr-8"
-                        style={{ background: "white" }}
-                      >
-                        <option value="">Kies bruiloft…</option>
-                        {weddings.map((w) => (
-                          <option key={w.id} value={w.id}>{w.title}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="w-4 h-4" style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--muted)", pointerEvents: "none" }} />
-                    </div>
-                  )}
-                  {addError && <p style={{ fontSize: "var(--text-base)", color: "var(--danger)" }}>{addError}</p>}
-                  <button
-                    onClick={handleAddToDreamTeam}
-                    disabled={adding || !selectedWedding}
-                    className="ddp-btn-gold"
-                    style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer", fontSize: "var(--text-md)", opacity: (adding || !selectedWedding) ? 0.6 : 1 }}
-                  >
-                    {adding ? "Bezig…" : "Uitnodigen voor Dream Team"}
-                  </button>
-                </div>
+                <button
+                  onClick={() => { setAddError(""); setShowInviteModal(true); }}
+                  className="ddp-btn-gold"
+                  style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.65rem 1rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer", fontSize: "var(--text-md)", width: "100%" }}
+                >
+                  Voeg toe aan Dream Team
+                </button>
               ) : (
                 <p style={{ fontSize: "var(--text-md)", color: "var(--ink-muted)" }}>
                   Alleen bruidsparen kunnen leveranciers toevoegen.
@@ -702,6 +682,82 @@ export default function VendorProfilePage() {
 
         </div>
       </div>
+
+      {showInviteModal && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.25rem" }}
+          onClick={() => setShowInviteModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="ddp-card"
+            style={{ width: "100%", maxWidth: "440px", padding: "1.75rem", background: "white" }}
+          >
+            <div className="flex items-start justify-between" style={{ marginBottom: "var(--space-5)" }}>
+              <div>
+                <h3 className="font-serif" style={{ fontSize: "var(--text-2xl)", fontWeight: 700, letterSpacing: "-0.01em" }}>
+                  Voeg toe aan Dream Team
+                </h3>
+                <p style={{ fontSize: "var(--text-base)", color: "var(--muted)", marginTop: "2px" }}>
+                  {vendor.name} ontvangt een verzoek en kan dit accepteren.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowInviteModal(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", padding: "0.25rem", flexShrink: 0 }}
+                aria-label="Sluiten"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {weddings.length === 0 ? (
+              <p style={{ fontSize: "var(--text-md)", color: "var(--muted)" }}>Je hebt nog geen bruiloft om aan toe te voegen.</p>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {weddings.length > 1 && (
+                  <div>
+                    <label style={{ fontSize: "var(--text-base)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>Bruiloft</label>
+                    <div style={{ position: "relative" }}>
+                      <select
+                        value={selectedWedding}
+                        onChange={(e) => setSelectedWedding(e.target.value)}
+                        className="ddp-select appearance-none pr-8"
+                        style={{ background: "white", width: "100%" }}
+                      >
+                        <option value="">Kies bruiloft…</option>
+                        {weddings.map((w) => (
+                          <option key={w.id} value={w.id}>{w.title}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="w-4 h-4" style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--muted)", pointerEvents: "none" }} />
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label style={{ fontSize: "var(--text-base)", color: "var(--muted)", display: "block", marginBottom: "var(--space-1)" }}>Bericht (optioneel)</label>
+                  <textarea
+                    value={inviteMessage}
+                    onChange={(e) => setInviteMessage(e.target.value)}
+                    placeholder="Vertel er iets bij, bijvoorbeeld waar jullie naar op zoek zijn…"
+                    rows={3}
+                    className="ddp-input resize-none"
+                  />
+                </div>
+                {addError && <p style={{ fontSize: "var(--text-base)", color: "var(--danger)" }}>{addError}</p>}
+                <button
+                  onClick={handleAddToDreamTeam}
+                  disabled={adding || !selectedWedding}
+                  className="ddp-btn-gold"
+                  style={{ background: "var(--gold)", color: "var(--ink)", fontWeight: 700, textAlign: "center", padding: "0.75rem 1rem", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer", fontSize: "var(--text-md)", opacity: (adding || !selectedWedding) ? 0.6 : 1 }}
+                >
+                  {adding ? "Bezig…" : "Uitnodiging versturen"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
