@@ -34,7 +34,7 @@ export async function completePendingRegistrationViaOAuth(
   await prisma.$executeRawUnsafe(`DELETE FROM "pending_registrations" WHERE "verifiedToken" = $1`, verifiedToken);
 
   if (pending.type === "couple") {
-    const { partner1, partner2, date, endDate, venue, budget } = data;
+    const { partner1, partner2, date, endDate, venue, venueVendorId, budget } = data;
     const coupleName = partner1 && partner2 ? `${partner1} & ${partner2}` : partner1 || "Bruidspaar";
 
     const user = await prisma.user.create({
@@ -78,6 +78,34 @@ export async function completePendingRegistrationViaOAuth(
     });
     await prisma.weddingTeamMember.create({ data: { weddingId: wedding.id, userId: user.id, role: "couple" } });
     await prisma.budget.create({ data: { weddingId: wedding.id, totalAmount: budget ? parseFloat(String(budget)) : 0 } });
+
+    // Zelfde koppeling als in de e-mail/wachtwoord-registratieflow: als het
+    // bruidspaar een bestaande catalogus-locatie koos, direct als uitgenodigd
+    // Dream Team-lid koppelen. Best-effort: mag registratie nooit laten falen.
+    if (venueVendorId) {
+      try {
+        const venueVendor = await prisma.vendor.findUnique({ where: { id: venueVendorId } });
+        if (venueVendor) {
+          const weddingVendor = await prisma.weddingVendor.create({
+            data: { weddingId: wedding.id, vendorId: venueVendor.id, status: "invited" },
+          });
+          if (venueVendor.userId) {
+            await prisma.notification.create({
+              data: {
+                userId: venueVendor.userId,
+                weddingId: wedding.id,
+                type: "vendor_invite",
+                content: `Je bent gekoppeld als trouwlocatie aan het Dream Team van "${title}".`,
+                relatedType: "weddingVendor",
+                relatedId: weddingVendor.id,
+              },
+            });
+          }
+        }
+      } catch {
+        // koppeling mislukt: registratie mag gewoon doorgaan
+      }
+    }
 
     return { ok: true, redirect: `${appUrl}/weddings/${wedding.id}` };
   }
