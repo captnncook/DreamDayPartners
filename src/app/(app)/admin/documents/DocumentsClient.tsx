@@ -5,6 +5,16 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { useLang } from "@/components/LangProvider";
 
+type StorageRow = {
+  weddingId: string;
+  title: string;
+  weddingCode: string;
+  fileCount: number;
+  bytes: number;
+  sizeLabel: string;
+  share: number;
+};
+
 type DocRow = {
   id: string;
   name: string;
@@ -26,6 +36,18 @@ export default function DocumentsClient() {
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [category, setCategory] = useState("");
+  const [showStorage, setShowStorage] = useState(false);
+  const [storage, setStorage] = useState<{ totalLabel: string; totalFiles: number; perWedding: StorageRow[] } | null>(null);
+  const [storageLoading, setStorageLoading] = useState(false);
+
+  useEffect(() => {
+    if (!showStorage || storage) return;
+    setStorageLoading(true);
+    fetch("/api/admin/storage")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setStorage(d))
+      .finally(() => setStorageLoading(false));
+  }, [showStorage, storage]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,10 +75,54 @@ export default function DocumentsClient() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{ad.pageTitle}</h1>
-        <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{ad.subtitle}</p>
+      <div className="flex items-end justify-between flex-wrap gap-3 mb-6">
+        <div>
+          <h1 className="font-serif" style={{ fontSize: "var(--text-6xl)", fontWeight: 700, letterSpacing: "-0.01em", color: "var(--foreground)" }}>{ad.pageTitle}</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>{ad.subtitle}</p>
+        </div>
+        <button onClick={() => setShowStorage((s) => !s)} className="ddp-btn-secondary text-sm" style={{ padding: "0.5rem 1rem" }}>
+          {showStorage ? ad.storageToggleHide : ad.storageToggleShow}
+        </button>
       </div>
+
+      {showStorage && (
+        <div className="mb-8">
+          <h2 className="dash-section-title mb-1">{ad.storageTitle}</h2>
+          <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>{ad.storageSubtitle}</p>
+          {storageLoading || !storage ? (
+            <p className="text-sm" style={{ color: "var(--muted)" }}>{ad.loading}</p>
+          ) : storage.perWedding.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--muted)" }}>{ad.storageEmpty}</p>
+          ) : (
+            <>
+              <p className="text-sm mb-3" style={{ color: "var(--foreground)", fontWeight: 600 }}>
+                {ad.storageTotal.replace("{size}", storage.totalLabel).replace("{count}", String(storage.totalFiles))}
+              </p>
+              <div style={{ borderTop: "1px solid var(--border)" }}>
+                {storage.perWedding.map((w) => (
+                  <div key={w.weddingId} className="dash-row" style={{ flexDirection: "column", alignItems: "stretch", gap: "0.375rem" }}>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <span className="font-serif text-sm truncate" style={{ fontWeight: 700 }}>{w.title}</span>
+                        <span className="text-xs ml-2" style={{ color: "var(--muted)" }}>{w.weddingCode}</span>
+                      </div>
+                      <div className="text-xs flex-shrink-0 text-right" style={{ color: "var(--foreground)", fontWeight: 600 }}>
+                        {w.sizeLabel}
+                        <span className="block" style={{ color: "var(--muted)", fontWeight: 400 }}>
+                          {ad.storageFileCount.replace("{n}", String(w.fileCount))}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ height: "3px", background: "var(--border)", borderRadius: "2px", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${Math.max(2, w.share * 100)}%`, background: "var(--gold)" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="flex gap-3 mb-5 flex-wrap">
         <div className="ddp-search flex-1" style={{ minWidth: "220px" }}>
