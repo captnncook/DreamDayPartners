@@ -212,6 +212,14 @@ function AanmeldenForm() {
     // anders verliest iemand die de wizard-link met querystring opnieuw opent alsnog
     // alles, ook al is het exact hetzelfde probleem dat de sessionStorage-restore
     // net had moeten oplossen.
+    // Een foutmelding van de Google/Apple-terugkeer (bv. e-mailadres komt niet
+    // overeen) moet altijd zichtbaar worden, ook als er al herstelde
+    // wizard-voortgang is — anders komt iemand na een mislukte OAuth-poging
+    // gewoon weer op hetzelfde "kies hoe je wilt inloggen"-scherm terecht
+    // zonder enige uitleg waarom.
+    const err = searchParams.get("error");
+    if (err) setError(decodeURIComponent(err));
+
     const hasRestoredProgress = restored.authStep !== undefined && restored.authStep !== "form" || (restored.formStep ?? 0) > 0;
     if (hasRestoredProgress) return;
 
@@ -236,8 +244,6 @@ function AanmeldenForm() {
       setAccount(type);
       setFormStep(1);
     }
-    const err = searchParams.get("error");
-    if (err) setError(decodeURIComponent(err));
   }, [searchParams]);
 
   // Both couple and vendor have email on step 3; data steps before that differ
