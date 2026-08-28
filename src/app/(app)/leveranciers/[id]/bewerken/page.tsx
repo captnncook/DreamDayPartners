@@ -124,31 +124,34 @@ function TierSlider({
         {tv.hoursSavedOutro}
       </p>
 
-      <div style={{ display: "flex", border: `1px solid ${dark ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--radius-full)", overflow: "hidden", marginBottom: "var(--space-5)", maxWidth: "260px" }}>
-        <button
-          type="button"
-          onClick={() => setBillingInterval("month")}
-          style={{
-            flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
-            fontSize: "var(--text-sm)", fontWeight: billingInterval === "month" ? 700 : 500,
-            background: billingInterval === "month" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
-            color: billingInterval === "month" ? (dark ? "var(--ink-text)" : "white") : mutedColor,
-          }}
-        >
-          {tv.monthly}
-        </button>
-        <button
-          type="button"
-          onClick={() => setBillingInterval("year")}
-          style={{
-            flex: 1, padding: "0.4rem 0.75rem", border: "none", cursor: "pointer",
-            fontSize: "var(--text-sm)", fontWeight: billingInterval === "year" ? 700 : 500,
-            background: billingInterval === "year" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
-            color: billingInterval === "year" ? "var(--gold)" : mutedColor,
-          }}
-        >
-          {tv.yearly}
-        </button>
+      <div className="flex items-center gap-2.5" style={{ marginBottom: "var(--space-5)" }}>
+        <div style={{ display: "inline-flex", border: `1px solid ${dark ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--radius-full)", overflow: "hidden" }}>
+          <button
+            type="button"
+            onClick={() => setBillingInterval("month")}
+            style={{
+              padding: "0.4rem 1rem", border: "none", cursor: "pointer", whiteSpace: "nowrap",
+              fontSize: "var(--text-sm)", fontWeight: billingInterval === "month" ? 700 : 500,
+              background: billingInterval === "month" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
+              color: billingInterval === "month" ? (dark ? "var(--ink-text)" : "white") : mutedColor,
+            }}
+          >
+            {tv.monthly}
+          </button>
+          <button
+            type="button"
+            onClick={() => setBillingInterval("year")}
+            style={{
+              padding: "0.4rem 1rem", border: "none", cursor: "pointer", whiteSpace: "nowrap",
+              fontSize: "var(--text-sm)", fontWeight: billingInterval === "year" ? 700 : 500,
+              background: billingInterval === "year" ? (dark ? "rgba(255,255,255,0.12)" : "var(--ink)") : "transparent",
+              color: billingInterval === "year" ? "var(--gold)" : mutedColor,
+            }}
+          >
+            {tv.yearly}
+          </button>
+        </div>
+        <span style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--gold)" }}>{tv.yearlyBadge}</span>
       </div>
 
       <button

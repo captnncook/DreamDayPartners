@@ -148,18 +148,26 @@ export default function VendorProfilePage() {
   }
 
   async function handleAddToDreamTeam() {
-    if (!selectedWedding) return;
+    if (!selectedWedding) { setAddError("Kies eerst een bruiloft."); return; }
     setAdding(true);
     setAddError("");
-    const res = await fetch(`/api/catalogus/${id}/dream-team`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ weddingId: selectedWedding }),
-    });
-    const data = await res.json();
-    if (!res.ok) setAddError(data.error ?? "Er ging iets mis");
-    else setAdded(true);
-    setAdding(false);
+    try {
+      const res = await fetch(`/api/catalogus/${id}/dream-team`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weddingId: selectedWedding }),
+      });
+      let data: { error?: string } = {};
+      try { data = await res.json(); } catch { /* geen JSON-body, val terug op generieke melding */ }
+      if (!res.ok) setAddError(data.error ?? "Er ging iets mis");
+      else setAdded(true);
+    } catch {
+      // Netwerkfout: zonder deze catch bleef de knop hier permanent op
+      // "Bezig…" staan omdat setAdding(false) nooit werd bereikt.
+      setAddError("Netwerkfout, probeer opnieuw");
+    } finally {
+      setAdding(false);
+    }
   }
 
   if (loading) {
@@ -652,6 +660,10 @@ export default function VendorProfilePage() {
                 <div className="flex items-center gap-2" style={{ color: "var(--gold)", fontSize: "0.9rem", fontWeight: 600 }}>
                   <Check className="w-4 h-4" /> Uitnodiging verstuurd!
                 </div>
+              ) : isCouple && weddings.length === 0 ? (
+                <p style={{ fontSize: "var(--text-md)", color: "var(--ink-muted)" }}>
+                  Je hebt nog geen bruiloft om aan toe te voegen.
+                </p>
               ) : isCouple ? (
                 <div className="flex flex-col gap-2.5">
                   {weddings.length > 1 && (
