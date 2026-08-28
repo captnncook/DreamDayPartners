@@ -87,25 +87,15 @@ export default function Sidebar({ user }: SidebarProps) {
           </div>
           <div className="min-w-0">
             <div className="text-sm font-semibold truncate" style={{ color: "var(--ink-text)" }}>{user.name}</div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-xs" style={{ color: "var(--ink-muted)" }}>{roleLabels[user.role] ?? user.role}</span>
-              {user.isPremium && (
-                <span
-                  style={{
-                    fontSize: "0.6rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                    color: "var(--gold)",
-                    border: "1px solid var(--gold)",
-                    borderRadius: "999px",
-                    padding: "0.05rem 0.4rem",
-                  }}
-                >
-                  Pro
-                </span>
-              )}
-            </div>
+            <div className="text-xs truncate" style={{ color: "var(--ink-muted)" }}>{roleLabels[user.role] ?? user.role}</div>
+            {user.isPremium && (
+              <div
+                className="text-xs font-semibold mt-0.5"
+                style={{ color: "var(--gold)", letterSpacing: "0.02em" }}
+              >
+                Premium
+              </div>
+            )}
           </div>
         </div>
       </div>
