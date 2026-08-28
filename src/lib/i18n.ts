@@ -213,6 +213,7 @@ export const translations = {
       goToVendors: "Leveranciers beheren →",
       viewDetail: "Bekijk details →",
       portal: "Portaltoegang actief",
+      pendingRequest: "In aanvraag",
       statusLabels: {
         invited: "Uitgenodigd",
         contacted: "Gecontacteerd",
@@ -1759,6 +1760,7 @@ export const translations = {
       goToVendors: "Manage vendors →",
       viewDetail: "View details →",
       portal: "Portal access active",
+      pendingRequest: "Requested",
       statusLabels: {
         invited: "Invited",
         contacted: "Contacted",

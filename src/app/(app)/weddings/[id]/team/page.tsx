@@ -172,11 +172,7 @@ export default function TeamPage() {
       ) : (
         <div style={{ borderTop: "1px solid var(--border)" }}>
           {visibleVendors.map((wv) => {
-            const statusLabel = tm.statusLabels[wv.status as keyof typeof tm.statusLabels] ?? wv.status;
-            const statusColor =
-              ["confirmed", "booked"].includes(wv.status) ? "var(--gold-deep)"
-              : wv.status === "quote_received" ? "var(--foreground)"
-              : "var(--muted)";
+            const isPending = wv.status === "invited";
             const isDiscovery = access === "discovery";
             const canContact = Boolean(wv.vendor.userId);
 
@@ -198,9 +194,11 @@ export default function TeamPage() {
                     </div>
                   )}
                   {!isDiscovery && wv.notes && <div style={{ fontSize: "var(--text-sm)", color: "var(--muted)", fontStyle: "italic", marginTop: "2px" }}>{wv.notes}</div>}
-                  {!isDiscovery && (
+                  {!isDiscovery && (isPending || wv.portalAccess) && (
                     <div className="mt-1 flex items-center gap-2 flex-wrap">
-                      <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: statusColor }}>{statusLabel}</span>
+                      {isPending && (
+                        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>{tm.pendingRequest}</span>
+                      )}
                       {wv.portalAccess && (
                         <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--gold-deep)" }}>{tm.portal}</span>
                       )}
