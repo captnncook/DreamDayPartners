@@ -4,6 +4,7 @@ import { setSession } from "@/lib/session";
 import { compare } from "bcryptjs";
 
 import { withErrorLogging } from "@/lib/apiErrorLogging";
+import { logActivitySignal, getClientIp } from "@/lib/activitySignal";
 async function bumpLogin(userId: string) {
   try {
     await prisma.user.update({ where: { id: userId }, data: { loginCount: { increment: 1 }, lastLoginAt: new Date() } });
@@ -39,6 +40,7 @@ async function POSTImpl(req: NextRequest) {
     }
     const valid = await compare(password, user.passwordHash);
     if (!valid) {
+      await logActivitySignal("login_failed", getClientIp(req), email);
       return NextResponse.json({ error: "Onjuist wachtwoord" }, { status: 401 });
     }
     await setSession(user.id);

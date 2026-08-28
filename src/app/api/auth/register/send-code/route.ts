@@ -4,6 +4,7 @@ import { sendMail, verificationCodeEmail } from "@/lib/mail";
 import { randomBytes } from "crypto";
 
 import { withErrorLogging } from "@/lib/apiErrorLogging";
+import { logActivitySignal, getClientIp } from "@/lib/activitySignal";
 function generateCode(): string {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
@@ -43,6 +44,8 @@ async function POSTImpl(req: NextRequest) {
 
   const tpl = verificationCodeEmail(code);
   await sendMail({ to: email, subject: tpl.subject, html: tpl.html });
+
+  await logActivitySignal("register", getClientIp(req), email);
 
   return NextResponse.json({ pendingId: id });
 }

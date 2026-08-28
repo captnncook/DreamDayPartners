@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendMail, rsvpConfirmationEmail } from "@/lib/mail";
 import { withErrorLogging } from "@/lib/apiErrorLogging";
+import { logActivitySignal, getClientIp } from "@/lib/activitySignal";
 
 async function GETImpl(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -112,6 +113,8 @@ async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ token:
     const tpl = rsvpConfirmationEmail(wedding.title, new Date(wedding.date), wedding.venue, rsvpStatus === "confirmed", guestList.map((g) => g.name));
     await sendMail({ to: email, subject: tpl.subject, html: tpl.html, role: "couple" });
   }
+
+  await logActivitySignal("rsvp", getClientIp(req), email);
 
   return NextResponse.json({ guests: created });
 }

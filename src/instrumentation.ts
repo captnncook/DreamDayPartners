@@ -168,6 +168,17 @@ export async function register() {
         CONSTRAINT "admin_notes_pkey" PRIMARY KEY ("id")
       )`,
       `CREATE INDEX IF NOT EXISTS "admin_notes_targetType_targetId_idx" ON "admin_notes" ("targetType", "targetId")`,
+
+      `CREATE TABLE IF NOT EXISTS "activity_signals" (
+        "id" TEXT NOT NULL,
+        "kind" TEXT NOT NULL,
+        "ip" TEXT,
+        "email" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT "activity_signals_pkey" PRIMARY KEY ("id")
+      )`,
+      `CREATE INDEX IF NOT EXISTS "activity_signals_kind_createdAt_idx" ON "activity_signals" ("kind", "createdAt")`,
+      `CREATE INDEX IF NOT EXISTS "activity_signals_ip_createdAt_idx" ON "activity_signals" ("ip", "createdAt")`,
     ];
 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });

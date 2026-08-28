@@ -1531,6 +1531,18 @@ export const translations = {
       storageToggleShow: "Toon opslaggebruik",
       storageToggleHide: "Verberg opslaggebruik",
     },
+    adminActivity: {
+      pageTitle: "Activiteit",
+      subtitle: "Signalen van publieke formulieren (aanmelden, RSVP, contactverzoeken, mislukte logins). Puur ter info — niets wordt automatisch geblokkeerd.",
+      perIpTitle: "Per IP-adres, laatste 24 uur",
+      perIpEmpty: "Geen activiteit in de afgelopen 24 uur.",
+      notableNote: "Ongewoon veel activiteit vanaf dit IP ({n}+) — de rest is normaal gebruiksvolume.",
+      recentTitle: "Recente signalen",
+      recentEmpty: "Nog geen signalen vastgelegd.",
+      kindRegister: "Aanmelding gestart", kindRsvp: "RSVP verstuurd", kindVendorContact: "Contactverzoek leverancier", kindLoginFailed: "Mislukte login",
+      loading: "Laden…",
+      timesLabel: "{n}×",
+    },
   },
   en: {
     nav: {
@@ -3063,6 +3075,18 @@ export const translations = {
       storageEmpty: "No documents uploaded yet.",
       storageToggleShow: "Show storage usage",
       storageToggleHide: "Hide storage usage",
+    },
+    adminActivity: {
+      pageTitle: "Activity",
+      subtitle: "Signals from public forms (sign-up, RSVP, contact requests, failed logins). Purely informational — nothing is blocked automatically.",
+      perIpTitle: "Per IP address, last 24 hours",
+      perIpEmpty: "No activity in the last 24 hours.",
+      notableNote: "Unusually high activity from this IP ({n}+) — everything else is normal usage volume.",
+      recentTitle: "Recent signals",
+      recentEmpty: "No signals recorded yet.",
+      kindRegister: "Sign-up started", kindRsvp: "RSVP submitted", kindVendorContact: "Vendor contact request", kindLoginFailed: "Failed login",
+      loading: "Loading…",
+      timesLabel: "{n}×",
     },
   },
 };

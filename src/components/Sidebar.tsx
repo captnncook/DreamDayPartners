@@ -39,6 +39,7 @@ export default function Sidebar({ user }: SidebarProps) {
     { href: "/admin/accounts",            label: "Accounts",          roles: ["admin"] },
     { href: "/admin/vendors",             label: "Leveranciers",      roles: ["admin"] },
     { href: "/admin/documents",           label: "Documenten",        roles: ["admin"] },
+    { href: "/admin/activity",            label: "Activiteit",        roles: ["admin"] },
     { href: "/admin/errors",              label: "Foutmeldingen",     roles: ["admin"] },
   ];
 

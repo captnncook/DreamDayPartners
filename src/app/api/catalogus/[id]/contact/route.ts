@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withErrorLogging } from "@/lib/apiErrorLogging";
+import { logActivitySignal, getClientIp } from "@/lib/activitySignal";
 
 async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,6 +15,9 @@ async function POSTImpl(req: NextRequest, { params }: { params: Promise<{ id: st
   const req2 = await prisma.vendorContactRequest.create({
     data: { vendorId: id, name, email, phone: phone || null, message, weddingDate: weddingDate ? new Date(weddingDate) : null },
   });
+
+  await logActivitySignal("vendor_contact", getClientIp(req), email);
+
   return NextResponse.json({ request: req2 });
 }
 

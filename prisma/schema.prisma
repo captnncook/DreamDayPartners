@@ -653,6 +653,18 @@ model AdminEvent {
   @@map("admin_events")
 }
 
+model ActivitySignal {
+  id        String   @id @default(uuid())
+  kind      String   // register | rsvp | vendor_contact | login_failed
+  ip        String?
+  email     String?
+  createdAt DateTime @default(now())
+
+  @@map("activity_signals")
+  @@index([kind, createdAt])
+  @@index([ip, createdAt])
+}
+
 model AdminNote {
   id         String   @id @default(uuid())
   targetType String   // user | wedding
