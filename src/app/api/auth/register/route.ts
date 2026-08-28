@@ -46,7 +46,7 @@ async function POSTImpl(req: NextRequest) {
   );
 
   if (pending.type === "couple") {
-    const { partner1, partner2, date, endDate, venue, budget, guestCount } = data;
+    const { partner1, partner2, date, endDate, venue, venueVendorId, budget, guestCount } = data;
     if (!date) {
       return NextResponse.json({ error: "Trouwdatum ontbreekt. Ga terug en vul jullie trouwdatum in." }, { status: 400 });
     }
@@ -104,6 +104,35 @@ async function POSTImpl(req: NextRequest) {
     await seedStarterTasks(wedding.id);
 
     if (guestCount) { /* stored in wedding notes if needed */ }
+
+    // Als het bruidspaar tijdens de wizard een bestaande catalogus-locatie
+    // koos (autocomplete-suggestie), koppel die leverancier direct aan de
+    // nieuwe bruiloft — net als een handmatige Dream Team-uitnodiging.
+    // Best-effort: mag registratie nooit laten falen.
+    if (venueVendorId) {
+      try {
+        const venueVendor = await prisma.vendor.findUnique({ where: { id: venueVendorId } });
+        if (venueVendor) {
+          const weddingVendor = await prisma.weddingVendor.create({
+            data: { weddingId: wedding.id, vendorId: venueVendor.id, status: "invited" },
+          });
+          if (venueVendor.userId) {
+            await prisma.notification.create({
+              data: {
+                userId: venueVendor.userId,
+                weddingId: wedding.id,
+                type: "vendor_invite",
+                content: `Je bent gekoppeld als trouwlocatie aan het Dream Team van "${title}".`,
+                relatedType: "weddingVendor",
+                relatedId: weddingVendor.id,
+              },
+            });
+          }
+        }
+      } catch {
+        // koppeling mislukt: registratie mag gewoon doorgaan
+      }
+    }
 
     return NextResponse.json({ redirect: `/weddings/${wedding.id}` }, { status: 201 });
   }

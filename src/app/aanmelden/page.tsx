@@ -35,7 +35,7 @@ type StoredProgress = {
   authStep: AuthStep;
   pendingId: string;
   verifiedToken: string;
-  couple: { partner1: string; partner2: string; date: string; endDate: string; venue: string; guestCount: string; email: string };
+  couple: { partner1: string; partner2: string; date: string; endDate: string; venue: string; venueVendorId: string; guestCount: string; email: string };
   multiDay: boolean;
   vendor: { businessName: string; category: string; contactPerson: string; phone: string; website: string; city: string; email: string };
 };
@@ -76,7 +76,7 @@ function AanmeldenForm() {
   const [saving, setSaving] = useState(false);
 
   const [couple, setCouple] = useState(restored.couple ?? {
-    partner1: "", partner2: "", date: "", endDate: "", venue: "", guestCount: "", email: "",
+    partner1: "", partner2: "", date: "", endDate: "", venue: "", venueVendorId: "", guestCount: "", email: "",
   });
   const [multiDay, setMultiDay] = useState(restored.multiDay ?? false);
   const [vendor, setVendor] = useState(restored.vendor ?? {
@@ -484,7 +484,7 @@ function AanmeldenForm() {
                   <div ref={venueWrapRef} style={{ position: "relative" }}>
                     <input
                       value={couple.venue}
-                      onChange={e => { setCouple({ ...couple, venue: e.target.value }); setVenueOpen(true); }}
+                      onChange={e => { setCouple({ ...couple, venue: e.target.value, venueVendorId: "" }); setVenueOpen(true); }}
                       onFocus={() => setVenueOpen(true)}
                       placeholder={s.venuePlaceholder}
                       className="ddp-input"
@@ -497,7 +497,7 @@ function AanmeldenForm() {
                             key={v.id}
                             type="button"
                             className="ddp-suggest-row"
-                            onClick={() => { setCouple(c => ({ ...c, venue: v.city ? `${v.name}, ${v.city}` : v.name })); setVenueOpen(false); }}
+                            onClick={() => { setCouple(c => ({ ...c, venue: v.city ? `${v.name}, ${v.city}` : v.name, venueVendorId: v.id })); setVenueOpen(false); }}
                           >
                             <span style={{ fontWeight: 600 }}>{v.name}</span>
                             {v.city && <span style={{ color: "var(--muted)" }}>, {v.city}</span>}
