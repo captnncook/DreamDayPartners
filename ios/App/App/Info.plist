@@ -24,6 +24,14 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>DreamDay heeft toegang tot de camera nodig om foto's te maken voor documenten en inspiratiebeelden bij de bruiloft.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>DreamDay heeft toegang tot je foto's nodig om afbeeldingen en documenten te kunnen toevoegen aan de bruiloft.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>DreamDay wil foto's kunnen opslaan in je fotobibliotheek, bijvoorbeeld gedeelde beelden van de bruiloft.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
